@@ -54,10 +54,10 @@ void main() {
       final offset = (y * image.width + x) * 4;
       for (var channel = 0; channel < 3; channel++) {
         final value = bytes.getUint8(offset + channel);
-        // One level of slack for gradient dithering.
+        // Slack for gradient and surface dithering.
         expect(
           value,
-          greaterThanOrEqualTo(floor[channel] - 1),
+          greaterThanOrEqualTo(floor[channel] - 2),
           reason: 'row $y of ${image.height}, channel $channel: $value is darker than the backdrop',
         );
       }

@@ -38,5 +38,5 @@ mixin SearchInputFocusable {
 }
 
 mixin LibraryLoadable {
-  void loadLibraryByKey(String libraryGlobalKey);
+  void loadLibraryByKey(String libraryGlobalKey, {bool defaultToRecommended = false});
 }

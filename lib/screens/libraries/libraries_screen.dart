@@ -29,6 +29,7 @@ import '../../widgets/desktop_app_bar.dart';
 import '../../widgets/focusable_tab_chip.dart';
 import '../../widgets/library_management_sheet.dart';
 import '../../widgets/toolbar_scrim.dart';
+import '../../widgets/tv_spotlight_scaffold.dart';
 import '../../services/media_list_playback_launcher.dart';
 import '../../services/storage_service.dart';
 import '../../mixins/refreshable.dart';
@@ -419,10 +420,8 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   }
 
   /// Rebuild tab infrastructure when the visible tab set changes.
-  void _updateVisibleTabs(List<LibraryTabType> newTabs) {
+  void _updateVisibleTabs(List<LibraryTabType> newTabs, {bool defaultToRecommended = false}) {
     if (listEquals(_visibleTabs, newTabs)) return;
-
-    final currentTabType = _visibleTabs.length > tabController.index ? _visibleTabs[tabController.index] : null;
 
     for (final node in _tabFocusNodes) {
       node.dispose();
@@ -433,14 +432,14 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     _tabFocusNodes = List.generate(newTabs.length, (i) => FocusNode(debugLabel: 'tab_chip_${newTabs[i].name}'));
     initTabNavigation();
 
-    final newIndex = currentTabType != null ? newTabs.indexOf(currentTabType) : -1;
-    if (newIndex > 0) {
-      // Carrying the tab type over is not a user pick: it must neither focus
-      // nor save — the save would overwrite the destination library's saved
-      // tab before [_loadLibraryContent] restores it.
-      _isRestoringTab = true;
-      tabController.index = newIndex;
-      _isRestoringTab = false;
+    if (defaultToRecommended) {
+      final recommendedIndex = newTabs.indexOf(LibraryTabType.recommended);
+      final targetIndex = recommendedIndex >= 0 ? recommendedIndex : 0;
+      if (targetIndex > 0) {
+        _isRestoringTab = true;
+        tabController.index = targetIndex;
+        _isRestoringTab = false;
+      }
     }
   }
 
@@ -515,11 +514,11 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
   /// Public method to load a library by key (called from MainScreen side nav)
   @override
-  void loadLibraryByKey(String libraryGlobalKey) {
-    _loadLibraryContent(libraryGlobalKey);
+  void loadLibraryByKey(String libraryGlobalKey, {bool defaultToRecommended = false}) {
+    _loadLibraryContent(libraryGlobalKey, defaultToRecommended: defaultToRecommended);
   }
 
-  Future<void> _loadLibraryContent(String libraryGlobalKey) async {
+  Future<void> _loadLibraryContent(String libraryGlobalKey, {bool defaultToRecommended = false}) async {
     final librariesProvider = context.read<LibrariesProvider>();
     final allLibraries = librariesProvider.libraries;
 
@@ -532,7 +531,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
     // Update visible tabs and state in the same synchronous block so no
     // intermediate rebuild can see a mismatched controller/key pair.
-    _updateVisibleTabs(visibleLibraryTabs(selectedLibrary));
+    _updateVisibleTabs(visibleLibraryTabs(selectedLibrary), defaultToRecommended: defaultToRecommended);
 
     _updateState(() {
       _selectedLibraryGlobalKey = libraryGlobalKey;
@@ -557,11 +556,22 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     await storage.saveSelectedLibraryKey(libraryGlobalKey);
     if (!mounted || _selectedLibraryGlobalKey != libraryGlobalKey) return;
 
-    // Restore saved tab by name
-    final savedTabName = storage.getLibraryTab(libraryGlobalKey);
-    final savedType = LibraryTabType.values.where((t) => t.name == savedTabName).firstOrNull;
-    final targetTabIndex = savedType != null ? _visibleTabs.indexOf(savedType) : -1;
-    if (targetTabIndex >= 0 && targetTabIndex != tabController.index) {
+    // When clicking/switching a library with defaultToRecommended: true, always pick Recommended.
+    // Otherwise restore saved tab by name (e.g. cold start), or fallback to Recommended / first tab.
+    final recommendedIndex = _visibleTabs.indexOf(LibraryTabType.recommended);
+    int targetTabIndex;
+    if (defaultToRecommended && recommendedIndex >= 0) {
+      targetTabIndex = recommendedIndex;
+    } else {
+      final savedTabName = storage.getLibraryTab(libraryGlobalKey);
+      final savedType = LibraryTabType.values.where((t) => t.name == savedTabName).firstOrNull;
+      targetTabIndex = savedType != null
+          ? _visibleTabs.indexOf(savedType)
+          : (recommendedIndex >= 0 ? recommendedIndex : 0);
+      if (targetTabIndex < 0) targetTabIndex = 0;
+    }
+
+    if (targetTabIndex != tabController.index) {
       // Set flag to prevent _onTabChanged from triggering focus
       _isRestoringTab = true;
       // Use animateTo with zero duration for instant switch without animation race conditions
@@ -774,6 +784,12 @@ class _LibrariesScreenState extends State<LibrariesScreen>
                 onSelect: () {
                   final key = mainServerLibraries[i].globalKey;
                   if (key == _selectedLibraryGlobalKey) {
+                    final recIndex = _visibleTabs.indexOf(LibraryTabType.recommended);
+                    if (recIndex >= 0 && tabController.index != recIndex) {
+                      _isRestoringTab = true;
+                      tabController.index = recIndex;
+                      _isRestoringTab = false;
+                    }
                     _focusCurrentTab();
                     return;
                   }
@@ -781,7 +797,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
                   if (scope?.selectLibrary != null) {
                     scope!.selectLibrary!(key);
                   } else {
-                    unawaited(_loadLibraryContent(key));
+                    unawaited(_loadLibraryContent(key, defaultToRecommended: true));
                   }
                 },
                 onNavigateLeft: i > 0
@@ -1082,6 +1098,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       final tabs = TabBarView(
         key: ValueKey(_selectedLibraryGlobalKey),
         controller: tabController,
+        clipBehavior: useTvRecommendedBackdrop ? Clip.none : Clip.hardEdge,
         // Disable swipe on desktop/TV - trackpad and d-pad scroll actions can trigger accidental tab switches.
         // See: https://github.com/flutter/flutter/issues/11132
         physics: useSideNavigation ? const NeverScrollableScrollPhysics() : null,
@@ -1106,6 +1123,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
             NestedScrollView(
               controller: _outerScrollController,
               floatHeaderSlivers: true,
+              clipBehavior: useTvRecommendedBackdrop ? Clip.none : Clip.hardEdge,
               headerSliverBuilder: (context, innerBoxIsScrolled) => [
                 if (!useTvRecommendedBackdrop)
                   SliverOverlapAbsorber(
@@ -1147,7 +1165,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               body: tabs,
             ),
             if (useTvRecommendedBackdrop)
-              Positioned(top: 0, left: 0, right: 0, child: ExcludeFocusTraversal(child: buildTransparentTvTopBar())),
+              TvToolbarOverlay(child: buildTransparentTvTopBar()),
           ],
         ),
       );
@@ -1164,6 +1182,9 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       child: body,
     );
 
-    return Scaffold(body: scrollBody);
+    return Scaffold(
+      backgroundColor: useTvRecommendedBackdrop ? Colors.transparent : null,
+      body: scrollBody,
+    );
   }
 }

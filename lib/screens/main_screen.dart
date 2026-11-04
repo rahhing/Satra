@@ -1824,7 +1824,10 @@ class _MainScreenState extends State<MainScreen>
     // before applying the requested library and focus; neither action may drop.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      _onScreen<LibraryLoadable>(NavigationTabId.libraries, (screen) => screen.loadLibraryByKey(libraryGlobalKey));
+      _onScreen<LibraryLoadable>(
+        NavigationTabId.libraries,
+        (screen) => screen.loadLibraryByKey(libraryGlobalKey, defaultToRecommended: true),
+      );
       _onScreen<FocusableTab>(NavigationTabId.libraries, (screen) => screen.focusActiveTabIfReady());
     });
   }

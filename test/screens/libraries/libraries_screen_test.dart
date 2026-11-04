@@ -629,6 +629,81 @@ void main() {
     await tester.pump();
     expect(homeSelected, isTrue);
   });
+
+  testWidgets('clicking on a library defaults to Recommended even with a saved non-recommended tab', (tester) async {
+    final preferences = _GatedPreferences({
+      'selected_library_key': _libraryA.globalKey,
+      'library_tab_${_libraryA.globalKey}': LibraryTabType.recommended.name,
+      'library_tab_${_libraryB.globalKey}': LibraryTabType.browse.name,
+    });
+    final harness = await _Harness.create(preferences);
+    addTearDown(harness.dispose);
+
+    await harness.pump(tester);
+    expect(harness.controller(tester).index, LibraryTabType.recommended.index);
+
+    // Clicking / selecting Library B with defaultToRecommended: true must open Recommended
+    final loadable = tester.state(find.byType(LibrariesScreen)) as LibraryLoadable;
+    loadable.loadLibraryByKey(_libraryB.globalKey, defaultToRecommended: true);
+    await tester.pumpAndSettle();
+
+    expect(harness.controller(tester).index, LibraryTabType.recommended.index);
+  });
+
+  testWidgets('clicking the currently active library chip resets to Recommended', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    final harness = await _Harness.create(
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      libraryOrder: const [_libraryA, _libraryB],
+    );
+    addTearDown(harness.dispose);
+    final downloads = NoSyncRulesDownloadProvider();
+    addTearDown(downloads.dispose);
+
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<LibrariesProvider>.value(value: harness.libraries),
+          ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: harness.hiddenLibraries),
+          ChangeNotifierProvider<MultiServerProvider>.value(value: harness.multiServer),
+          ChangeNotifierProvider<DownloadProvider>.value(value: downloads),
+        ],
+        child: InputModeTracker(
+          child: MaterialApp(
+            theme: monoTheme(MonoPalette.dark),
+            home: OverlaySheetHost(
+              child: MainScreenFocusScope(
+                focusSidebar: () {},
+                sideNavigationWidth: 64,
+                selectHome: () {},
+                selectLibrary: (_) {},
+                child: const LibrariesScreen(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Switch to Browse tab
+    harness.controller(tester).index = LibraryTabType.browse.index;
+    await tester.pumpAndSettle();
+    expect(harness.controller(tester).index, LibraryTabType.browse.index);
+
+    // Click active library chip "Library A"
+    await tester.tap(find.text('Library A'));
+    await tester.pumpAndSettle();
+
+    // Must reset to Recommended!
+    expect(harness.controller(tester).index, LibraryTabType.recommended.index);
+  });
 }
 
 final class _Harness {
