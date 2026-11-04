@@ -42,13 +42,21 @@ class _WheelScrollState extends State<_WheelScroll> {
   double? _target;
   int _generation = 0;
 
+  ScrollPosition? _resolvePosition() {
+    final controller = widget.details.controller;
+    if (controller != null && controller.hasClients && controller.positions.length == 1) {
+      return controller.position;
+    }
+    return context.findAncestorStateOfType<ScrollableState>()?.position;
+  }
+
   void _onSignal(PointerSignalEvent signal) {
     if (signal is! PointerScrollEvent || signal.kind != PointerDeviceKind.mouse) return;
     if (AppMotion.duration(context) == Duration.zero) return;
-    final controller = widget.details.controller;
-    if (controller == null || !controller.hasClients || controller.positions.length != 1) return;
-    final position = controller.position;
-    if (!position.hasContentDimensions || !position.physics.shouldAcceptUserOffset(position)) return;
+    final position = _resolvePosition();
+    if (position == null || !position.hasContentDimensions || !position.physics.shouldAcceptUserOffset(position)) {
+      return;
+    }
     final axis = axisDirectionToAxis(widget.details.direction);
     final delta = HardwareKeyboard.instance.isShiftPressed
         ? (axis == Axis.vertical ? signal.scrollDelta.dx : signal.scrollDelta.dy)
@@ -61,7 +69,7 @@ class _WheelScrollState extends State<_WheelScroll> {
     final target = math.max(position.minScrollExtent, math.min(position.maxScrollExtent, origin + directedDelta));
     if (target == position.pixels) return;
     GestureBinding.instance.pointerSignalResolver.register(signal, (_) {
-      if (!mounted || !controller.hasClients || controller.position != position) return;
+      if (!mounted || !position.hasContentDimensions || _resolvePosition() != position) return;
       final generation = ++_generation;
       _target = target;
       signal.respond(allowPlatformDefault: false);

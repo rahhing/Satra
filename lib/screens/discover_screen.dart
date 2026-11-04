@@ -26,9 +26,14 @@ import '../widgets/hero_carousel_backdrop.dart';
 import '../widgets/optimized_media_image.dart' show ClearLogoImage, blurArtwork;
 import '../widgets/toolbar_scrim.dart';
 import '../widgets/system_clock.dart';
+import '../widgets/focusable_tab_chip.dart';
+import '../media/media_library.dart';
 import '../providers/discover_provider.dart';
+import '../providers/hidden_libraries_provider.dart';
+import '../providers/libraries_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../providers/watch_state_store.dart';
+import '../utils/library_grouping.dart';
 import '../widgets/hub_section.dart';
 import '../widgets/app_menu.dart';
 import '../widgets/clickable_cursor.dart';
@@ -124,9 +129,33 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   final _hubFocusMemory = HubFocusMemory();
 
   late FocusNode _heroFocusNode;
+  final FocusNode _homeChipFocusNode = FocusNode(debugLabel: 'discover_top_home_chip');
+  final Map<String, FocusNode> _libraryChipFocusNodes = {};
   final _actionBarKey = GlobalKey<FocusableActionBarState>();
   final _serverActivitiesButtonKey = GlobalKey<ServerActivitiesButtonState>();
   final _userMenuKey = GlobalKey<AppMenuButtonState<String>>();
+
+  FocusNode _focusNodeForLibraryChip(String globalKey) {
+    return _libraryChipFocusNodes.putIfAbsent(
+      globalKey,
+      () => FocusNode(debugLabel: 'discover_top_lib_$globalKey'),
+    );
+  }
+
+  List<MediaLibrary> _currentMainServerLibraries(BuildContext context, {required bool listen}) {
+    final librariesProvider = Provider.of<LibrariesProvider?>(context, listen: listen);
+    final hiddenLibrariesProvider = Provider.of<HiddenLibrariesProvider?>(context, listen: listen);
+    final multiServerProvider = Provider.of<MultiServerProvider?>(context, listen: false);
+    final allLibraries = librariesProvider?.libraries ?? const <MediaLibrary>[];
+    final hiddenKeys = hiddenLibrariesProvider?.hiddenLibraryKeys ?? const <String>{};
+    final visibleLibraries = allLibraries.where((lib) => !hiddenKeys.contains(lib.globalKey)).toList();
+    final preferredServerId = SettingsService.instanceOrNull?.read(SettingsService.mainServerId);
+    return resolveMainServerLibraries(
+      visibleLibraries,
+      orderedServerIds: multiServerProvider?.serverIds,
+      preferredServerId: preferredServerId,
+    );
+  }
 
   /// Backend-neutral hero client lookup. Returns the actual
   /// [MediaServerClient] for the item's server (Plex or Jellyfin) so
@@ -215,6 +244,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   void _focusTopActions() {
     if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
+    if (_homeChipFocusNode.context != null) {
+      _homeChipFocusNode.requestFocus();
+      return;
+    }
     final actionBar = _actionBarKey.currentState;
     if (actionBar != null) {
       actionBar.requestFocusOnFirst();
@@ -223,6 +256,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted || !(ModalRoute.of(context)?.isCurrent ?? false)) return;
+      if (_homeChipFocusNode.context != null) {
+        _homeChipFocusNode.requestFocus();
+        return;
+      }
       _actionBarKey.currentState?.requestFocusOnFirst();
     });
   }
@@ -475,6 +512,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _scrollController.dispose();
     _heroFocusNode.removeListener(_onHeroFocusChanged);
     _heroFocusNode.dispose();
+    _homeChipFocusNode.dispose();
+    for (final node in _libraryChipFocusNodes.values) {
+      node.dispose();
+    }
     super.dispose();
   }
 
@@ -803,12 +844,71 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     return ToolbarScrim(
       child: Row(
         children: [
-          if (!PlatformDetector.isTV())
-            Text(
-              t.discover.title,
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foregroundColor, fontWeight: .bold),
+          Expanded(
+            child: SettingValueBuilder<String?>(
+              pref: SettingsService.mainServerId,
+              builder: (context, _, _) {
+                final mainServerLibraries = _currentMainServerLibraries(context, listen: true);
+                final mainScope = MainScreenFocusScope.of(context, listen: false);
+                final showTopNav =
+                    PlatformDetector.isTV() ||
+                    mainServerLibraries.isNotEmpty ||
+                    mainScope?.selectLibrary != null ||
+                    mainScope?.selectHome != null;
+                if (!showTopNav) {
+                  return Align(
+                    alignment: AlignmentDirectional.centerStart,
+                    child: Text(
+                      t.discover.title,
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foregroundColor, fontWeight: .bold),
+                    ),
+                  );
+                }
+                return Align(
+                  alignment: AlignmentDirectional.centerStart,
+                  child: TabChipStrip(
+                    children: [
+                      FocusableTabChip(
+                        label: t.common.home,
+                        isSelected: true,
+                        focusNode: _homeChipFocusNode,
+                        onSelect: _focusContentFromAppBar,
+                        onNavigateLeft: _navigateToSidebar,
+                        onNavigateRight: mainServerLibraries.isNotEmpty
+                            ? () => _focusNodeForLibraryChip(mainServerLibraries.first.globalKey).requestFocus()
+                            : () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                        onNavigateDown: _focusContentFromAppBar,
+                        onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                        onBack: _navigateToSidebar,
+                      ),
+                      for (int i = 0; i < mainServerLibraries.length; i++) ...[
+                        const SizedBox(width: 8),
+                        FocusableTabChip(
+                          label: mainServerLibraries[i].title,
+                          isSelected: false,
+                          focusNode: _focusNodeForLibraryChip(mainServerLibraries[i].globalKey),
+                          onSelect: () => MainScreenFocusScope.of(
+                            context,
+                            listen: false,
+                          )?.selectLibrary?.call(mainServerLibraries[i].globalKey),
+                          onNavigateLeft: i > 0
+                              ? () => _focusNodeForLibraryChip(mainServerLibraries[i - 1].globalKey).requestFocus()
+                              : () => _homeChipFocusNode.requestFocus(),
+                          onNavigateRight: i < mainServerLibraries.length - 1
+                              ? () => _focusNodeForLibraryChip(mainServerLibraries[i + 1].globalKey).requestFocus()
+                              : () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                          onNavigateDown: _focusContentFromAppBar,
+                          onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                          onBack: _navigateToSidebar,
+                        ),
+                      ],
+                    ],
+                  ),
+                );
+              },
             ),
-          const Spacer(),
+          ),
+          const SizedBox(width: 12),
           // TV only: a fullscreen leanback app hides the system clock, while a
           // phone status bar and a desktop menu bar already show one.
           if (PlatformDetector.isTV()) ...[
@@ -832,7 +932,21 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
               return FocusableActionBar(
                 key: _actionBarKey,
-                onNavigateLeft: _navigateToSidebar,
+                onNavigateLeft: () {
+                  final libs = _currentMainServerLibraries(context, listen: false);
+                  if (libs.isNotEmpty) {
+                    final node = _focusNodeForLibraryChip(libs.last.globalKey);
+                    if (node.context != null) {
+                      node.requestFocus();
+                      return;
+                    }
+                  }
+                  if (_homeChipFocusNode.context != null) {
+                    _homeChipFocusNode.requestFocus();
+                    return;
+                  }
+                  _navigateToSidebar();
+                },
                 onNavigateDown: _focusContentFromAppBar,
                 actions: [
                   FocusableAction(icon: Symbols.refresh_rounded, iconColor: foregroundColor, onPressed: manualRefresh),
@@ -956,7 +1070,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final theme = Theme.of(context);
     final continueWatchingHub = _onDeck.isEmpty ? null : _continueWatchingHub;
     return Material(
-      color: Colors.transparent,
+      color: theme.scaffoldBackgroundColor,
       child: Stack(
         children: [
           CustomScrollView(

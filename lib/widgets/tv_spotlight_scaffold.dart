@@ -125,23 +125,29 @@ class TvSpotlightScaffold extends StatelessWidget {
                     behavior: HitTestBehavior.translucent,
                     onPointerSignal: (signal) {
                       if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
-                        _findDescendantBrowseRail(context)?.scrollVerticallyBy(signal.scrollDelta.dy);
+                        GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
+                          if (event is PointerScrollEvent) {
+                            _findDescendantBrowseRail(context)?.stepHubByScroll(event.scrollDelta.dy);
+                          }
+                        });
                       }
                     },
-                    child: ValueListenableBuilder<MediaItem?>(
-                      valueListenable: spotlightListenable,
-                      builder: (context, _, _) {
-                        final spotlight = resolveSpotlight();
-                        return _CatalogSpotlightBackground(
-                          item: spotlight,
-                          client: resolveClient(spotlight),
-                          hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
-                          contentTop: spotlightTop,
-                          contentBottom: spotlightBottom,
-                          contentLeft: spotlightLeft + foregroundLeft,
-                          targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
-                        );
-                      },
+                    child: RepaintBoundary(
+                      child: ValueListenableBuilder<MediaItem?>(
+                        valueListenable: spotlightListenable,
+                        builder: (context, _, _) {
+                          final spotlight = resolveSpotlight();
+                          return _CatalogSpotlightBackground(
+                            item: spotlight,
+                            client: resolveClient(spotlight),
+                            hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
+                            contentTop: spotlightTop,
+                            contentBottom: spotlightBottom,
+                            contentLeft: spotlightLeft + foregroundLeft,
+                            targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
+                          );
+                        },
+                      ),
                     ),
                   ),
                   builder: (context, animatedBleed, child) =>

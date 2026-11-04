@@ -3355,6 +3355,91 @@ void main() {
     expect(verticalPos.pixels, greaterThan(80));
     expect(lastActiveHub?.id, 'hub_2');
   });
+
+  testWidgets('mouse wheel scroll cycles one row at a time with 0.25s delay and aligns row to top', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 720);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final serverManager = MultiServerManager();
+    final multiServerProvider = testMultiServerProvider(serverManager);
+    addTearDown(multiServerProvider.dispose);
+
+    MediaHub buildHub(int hubIdx) => MediaHub(
+      id: 'hub_$hubIdx',
+      title: 'Hub $hubIdx',
+      type: 'movie',
+      items: [
+        for (var i = 0; i < 4; i++)
+          testMediaItem(
+            id: 'movie_${hubIdx}_$i',
+            backend: MediaBackend.plex,
+            kind: MediaKind.movie,
+            title: 'Movie $hubIdx-$i',
+          ),
+      ],
+      size: 4,
+    );
+
+    final hubs = [buildHub(0), buildHub(1), buildHub(2)];
+    MediaHub? lastActiveHub;
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<MultiServerProvider>.value(
+        value: multiServerProvider,
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: Scaffold(
+            body: SizedBox(
+              width: 1280,
+              height: 720,
+              child: TvBrowseRail(
+                focusMemory: focusMemory,
+                hubs: hubs,
+                autofocus: true,
+                iconForHub: (_, _) => Icons.movie_rounded,
+                onActiveHubChanged: (hub, _) => lastActiveHub = hub,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final railCenter = tester.getCenter(find.byType(TvBrowseRail));
+    final verticalPos = _verticalRailPosition(tester);
+    expect(verticalPos.pixels, 0);
+
+    // First wheel scroll down steps cleanly to hub_1.
+    final pointer = TestPointer(1, PointerDeviceKind.mouse);
+    await tester.sendEventToBinding(pointer.hover(railCenter));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+    await tester.pump();
+    expect(lastActiveHub?.id, 'hub_1');
+
+    // A second scroll within 0.25s (e.g. 100ms later) is ignored by the cooldown.
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+    await tester.pump();
+    expect(lastActiveHub?.id, 'hub_1');
+
+    // After 0.25s total has elapsed, the next scroll down advances to hub_2.
+    await tester.pump(const Duration(milliseconds: 160));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, 120)));
+    await tester.pumpAndSettle();
+    expect(lastActiveHub?.id, 'hub_2');
+
+    // Scrolling up after 0.25s steps back to hub_1 and aligns its header at the top of the rail.
+    await tester.pump(const Duration(milliseconds: 260));
+    await tester.sendEventToBinding(pointer.scroll(const Offset(0, -120)));
+    await tester.pumpAndSettle();
+    expect(lastActiveHub?.id, 'hub_1');
+    final railTop = tester.getTopLeft(find.byKey(const ValueKey('tv_browse_rail_vertical'))).dy;
+    final hub1HeaderTop = tester.getTopLeft(find.text('Hub 1')).dy;
+    expect(hub1HeaderTop, greaterThanOrEqualTo(railTop));
+  });
 }
 
 ScrollPosition _activeRailPosition(WidgetTester tester) {

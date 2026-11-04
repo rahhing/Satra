@@ -26,7 +26,6 @@ import '../theme/mono_tokens.dart';
 import '../utils/layout_constants.dart';
 import '../utils/media_image_helper.dart';
 import '../utils/media_navigation_helper.dart';
-import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
 import 'animated_dim_scrim.dart';
 import 'app_icon.dart';
@@ -487,6 +486,8 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   bool _isUserVerticalScrollActive = false;
   double? _wheelScrollTarget;
   int _wheelScrollGeneration = 0;
+  static const Duration wheelRowStepDelay = Duration(milliseconds: 250);
+  Timer? _wheelRowStepCooldownTimer;
 
   /// Hub key whose leading slot took focus only because the hub had no items
   /// yet (the clamp in [_moveHub]); when items arrive, focus advances to the
@@ -700,6 +701,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
 
   @override
   void dispose() {
+    _wheelRowStepCooldownTimer?.cancel();
     _selectLongPress.dispose();
     _focusNode.removeListener(_handleFocusChange);
     _focusNode.dispose();
@@ -1062,6 +1064,27 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     _notifyActiveHubChanged();
   }
 
+  /// Steps the active hub row up or down by one row on mouse wheel / trackpad
+  /// scroll, enforcing a 0.25s ([wheelRowStepDelay]) cooldown between steps so
+  /// each scroll cycles cleanly to the next row without cutting off the top of
+  /// the row's header/pills.
+  bool stepHubByScroll(double dy) {
+    if (dy == 0 || widget.hubs.isEmpty) return false;
+    if (_wheelRowStepCooldownTimer?.isActive ?? false) return false;
+    final delta = dy > 0 ? 1 : -1;
+    final next = (_hubIndex + delta).clamp(0, widget.hubs.length - 1);
+    if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
+      _focusNode.requestFocus();
+    }
+    if (next == _hubIndex) {
+      _alignActiveHubToTop(animate: true);
+      return false;
+    }
+    _wheelRowStepCooldownTimer = Timer(wheelRowStepDelay, () {});
+    _moveHub(delta);
+    return true;
+  }
+
   /// Scrolls the vertical hub list by [dy] (e.g. when wheel-scrolling over
   /// the upper spotlight backdrop).
   void scrollVerticallyBy(double dy) {
@@ -1098,10 +1121,14 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     if (hubIndex < 0 || hubIndex >= widget.hubs.length || _itemAtSlot(hub, index) == null) {
       return;
     }
+    if (_focusModel.verticalScrollActive) return;
+    final hubChanged = _hubIndex != hubIndex;
+    if (hubChanged && !_isUserVerticalScrollActive) {
+      return;
+    }
     if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
       _focusNode.requestFocus();
     }
-    final hubChanged = _hubIndex != hubIndex;
     if (!hubChanged && _itemIndex == index) {
       return;
     }
@@ -1508,29 +1535,19 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     required double bottomPadding,
   }) {
     return Listener(
-      onPointerDown: (_) {
-        _wheelScrollGeneration++;
-        _wheelScrollTarget = null;
-        _isUserVerticalScrollActive = true;
-        _hasUserInteracted = true;
-        _hasUserChangedHub = true;
-      },
       onPointerSignal: (signal) {
         if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0 && !HardwareKeyboard.instance.isShiftPressed) {
-          _isUserVerticalScrollActive = true;
-          _hasUserInteracted = true;
-          _hasUserChangedHub = true;
-          if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
-            _focusNode.requestFocus();
-          }
+          GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
+            if (event is PointerScrollEvent) {
+              stepHubByScroll(event.scrollDelta.dy);
+            }
+          });
         }
       },
       child: ListView.builder(
         key: const ValueKey('tv_browse_rail_vertical'),
         controller: _verticalController,
-        physics: PlatformDetector.isAppleTV()
-            ? const NeverScrollableScrollPhysics()
-            : const ClampingScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         // Inert on media lists (no keep-alive clients): dropping the per-child
         // wrappers shrinks build + semantics work per item.
         addAutomaticKeepAlives: false,

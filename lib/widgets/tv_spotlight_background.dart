@@ -115,34 +115,36 @@ class TvSpotlightBackground extends StatelessWidget {
                 bottom: contentBottom,
                 // The info block still cross-fades via AnimatedSwitcher, but its
                 // saveLayers are bounded to the text region, not the screen.
-                child: AnimatedSwitcher(
-                  duration: DevicePerformance.reducedDuration(const Duration(milliseconds: 280)),
-                  switchInCurve: Curves.easeOutCubic,
-                  switchOutCurve: Curves.easeOutCubic,
-                  // Expand instead of the default loose centered Stack so the
-                  // info keeps filling the region and bottom-left aligning.
-                  layoutBuilder: (currentChild, previousChildren) =>
-                      Stack(fit: StackFit.expand, children: [...previousChildren, ?currentChild]),
-                  child: KeyedSubtree(
-                    key: ValueKey(media.globalKey),
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        if (!constraints.hasBoundedHeight || constraints.maxHeight <= 0 || constraints.maxWidth <= 0) {
-                          return Align(alignment: .bottomLeft, child: _buildInfo(context, media, constraints.maxWidth));
-                        }
+                child: RepaintBoundary(
+                  child: AnimatedSwitcher(
+                    duration: DevicePerformance.reducedDuration(const Duration(milliseconds: 280)),
+                    switchInCurve: Curves.easeOutCubic,
+                    switchOutCurve: Curves.easeOutCubic,
+                    // Expand instead of the default loose centered Stack so the
+                    // info keeps filling the region and bottom-left aligning.
+                    layoutBuilder: (currentChild, previousChildren) =>
+                        Stack(fit: StackFit.expand, children: [...previousChildren, ?currentChild]),
+                    child: KeyedSubtree(
+                      key: ValueKey(media.globalKey),
+                      child: LayoutBuilder(
+                        builder: (context, constraints) {
+                          if (!constraints.hasBoundedHeight || constraints.maxHeight <= 0 || constraints.maxWidth <= 0) {
+                            return Align(alignment: .bottomLeft, child: _buildInfo(context, media, constraints.maxWidth));
+                          }
 
-                        return Align(
-                          alignment: .bottomLeft,
-                          child: FittedBox(
-                            fit: BoxFit.scaleDown,
+                          return Align(
                             alignment: .bottomLeft,
-                            child: SizedBox(
-                              width: constraints.maxWidth,
-                              child: _buildInfo(context, media, constraints.maxWidth),
+                            child: FittedBox(
+                              fit: BoxFit.scaleDown,
+                              alignment: .bottomLeft,
+                              child: SizedBox(
+                                width: constraints.maxWidth,
+                                child: _buildInfo(context, media, constraints.maxWidth),
+                              ),
                             ),
-                          ),
-                        );
-                      },
+                          );
+                        },
+                      ),
                     ),
                   ),
                 ),

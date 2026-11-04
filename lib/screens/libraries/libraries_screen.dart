@@ -20,12 +20,15 @@ import '../../providers/multi_server_provider.dart';
 import '../../services/settings_service.dart';
 import '../../widgets/settings_builder.dart';
 import '../../utils/app_logger.dart';
+import '../../utils/library_grouping.dart';
 import '../../utils/platform_detector.dart';
 import '../../utils/content_utils.dart';
+import '../../navigation/main_screen_scope.dart';
 import '../../widgets/app_menu.dart';
 import '../../widgets/desktop_app_bar.dart';
 import '../../widgets/focusable_tab_chip.dart';
 import '../../widgets/library_management_sheet.dart';
+import '../../widgets/toolbar_scrim.dart';
 import '../../services/media_list_playback_launcher.dart';
 import '../../services/storage_service.dart';
 import '../../mixins/refreshable.dart';
@@ -99,6 +102,15 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     LibraryTabType.values.length,
     (i) => FocusNode(debugLabel: 'tab_chip_${LibraryTabType.values[i].name}'),
   );
+  final FocusNode _homeChipFocusNode = FocusNode(debugLabel: 'libraries_top_home_chip');
+  final Map<String, FocusNode> _libraryChipFocusNodes = {};
+
+  FocusNode _focusNodeForLibraryChip(String globalKey) {
+    return _libraryChipFocusNodes.putIfAbsent(
+      globalKey,
+      () => FocusNode(debugLabel: 'libraries_top_lib_$globalKey'),
+    );
+  }
 
   @override
   List<FocusNode> get tabChipFocusNodes => _tabFocusNodes;
@@ -391,6 +403,10 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   void dispose() {
     _outerScrollController.dispose();
     for (final node in _tabFocusNodes) {
+      node.dispose();
+    }
+    _homeChipFocusNode.dispose();
+    for (final node in _libraryChipFocusNodes.values) {
       node.dispose();
     }
     disposeTabNavigation();
@@ -715,26 +731,100 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     List<MediaLibrary> visibleLibraries,
     MediaLibrary? selectedLibrary, {
     required bool groupByServer,
+    required List<MediaLibrary> mainServerLibraries,
   }) {
+    final mainScope = MainScreenFocusScope.of(context, listen: false);
+    final showTopLevelNav =
+        PlatformDetector.shouldUseSideNavigation(context) &&
+        (mainScope?.selectHome != null || mainScope?.selectLibrary != null);
+    final hasLibraryTabs = _selectedLibraryGlobalKey != null && _visibleTabs.isNotEmpty && selectedLibrary != null;
+
     // No selection at all, or visible list is empty AND we're not browsing a hidden library
-    if (_selectedLibraryGlobalKey == null || (visibleLibraries.isEmpty && selectedLibrary == null)) {
+    if (!showTopLevelNav &&
+        (_selectedLibraryGlobalKey == null || (visibleLibraries.isEmpty && selectedLibrary == null))) {
       return Text(t.libraries.title);
     }
 
-    // On desktop/TV with side nav, show tabs in app bar (library name is in side nav)
+    // On desktop/TV with side nav, show Home + main server libraries + tabs in app bar
     if (PlatformDetector.shouldUseSideNavigation(context)) {
       return TabChipStrip(
         children: [
-          for (int i = 0; i < _visibleTabs.length; i++) ...[
-            if (i > 0) const SizedBox(width: 8),
-            buildTabChip(
-              _getTabLabel(_visibleTabs[i]),
-              i,
-              onSelectWhenActive: _focusCurrentTab,
+          if (showTopLevelNav) ...[
+            FocusableTabChip(
+              label: t.common.home,
+              isSelected: false,
+              focusNode: _homeChipFocusNode,
+              onSelect: () => MainScreenFocusScope.of(context, listen: false)?.selectHome?.call(),
+              onNavigateLeft: onTabBarBack,
+              onNavigateRight: mainServerLibraries.isNotEmpty
+                  ? () => _focusNodeForLibraryChip(mainServerLibraries.first.globalKey).requestFocus()
+                  : (hasLibraryTabs
+                        ? () => getTabChipFocusNode(0).requestFocus()
+                        : () => _actionBarKey.currentState?.requestFocusOnFirst()),
               onNavigateDown: _focusCurrentTabFromTabBar,
-              onNavigateToActions: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+              onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+              onBack: onTabBarBack,
             ),
+            for (int i = 0; i < mainServerLibraries.length; i++) ...[
+              const SizedBox(width: 8),
+              FocusableTabChip(
+                label: mainServerLibraries[i].title,
+                isSelected: mainServerLibraries[i].globalKey == _selectedLibraryGlobalKey,
+                focusNode: _focusNodeForLibraryChip(mainServerLibraries[i].globalKey),
+                onSelect: () {
+                  final key = mainServerLibraries[i].globalKey;
+                  if (key == _selectedLibraryGlobalKey) {
+                    _focusCurrentTab();
+                    return;
+                  }
+                  final scope = MainScreenFocusScope.of(context, listen: false);
+                  if (scope?.selectLibrary != null) {
+                    scope!.selectLibrary!(key);
+                  } else {
+                    unawaited(_loadLibraryContent(key));
+                  }
+                },
+                onNavigateLeft: i > 0
+                    ? () => _focusNodeForLibraryChip(mainServerLibraries[i - 1].globalKey).requestFocus()
+                    : () => _homeChipFocusNode.requestFocus(),
+                onNavigateRight: i < mainServerLibraries.length - 1
+                    ? () => _focusNodeForLibraryChip(mainServerLibraries[i + 1].globalKey).requestFocus()
+                    : (hasLibraryTabs
+                          ? () => getTabChipFocusNode(0).requestFocus()
+                          : () => _actionBarKey.currentState?.requestFocusOnFirst()),
+                onNavigateDown: _focusCurrentTabFromTabBar,
+                onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                onBack: onTabBarBack,
+              ),
+            ],
+            if (hasLibraryTabs)
+              Container(
+                width: 1,
+                height: 20,
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+              ),
           ],
+          if (hasLibraryTabs)
+            for (int i = 0; i < _visibleTabs.length; i++) ...[
+              if (i > 0) const SizedBox(width: 8),
+              buildTabChip(
+                _getTabLabel(_visibleTabs[i]),
+                i,
+                onSelectWhenActive: _focusCurrentTab,
+                onNavigateDown: _focusCurrentTabFromTabBar,
+                onNavigateToActions: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                onNavigateLeftFromFirst: showTopLevelNav
+                    ? () {
+                        if (mainServerLibraries.isNotEmpty) {
+                          _focusNodeForLibraryChip(mainServerLibraries.last.globalKey).requestFocus();
+                        } else {
+                          _homeChipFocusNode.requestFocus();
+                        }
+                      }
+                    : null,
+              ),
+            ],
         ],
       );
     }
@@ -793,11 +883,15 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   Widget build(BuildContext context) {
     return SettingValueBuilder<bool>(
       pref: SettingsService.groupLibrariesByServer,
-      builder: (context, groupByServerSetting, _) => _buildContent(context, groupByServerSetting),
+      builder: (context, groupByServerSetting, _) => SettingValueBuilder<String?>(
+        pref: SettingsService.mainServerId,
+        builder: (context, preferredServerId, _) =>
+            _buildContent(context, groupByServerSetting, preferredServerId: preferredServerId),
+      ),
     );
   }
 
-  Widget _buildContent(BuildContext context, bool groupByServerSetting) {
+  Widget _buildContent(BuildContext context, bool groupByServerSetting, {String? preferredServerId}) {
     final librariesProvider = context.watch<LibrariesProvider>();
     final allLibraries = librariesProvider.libraries;
     final isLoadingLibraries = librariesProvider.isLoading;
@@ -809,6 +903,11 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
     // Compute visible libraries (filtered from all libraries)
     final visibleLibraries = allLibraries.where((lib) => !hiddenKeys.contains(lib.globalKey)).toList();
+    final mainServerLibraries = resolveMainServerLibraries(
+      visibleLibraries,
+      orderedServerIds: Provider.of<MultiServerProvider?>(context, listen: false)?.serverIds,
+      preferredServerId: preferredServerId,
+    );
 
     // Resolve selected library defensively — may be null if server temporarily dropped during refresh
     final selectedLibrary = _selectedLibraryGlobalKey != null
@@ -878,7 +977,12 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     ];
 
     Widget appBar({required bool floating}) => DesktopSliverAppBar(
-      title: _buildAppBarTitle(visibleLibraries, selectedLibrary, groupByServer: groupByServerSetting),
+      title: _buildAppBarTitle(
+        visibleLibraries,
+        selectedLibrary,
+        groupByServer: groupByServerSetting,
+        mainServerLibraries: mainServerLibraries,
+      ),
       // When showing the tab content, let the app bar float away with the
       // content. Otherwise (loading / empty / error states) keep it pinned so
       // it stays visible over the centered state widget.
@@ -910,17 +1014,21 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     }
 
     Widget buildTransparentTvTopBar() {
-      return SafeArea(
-        bottom: false,
-        child: AppBar(
-          primary: false,
-          backgroundColor: Colors.transparent,
-          surfaceTintColor: Colors.transparent,
-          shadowColor: Colors.transparent,
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          title: _buildAppBarTitle(visibleLibraries, selectedLibrary, groupByServer: groupByServerSetting),
-          actions: [
+      return ToolbarScrim(
+        child: Row(
+          children: [
+            Expanded(
+              child: Align(
+                alignment: AlignmentDirectional.centerStart,
+                child: _buildAppBarTitle(
+                  visibleLibraries,
+                  selectedLibrary,
+                  groupByServer: groupByServerSetting,
+                  mainServerLibraries: mainServerLibraries,
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
             FocusableActionBar(
               key: _actionBarKey,
               onNavigateLeft: () => getTabChipFocusNode(_visibleTabs.length - 1).requestFocus(),
@@ -1056,6 +1164,6 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       child: body,
     );
 
-    return Scaffold(backgroundColor: Colors.transparent, body: scrollBody);
+    return Scaffold(body: scrollBody);
   }
 }

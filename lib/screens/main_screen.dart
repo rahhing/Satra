@@ -68,7 +68,6 @@ import '../widgets/vertical_bar_shell.dart';
 import '../widgets/side_navigation_rail.dart';
 import '../widgets/glass_surface.dart';
 import '../widgets/retained_tab_view.dart';
-import '../widgets/artwork_atmosphere.dart';
 import '../focus/covered_route_focus_boundary.dart';
 import '../focus/dpad_navigator.dart';
 import '../focus/key_event_utils.dart';
@@ -2029,10 +2028,7 @@ class _MainScreenState extends State<MainScreen>
     // covers this route without unmounting it. Every focus self-heal below
     // (offline sidebar refocus, library reload, tab claims) is dropped while
     // covered, and focus returns to where it was when the cover pops (#2915).
-    return ArtworkAtmosphereHost(
-      allowNetwork: !_isOffline,
-      child: CoveredRouteFocusBoundary(child: _buildContent(context, useSideNav)),
-    );
+    return CoveredRouteFocusBoundary(child: _buildContent(context, useSideNav));
   }
 
   Widget _buildContent(BuildContext context, bool useSideNav) {
@@ -2088,12 +2084,13 @@ class _MainScreenState extends State<MainScreen>
                     foregroundWidth: contentLayout.width,
                     viewportWidth: viewportWidth,
                     selectLibrary: _selectLibrary,
+                    selectHome: () => _selectTab(NavigationTabId.discover),
                     openSettings: _openSettings,
                     child: SideNavigationScope(
                       child: Stack(
                         clipBehavior: Clip.hardEdge,
                         children: [
-                          const Positioned.fill(child: ColoredBox(color: Colors.transparent)),
+                          Positioned.fill(child: ColoredBox(color: Theme.of(context).scaffoldBackgroundColor)),
                           Positioned(
                             top: 0,
                             bottom: 0,

@@ -387,7 +387,6 @@ class ExploreScreenState extends State<ExploreScreen>
     }
 
     return Scaffold(
-      backgroundColor: Colors.transparent,
       // Horizontal-only SafeArea, as on Search: the field, shelves, and
       // results clear a landscape notch or iPhone Duo's portrait sensor column.
       body: RefreshIndicator(

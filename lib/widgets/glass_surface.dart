@@ -1,11 +1,10 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import '../theme/app_motion.dart';
 
-/// A bounded frosted pane. Blur is reserved for chrome, never repeated in grids.
-/// Reduced-effects and high-contrast users get an opaque, readable surface.
+/// A bounded frosted pane. Uses a crisp translucent surface with subtle
+/// specular border and gradient highlight without per-frame GPU texture
+/// readback blurs that drop frames during scrolling and crossfades.
 class GlassSurface extends StatelessWidget {
   const GlassSurface({
     super.key,
@@ -32,10 +31,11 @@ class GlassSurface extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     final effects = AppMotion.effectsEnabled(context);
     final surface = tint ?? scheme.surface;
+    final effectiveAlpha = effects ? (opacity < 0.88 ? (opacity + 0.14).clamp(0.0, 0.96) : opacity) : 1.0;
     final pane = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
-        color: surface.withValues(alpha: effects ? opacity : 1),
+        color: surface.withValues(alpha: effectiveAlpha),
         border: border
             ? Border.all(color: Colors.white.withValues(alpha: scheme.brightness == Brightness.dark ? 0.10 : 0.8))
             : null,
@@ -51,12 +51,7 @@ class GlassSurface extends StatelessWidget {
     );
     return ClipRRect(
       borderRadius: borderRadius,
-      child: effects && opacity < 1
-          ? BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: sigma, sigmaY: sigma),
-              child: pane,
-            )
-          : pane,
+      child: pane,
     );
   }
 }

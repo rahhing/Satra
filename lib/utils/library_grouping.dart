@@ -18,3 +18,42 @@ LibraryServerGroups groupLibrariesByFirstAppearance(List<MediaLibrary> libraries
   }
   return (serverOrder: order, byServer: byServer);
 }
+
+/// Returns the visible libraries belonging to the "main" server.
+///
+/// Defaults to the first server group with visible libraries (matching the
+/// first server added / first server group in the sidebar), or
+/// [preferredServerId] if configured and present.
+List<MediaLibrary> resolveMainServerLibraries(
+  List<MediaLibrary> visibleLibraries, {
+  Iterable<String>? orderedServerIds,
+  String? preferredServerId,
+}) {
+  if (visibleLibraries.isEmpty) return const [];
+  final grouped = groupLibrariesByFirstAppearance(visibleLibraries);
+  if (grouped.serverOrder.isEmpty) return const [];
+
+  if (preferredServerId != null && preferredServerId.isNotEmpty) {
+    final preferred = grouped.byServer[preferredServerId];
+    if (preferred != null && preferred.isNotEmpty) {
+      return preferred;
+    }
+  }
+
+  final firstGroupKey = grouped.serverOrder.first;
+  if (firstGroupKey.isNotEmpty) {
+    return grouped.byServer[firstGroupKey] ?? const [];
+  }
+
+  if (orderedServerIds != null) {
+    for (final serverId in orderedServerIds) {
+      final bucket = grouped.byServer[serverId];
+      if (bucket != null && bucket.isNotEmpty) {
+        return bucket;
+      }
+    }
+  }
+
+  return grouped.byServer[firstGroupKey] ?? const [];
+}
+

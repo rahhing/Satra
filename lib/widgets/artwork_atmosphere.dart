@@ -86,13 +86,15 @@ class _ArtworkAtmosphereHostState extends State<ArtworkAtmosphereHost> {
         Positioned.fill(
           child: IgnorePointer(
             child: ExcludeSemantics(
-              child: ValueListenableBuilder<MediaItem?>(
-                valueListenable: _controller,
-                builder: (context, item, _) => SettingValueBuilder<bool>(
-                  pref: SettingsService.hideSpoilers,
-                  builder: (context, hideSpoilers, _) => ArtworkAtmosphere(
-                    item: hideSpoilers && (item?.shouldHideSpoiler ?? false) ? null : item,
-                    allowNetwork: widget.allowNetwork,
+              child: RepaintBoundary(
+                child: ValueListenableBuilder<MediaItem?>(
+                  valueListenable: _controller,
+                  builder: (context, item, _) => SettingValueBuilder<bool>(
+                    pref: SettingsService.hideSpoilers,
+                    builder: (context, hideSpoilers, _) => ArtworkAtmosphere(
+                      item: hideSpoilers && (item?.shouldHideSpoiler ?? false) ? null : item,
+                      allowNetwork: widget.allowNetwork,
+                    ),
                   ),
                 ),
               ),

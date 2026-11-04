@@ -22,6 +22,7 @@ import 'package:plezy/media/media_sort.dart';
 import 'package:plezy/media/server_capabilities.dart';
 import 'package:plezy/mixins/refreshable.dart';
 import 'package:plezy/mixins/tab_visibility_aware.dart';
+import 'package:plezy/navigation/main_screen_scope.dart';
 import 'package:plezy/providers/discover_provider.dart';
 import 'package:plezy/providers/download_provider.dart';
 import 'package:plezy/providers/hidden_libraries_provider.dart';
@@ -561,6 +562,72 @@ void main() {
     await tester.pumpAndSettle();
     expect(client.libraryHubCalls, hubCalls + 1, reason: 'activation consumes the push-marked library epoch');
     expect(_rowState(tester, 'B').widget.hub.items.map((item) => item.id), ['B-0', 'B-1']);
+  });
+
+  testWidgets('top bar renders Home and main server libraries when hosted in MainScreenFocusScope', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    LocaleSettings.setLocaleSync(AppLocale.en);
+    const secondServerLib = MediaLibrary(
+      id: 'other',
+      backend: MediaBackend.plex,
+      title: 'Other Server Library',
+      kind: MediaKind.movie,
+      serverId: 'server-2',
+    );
+    final harness = await _Harness.create(
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      libraryOrder: const [_libraryA, _libraryB, secondServerLib],
+    );
+    addTearDown(harness.dispose);
+    final downloads = NoSyncRulesDownloadProvider();
+    addTearDown(downloads.dispose);
+
+    var homeSelected = false;
+    String? librarySelectedFromTopBar;
+
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<LibrariesProvider>.value(value: harness.libraries),
+          ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: harness.hiddenLibraries),
+          ChangeNotifierProvider<MultiServerProvider>.value(value: harness.multiServer),
+          ChangeNotifierProvider<DownloadProvider>.value(value: downloads),
+        ],
+        child: InputModeTracker(
+          child: MaterialApp(
+            theme: monoTheme(MonoPalette.dark),
+            home: OverlaySheetHost(
+              child: MainScreenFocusScope(
+                focusSidebar: () {},
+                sideNavigationWidth: 64,
+                selectHome: () => homeSelected = true,
+                selectLibrary: (key) => librarySelectedFromTopBar = key,
+                child: const LibrariesScreen(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.text(t.common.home), findsOneWidget);
+    expect(find.text('Library A'), findsOneWidget);
+    expect(find.text('Library B'), findsOneWidget);
+    expect(find.text('Other Server Library'), findsNothing);
+
+    await tester.tap(find.text('Library B'));
+    await tester.pump();
+    expect(librarySelectedFromTopBar, _libraryB.globalKey);
+
+    await tester.tap(find.text(t.common.home));
+    await tester.pump();
+    expect(homeSelected, isTrue);
   });
 }
 

@@ -753,6 +753,116 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('top bar displays Home and the main server libraries, selecting a library on tap', (tester) async {
+    final settings = await SettingsService.getInstance();
+    await settings.write(SettingsService.mainServerId, null);
+
+    const mainMovies = MediaLibrary(
+      id: '1',
+      backend: MediaBackend.plex,
+      title: 'Movies',
+      kind: MediaKind.movie,
+      serverId: 'server_main',
+      serverName: 'home',
+    );
+    const mainShows = MediaLibrary(
+      id: '2',
+      backend: MediaBackend.plex,
+      title: 'TV Shows',
+      kind: MediaKind.show,
+      serverId: 'server_main',
+      serverName: 'home',
+    );
+    const secondServerLib = MediaLibrary(
+      id: '3',
+      backend: MediaBackend.plex,
+      title: 'Secondary Movies',
+      kind: MediaKind.movie,
+      serverId: 'server_secondary',
+      serverName: 'homeserver',
+    );
+
+    final librariesProvider = LibrariesProvider();
+    await librariesProvider.updateLibraryOrder(const [mainMovies, mainShows, secondServerLib]);
+    final hiddenLibrariesProvider = HiddenLibrariesProvider();
+    await hiddenLibrariesProvider.ensureInitialized();
+
+    final client = _FakeMediaServerClient(hubs: const []);
+    final manager = MultiServerManager()..debugRegisterClientForTesting(client);
+    final multiServerProvider = testMultiServerProvider(manager);
+    final watchTogetherProvider = WatchTogetherProvider();
+    final companionRemoteProvider = CompanionRemoteProvider();
+
+    final db = AppDatabase.forTesting(NativeDatabase.memory());
+    addTearDown(db.close);
+    final profileRegistry = _FakeProfileRegistry(db);
+    final connectionRegistry = _FakeConnectionRegistry(db);
+    final profileConnectionRegistry = _FakeProfileConnectionRegistry(db);
+    final storage = await StorageService.getInstance();
+    final plexHome = PlexHomeService(
+      connections: connectionRegistry,
+      profileConnections: profileConnectionRegistry,
+      storage: storage,
+      plexHomeUserFetcher: (_) async => const [],
+    );
+    final activeProfileProvider = ActiveProfileProvider(
+      registry: profileRegistry,
+      plexHome: plexHome,
+      connections: connectionRegistry,
+      profileConnections: profileConnectionRegistry,
+      storage: storage,
+    );
+    final discoverProvider = DiscoverProvider(
+      multiServerProvider,
+      hiddenLibrariesProvider,
+      librariesProvider,
+      profileId: 'p1',
+      isProfileBinding: () => false,
+      syncSystemShelf: (_, _) async {},
+    );
+
+    String? selectedLibraryKey;
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<MultiServerProvider>.value(value: multiServerProvider),
+            ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: hiddenLibrariesProvider),
+            ChangeNotifierProvider<LibrariesProvider>.value(value: librariesProvider),
+            ChangeNotifierProvider<WatchTogetherProvider>.value(value: watchTogetherProvider),
+            ChangeNotifierProvider<CompanionRemoteProvider>.value(value: companionRemoteProvider),
+            ChangeNotifierProvider<ActiveProfileProvider>.value(value: activeProfileProvider),
+            ChangeNotifierProvider<DiscoverProvider>.value(value: discoverProvider),
+          ],
+          child: InputModeTracker(
+            child: MaterialApp(
+              theme: monoTheme(MonoPalette.dark),
+              home: MainScreenFocusScope(
+                focusSidebar: () {},
+                sideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+                selectLibrary: (key) => selectedLibraryKey = key,
+                child: const DiscoverScreen(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 100));
+
+    expect(find.text(t.common.home), findsOneWidget);
+    expect(find.text('Movies'), findsOneWidget);
+    expect(find.text('TV Shows'), findsOneWidget);
+    expect(find.text('Secondary Movies'), findsNothing, reason: 'only main server libraries appear in top bar');
+
+    await tester.tap(find.text('TV Shows'));
+    await tester.pump();
+    expect(selectedLibraryKey, mainShows.globalKey);
+
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('clicking the Watch Together participant count opens Watch Together (#2846)', (tester) async {
     await _pumpDiscoverShell(tester, isTv: false, watchTogether: _InSessionWatchTogether(participantCount: 3));
     final badge = find.descendant(of: find.byType(FocusableActionBar), matching: find.text('3'));

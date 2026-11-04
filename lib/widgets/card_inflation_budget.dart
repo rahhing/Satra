@@ -100,8 +100,7 @@ mixin SkeletonUpgradeScheduler<T extends StatefulWidget> on State<T> {
   }) {
     final cached = memo.tryGet(index, item, epoch: epoch, salt: salt);
     if (cached != null) return cached;
-    if (keyboardMode) {
-      if (isOnScreen == null) return memo.widgetFor(index, item, epoch: epoch, salt: salt, build: build);
+    if (isOnScreen != null) {
       return memo.widgetFor(
         index,
         item,
@@ -109,6 +108,9 @@ mixin SkeletonUpgradeScheduler<T extends StatefulWidget> on State<T> {
         salt: salt,
         build: () => BudgetedCard(urgent: isOnScreen, placeholder: skeleton(), builder: (_) => build()),
       );
+    }
+    if (keyboardMode) {
+      return memo.widgetFor(index, item, epoch: epoch, salt: salt, build: build);
     }
     if (CardInflationBudget.isScrollingContext(context) && !CardInflationBudget.tryTake()) {
       scheduleSkeletonUpgrade();
