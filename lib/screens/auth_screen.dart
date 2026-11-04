@@ -29,6 +29,9 @@ import '../media/media_browser_dialect.dart';
 import '../navigation/profile_session_screen.dart';
 import '../utils/navigation_transitions.dart';
 import '../widgets/backend_badge.dart';
+import '../widgets/ambient_background.dart';
+import '../widgets/glass_surface.dart';
+import '../widgets/brand_mark.dart';
 import '../widgets/dialog_action_button.dart';
 import 'auth/plex_pin_auth_flow.dart';
 import 'profile/profile_switch_screen.dart';
@@ -261,69 +264,101 @@ class _AuthScreenState extends State<AuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // Use two-column layout on desktop, single column on mobile
-    final isDesktop = MediaQuery.sizeOf(context).width > 700;
-
     return Focus(
       canRequestFocus: false,
       onKeyEvent: (_, event) => handleBackKeyNavigation(context, event),
       child: Scaffold(
-        body: Center(
-          child: Container(
-            constraints: BoxConstraints(maxWidth: isDesktop ? 800 : 400),
-            padding: .fromLTRB(24, 24, 24, 24 + MediaQuery.paddingOf(context).bottom),
-            child: isDesktop
-                ? Row(
-                    crossAxisAlignment: .center,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: .center,
-                          crossAxisAlignment: .center,
-                          children: [
-                            Image.asset('assets/plezy.png', width: 120, height: 120),
-                            const SizedBox(height: 24),
-                            Text(
-                              t.app.title,
-                              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: .bold),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
-                        ),
+        body: AmbientBackground(
+          child: SafeArea(
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                final wide = constraints.maxWidth >= 900 && constraints.maxHeight >= 500;
+                final compact = constraints.maxHeight < 620;
+                final padding = EdgeInsets.all(compact ? 20 : 32);
+                final brand = Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    BrandMark(
+                      size: wide
+                          ? 160
+                          : compact
+                          ? 80
+                          : 128,
+                    ),
+                    SizedBox(height: compact ? 12 : 24),
+                    Text(
+                      t.app.title,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontSize: wide ? 40 : 32,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -1,
                       ),
-                      const SizedBox(width: 48),
-                      Expanded(
-                        child: Center(
-                          child: SingleChildScrollView(
-                            child: Column(
-                              mainAxisSize: .min,
-                              crossAxisAlignment: .stretch,
-                              children: [_buildAuthBody()],
-                            ),
-                          ),
-                        ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                );
+                final panel = Center(
+                  child: ConstrainedBox(constraints: const BoxConstraints(maxWidth: 448), child: _buildAuthPanel()),
+                );
+                return SingleChildScrollView(
+                  padding: padding,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: (constraints.maxHeight - padding.vertical).clamp(0, double.infinity),
+                    ),
+                    child: Center(
+                      child: SizedBox(
+                        width: wide ? 1040 : 448,
+                        child: wide
+                            ? Row(
+                                children: [
+                                  Expanded(child: brand),
+                                  const SizedBox(width: 64),
+                                  Expanded(child: panel),
+                                ],
+                              )
+                            : Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  brand,
+                                  SizedBox(height: compact ? 24 : 40),
+                                  panel,
+                                ],
+                              ),
                       ),
-                    ],
-                  )
-                : SingleChildScrollView(
-                    child: Column(
-                      mainAxisSize: .min,
-                      crossAxisAlignment: .stretch,
-                      children: [
-                        Image.asset('assets/plezy.png', width: 120, height: 120),
-                        const SizedBox(height: 24),
-                        Text(
-                          t.app.title,
-                          style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontWeight: .bold),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 48),
-                        _buildAuthBody(),
-                      ],
                     ),
                   ),
+                );
+              },
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildAuthPanel() {
+    final theme = Theme.of(context);
+    final controls = ButtonStyle(
+      minimumSize: const WidgetStatePropertyAll(Size(0, 54)),
+      textStyle: WidgetStatePropertyAll(
+        theme.textTheme.labelLarge?.copyWith(fontSize: 16, fontWeight: FontWeight.w600),
+      ),
+      shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))),
+      visualDensity: VisualDensity.standard,
+    );
+    return Theme(
+      data: theme.copyWith(
+        visualDensity: VisualDensity.standard,
+        elevatedButtonTheme: ElevatedButtonThemeData(style: theme.elevatedButtonTheme.style?.merge(controls)),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: (theme.outlinedButtonTheme.style ?? const ButtonStyle()).merge(controls),
+        ),
+      ),
+      child: GlassSurface(
+        borderRadius: const BorderRadius.all(Radius.circular(28)),
+        opacity: 0.62,
+        child: Padding(padding: const EdgeInsets.all(28), child: _buildAuthBody()),
       ),
     );
   }

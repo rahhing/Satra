@@ -1,9 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import 'gapped_track_shape.dart';
 import 'mono_tokens.dart';
+import 'app_motion.dart';
 
 /// One of the six colours a [MonoPalette] holds. [id] is the key the custom
 /// theme persists the colour under.
@@ -71,12 +73,12 @@ class MonoPalette {
     accent: Color(0xFF111111),
   );
   static const dark = MonoPalette(
-    bg: Color(0xFF0E0F12),
-    surface: Color(0xFF15171C),
-    outline: Color(0x1FFFFFFF),
-    text: Color(0xFFEDEDED),
-    textMuted: Color(0x99EDEDED),
-    accent: Color(0xFFEDEDED),
+    bg: Color(0xFF000000),
+    surface: Color(0xFF111114),
+    outline: Color(0x18F3F4F7),
+    text: Color(0xFFF3F4F7),
+    textMuted: Color(0xA6F3F4F7),
+    accent: Color(0xFFF3F4F7),
   );
   static const oled = MonoPalette(
     bg: Color(0xFF000000), // Pure black for OLED
@@ -256,13 +258,25 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
     foregroundColor: WidgetStateProperty.resolveWith(
       (states) => states.contains(WidgetState.disabled) ? c.text.withValues(alpha: 0.38) : onAccent,
     ),
-    shape: const WidgetStatePropertyAll(StadiumBorder()),
+    animationDuration: AppMotion.standard,
+    shape: const WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))),
   );
 
   final base = ThemeData(
     platform: platform,
     useMaterial3: true,
+    fontFamily: 'Inter',
     brightness: brightness,
+    pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: PredictiveBackPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.macOS: FluidPageTransitionsBuilder(),
+        TargetPlatform.windows: FluidPageTransitionsBuilder(),
+        TargetPlatform.linux: FluidPageTransitionsBuilder(),
+        TargetPlatform.fuchsia: FluidPageTransitionsBuilder(),
+      },
+    ),
     // Linux resolves UI text through fontconfig, which on a minimal desktop
     // may have no CJK font at all; the bundled subtitle fonts (pubspec
     // `fonts:`) cover it. Other platforms keep their native CJK fonts.
@@ -281,8 +295,8 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       onSecondary: c.bg,
       surface: c.surface,
       onSurface: c.text,
-      error: const Color(0xFFB00020),
-      onError: Colors.white,
+      error: brightness == Brightness.dark ? const Color(0xFFFF8C9A) : const Color(0xFFB00020),
+      onError: brightness == Brightness.dark ? Colors.black : Colors.white,
       tertiary: c.text,
       onTertiary: c.bg,
       primaryContainer: c.surface,
@@ -315,12 +329,14 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       scrolledUnderElevation: 0,
       centerTitle: false,
       foregroundColor: c.text,
-      titleTextStyle: TextStyle(color: c.text, fontSize: 18, fontWeight: .w700, letterSpacing: -0.2),
+      titleTextStyle: TextStyle(color: c.text, fontSize: 20, fontWeight: .w700, letterSpacing: -0.6),
     ),
     textTheme: Typography.englishLike2021
-        .apply(bodyColor: c.text, displayColor: c.text)
+        .apply(fontFamily: 'Inter', bodyColor: c.text, displayColor: c.text)
         .copyWith(
-          displayLarge: const TextStyle(fontWeight: .w700, letterSpacing: -0.5),
+          displayLarge: const TextStyle(fontWeight: .w700, letterSpacing: -1.5),
+          displaySmall: TextStyle(color: c.text, fontSize: 40, fontWeight: .w700, letterSpacing: -1.2),
+          headlineMedium: TextStyle(color: c.text, fontSize: 28, fontWeight: .w700, letterSpacing: -0.8),
           titleMedium: const TextStyle(fontWeight: .w600),
           bodyMedium: TextStyle(color: c.text),
           bodySmall: TextStyle(color: c.textMuted),
@@ -329,7 +345,31 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       color: c.surface,
       elevation: 0,
       margin: .zero,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(14))),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: c.outline),
+      ),
+    ),
+    dialogTheme: DialogThemeData(
+      backgroundColor: c.surface,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(28),
+        side: BorderSide(color: c.outline),
+      ),
+    ),
+    bottomSheetTheme: BottomSheetThemeData(
+      backgroundColor: c.surface,
+      surfaceTintColor: Colors.transparent,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
+    ),
+    popupMenuTheme: PopupMenuThemeData(
+      color: c.surface,
+      surfaceTintColor: Colors.transparent,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: c.outline),
+      ),
     ),
     inputDecorationTheme: _inputDecorationTheme(c.text, c.textMuted),
     elevatedButtonTheme: ElevatedButtonThemeData(style: buttonStyle),
@@ -359,14 +399,39 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       textColor: c.text,
     ),
     navigationBarTheme: NavigationBarThemeData(
-      backgroundColor: c.bg,
+      height: 68,
+      backgroundColor: Colors.transparent,
+      surfaceTintColor: Colors.transparent,
       elevation: 0,
-      indicatorColor: Colors.transparent,
-      labelTextStyle: WidgetStatePropertyAll(TextStyle(color: c.textMuted, fontSize: 11)),
+      indicatorColor: c.accent.withValues(alpha: 0.12),
+      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      labelTextStyle: WidgetStateProperty.resolveWith(
+        (states) => TextStyle(
+          color: states.contains(WidgetState.selected) ? c.accent : c.textMuted,
+          fontSize: 11,
+          fontWeight: states.contains(WidgetState.selected) ? FontWeight.w600 : FontWeight.w400,
+        ),
+      ),
       iconTheme: WidgetStateProperty.resolveWith((states) {
         final active = states.contains(WidgetState.selected);
         return IconThemeData(opacity: active ? 1 : 0.6, size: 22, color: active ? c.accent : c.text);
       }),
+    ),
+    navigationRailTheme: NavigationRailThemeData(
+      backgroundColor: Colors.transparent,
+      indicatorColor: c.accent.withValues(alpha: 0.12),
+      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      selectedIconTheme: IconThemeData(color: c.accent),
+      unselectedIconTheme: IconThemeData(color: c.textMuted),
+      selectedLabelTextStyle: TextStyle(color: c.accent, fontSize: 11, fontWeight: .w600),
+      unselectedLabelTextStyle: TextStyle(color: c.textMuted, fontSize: 11),
+    ),
+    scrollbarTheme: ScrollbarThemeData(
+      thickness: const WidgetStatePropertyAll(4),
+      radius: const Radius.circular(8),
+      thumbColor: WidgetStateProperty.resolveWith(
+        (states) => c.text.withValues(alpha: states.contains(WidgetState.dragged) ? 0.5 : 0.2),
+      ),
     ),
     // Floating snackbars auto-offset above the Scaffold's bottom NavigationBar,
     // so they don't cover it on mobile. Background color tracks the theme to
@@ -385,16 +450,16 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
   return base.copyWith(
     extensions: [
       MonoTokens(
-        radiusSm: 8,
-        radiusMd: 12,
-        radiusLg: 20,
+        radiusSm: 12,
+        radiusMd: 18,
+        radiusLg: 24,
         radiusXs: 5,
         groupGap: 2,
         space: 12,
-        fast: const Duration(milliseconds: 120),
-        normal: const Duration(milliseconds: 200),
-        slow: const Duration(milliseconds: 300),
-        expressive: const Duration(milliseconds: 350),
+        fast: const Duration(milliseconds: 180),
+        normal: AppMotion.standard,
+        slow: AppMotion.slow,
+        expressive: AppMotion.slow,
         bg: c.bg,
         surface: c.surface,
         outline: c.outline,

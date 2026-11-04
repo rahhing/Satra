@@ -3,6 +3,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'glass_surface.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../focus/dpad_navigator.dart';
@@ -203,15 +204,18 @@ class _AnchoredPanel extends StatelessWidget {
     final availableHeight = openBelow ? spaceBelow : anchorRect.top - gap - edgePadding;
     final effectiveMaxHeight = math.max(120.0, math.min(maxHeight, availableHeight));
 
-    final panel = Material(
-      elevation: 3,
-      shadowColor: colorScheme.shadow,
-      color: Color.alphaBlend(colorScheme.onSurface.withValues(alpha: 0.08), colorScheme.surface),
+    final panel = GlassSurface(
       borderRadius: BorderRadius.circular(tokens(context).radiusMd),
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: panelWidth, maxWidth: panelWidth, maxHeight: effectiveMaxHeight),
-        child: PrimaryScrollController.none(child: builder(context)),
+      child: Material(
+        elevation: 3,
+        shadowColor: colorScheme.shadow,
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(tokens(context).radiusMd),
+        clipBehavior: Clip.antiAlias,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: panelWidth, maxWidth: panelWidth, maxHeight: effectiveMaxHeight),
+          child: PrimaryScrollController.none(child: builder(context)),
+        ),
       ),
     );
 
@@ -823,21 +827,23 @@ class _AppMenuSurface<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final surface = Color.alphaBlend(colorScheme.onSurface.withValues(alpha: 0.08), colorScheme.surface);
-    return Material(
-      elevation: 3,
-      shadowColor: colorScheme.shadow,
-      color: surface,
+    return GlassSurface(
       borderRadius: BorderRadius.circular(tokens(context).radiusMd),
-      clipBehavior: Clip.antiAlias,
-      child: ConstrainedBox(
-        constraints: BoxConstraints(minWidth: width, maxWidth: width, maxHeight: maxHeight),
-        child: PrimaryScrollController.none(
-          child: SingleChildScrollView(
-            child: AppMenuList<T>(
-              entries: entries,
-              focusFirstItem: focusFirstItem,
-              onSelected: (value) => Navigator.pop(context, value),
+      child: Material(
+        elevation: 3,
+        shadowColor: colorScheme.shadow,
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(tokens(context).radiusMd),
+        clipBehavior: Clip.antiAlias,
+        child: ConstrainedBox(
+          constraints: BoxConstraints(minWidth: width, maxWidth: width, maxHeight: maxHeight),
+          child: PrimaryScrollController.none(
+            child: SingleChildScrollView(
+              child: AppMenuList<T>(
+                entries: entries,
+                focusFirstItem: focusFirstItem,
+                onSelected: (value) => Navigator.pop(context, value),
+              ),
             ),
           ),
         ),

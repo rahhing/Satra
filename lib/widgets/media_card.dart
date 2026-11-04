@@ -8,6 +8,8 @@ import 'package:plezy/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import '../focus/card_focus_scope.dart';
+import 'hover_lift.dart';
+import 'artwork_atmosphere.dart';
 import '../focus/focus_theme.dart';
 import '../focus/input_mode_tracker.dart';
 import '../i18n/app_locale_utils.dart';
@@ -477,6 +479,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
 
   Widget _buildContent(BuildContext context) {
     final item = _effectiveItem(context);
+    if (CardFocusScope.maybeOf(context) == true) ArtworkAtmosphereScope.select(context, item);
     final viewMode = widget.viewModeOverride ?? SettingsService.instance.read(SettingsService.viewMode);
 
     final semanticLabel = _semanticLabel(item);
@@ -516,7 +519,9 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
       onTap: handleTap,
       onLongPress: showContextMenu,
       excludeSemantics: !preserveDetailSemantics,
-      child: cardWidget,
+      child: ArtworkAtmosphereScope.maybeOf(context) == null
+          ? cardWidget
+          : MouseRegion(onEnter: (_) => ArtworkAtmosphereScope.select(context, item), child: cardWidget),
     );
 
     // Catalog stand-ins (Explore tab) have no server-backed actions — every
@@ -1655,7 +1660,7 @@ class _CardTapRegion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (!PlatformDetector.isDesktopOS()) {
+    if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTVDevice()) {
       return GestureDetector(
         excludeFromSemantics: true,
         behavior: HitTestBehavior.opaque,
@@ -1667,17 +1672,19 @@ class _CardTapRegion extends StatelessWidget {
         child: child,
       );
     }
-    return InkWell(
-      excludeFromSemantics: true,
-      mouseCursor: SystemMouseCursors.click,
-      canRequestFocus: false,
-      onTap: onTap,
-      onTapDown: onTapDown,
-      onLongPress: onLongPress,
-      onSecondaryTapDown: onSecondaryTapDown,
-      onSecondaryTap: onSecondaryTap,
-      borderRadius: borderRadius,
-      child: child,
+    return HoverLift(
+      child: InkWell(
+        excludeFromSemantics: true,
+        mouseCursor: SystemMouseCursors.click,
+        canRequestFocus: false,
+        onTap: onTap,
+        onTapDown: onTapDown,
+        onLongPress: onLongPress,
+        onSecondaryTapDown: onSecondaryTapDown,
+        onSecondaryTap: onSecondaryTap,
+        borderRadius: borderRadius,
+        child: child,
+      ),
     );
   }
 }

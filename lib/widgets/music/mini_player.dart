@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import '../glass_surface.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
@@ -288,7 +289,7 @@ class _MiniPlayerCardState extends State<_MiniPlayerCard> with ContextMenuTapMix
     final artist = widget.track.trackArtistTitle;
 
     Widget card = Material(
-      color: tk.surface,
+      color: Colors.transparent,
       clipBehavior: Clip.antiAlias,
       borderRadius: BorderRadius.circular(tk.radiusLg),
       child: InkWell(
@@ -401,6 +402,8 @@ class _MiniPlayerCardState extends State<_MiniPlayerCard> with ContextMenuTapMix
         ),
       ),
     );
+
+    card = GlassSurface(borderRadius: BorderRadius.circular(tk.radiusLg), child: card);
 
     card = DecoratedBox(
       decoration: BoxDecoration(

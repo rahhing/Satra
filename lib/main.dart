@@ -12,7 +12,6 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
 import 'connection/connection.dart';
 import 'connection/connection_bootstrap.dart';
@@ -30,6 +29,7 @@ import 'profiles/profile_selection_policy.dart';
 import 'models/external_player_models.dart';
 import 'mixins/mounted_set_state_mixin.dart';
 import 'theme/mono_theme.dart';
+import 'theme/fluid_scroll_behavior.dart';
 import 'profiles/plex_home_service.dart';
 import 'screens/auth_screen.dart';
 import 'screens/profile/pin_entry_dialog.dart';
@@ -47,6 +47,7 @@ import 'widgets/agent_control_scope.dart';
 import 'widgets/settings_builder.dart';
 import 'utils/iphone_duo.dart';
 import 'utils/platform_detector.dart';
+import 'utils/desktop_ui_scale.dart';
 import 'utils/pointer_scroll_axis.dart';
 import 'services/apple_tv_remote_touch_service.dart';
 import 'services/discord_rpc_service.dart';
@@ -95,6 +96,7 @@ import 'utils/watch_state_notifier.dart';
 import 'i18n/app_locale_utils.dart';
 import 'i18n/strings.g.dart';
 import 'widgets/app_icon.dart';
+import 'widgets/brand_mark.dart';
 import 'widgets/app_system_ui_style.dart';
 import 'focus/input_mode_tracker.dart';
 import 'focus/key_event_utils.dart';
@@ -1209,6 +1211,9 @@ FutureOr<SentryEvent?> _beforeSend(SentryEvent event, Hint _) {
 /// them here loads nothing until a reader runs.
 void _registerAppLicenses() {
   _registerShaderLicenses();
+  LicenseRegistry.addLicense(() async* {
+    yield LicenseEntryWithLineBreaks(const ['Inter'], await rootBundle.loadString('assets/fonts/OFL.txt'));
+  });
   // iOS covers iPhone, iPad, and Apple TV; mpv-build links SpatialAudioBridge
   // into libmpv there and not on macOS.
   if (Platform.isIOS) _registerSpatialAudioLicenses();
@@ -1975,6 +1980,7 @@ class _AppShell extends StatelessWidget {
                   child: MaterialApp(
                     title: t.app.title,
                     debugShowCheckedModeBanner: false,
+                    scrollBehavior: const FluidScrollBehavior(),
                     // The app language, not Flutter's en-US default: every
                     // Text inherits it as the locale that selects CJK glyph
                     // forms, and Material's own strings follow it.
@@ -2058,6 +2064,29 @@ class FormFactorScale extends StatelessWidget {
     // behavior and overscan handling remain unchanged.
     if (PlatformDetector.isAppleTV()) {
       return _scaledSurface(child: child, scale: _appleTvScale, zeroInsets: true);
+    }
+    if (PlatformDetector.isDesktopOS() &&
+        DesktopUiScale.isDesktopPlatform(Theme.of(context).platform) &&
+        !PlatformDetector.isTVDevice() &&
+        !PlatformDetector.isAutomotive()) {
+      Widget desktopSurface(BuildContext context, double preference, Widget content) => LayoutBuilder(
+        builder: (context, constraints) {
+          final view = View.of(context);
+          final scale = DesktopUiScale.resolve(
+            displaySize: view.display.size,
+            devicePixelRatio: MediaQuery.devicePixelRatioOf(context),
+            viewportSize: constraints.biggest,
+            preference: preference,
+          );
+          return _scaledSurface(child: content, scale: scale, zeroInsets: false);
+        },
+      );
+      if (SettingsService.instanceOrNull == null) return desktopSurface(context, DesktopUiScale.automatic, child);
+      return SettingValueBuilder<double>(
+        pref: SettingsService.desktopUiScale,
+        child: child,
+        builder: (context, preference, content) => desktopSurface(context, preference, content!),
+      );
     }
     if (!PlatformDetector.isAutomotive()) return child;
 
@@ -2530,7 +2559,7 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SvgPicture.asset('assets/plezy_adaptive_foreground.svg', width: 160, height: 160),
+                  const BrandMark(size: 160),
                   _buildStatusText(context),
                   const SizedBox(height: 16),
                   Center(
@@ -2553,7 +2582,7 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
       color: Theme.of(context).scaffoldBackgroundColor,
       child: Stack(
         children: [
-          Center(child: SvgPicture.asset('assets/plezy_adaptive_foreground.svg', width: 288, height: 288)),
+          const Center(child: BrandMark(size: 288)),
           Positioned(left: 0, right: 0, bottom: height * 0.5 - 170, child: _buildStatusText(context)),
           Positioned(
             left: 0,

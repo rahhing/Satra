@@ -102,7 +102,7 @@ class _Translations$app$ko extends Translations$app$en {
 	final TranslationsKo _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Plezy';
+	@override String get title => 'Satra';
 }
 
 // Path: appIcon
@@ -3385,7 +3385,7 @@ class _Translations$services$libraryFilter$ko extends Translations$services$libr
 extension on TranslationsKo {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'app.title' => 'Plezy',
+			'app.title' => 'Satra',
 			'appIcon.title' => '앱 아이콘',
 			'appIcon.defaultIcon' => '기본',
 			'appIcon.current' => '현재 아이콘',

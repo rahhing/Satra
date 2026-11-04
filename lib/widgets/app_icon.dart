@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 /// Wrapper around [Icon] that centralizes our Material Symbols defaults.
-/// Defaults: fill=1 (filled) and weight=700 (bold). Update [AppIconDefaults]
+/// Defaults: fill=0 (outlined) and weight=500. Update [AppIconDefaults]
 /// to tweak app-wide icon appearance from one place.
 class AppIcon extends StatelessWidget {
   const AppIcon(
@@ -49,8 +49,8 @@ class AppIcon extends StatelessWidget {
 
 /// Central place to adjust default Material Symbol variations.
 class AppIconDefaults {
-  static double fill = 1;
-  static double weight = 700;
+  static double fill = 0;
+  static double weight = 500;
   static double? grade;
   static double? opticalSize;
   static Color? color;

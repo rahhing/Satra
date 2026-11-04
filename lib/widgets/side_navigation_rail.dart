@@ -31,6 +31,9 @@ import 'music/equalizer_icon.dart';
 import '../providers/multi_server_provider.dart';
 import '../services/fullscreen_state_manager.dart';
 import '../theme/mono_tokens.dart';
+import '../theme/app_motion.dart';
+import 'glass_surface.dart';
+import 'brand_mark.dart';
 import '../widgets/backend_badge.dart';
 import '../i18n/strings.g.dart';
 
@@ -80,12 +83,12 @@ KeyEventResult _handleRailItemKey(KeyEvent event, {required VoidCallback onSelec
 /// layout.
 class NavigationRailItem extends StatelessWidget {
   /// M3E collapsed-rail active indicator geometry.
-  static const double collapsedIndicatorWidth = 56;
-  static const double collapsedIndicatorHeight = 32;
+  static const double collapsedIndicatorWidth = 48;
+  static const double collapsedIndicatorHeight = 40;
 
   /// Fixed collapsed item height so the collapse morph interpolates between
   /// known extents (32px pill + breathing room).
-  static const double collapsedItemHeight = 40;
+  static const double collapsedItemHeight = 48;
 
   final IconData icon;
   final IconData? selectedIcon;
@@ -170,8 +173,8 @@ class NavigationRailItem extends StatelessWidget {
     // The collapsed TV rail is a transparent overlay strip; a persistent
     // active pill over artwork is noise there, so it shows focus only.
     final showSelected = isSelected && !suppressSelectedBackground && !(collapsedLayout && PlatformDetector.isTV());
-    if (focused) return t.text.withValues(alpha: showSelected ? selectedFocusAlpha : focusAlpha);
-    if (showSelected) return t.text.withValues(alpha: 0.1);
+    if (focused) return t.accent.withValues(alpha: showSelected ? 0.23 : 0.16);
+    if (showSelected) return t.accent.withValues(alpha: 0.12);
     return null;
   }
 
@@ -187,7 +190,7 @@ class NavigationRailItem extends StatelessWidget {
       iconWidget ??
       AppIcon(
         isSelected && selectedIcon != null ? selectedIcon! : icon,
-        fill: 1,
+        fill: isSelected ? 1 : 0,
         size: iconSize,
         color: isSelected ? t.accent : t.textMuted,
       );
@@ -211,7 +214,7 @@ class NavigationRailItem extends StatelessWidget {
             alignment: .center,
             decoration: BoxDecoration(
               color: _indicatorColor(t, focused: focused, expansion: 0),
-              borderRadius: BorderRadius.circular(MonoTokens.radiusFull),
+              borderRadius: BorderRadius.circular(14),
             ),
             child: _leadingIcon(t),
           ),
@@ -272,7 +275,7 @@ class NavigationRailItem extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: fixedHeight ? 0 : 8),
       decoration: BoxDecoration(
         color: _indicatorColor(t, focused: focused, expansion: 1),
-        borderRadius: BorderRadius.circular(MonoTokens.radiusFull),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: _buildExpandedContent(context, t, labelOpacity: 1, showLeading: true),
     );
@@ -312,7 +315,7 @@ class NavigationRailItem extends StatelessWidget {
               height: lerpDouble(collapsedIndicatorHeight, expandedHeight, expansion),
               decoration: BoxDecoration(
                 color: _indicatorColor(t, focused: focused, expansion: expansion),
-                borderRadius: BorderRadius.circular(MonoTokens.radiusFull),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
           ),
@@ -357,7 +360,7 @@ class NavigationRailItem extends StatelessWidget {
               )
             : TweenAnimationBuilder<double>(
                 tween: Tween(end: isCollapsed ? 0.0 : 1.0),
-                duration: SideNavigationRailState.expandDuration,
+                duration: AppMotion.duration(context, SideNavigationRailState.expandDuration),
                 curve: SideNavigationRailState.expandCurve,
                 builder: (context, expansion, _) =>
                     _buildMorphingLayouts(context, t, focused: focused, expansion: expansion),
@@ -455,8 +458,11 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   /// track tick for tick.
   /// Reduced-tier devices resolve this to zero; keep every consumer on this
   /// getter so the shell and rail continue to move in lockstep.
-  static Duration get expandDuration => DevicePerformance.reducedDuration(const Duration(milliseconds: 250));
-  static const Curve expandCurve = Curves.easeInOutCubicEmphasized;
+  static Duration get expandDuration =>
+      WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations
+      ? Duration.zero
+      : DevicePerformance.reducedDuration(const Duration(milliseconds: 320));
+  static const Curve expandCurve = Curves.easeOutCubic;
 
   static double collapsedWidthForContext(BuildContext _) => PlatformDetector.isTV() ? tvCollapsedWidth : collapsedWidth;
 
@@ -841,9 +847,10 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
     librariesProvider.refresh();
   }
 
-  /// Calculate top padding for macOS traffic lights
+  /// Calculate top padding for macOS traffic lights and TV overlaid top bar
   double _getTopPadding(BuildContext context) {
-    double basePadding = MediaQuery.paddingOf(context).top + 16;
+    final safeTop = MediaQuery.paddingOf(context).top;
+    double basePadding = safeTop + (PlatformDetector.isTV() ? 76 : 16);
 
     // On macOS, add extra padding for traffic lights (when not fullscreen)
     if (Platform.isMacOS) {
@@ -978,7 +985,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                           duration: expandDuration,
                           curve: expandCurve,
                           decoration: BoxDecoration(
-                            color: t.surface,
+                            color: Colors.transparent,
                             // Open rails read as an M3E panel: rounded
                             // trailing corners, extra-rounded plus an edge
                             // shadow while floating over content (modal)
@@ -989,8 +996,17 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                                     right: Radius.circular(_isFloatingPanel ? overlayCornerRadius : t.radiusLg),
                                   ),
                             boxShadow: _isFloatingPanel
-                                ? [BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 24)]
+                                ? [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 32)]
                                 : const [],
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.fromLTRB(6, PlatformDetector.isTV() ? 68 : 8, 6, 8),
+                            child: GlassSurface(
+                              tint: t.surface,
+                              opacity: _isFloatingPanel ? 0.78 : 0.66,
+                              borderRadius: const BorderRadius.all(Radius.circular(24)),
+                              child: const SizedBox.expand(),
+                            ),
                           ),
                         ),
                       ),
@@ -1013,6 +1029,11 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                                   padding: EdgeInsets.zero,
                                   clipBehavior: Clip.hardEdge,
                                   children: [
+                                    if (!PlatformDetector.isTV())
+                                      const Padding(
+                                        padding: EdgeInsets.only(top: 4, bottom: 20),
+                                        child: Center(child: BrandMark(size: 28)),
+                                      ),
                                     if (widget.isOfflineMode && widget.onReconnect != null) ...[
                                       _buildReconnectItem(isCollapsed: isCollapsed),
                                       const SizedBox(height: _itemGap),
@@ -1076,31 +1097,46 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                                       ),
                                       const SizedBox(height: _itemGap),
                                     ],
-                                    // Downloads (hidden on Apple TV — no user
-                                    // file storage)
-                                    if (_showDownloads) ...[
-                                      _buildNavItem(
-                                        icon: Symbols.download_rounded,
-                                        selectedIcon: Symbols.download_rounded,
-                                        label: Translations.of(context).navigation.downloads,
-                                        isSelected: widget.selectedTab == NavigationTabId.downloads,
-                                        onTap: () => widget.onDestinationSelected(NavigationTabId.downloads),
-                                        focusNode: _focusTracker.get(_kDownloads),
-                                        isCollapsed: isCollapsed,
-                                      ),
-                                      const SizedBox(height: _itemGap),
-                                    ],
-                                    _buildNavItem(
-                                      icon: Symbols.settings_rounded,
-                                      selectedIcon: Symbols.settings_rounded,
-                                      label: Translations.of(context).common.settings,
-                                      isSelected: widget.selectedTab == NavigationTabId.settings,
-                                      onTap: () => widget.onDestinationSelected(NavigationTabId.settings),
-                                      focusNode: _focusTracker.get(_kSettings),
-                                      isCollapsed: isCollapsed,
-                                    ),
                                   ],
                                 ),
+                              ),
+                            ),
+                            AnimatedPadding(
+                              padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                              duration: expandDuration,
+                              curve: expandCurve,
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                                    child: Divider(height: 1, color: t.outline),
+                                  ),
+                                  // Downloads (hidden on Apple TV — no user
+                                  // file storage)
+                                  if (_showDownloads) ...[
+                                    _buildNavItem(
+                                      icon: Symbols.download_rounded,
+                                      selectedIcon: Symbols.download_rounded,
+                                      label: Translations.of(context).navigation.downloads,
+                                      isSelected: widget.selectedTab == NavigationTabId.downloads,
+                                      onTap: () => widget.onDestinationSelected(NavigationTabId.downloads),
+                                      focusNode: _focusTracker.get(_kDownloads),
+                                      isCollapsed: isCollapsed,
+                                    ),
+                                    const SizedBox(height: _itemGap),
+                                  ],
+                                  _buildNavItem(
+                                    icon: Symbols.settings_rounded,
+                                    selectedIcon: Symbols.settings_rounded,
+                                    label: Translations.of(context).common.settings,
+                                    isSelected: widget.selectedTab == NavigationTabId.settings,
+                                    onTap: () => widget.onDestinationSelected(NavigationTabId.settings),
+                                    focusNode: _focusTracker.get(_kSettings),
+                                    isCollapsed: isCollapsed,
+                                  ),
+                                  const SizedBox(height: 8),
+                                ],
                               ),
                             ),
                             if (_showFullscreenToggle)

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -25,6 +26,7 @@ import '../theme/mono_tokens.dart';
 import '../utils/layout_constants.dart';
 import '../utils/media_image_helper.dart';
 import '../utils/media_navigation_helper.dart';
+import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
 import 'animated_dim_scrim.dart';
 import 'app_icon.dart';
@@ -482,6 +484,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   bool _hasUserChangedHub = false;
   int _verticalScrollGeneration = 0;
   bool _hasUserChangedItem = false;
+  bool _isUserVerticalScrollActive = false;
+  double? _wheelScrollTarget;
+  int _wheelScrollGeneration = 0;
 
   /// Hub key whose leading slot took focus only because the hub had no items
   /// yet (the clamp in [_moveHub]); when items arrive, focus advances to the
@@ -511,6 +516,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   void initState() {
     super.initState();
     _focusNode.addListener(_handleFocusChange);
+    _verticalController.addListener(_handleVerticalScroll);
     final startHub = _activeHub;
     if (startHub != null) _itemIndex = _defaultSlotFor(startHub);
     _selectInitialHubIfPossible();
@@ -704,6 +710,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     for (final controller in _scrollControllers.values) {
       controller.dispose();
     }
+    _verticalController.removeListener(_handleVerticalScroll);
     _verticalController.dispose();
     _verticalScrollGeneration++;
     _verticalScrollSnapshotController.dispose();
@@ -894,6 +901,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
 
   void _moveHub(int delta) {
     if (widget.hubs.isEmpty) return;
+    _isUserVerticalScrollActive = false;
+    _wheelScrollGeneration++;
+    _wheelScrollTarget = null;
     _hasUserInteracted = true;
     final next = (_hubIndex + delta).clamp(0, widget.hubs.length - 1);
     if (next == _hubIndex) return;
@@ -933,6 +943,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   /// section key path in [_scrollActiveHubToTop].
   bool _alignActiveHubToTop({required bool animate}) {
     if (!_verticalController.hasClients || _hubIndex < 0 || _hubIndex >= _sectionOffsets.length) return false;
+    _isUserVerticalScrollActive = false;
     final target = _sectionOffsets[_hubIndex].clamp(0.0, _sectionMaxScrollExtent).toDouble();
     if (animate) {
       _startVerticalScrollAnimation(
@@ -973,6 +984,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
       final key = _hubSectionKeys[_hubIndex];
       final context = key?.currentContext;
       if (context == null) return;
+      _isUserVerticalScrollActive = false;
       if (animate) {
         _startVerticalScrollAnimation(
           () => Scrollable.ensureVisible(
@@ -1014,25 +1026,107 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     );
   }
 
-  void _setHoveredItem(MediaHub hub, int index) {
-    final active = _activeHub;
-    if (active == null || _hubKey(active) != _hubKey(hub) || _itemAtSlot(hub, index) == null || _itemIndex == index) {
+  void _handleVerticalScroll() {
+    if (!_isUserVerticalScrollActive || _focusModel.verticalScrollActive) return;
+    if (!_verticalController.hasClients || widget.hubs.isEmpty || _sectionOffsets.isEmpty) return;
+    final offset = _verticalController.offset;
+    var nextHubIndex = 0;
+    for (var i = 0; i < _sectionOffsets.length && i < widget.hubs.length; i++) {
+      final top = _sectionOffsets[i];
+      final height = i < _sectionHeights.length ? _sectionHeights[i] : 0.0;
+      if (offset >= top + (height * 0.45)) {
+        nextHubIndex = (i + 1).clamp(0, widget.hubs.length - 1);
+      } else {
+        nextHubIndex = i;
+        break;
+      }
+    }
+    if (nextHubIndex == _hubIndex) return;
+    final currentHub = _activeHub;
+    if (currentHub != null) _rememberFocus(currentHub);
+    final nextHub = widget.hubs[nextHubIndex];
+    final totalCount = _totalItemCount(nextHub);
+    final remembered = widget.focusMemory.getForHubOnly(
+      _hubKey(nextHub),
+      totalCount,
+      fallback: _defaultSlotFor(nextHub),
+    );
+    _hubIndex = nextHubIndex;
+    _itemIndex = remembered.clamp(0, totalCount == 0 ? 0 : totalCount - 1);
+    _displacedFocusItem = null;
+    _pendingLeadingAutoAdvanceHubKey = nextHub.items.isEmpty && _isLeadingSlot(nextHub, _itemIndex)
+        ? _hubKey(nextHub)
+        : null;
+    _focusModel.set(_hubIndex, _itemIndex);
+    _notifyFocusedItem();
+    _notifyActiveHubChanged();
+  }
+
+  /// Scrolls the vertical hub list by [dy] (e.g. when wheel-scrolling over
+  /// the upper spotlight backdrop).
+  void scrollVerticallyBy(double dy) {
+    if (dy == 0 || !_verticalController.hasClients) return;
+    final position = _verticalController.position;
+    if (!position.hasContentDimensions) return;
+    _isUserVerticalScrollActive = true;
+    _hasUserInteracted = true;
+    _hasUserChangedHub = true;
+    if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
+      _focusNode.requestFocus();
+    }
+    final remaining = (_wheelScrollTarget ?? position.pixels) - position.pixels;
+    final origin = remaining * dy < 0 ? position.pixels : (_wheelScrollTarget ?? position.pixels);
+    final target = (origin + dy).clamp(position.minScrollExtent, position.maxScrollExtent).toDouble();
+    if ((target - position.pixels).abs() < 0.5) return;
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) {
+      _wheelScrollTarget = null;
+      position.jumpTo(target);
       return;
     }
+    final generation = ++_wheelScrollGeneration;
+    _wheelScrollTarget = target;
+    unawaited(
+      position
+          .animateTo(target, duration: const Duration(milliseconds: 240), curve: Curves.easeOutCubic)
+          .whenComplete(() {
+            if (generation == _wheelScrollGeneration) _wheelScrollTarget = null;
+          }),
+    );
+  }
+
+  void _setHoveredItem(MediaHub hub, int hubIndex, int index) {
+    if (hubIndex < 0 || hubIndex >= widget.hubs.length || _itemAtSlot(hub, index) == null) {
+      return;
+    }
+    if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
+      _focusNode.requestFocus();
+    }
+    final hubChanged = _hubIndex != hubIndex;
+    if (!hubChanged && _itemIndex == index) {
+      return;
+    }
+    final previousHub = _activeHub;
+    if (hubChanged && previousHub != null) _rememberFocus(previousHub);
     _hasUserInteracted = true;
+    _hubIndex = hubIndex;
     _itemIndex = index;
+    if (hubChanged) _hasUserChangedHub = true;
     _hasUserChangedItem = true;
     _pendingLeadingAutoAdvanceHubKey = null;
     _displacedFocusItem = null;
     _focusModel.set(_hubIndex, _itemIndex);
     _rememberFocus(hub);
     _notifyFocusedItem();
+    if (hubChanged) _notifyActiveHubChanged();
   }
 
-  void _selectHubItem(MediaHub hub, int hubIndex, int itemIndex) {
+  void _selectHubItem(MediaHub hub, int hubIndex, int itemIndex, {bool alignScroll = false}) {
     final totalCount = _totalItemCount(hub);
     if (totalCount == 0) return;
     _hasUserInteracted = true;
+    if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
+      _focusNode.requestFocus();
+    }
 
     final clampedItemIndex = itemIndex.clamp(0, totalCount - 1).toInt();
     final hubChanged = _hubIndex != hubIndex;
@@ -1049,8 +1143,10 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     _rememberFocus(hub);
     _notifyFocusedItem();
     if (hubChanged) _notifyActiveHubChanged();
-    _scrollActiveHubToTop();
-    _scrollToItemAfterLayout(animate: false);
+    if (alignScroll) {
+      _scrollActiveHubToTop();
+      _scrollToItemAfterLayout(animate: false);
+    }
   }
 
   void _rememberFocus(MediaHub hub) {
@@ -1411,59 +1507,80 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     required double railViewportWidth,
     required double bottomPadding,
   }) {
-    return ListView.builder(
-      key: const ValueKey('tv_browse_rail_vertical'),
-      controller: _verticalController,
-      physics: const NeverScrollableScrollPhysics(),
-      // Inert on media lists (no keep-alive clients): dropping the per-child
-      // wrappers shrinks build + semantics work per item.
-      addAutomaticKeepAlives: false,
-      addSemanticIndexes: false,
-      clipBehavior: Clip.none,
-      padding: .only(bottom: bottomPadding),
-      itemExtentBuilder: (index, _) => sectionHeights[index],
-      itemCount: widget.hubs.length,
-      itemBuilder: (context, hubIndex) {
-        final hub = widget.hubs[hubIndex];
-        final metrics = metricsByHub[hubIndex];
-        final sectionHeight = sectionHeights[hubIndex];
-        // Active-hub state is observed through _focusModel so a hub move
-        // repaints only the two affected headers/artwork tints; the row content
-        // below is passed through as a stable child.
-        bool isActiveHub() => _focusModel.hubIndex == hubIndex;
-
-        return SnapshotWidget(
-          controller: _verticalScrollSnapshotController,
-          mode: SnapshotMode.permissive,
-          autoresize: true,
-          child: SizedBox(
-            key: _hubSectionKeys.putIfAbsent(hubIndex, () => GlobalKey()),
-            height: sectionHeight,
-            child: Column(
-              crossAxisAlignment: .stretch,
-              children: [
-                ListenableSelector<bool>(
-                  listenable: _focusModel,
-                  selector: isActiveHub,
-                  builder: (context, isActive, _) =>
-                      _buildHubHeader(context, hub: hub, hubIndex: hubIndex, isActive: isActive, scale: scale),
-                ),
-                _buildHubRail(
-                  hub: hub,
-                  hubIndex: hubIndex,
-                  episodePosterMode: modes[hubIndex],
-                  metrics: metrics,
-                  scale: scale,
-                  fullCardLayout: fullCardLayout,
-                  leftOverflow: leftOverflow,
-                  interactionExpansion: interactionExpansion,
-                  railViewportWidth: railViewportWidth,
-                ),
-              ],
-            ),
-          ),
-        );
+    return Listener(
+      onPointerDown: (_) {
+        _wheelScrollGeneration++;
+        _wheelScrollTarget = null;
+        _isUserVerticalScrollActive = true;
+        _hasUserInteracted = true;
+        _hasUserChangedHub = true;
       },
+      onPointerSignal: (signal) {
+        if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0 && !HardwareKeyboard.instance.isShiftPressed) {
+          _isUserVerticalScrollActive = true;
+          _hasUserInteracted = true;
+          _hasUserChangedHub = true;
+          if (!_focusNode.hasFocus && (ModalRoute.of(context)?.isCurrent ?? true)) {
+            _focusNode.requestFocus();
+          }
+        }
+      },
+      child: ListView.builder(
+        key: const ValueKey('tv_browse_rail_vertical'),
+        controller: _verticalController,
+        physics: PlatformDetector.isAppleTV()
+            ? const NeverScrollableScrollPhysics()
+            : const ClampingScrollPhysics(),
+        // Inert on media lists (no keep-alive clients): dropping the per-child
+        // wrappers shrinks build + semantics work per item.
+        addAutomaticKeepAlives: false,
+        addSemanticIndexes: false,
+        clipBehavior: Clip.none,
+        padding: .only(bottom: bottomPadding),
+        itemExtentBuilder: (index, _) => sectionHeights[index],
+        itemCount: widget.hubs.length,
+        itemBuilder: (context, hubIndex) {
+          final hub = widget.hubs[hubIndex];
+          final metrics = metricsByHub[hubIndex];
+          final sectionHeight = sectionHeights[hubIndex];
+          // Active-hub state is observed through _focusModel so a hub move
+          // repaints only the two affected headers/artwork tints; the row content
+          // below is passed through as a stable child.
+          bool isActiveHub() => _focusModel.hubIndex == hubIndex;
+
+          return SnapshotWidget(
+            controller: _verticalScrollSnapshotController,
+            mode: SnapshotMode.permissive,
+            autoresize: true,
+            child: SizedBox(
+              key: _hubSectionKeys.putIfAbsent(hubIndex, () => GlobalKey()),
+              height: sectionHeight,
+              child: Column(
+                crossAxisAlignment: .stretch,
+                children: [
+                  ListenableSelector<bool>(
+                    listenable: _focusModel,
+                    selector: isActiveHub,
+                    builder: (context, isActive, _) =>
+                        _buildHubHeader(context, hub: hub, hubIndex: hubIndex, isActive: isActive, scale: scale),
+                  ),
+                  _buildHubRail(
+                    hub: hub,
+                    hubIndex: hubIndex,
+                    episodePosterMode: modes[hubIndex],
+                    metrics: metrics,
+                    scale: scale,
+                    fullCardLayout: fullCardLayout,
+                    leftOverflow: leftOverflow,
+                    interactionExpansion: interactionExpansion,
+                    railViewportWidth: railViewportWidth,
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -1547,50 +1664,61 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
       context,
     ).textTheme.titleMedium?.copyWith(color: serverColor, fontSize: 15 * scale, height: 1, fontWeight: FontWeight.w700);
 
+    final canViewAll = _trailingFor(hub) == TvRailTrailing.viewAll;
+    final headerRow = Align(
+      alignment: .centerLeft,
+      child: Row(
+        children: [
+          AppIcon(widget.iconForHub(hub, hubIndex), fill: 1, size: 20 * scale, color: iconColor),
+          SizedBox(width: 8 * scale),
+          Expanded(
+            child: Row(
+              children: [
+                Flexible(
+                  child: Text(
+                    hub.title,
+                    maxLines: 1,
+                    overflow: .ellipsis,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: titleColor,
+                      fontSize: 18 * scale,
+                      height: 1,
+                      fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
+                    ),
+                  ),
+                ),
+                if (showServerName) ...[
+                  SizedBox(width: 8 * scale),
+                  Text('•', style: serverStyle),
+                  SizedBox(width: 8 * scale),
+                  Flexible(
+                    child: Text(hub.serverName!, maxLines: 1, overflow: .ellipsis, style: serverStyle),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          if (canViewAll) ...[
+            SizedBox(width: 8 * scale),
+            AppIcon(Symbols.chevron_right_rounded, fill: 1, size: 20 * scale, color: iconColor),
+            SizedBox(width: 30 * scale),
+          ],
+        ],
+      ),
+    );
+
     return SizedBox(
       height: TvBrowseRailLayout.hubStripHeightForScale(scale),
       child: ExcludeFocus(
-        child: Align(
-          alignment: .centerLeft,
-          child: Row(
-            children: [
-              AppIcon(widget.iconForHub(hub, hubIndex), fill: 1, size: 20 * scale, color: iconColor),
-              SizedBox(width: 8 * scale),
-              Expanded(
-                child: Row(
-                  children: [
-                    Flexible(
-                      child: Text(
-                        hub.title,
-                        maxLines: 1,
-                        overflow: .ellipsis,
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          color: titleColor,
-                          fontSize: 18 * scale,
-                          height: 1,
-                          fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    if (showServerName) ...[
-                      SizedBox(width: 8 * scale),
-                      Text('•', style: serverStyle),
-                      SizedBox(width: 8 * scale),
-                      Flexible(
-                        child: Text(hub.serverName!, maxLines: 1, overflow: .ellipsis, style: serverStyle),
-                      ),
-                    ],
-                  ],
+        child: canViewAll
+            ? ClickableCursor(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => _navigateToHubDetail(_liveHub(hub, hubIndex)),
+                  child: headerRow,
                 ),
-              ),
-              if (_trailingFor(hub) == TvRailTrailing.viewAll) ...[
-                SizedBox(width: 8 * scale),
-                AppIcon(Symbols.chevron_right_rounded, fill: 1, size: 20 * scale, color: iconColor),
-                SizedBox(width: 30 * scale),
-              ],
-            ],
-          ),
-        ),
+              )
+            : headerRow,
       ),
     );
   }
@@ -1849,7 +1977,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     return Padding(
       padding: .only(right: metrics.itemGap),
       child: MouseRegion(
-        onEnter: (_) => _setHoveredItem(_liveHub(hub, hubIndex), itemIndex),
+        onEnter: (_) => _setHoveredItem(_liveHub(hub, hubIndex), hubIndex, itemIndex),
         child: Align(alignment: .topLeft, child: focusableCard),
       ),
     );

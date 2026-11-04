@@ -22,12 +22,14 @@ void main() {
     SettingsService.resetForTesting();
     TvDetectionService.debugSetAppleTVOverride(false);
     TvDetectionService.debugSetAutomotiveOverride(false);
+    PlatformDetector.debugSetIsDesktopOSOverride(false);
     await SettingsService.getInstance();
   });
 
   tearDown(() {
     TvDetectionService.debugSetAppleTVOverride(null);
     TvDetectionService.debugSetAutomotiveOverride(null);
+    PlatformDetector.debugSetIsDesktopOSOverride(null);
     SettingsService.resetForTesting();
   });
 

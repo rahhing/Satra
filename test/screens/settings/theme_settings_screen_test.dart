@@ -182,11 +182,11 @@ void main() {
     expect(_isChecked(settings.ThemeMode.glacier), isTrue);
   });
 
-  testWidgets('a stored perk that is locked shows System checked, stays stored and says so', (tester) async {
+  testWidgets('a stored perk that is locked shows Dark checked, stays stored and says so', (tester) async {
     await SettingsService.instance.write(SettingsService.themeMode, settings.ThemeMode.forest);
     final harness = await _pumpPicker(tester, SupporterAvailability.purchasable);
 
-    expect(_isChecked(settings.ThemeMode.system), isTrue);
+    expect(_isChecked(settings.ThemeMode.dark), isTrue);
     expect(_isChecked(settings.ThemeMode.forest), isFalse);
     expect(harness.stored, settings.ThemeMode.forest);
     expect(find.descendant(of: _tile(settings.ThemeMode.forest), matching: _savedMarker), findsOneWidget);
@@ -237,7 +237,7 @@ void main() {
   testWidgets('with a D-pad and a locked saved perk the picker opens on System, which paints', (tester) async {
     await SettingsService.instance.write(SettingsService.themeMode, settings.ThemeMode.glacier);
     await _pumpPicker(tester, SupporterAvailability.purchasable, viaKeyboard: true);
-    expect(_focusedTile(), settings.ThemeMode.system);
+    expect(_focusedTile(), settings.ThemeMode.dark);
   });
 
   testWidgets('on TV a locked saved perk shows the TV default, OLED, selected and focused', (tester) async {

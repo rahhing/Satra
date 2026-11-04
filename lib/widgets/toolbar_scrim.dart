@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'rasterized_gradient.dart';
+import 'glass_surface.dart';
 
 /// Top-edge fade behind a toolbar that floats over content, keeping its
 /// glyphs legible against artwork without a solid chrome bar.
@@ -39,7 +40,12 @@ class ToolbarScrim extends StatelessWidget {
           right: safePadding.right + 16,
           bottom: 16,
         ),
-        child: child,
+        child: GlassSurface(
+          borderRadius: const BorderRadius.all(Radius.circular(22)),
+          sigma: 24,
+          opacity: 0.56,
+          child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: child),
+        ),
       ),
     );
   }

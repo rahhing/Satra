@@ -103,7 +103,7 @@ class _Translations$app$zh_Hant extends Translations$app$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Plezy';
+	@override String get title => 'Satra';
 }
 
 // Path: appIcon
@@ -3386,7 +3386,7 @@ class _Translations$services$libraryFilter$zh_Hant extends Translations$services
 extension on TranslationsZhHant {
 	dynamic _flatMapFunction(String path) {
 		return switch (path) {
-			'app.title' => 'Plezy',
+			'app.title' => 'Satra',
 			'appIcon.title' => '應用程式圖示',
 			'appIcon.defaultIcon' => '預設',
 			'appIcon.current' => '目前圖示',

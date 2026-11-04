@@ -328,9 +328,12 @@ class DesktopVideoControlsState extends State<DesktopVideoControls> {
     _onContentStripNavigateUp();
   }
 
+  bool get _hideVolumeForTv =>
+      PlatformDetector.isTV() && (!PlatformDetector.isDesktopOS() || PlatformDetector.isTVDevice());
+
   /// Handle left navigation from first track control - go to volume (or last button on TV)
   void navigateFromTrackToVolume() {
-    if (PlatformDetector.isTV()) {
+    if (_hideVolumeForTv) {
       // On TV (no volume), go to last mounted button
       for (int i = _buttonFocusNodes.length - 1; i >= 0; i--) {
         if (_buttonFocusNodes[i].context != null) {
@@ -478,7 +481,7 @@ class DesktopVideoControlsState extends State<DesktopVideoControls> {
         break;
       }
     }
-    rightTarget ??= PlatformDetector.isTV()
+    rightTarget ??= _hideVolumeForTv
         ? (_trackControlFocusNodes.isNotEmpty ? _trackControlFocusNodes.first : null)
         : _volumeFocusNode;
 
@@ -916,7 +919,7 @@ class DesktopVideoControlsState extends State<DesktopVideoControls> {
                     ),
                   ),
                 // Volume control (hidden on TV — hardware handles volume)
-                if (!PlatformDetector.isTV()) ...[
+                if (!_hideVolumeForTv) ...[
                   VolumeControl(
                     volumeController: widget.volumeController,
                     focusNode: _volumeFocusNode,

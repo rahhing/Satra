@@ -11,6 +11,7 @@ import '../../services/settings_service.dart' hide ThemeMode;
 import '../../focus/focusable_slider.dart';
 import '../../services/device_performance.dart';
 import '../../utils/platform_detector.dart';
+import '../../utils/desktop_ui_scale.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../../widgets/setting_tile.dart';
@@ -45,6 +46,11 @@ class AppearanceSettingsScreen extends StatelessWidget {
             _themeSelector(),
             if (AppIconSetting.isShown(context)) const AppIconSetting(),
             if (PlatformDetector.isAutomotive()) _displayScaleSelector(),
+            if (PlatformDetector.isDesktopOS() &&
+                DesktopUiScale.isDesktopPlatform(Theme.of(context).platform) &&
+                !PlatformDetector.isTV() &&
+                !PlatformDetector.isAutomotive())
+              _desktopScaleSelector(),
             if (Platform.isAndroid) _visualEffectsSelector(context),
           ],
         ),
@@ -277,6 +283,22 @@ class AppearanceSettingsScreen extends StatelessWidget {
       },
     );
   }
+
+  Widget _desktopScaleSelector() => SettingSelectionTile<double>(
+    pref: SettingsService.desktopUiScale,
+    icon: Symbols.format_size_rounded,
+    title: t.settings.displayScale,
+    subtitleBuilder: (value) =>
+        value == DesktopUiScale.automatic ? t.settings.desktopScaleAutomatic : '${(value * 100).round()}%',
+    options: [
+      for (final value in DesktopUiScale.options)
+        DialogOption(
+          value: value,
+          title: value == DesktopUiScale.automatic ? t.settings.desktopScaleAutomatic : '${(value * 100).round()}%',
+          subtitle: value == DesktopUiScale.automatic ? t.settings.desktopScaleDescription : null,
+        ),
+    ],
+  );
 
   Widget _viewModeSelector() => SettingSegmentedTile<ViewMode>(
     pref: SettingsService.viewMode,

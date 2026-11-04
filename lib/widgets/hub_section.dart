@@ -497,7 +497,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
     final leadingPadding = _leadingPaddingFor(isTv);
     final titleStyle = Theme.of(
       context,
-    ).textTheme.titleLarge?.copyWith(fontSize: isTv ? 26 : null, fontWeight: isTv ? FontWeight.w700 : null);
+    ).textTheme.titleLarge?.copyWith(fontSize: isTv ? 26 : 22, fontWeight: FontWeight.w700, letterSpacing: -0.5);
 
     return Padding(
       padding: .only(

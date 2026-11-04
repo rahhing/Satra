@@ -1,4 +1,5 @@
 import 'dart:async';
+import '../widgets/artwork_atmosphere.dart';
 import '../media/ids.dart';
 import 'dart:io' show Platform;
 import 'dart:math' as math;
@@ -955,7 +956,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final theme = Theme.of(context);
     final continueWatchingHub = _onDeck.isEmpty ? null : _continueWatchingHub;
     return Material(
-      color: theme.scaffoldBackgroundColor,
+      color: Colors.transparent,
       child: Stack(
         children: [
           CustomScrollView(
@@ -1165,6 +1166,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   Widget _buildHeroSection() {
+    if (_onDeck.isNotEmpty) {
+      ArtworkAtmosphereScope.select(context, _onDeck[_heroIndex.value.clamp(0, _onDeck.length - 1)]);
+    }
     final statusBarHeight = MediaQuery.paddingOf(context).top;
     final useSideNav = PlatformDetector.shouldUseSideNavigation(context);
     final isTv = PlatformDetector.isTV();
@@ -1197,6 +1201,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                 onPageChanged: (index) {
                   if (index >= 0 && index < _onDeck.length) {
                     _heroIndex.value = index;
+                    ArtworkAtmosphereScope.select(context, _onDeck[index]);
                     _resetAutoScrollTimer();
                   }
                 },

@@ -1,4 +1,5 @@
 import 'package:drift/native.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
@@ -3263,6 +3264,96 @@ void main() {
           (position) => axisDirectionToAxis(position.axisDirection) == Axis.horizontal && position.minScrollExtent < 0,
         );
     expect(inactiveRow.pixels, 0);
+  });
+
+  testWidgets('vertical drag scrolling and cross-row mouse hover update active hub and spotlight item', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 720);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final serverManager = MultiServerManager();
+    final multiServerProvider = testMultiServerProvider(serverManager);
+    addTearDown(multiServerProvider.dispose);
+
+    MediaHub buildHub(int hubIdx) => MediaHub(
+      id: 'hub_$hubIdx',
+      title: 'Hub $hubIdx',
+      type: 'movie',
+      items: [
+        for (var i = 0; i < 4; i++)
+          testMediaItem(
+            id: 'movie_${hubIdx}_$i',
+            backend: MediaBackend.plex,
+            kind: MediaKind.movie,
+            title: 'Movie $hubIdx-$i',
+          ),
+      ],
+      size: 4,
+    );
+
+    final hubs = [buildHub(0), buildHub(1), buildHub(2)];
+    MediaItem? lastFocusedItem;
+    MediaHub? lastActiveHub;
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<MultiServerProvider>.value(
+        value: multiServerProvider,
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: Scaffold(
+            body: SizedBox(
+              width: 1280,
+              height: 720,
+              child: TvBrowseRail(
+                focusMemory: focusMemory,
+                hubs: hubs,
+                autofocus: true,
+                iconForHub: (_, _) => Icons.movie_rounded,
+                onFocusedItemChanged: (item) => lastFocusedItem = item,
+                onActiveHubChanged: (hub, _) => lastActiveHub = hub,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(lastActiveHub?.id, 'hub_0');
+    expect(lastFocusedItem?.id, 'movie_0_0');
+
+    // Scroll partially so the second row's cards are visible inside the rail
+    // viewport while hub_0 is still the top active hub.
+    final railState = tester.state<TvBrowseRailState>(find.byType(TvBrowseRail));
+    final verticalPos = _verticalRailPosition(tester);
+    expect(verticalPos.pixels, 0);
+    railState.scrollVerticallyBy(80);
+    await tester.pumpAndSettle();
+    expect(verticalPos.pixels, 80);
+    expect(lastActiveHub?.id, 'hub_0');
+
+    // Hover a card in the second visible row without scrolling further: active
+    // hub and spotlight item update immediately while vertical scroll stays put.
+    final secondRowCard = find.ancestor(of: find.text('Movie 1-1'), matching: find.byType(MediaCard));
+    final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+    addTearDown(mouse.removePointer);
+    await mouse.addPointer(location: const Offset(10, 10));
+    await tester.pump();
+    await mouse.moveTo(tester.getTopLeft(secondRowCard) + const Offset(20, 20));
+    await tester.pump();
+
+    expect(lastActiveHub?.id, 'hub_1');
+    expect(lastFocusedItem?.id, 'movie_1_1');
+    expect(verticalPos.pixels, 80);
+
+    // Vertically scrolling further advances the vertical list and updates the
+    // active hub to the third row.
+    railState.scrollVerticallyBy(450);
+    await tester.pumpAndSettle();
+
+    expect(verticalPos.pixels, greaterThan(80));
+    expect(lastActiveHub?.id, 'hub_2');
   });
 }
 

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import '../utils/desktop_ui_scale.dart';
 import '../media/ids.dart';
 import '../media/playback_rate.dart';
 import '../media/media_version_preference.dart';
@@ -887,7 +888,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static const globalShaderPreset = StringPref('global_shader_preset', defaultValue: 'none');
   static const requireProfileSelectionOnOpen = BoolPref('require_profile_selection_on_open');
   static const useExternalPlayer = _UseExternalPlayerPref();
-  static const forceTvMode = BoolPref('force_tv_mode');
+  static const forceTvMode = BoolPref('force_tv_mode', defaultValue: true);
   static const visualEffects = EnumPref<VisualEffectsSetting>(
     'visual_effects',
     values: VisualEffectsSetting.values,
@@ -967,7 +968,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static final syncOffsetScope = PlayerSettingScopePref('sync_offset_scope', [audioSyncOffset, subtitleSyncOffset]);
   static final displaySwitchDelay = IntPref('display_switch_delay', transform: (v) => v.clamp(0, 10));
 
-  static ThemeMode _tvAwareThemeModeDefault() => PlatformDetector.isTV() ? ThemeMode.oled : ThemeMode.system;
+  static ThemeMode _tvAwareThemeModeDefault() => PlatformDetector.isTV() ? ThemeMode.oled : ThemeMode.dark;
   static const themeMode = EnumPref<ThemeMode>(
     'theme_mode',
     values: ThemeMode.values,
@@ -1007,6 +1008,7 @@ class SettingsService extends BaseSharedPreferencesService {
     defaultValueProvider: _tvAwareGridSpacingDefault,
   );
   static const automotiveUiScale = _AutomotiveUiScalePref();
+  static const desktopUiScale = DoublePref('desktop_ui_scale', transform: DesktopUiScale.normalize);
   static const tvCornerSpotlightBackdrop = BoolPref('tv_corner_spotlight_backdrop');
   static const episodePosterMode = _EpisodePosterModePref();
   static const continueWatchingAction = EnumPref<ContinueWatchingAction>(
@@ -1563,6 +1565,7 @@ class SettingsService extends BaseSharedPreferencesService {
     libraryDensity,
     gridSpacing,
     automotiveUiScale,
+    desktopUiScale,
     tvCornerSpotlightBackdrop,
     episodePosterMode,
     continueWatchingAction,
@@ -1667,6 +1670,7 @@ class SettingsService extends BaseSharedPreferencesService {
     'default_box_fit_mode' => (0, 2),
     'library_density' => (LibraryDensity.min, LibraryDensity.max),
     'automotive_ui_scale' => (AutomotiveUiScale.min, AutomotiveUiScale.max),
+    'desktop_ui_scale' => (0, 2.5),
     'remembered_brightness_level' => (-1, 1),
     _ => null,
   };

@@ -8,7 +8,7 @@ import '../utils/platform_detector.dart';
 /// Whether [event] is the exact current-page refresh chord for this desktop.
 bool _isPageRefreshShortcut(KeyEvent event) {
   if (event is! KeyDownEvent || event.logicalKey != LogicalKeyboardKey.keyR) return false;
-  if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTV()) return false;
+  if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTVDevice()) return false;
 
   final keyboard = HardwareKeyboard.instance;
   if (keyboard.isShiftPressed || keyboard.isAltPressed) return false;

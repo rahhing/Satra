@@ -1,7 +1,9 @@
 import 'dart:async';
+import '../widgets/artwork_atmosphere.dart';
 import 'dart:math' as math;
 import '../media/ids.dart';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../navigation/profile_navigation_scope.dart';
@@ -3530,6 +3532,16 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
           child: Scaffold(
             body: Stack(
               children: [
+                Positioned.fill(
+                  child: ArtworkAtmosphere(
+                    item: metadata,
+                    client: _getArtworkMediaClient(context),
+                    allowNetwork: !widget.isOffline,
+                    localArtworkPathResolver: widget.isOffline
+                        ? (path) => _offlineArtworkCandidatePath(context, path)
+                        : null,
+                  ),
+                ),
                 // Background art sits behind the scroll view so it can be
                 // taller than the hero sliver without displacing content.
                 _buildHeroBackdropLayer(context, metadata, size, headerHeight),
@@ -3874,14 +3886,22 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
         child: Scaffold(
           body: Stack(
             children: [
-              TvSpotlightBackground(
-                item: metadata,
-                client: _getArtworkMediaClient(context),
-                showInfo: false,
-                localArtworkPathResolver: widget.isOffline
-                    ? (path) => _offlineArtworkCandidatePath(context, path)
-                    : null,
-                allowNetwork: !widget.isOffline,
+              Listener(
+                behavior: HitTestBehavior.translucent,
+                onPointerSignal: (signal) {
+                  if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
+                    _tvDetailRailKey.currentState?.scrollVerticallyBy(signal.scrollDelta.dy);
+                  }
+                },
+                child: TvSpotlightBackground(
+                  item: metadata,
+                  client: _getArtworkMediaClient(context),
+                  showInfo: false,
+                  localArtworkPathResolver: widget.isOffline
+                      ? (path) => _offlineArtworkCandidatePath(context, path)
+                      : null,
+                  allowNetwork: !widget.isOffline,
+                ),
               ),
               _buildTvDetailRevealGate(revealContent, handleBack),
             ],

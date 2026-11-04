@@ -78,6 +78,7 @@ Future<ThemeProvider> _pumpEditor(WidgetTester tester, MonoPalette initial, {Siz
 }
 
 Future<void> _tapVisible(WidgetTester tester, Finder finder) async {
+  if (finder.evaluate().isEmpty) await _scrollTo(tester, finder);
   await tester.ensureVisible(finder);
   await tester.pumpAndSettle();
   await tester.tap(finder);
@@ -158,8 +159,10 @@ void main() {
     expect(find.text(onCard), findsOneWidget);
     // The colours the failing pairs are drawn from carry a marker.
     for (final slot in [MonoPaletteSlot.text, MonoPaletteSlot.bg, MonoPaletteSlot.surface]) {
+      await _scrollTo(tester, _slot(slot));
       expect(find.descendant(of: _slot(slot), matching: find.byIcon(Symbols.warning_rounded)), findsOneWidget);
     }
+    await _scrollTo(tester, _hexField);
 
     await _enterHex(tester, '#767676');
     expect(find.textContaining(t.themeEditor.contrast.textOnBg), findsNothing);

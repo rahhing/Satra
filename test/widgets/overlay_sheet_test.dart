@@ -273,8 +273,12 @@ void main() {
         // bottom-pinned, so the header sits at its FINAL y from the first tween
         // frame and holds there. Under a wrong (top) alignment it would instead
         // track the animating height. Only the exact value distinguishes them.
-        expect(tester.getTopLeft(header).dy, 800 - (smallHeight + 160));
-        expect(tester.getBottomLeft(animated).dy, 800, reason: 'bottom edge stays pinned to the viewport');
+        expect(tester.getTopLeft(header).dy, closeTo(800 - (smallHeight + 160), 0.000001));
+        expect(
+          tester.getBottomLeft(animated).dy,
+          closeTo(800, 0.000001),
+          reason: 'bottom edge stays pinned to the viewport',
+        );
       }
 
       await tester.pumpAndSettle();

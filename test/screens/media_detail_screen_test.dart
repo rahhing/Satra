@@ -2374,7 +2374,9 @@ void main() {
 
       await pumpPhoneDetail(tester, client, movie);
 
-      final backdrop = find.byType(CyclingMediaBackdrop);
+      // The sharp hero has its own rotation; the new blurred atmosphere is
+      // intentionally static and must not change the hero's artwork policy.
+      final backdrop = find.byWidgetPredicate((widget) => widget is CyclingMediaBackdrop && widget.active);
       expect(backdrop, findsOneWidget);
       // A fallback is reached only once every rotating path has failed, so the
       // square background has to be in the rotation set. Listed behind a

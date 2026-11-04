@@ -42,9 +42,10 @@ void main() {
     expect(identical(dark, oled), isFalse);
     expect(light.brightness, Brightness.light);
     expect(dark.brightness, Brightness.dark);
-    // OLED is the pure-black variant, which is the whole reason it exists.
+    // Both dark appearances use a black canvas; OLED keeps deeper surfaces.
     expect(oled.scaffoldBackgroundColor, const Color(0xFF000000));
-    expect(dark.scaffoldBackgroundColor, isNot(const Color(0xFF000000)));
+    expect(dark.scaffoldBackgroundColor, const Color(0xFF000000));
+    expect(dark.colorScheme.surface, isNot(oled.colorScheme.surface));
   });
 
   test('the cache keys on palette colours, not instance identity', () {

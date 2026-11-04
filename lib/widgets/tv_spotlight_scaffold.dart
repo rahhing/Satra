@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import '../i18n/strings.g.dart';
@@ -120,20 +121,28 @@ class TvSpotlightScaffold extends StatelessWidget {
                 final foregroundLeft = MainScreenFocusScope.foregroundLeftOf(context);
                 return SideNavigationBleedBuilder(
                   targetBleed: foregroundLeft,
-                  child: ValueListenableBuilder<MediaItem?>(
-                    valueListenable: spotlightListenable,
-                    builder: (context, _, _) {
-                      final spotlight = resolveSpotlight();
-                      return _CatalogSpotlightBackground(
-                        item: spotlight,
-                        client: resolveClient(spotlight),
-                        hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
-                        contentTop: spotlightTop,
-                        contentBottom: spotlightBottom,
-                        contentLeft: spotlightLeft + foregroundLeft,
-                        targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
-                      );
+                  child: Listener(
+                    behavior: HitTestBehavior.translucent,
+                    onPointerSignal: (signal) {
+                      if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
+                        _findDescendantBrowseRail(context)?.scrollVerticallyBy(signal.scrollDelta.dy);
+                      }
                     },
+                    child: ValueListenableBuilder<MediaItem?>(
+                      valueListenable: spotlightListenable,
+                      builder: (context, _, _) {
+                        final spotlight = resolveSpotlight();
+                        return _CatalogSpotlightBackground(
+                          item: spotlight,
+                          client: resolveClient(spotlight),
+                          hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
+                          contentTop: spotlightTop,
+                          contentBottom: spotlightBottom,
+                          contentLeft: spotlightLeft + foregroundLeft,
+                          targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
+                        );
+                      },
+                    ),
                   ),
                   builder: (context, animatedBleed, child) =>
                       Positioned(top: 0, bottom: 0, left: -animatedBleed, width: fullBleedWidth, child: child!),
@@ -145,6 +154,27 @@ class TvSpotlightScaffold extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  static TvBrowseRailState? _findDescendantBrowseRail(BuildContext context) {
+    TvBrowseRailState? found;
+    void visit(Element element) {
+      if (found != null) return;
+      if (element is StatefulElement && element.state is TvBrowseRailState) {
+        found = element.state as TvBrowseRailState;
+        return;
+      }
+      element.visitChildren(visit);
+    }
+
+    context.visitAncestorElements((ancestor) {
+      if (ancestor.widget is Stack) {
+        ancestor.visitChildElements(visit);
+        return false;
+      }
+      return true;
+    });
+    return found;
   }
 }
 

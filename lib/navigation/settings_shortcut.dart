@@ -28,7 +28,7 @@ MaterialPageRoute<void> buildSettingsRoute() {
 bool isSettingsShortcut(KeyEvent event) {
   if (event is! KeyDownEvent) return false;
   if (event.logicalKey != LogicalKeyboardKey.comma) return false;
-  if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTV()) return false;
+  if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTVDevice()) return false;
 
   final isMetaPressed = HardwareKeyboard.instance.isMetaPressed;
   final isControlPressed = HardwareKeyboard.instance.isControlPressed;

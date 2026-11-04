@@ -1,9 +1,11 @@
 <h1>
-  <img src="assets/plezy.png" alt="Plezy Logo" height="24" style="vertical-align: middle;" />
-  Plezy
+  <img src="assets/plezy.png" alt="Satra Logo" height="24" style="vertical-align: middle;" />
+  Satra
 </h1>
 
 A modern client for Plex, Jellyfin, and Emby on desktop, mobile, and TV. Built with Flutter for native performance and a clean interface.
+
+Satra is a fork of [Plezy](https://github.com/edde746/plezy) with navigation inspired by [Nuvio Desktop](https://github.com/NuvioMedia/NuvioDesktop), a black canvas, a white ribbon logo, frosted surfaces, artwork-driven backgrounds, and fluid browsing motion. See [the design notes](docs/visual-redesign.md) for implementation and verification details. The download links below are for upstream Plezy.
 
 <p>
   <a href="https://plezy.app">Website</a> ·

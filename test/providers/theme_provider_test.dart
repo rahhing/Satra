@@ -124,9 +124,10 @@ void main() {
       await p.setThemeMode(settings.ThemeMode.oled);
       final oled = p.darkTheme;
 
-      // OLED must be a true black canvas; regular dark uses a non-black surface.
+      // Both use black canvases; OLED keeps a deeper card/chrome surface.
       expect(oled.scaffoldBackgroundColor, const material.Color(0xFF000000));
-      expect(dark.scaffoldBackgroundColor, isNot(const material.Color(0xFF000000)));
+      expect(dark.scaffoldBackgroundColor, const material.Color(0xFF000000));
+      expect(dark.colorScheme.surface, isNot(oled.colorScheme.surface));
     });
 
     test('built-in Light, Dark and OLED paint their unchanged palettes', () async {
@@ -298,8 +299,8 @@ void main() {
         final p = _provider(supporter);
         await Future.delayed(Duration.zero);
 
-        expect(p.themeMode, settings.ThemeMode.system);
-        expect(p.materialThemeMode, material.ThemeMode.system);
+        expect(p.themeMode, settings.ThemeMode.dark);
+        expect(p.materialThemeMode, material.ThemeMode.dark);
         expect(identical(p.lightTheme, monoTheme(MonoPalette.light)), isTrue);
         expect(identical(p.darkTheme, monoTheme(MonoPalette.dark)), isTrue);
         expect(svc.read(settings.SettingsService.themeMode), mode);
@@ -340,7 +341,7 @@ void main() {
       await supporter.init();
 
       expect(supporter.isUnlocked, isFalse);
-      expect(p.themeMode, settings.ThemeMode.system);
+      expect(p.themeMode, settings.ThemeMode.dark);
       expect(svc.read(settings.SettingsService.themeMode), settings.ThemeMode.glacier);
     });
 
@@ -356,13 +357,13 @@ void main() {
       expect(p.lockedStoredThemeMode, settings.ThemeMode.glacier);
       notified = 0;
 
-      // Another locked perk paints the same System, but the saved choice moved.
+      // Another locked perk paints the same Dark, but the saved choice moved.
       await svc.write(settings.SettingsService.themeMode, settings.ThemeMode.forest);
       expect(notified, 1);
-      expect(p.themeMode, settings.ThemeMode.system);
+      expect(p.themeMode, settings.ThemeMode.dark);
       expect(p.lockedStoredThemeMode, settings.ThemeMode.forest);
 
-      // Custom with nothing saved would paint System even if unlocked.
+      // Custom with nothing saved would paint Dark even if unlocked.
       await svc.write(settings.SettingsService.themeMode, settings.ThemeMode.custom);
       expect(p.lockedStoredThemeMode, isNull);
     });
@@ -379,7 +380,7 @@ void main() {
       final svc = await _store(settings.ThemeMode.forest);
       final p = _provider(_supporter(SupporterAvailability.hidden));
       await Future.delayed(Duration.zero);
-      expect(p.themeMode, settings.ThemeMode.system);
+      expect(p.themeMode, settings.ThemeMode.dark);
       expect(svc.read(settings.SettingsService.themeMode), settings.ThemeMode.forest);
 
       await p.setThemeMode(settings.ThemeMode.oled);
@@ -391,7 +392,7 @@ void main() {
       await _store(settings.ThemeMode.custom);
       final p = _provider();
       await Future.delayed(Duration.zero);
-      expect(p.themeMode, settings.ThemeMode.system);
+      expect(p.themeMode, settings.ThemeMode.dark);
       expect(p.customPalette, isNull);
     });
 

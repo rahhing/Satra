@@ -66,6 +66,9 @@ import '../widgets/navigation_label_fit.dart';
 import '../widgets/mobile_navigation_rail.dart';
 import '../widgets/vertical_bar_shell.dart';
 import '../widgets/side_navigation_rail.dart';
+import '../widgets/glass_surface.dart';
+import '../widgets/retained_tab_view.dart';
+import '../widgets/artwork_atmosphere.dart';
 import '../focus/covered_route_focus_boundary.dart';
 import '../focus/dpad_navigator.dart';
 import '../focus/key_event_utils.dart';
@@ -1175,20 +1178,13 @@ class _MainScreenState extends State<MainScreen>
     await _pushProfileSelection();
   }
 
-  /// IndexedStack that disables tickers for offscreen children to prevent
-  /// animation controllers on non-visible tabs from scheduling frames.
+  /// Retain tab state while easing the newly selected page into view.
   Widget _buildTickerAwareStack() {
     return Column(
       children: [
         const AuthErrorBanner(),
         Expanded(
-          child: IndexedStack(
-            index: _currentIndex,
-            clipBehavior: Clip.none,
-            children: [
-              for (var i = 0; i < _screens.length; i++) TickerMode(enabled: i == _currentIndex, child: _screens[i]),
-            ],
-          ),
+          child: RetainedTabView(index: _currentIndex, children: _screens),
         ),
       ],
     );
@@ -1948,6 +1944,7 @@ class _MainScreenState extends State<MainScreen>
     final tabs = _getBottomNavigationTabs(context);
     final selectedIndex = tabs.indexWhere((tab) => tab.id == _currentTab);
     final navigationBar = NavigationBar(
+      backgroundColor: Colors.transparent,
       selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
       onDestinationSelected: (i) {
         if (i >= 0 && i < tabs.length) _selectTab(tabs[i].id);
@@ -2032,7 +2029,10 @@ class _MainScreenState extends State<MainScreen>
     // covers this route without unmounting it. Every focus self-heal below
     // (offline sidebar refocus, library reload, tab claims) is dropped while
     // covered, and focus returns to where it was when the cover pops (#2915).
-    return CoveredRouteFocusBoundary(child: _buildContent(context, useSideNav));
+    return ArtworkAtmosphereHost(
+      allowNetwork: !_isOffline,
+      child: CoveredRouteFocusBoundary(child: _buildContent(context, useSideNav)),
+    );
   }
 
   Widget _buildContent(BuildContext context, bool useSideNav) {
@@ -2093,7 +2093,7 @@ class _MainScreenState extends State<MainScreen>
                       child: Stack(
                         clipBehavior: Clip.hardEdge,
                         children: [
-                          Positioned.fill(child: ColoredBox(color: Theme.of(context).scaffoldBackgroundColor)),
+                          const Positioned.fill(child: ColoredBox(color: Colors.transparent)),
                           Positioned(
                             top: 0,
                             bottom: 0,
@@ -2200,6 +2200,7 @@ class _MainScreenState extends State<MainScreen>
   /// iPhone Duo with the system vertical bar: the tabs live in the bar.
   Widget _buildVerticalBarShell(BuildContext context, VerticalBarEdge edge) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: VerticalBarShell(
         edge: edge,
         railBuilder: (context, barWidth) => SettingValueBuilder<bool>(
@@ -2235,6 +2236,7 @@ class _MainScreenState extends State<MainScreen>
   /// the content must not indent for it a second time.
   Widget _buildLandscapeShell(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
       body: Builder(
         builder: (context) {
           final isRtl = Directionality.of(context) == TextDirection.rtl;
@@ -2274,6 +2276,8 @@ class _MainScreenState extends State<MainScreen>
 
   Widget _buildPortraitShell(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.transparent,
+      extendBody: true,
       body: _buildTickerAwareStack(),
       bottomNavigationBar: Column(
         key: _navBarKey,
@@ -2321,7 +2325,14 @@ class _MainScreenState extends State<MainScreen>
               _scheduleNavBarMeasure(rail: false);
               return NavigationBarTheme(
                 data: NavigationBarTheme.of(context).copyWith(height: hideLabels ? 56 : null),
-                child: _buildBottomNavigationBar(context, hideLabels: hideLabels),
+                child: SafeArea(
+                  top: false,
+                  minimum: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+                  child: GlassSurface(
+                    borderRadius: const BorderRadius.all(Radius.circular(30)),
+                    child: _buildBottomNavigationBar(context, hideLabels: hideLabels),
+                  ),
+                ),
               );
             },
           ),

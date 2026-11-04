@@ -56,6 +56,21 @@ static void my_application_activate(GApplication* application) {
   MyApplication* self = MY_APPLICATION(application);
   GtkWindow* window = GTK_WINDOW(gtk_application_window_new(GTK_APPLICATION(application)));
 
+  // A development/portable build has no newly installed desktop icon theme.
+  // Supply its bundled mark for X11 window managers. Wayland resolves icons
+  // through the desktop entry; install-local-launcher.py updates that entry
+  // when running a locally built bundle alongside the system installation.
+  g_autofree gchar* executable = g_file_read_link("/proc/self/exe", nullptr);
+  if (executable != nullptr) {
+    g_autofree gchar* directory = g_path_get_dirname(executable);
+    g_autofree gchar* icon =
+        g_build_filename(directory, "data", "flutter_assets", "assets", "plezy.png", nullptr);
+    g_autoptr(GError) icon_error = nullptr;
+    if (!gtk_window_set_icon_from_file(window, icon, &icon_error)) {
+      g_warning("Could not load the Satra window icon: %s", icon_error->message);
+    }
+  }
+
   // Default to traditional titlebar. Set GTK_CSD=1 to use a header bar.
   gboolean use_header_bar = FALSE;
   const gchar* gtk_csd = g_getenv("GTK_CSD");
@@ -65,11 +80,11 @@ static void my_application_activate(GApplication* application) {
   if (use_header_bar) {
     GtkHeaderBar* header_bar = GTK_HEADER_BAR(gtk_header_bar_new());
     gtk_widget_show(GTK_WIDGET(header_bar));
-    gtk_header_bar_set_title(header_bar, "Plezy");
+    gtk_header_bar_set_title(header_bar, "Satra");
     gtk_header_bar_set_show_close_button(header_bar, TRUE);
     gtk_window_set_titlebar(window, GTK_WIDGET(header_bar));
   } else {
-    gtk_window_set_title(window, "Plezy");
+    gtk_window_set_title(window, "Satra");
   }
 
   gtk_window_set_default_size(window, 1280, 720);

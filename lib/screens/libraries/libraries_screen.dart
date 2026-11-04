@@ -1056,6 +1056,6 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       child: body,
     );
 
-    return Scaffold(body: scrollBody);
+    return Scaffold(backgroundColor: Colors.transparent, body: scrollBody);
   }
 }

@@ -1,6 +1,6 @@
 {
   "app": {
-    "title": "Plezy"
+    "title": "Satra"
   },
   "appIcon": {
     "title": "App icon",
@@ -210,6 +210,8 @@
     "paperTheme": "Paper",
     "libraryDensity": "Library Density",
     "displayScale": "Display Scale",
+    "desktopScaleAutomatic": "Automatic (fit your display)",
+    "desktopScaleDescription": "Keep text and controls comfortable on high-resolution monitors.",
     "compact": "Compact",
     "comfortable": "Comfortable",
     "gridSpacing": "Grid Spacing",

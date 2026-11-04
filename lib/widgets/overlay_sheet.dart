@@ -10,6 +10,8 @@ import '../focus/input_mode_tracker.dart';
 import '../focus/key_event_utils.dart';
 import '../utils/iphone_duo.dart';
 import '../utils/platform_detector.dart';
+import '../theme/app_motion.dart';
+import 'glass_surface.dart';
 
 /// Entry in the sheet page stack.
 class _OverlaySheetEntry {
@@ -121,7 +123,7 @@ class OverlaySheetController {
   static BoxConstraints _defaultSheetConstraints(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final isWideViewport = size.width > 600;
-    final isDesktopWindow = isWideViewport && PlatformDetector.isDesktopOS() && !PlatformDetector.isTV();
+    final isDesktopWindow = isWideViewport && PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
     final maxHeight = size.height * 0.75;
     return BoxConstraints(
       maxWidth: isWideViewport ? 700 : double.infinity,
@@ -329,7 +331,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
     super.initState();
     _controller = OverlaySheetController._(this);
 
-    _animationController = AnimationController(duration: const Duration(milliseconds: 250), vsync: this);
+    _animationController = AnimationController(duration: AppMotion.standard, vsync: this);
 
     _slideCurve = CurvedAnimation(
       parent: _animationController,
@@ -405,6 +407,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
     }
 
     BackKeyUpSuppressor.clearSuppression();
+    _animationController.duration = AppMotion.duration(context);
     _animationController.forward(from: 0);
     _autoFocus();
 
@@ -474,7 +477,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
   }
 
   double? _resolveSheetHorizontalAnchor(Alignment alignment) {
-    if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTV()) return null;
+    if (!PlatformDetector.isDesktopOS() || PlatformDetector.isTVDevice()) return null;
     if (InputModeTracker.isKeyboardMode(context, listen: false)) return null;
     if (alignment.x != 0 || alignment.y <= 0) return null;
     return _lastPointerPosition?.dx;
@@ -780,8 +783,8 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
     final slideDirection = isTop ? -1.0 : 1.0;
     final slideDistance = size.height;
     final borderRadius = isTop
-        ? const BorderRadius.vertical(bottom: Radius.circular(16))
-        : const BorderRadius.vertical(top: Radius.circular(16));
+        ? const BorderRadius.vertical(bottom: Radius.circular(28))
+        : const BorderRadius.vertical(top: Radius.circular(28));
 
     final colorScheme = Theme.of(context).colorScheme;
 
@@ -890,26 +893,32 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
                 bottom: false,
                 child: Material(
                   key: _sheetKey,
-                  color: _explicitBackgroundColor ?? colorScheme.surface,
+                  color: _explicitBackgroundColor ?? Colors.transparent,
                   borderRadius: borderRadius,
                   clipBehavior: Clip.antiAlias,
-                  child: SafeArea(
-                    top: isTop,
-                    bottom: !isTop,
-                    left: false,
-                    right: false,
-                    // Content is sized by the sheet body, so pushing a nested
-                    // page or resolving async content changes the sheet's
-                    // height. Ease the box between those heights instead of
-                    // snapping. The child is laid out at its final size and
-                    // pinned to the anchored edge throughout, so it is revealed
-                    // rather than stretched.
-                    child: AnimatedSize(
-                      key: ValueKey(_sheetSession),
-                      duration: const Duration(milliseconds: 180),
-                      curve: Curves.easeOutCubic,
-                      alignment: isTop ? Alignment.topCenter : Alignment.bottomCenter,
-                      child: ConstrainedBox(constraints: effectiveConstraints, child: sheetContent),
+                  child: GlassSurface(
+                    enabled: _explicitBackgroundColor == null,
+                    tint: colorScheme.surface,
+                    borderRadius: borderRadius,
+                    opacity: 0.86,
+                    child: SafeArea(
+                      top: isTop,
+                      bottom: !isTop,
+                      left: false,
+                      right: false,
+                      // Content is sized by the sheet body, so pushing a nested
+                      // page or resolving async content changes the sheet's
+                      // height. Ease the box between those heights instead of
+                      // snapping. The child is laid out at its final size and
+                      // pinned to the anchored edge throughout, so it is revealed
+                      // rather than stretched.
+                      child: AnimatedSize(
+                        key: ValueKey(_sheetSession),
+                        duration: AppMotion.duration(context),
+                        curve: Curves.easeOutCubic,
+                        alignment: isTop ? Alignment.topCenter : Alignment.bottomCenter,
+                        child: ConstrainedBox(constraints: effectiveConstraints, child: sheetContent),
+                      ),
                     ),
                   ),
                 ),

@@ -197,6 +197,8 @@ class AgentSettingsCommands {
         if (!Platform.isAndroid) return 'Visual-effects tier selection is Android-only.';
       case 'automotive_ui_scale':
         if (!PlatformDetector.isAutomotive()) return 'Display scale customization is for automotive displays.';
+      case 'desktop_ui_scale':
+        if (!desktop || tv) return 'This display scale setting is for desktop windows.';
       case 'tv_full_card_layout' || 'tv_corner_spotlight_backdrop' || 'focus_glow':
         if (!tv) return 'This setting is used by the TV layout.';
       case 'show_hero_section' || 'show_season_posters_on_tabs':

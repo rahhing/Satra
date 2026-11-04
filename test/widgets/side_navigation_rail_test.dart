@@ -20,7 +20,6 @@ import 'package:plezy/providers/libraries_provider.dart';
 import 'package:plezy/providers/multi_server_provider.dart';
 import 'package:plezy/services/multi_server_manager.dart';
 import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/theme/mono_tokens.dart';
 import 'package:plezy/utils/platform_detector.dart';
 import 'package:plezy/widgets/app_icon.dart';
 import 'package:plezy/widgets/side_navigation_rail.dart';
@@ -243,7 +242,7 @@ void main() {
     expect(_railSurfaceOpacity(tester).opacity, 1.0);
   });
 
-  testWidgets('closed desktop rail shows icon-only pill destinations', (tester) async {
+  testWidgets('closed desktop rail shows icon-only rounded destinations', (tester) async {
     await _pumpBasicRail(tester);
 
     // Collapsed destinations are icon-only; labels appear only expanded.
@@ -256,7 +255,7 @@ void main() {
       const Size(NavigationRailItem.collapsedIndicatorWidth, NavigationRailItem.collapsedIndicatorHeight),
     );
     // Home is the selected tab: the pill carries the active indicator tint.
-    expect(_railItemDecoration(tester, homeItem)?.color, testMonoTokens.text.withValues(alpha: 0.1));
+    expect(_railItemDecoration(tester, homeItem)?.color, testMonoTokens.accent.withValues(alpha: 0.12));
 
     // Pill (and its icon) are centered in the rail.
     final rail = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedContainer)).first;
@@ -266,13 +265,13 @@ void main() {
     );
   });
 
-  testWidgets('expanded rail destination uses a full-width stadium indicator', (tester) async {
+  testWidgets('expanded rail destination uses a full-width rounded indicator', (tester) async {
     await _pumpBasicRail(tester, alwaysExpanded: true);
 
     final homeItem = find.byType(NavigationRailItem).first;
     final indicator = find.descendant(of: homeItem, matching: find.byType(Container)).first;
     expect(tester.getSize(indicator), const Size(SideNavigationRailState.expandedWidth - 24, 48));
-    expect(_railItemDecoration(tester, homeItem)?.borderRadius, BorderRadius.circular(MonoTokens.radiusFull));
+    expect(_railItemDecoration(tester, homeItem)?.borderRadius, BorderRadius.circular(14));
   });
 
   testWidgets('expanded TV rail keeps a transparent surface', (tester) async {
@@ -326,7 +325,7 @@ void main() {
     await _pumpBasicRail(tester, alwaysExpanded: true);
 
     final selectedItem = find.byType(NavigationRailItem).first;
-    expect(_railItemDecoration(tester, selectedItem)?.color, testMonoTokens.text.withValues(alpha: 0.1));
+    expect(_railItemDecoration(tester, selectedItem)?.color, testMonoTokens.accent.withValues(alpha: 0.12));
   });
 
   testWidgets('D-pad sidebar focus hides selected item background after focus moves', (tester) async {
@@ -677,6 +676,9 @@ void main() {
     expect(tester.getSize(rail).width, SideNavigationRailState.expandedWidth);
 
     await gesture.moveTo(tester.getBottomRight(rail) + const Offset(100, -10));
+    // The rail deliberately waits 150ms before collapsing. Do not rely on an
+    // unrelated InkWell hover animation to keep pumpAndSettle advancing time.
+    await tester.pump(const Duration(milliseconds: 160));
     await tester.pumpAndSettle();
 
     expect(tester.getSize(rail).width, SideNavigationRailState.collapsedWidth);
@@ -707,6 +709,9 @@ void main() {
     expect(scrimReports.last, isTrue);
 
     await gesture.moveTo(tester.getBottomRight(rail) + const Offset(100, -10));
+    // The rail deliberately waits 150ms before collapsing. Do not rely on an
+    // unrelated InkWell hover animation to keep pumpAndSettle advancing time.
+    await tester.pump(const Duration(milliseconds: 160));
     await tester.pumpAndSettle();
     expect(scrimReports.last, isFalse);
   });
@@ -737,6 +742,9 @@ void main() {
     expect(_railSurfaceOpacity(tester).opacity, 1.0);
 
     await gesture.moveTo(tester.getBottomRight(rail) + const Offset(100, -10));
+    // The rail deliberately waits 150ms before collapsing. Do not rely on an
+    // unrelated InkWell hover animation to keep pumpAndSettle advancing time.
+    await tester.pump(const Duration(milliseconds: 160));
     await tester.pumpAndSettle();
 
     expect(tester.getSize(rail).width, SideNavigationRailState.tvCollapsedWidth);
@@ -774,6 +782,16 @@ void main() {
     final rail = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedContainer)).first;
     expect(tester.getSize(rail).width, SideNavigationRailState.expandedWidth);
     expect(_railSurfaceOpacity(tester).opacity, 0.0);
+  });
+
+  testWidgets('TV rail pushes top navigation item below the overlaid top bar', (tester) async {
+    await TvDetectionService.getInstance();
+    TvDetectionService.setForceTVSync(true);
+
+    await _pumpBasicRail(tester);
+
+    final firstItemTop = tester.getTopLeft(find.byType(NavigationRailItem).first).dy;
+    expect(firstItemTop, greaterThanOrEqualTo(76.0));
   });
 
   testWidgets('Apple TV D-pad focus skips hidden downloads item', (tester) async {

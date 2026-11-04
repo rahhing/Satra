@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/device_performance.dart';
+import '../theme/app_motion.dart';
 import 'layout_constants.dart';
 
 Route<T> fadeRoute<T>(Widget page) {
@@ -11,7 +12,7 @@ Route<T> fadeRoute<T>(Widget page) {
     opaque: false,
     pageBuilder: (context, animation, secondaryAnimation) => page,
     transitionsBuilder: (context, animation, secondaryAnimation, child) =>
-        FadeTransition(opacity: animation, child: child),
+        AppMotion.transition(context, animation, child),
     transitionDuration: DevicePerformance.reducedDuration(AppDurations.animSlow),
     reverseTransitionDuration: DevicePerformance.reducedDuration(AppDurations.animSlow),
   );

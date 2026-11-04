@@ -57,6 +57,12 @@ mixin MemoryPressureBreadcrumbs on PaintingBinding {
       'liveImages': cache.liveImageCount,
       ..._playbackData(),
     };
+    // Linux's current and peak RSS use separate kernel counters and can
+    // disagree by a page while memory changes. The observed sample is itself
+    // a lower bound on the peak; keep the diagnostic internally consistent.
+    final rssMb = data['rssMb'];
+    final maxRssMb = data['maxRssMb'];
+    if (rssMb is int && maxRssMb is int) data['maxRssMb'] = math.max(rssMb, maxRssMb);
     super.handleMemoryPressure();
     data
       ..['imageCacheMbAfter'] = cache.currentSizeBytes >> 20

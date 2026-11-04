@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../services/device_performance.dart';
 import '../theme/mono_tokens.dart';
+import '../theme/app_motion.dart';
 import '../utils/platform_detector.dart';
 
 class FocusTheme {
@@ -25,8 +25,10 @@ class FocusTheme {
   static Duration getAnimationDuration(BuildContext context) {
     // Reduced tier: snap focus transitions (scale/border/glow) instead of
     // animating — each animation frame re-rasterizes the focused card.
-    if (DevicePerformance.isReduced) return Duration.zero;
-    return Theme.of(context).extension<MonoTokens>()?.fast ?? const Duration(milliseconds: 150);
+    return AppMotion.duration(
+      context,
+      Theme.of(context).extension<MonoTokens>()?.fast ?? const Duration(milliseconds: 180),
+    );
   }
 
   /// How long a TV row (or the hub list) glides after one D-pad focus step.
