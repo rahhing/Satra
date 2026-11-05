@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dart_discord_presence/dart_discord_presence.dart';
+import 'package:clock/clock.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:satra/media/ids.dart';
@@ -268,30 +269,117 @@ void main() {
       });
     });
 
-    test('a paused video withdraws the card and resume brings it back', () {
+    test('paused episodes keep a static position and resume excludes the paused time', () {
       fakeAsync((async) {
-        final rpcService = connectedService(async);
-        final client = clients.single;
-        final movie = testMediaItem(kind: MediaKind.movie, title: 'Heat', durationMs: 10200000);
-
-        unawaited(rpcService.startPlayback(movie, _NoopClient()));
+        final service = connectedService(async);
+        final rpc = clients.single;
+        final episode = testMediaItem(
+          kind: MediaKind.episode,
+          title: 'Pilot',
+          grandparentTitle: 'The Show',
+          parentIndex: 1,
+          index: 2,
+          durationMs: 2700000,
+        );
+        unawaited(service.startPlayback(episode, _NoopClient()));
         async.flushMicrotasks();
-        expect(client.presences.single.details, 'Heat');
-
-        unawaited(rpcService.pausePlayback());
+        unawaited(service.pausePlayback(position: const Duration(minutes: 12, seconds: 34)));
         async.flushMicrotasks();
-
-        // The card posted while playing stays a single log entry; pause
-        // withdraws it instead of re-posting a timer-less card.
-        expect(client.presences, hasLength(1));
-        expect(client.clearPresenceCalls, isPositive);
-
-        unawaited(rpcService.resumePlayback());
+        final paused = rpc.presences.last;
+        expect(paused.type, DiscordActivityType.watching);
+        expect(paused.details, 'The Show');
+        expect(paused.state, 'Paused at 12:34 / 45:00 · S1 E2 - Pilot');
+        expect(paused.timestamps, isNull);
+        expect(rpc.clearPresenceCalls, 0);
+        final count = rpc.presences.length;
+        async.elapse(const Duration(hours: 3));
+        expect(rpc.presences.length, count);
+        expect(rpc.presences.last.state, paused.state);
+        unawaited(service.resumePlayback(position: const Duration(minutes: 12, seconds: 34)));
         async.flushMicrotasks();
-        expect(client.presences.last.details, 'Heat');
-        expect(client.presences.last.timestamps, isNotNull);
+        final resumed = rpc.presences.last;
+        final now = clock.now().millisecondsSinceEpoch ~/ 1000;
+        expect(resumed.state, 'S1 E2 - Pilot');
+        expect(resumed.timestamps!.start, now - 754);
+        expect(resumed.timestamps!.end, now + 2700 - 754);
+        unawaited(service.dispose());
+        async.flushMicrotasks();
+      });
+    });
 
-        unawaited(rpcService.dispose());
+    test('seeking while paused updates the static time and resume accounts for speed', () {
+      fakeAsync((async) {
+        final service = connectedService(async);
+        final rpc = clients.single;
+        unawaited(
+          service.startPlayback(
+            testMediaItem(kind: MediaKind.movie, title: 'Heat', durationMs: 7200000),
+            _NoopClient(),
+          ),
+        );
+        async.flushMicrotasks();
+        unawaited(service.pausePlayback(position: const Duration(hours: 1)));
+        async.flushMicrotasks();
+        expect(rpc.presences.last.state, 'Paused at 1:00:00 / 2:00:00');
+        service.updatePosition(const Duration(hours: 1, seconds: 1));
+        async.flushMicrotasks();
+        expect(rpc.presences.last.state, 'Paused at 1:00:01 / 2:00:00');
+        expect(rpc.presences.last.timestamps, isNull);
+        service.updatePlaybackSpeed(2);
+        async.elapse(const Duration(minutes: 5));
+        unawaited(service.resumePlayback());
+        async.flushMicrotasks();
+        final timestamps = rpc.presences.last.timestamps!;
+        final now = clock.now().millisecondsSinceEpoch ~/ 1000;
+        expect(timestamps.start, closeTo(now - 1800, 1));
+        expect(timestamps.end, closeTo(now + 1799, 1));
+        unawaited(service.stopPlayback());
+        async.flushMicrotasks();
+        expect(rpc.clearPresenceCalls, 1);
+        unawaited(service.dispose());
+        async.flushMicrotasks();
+      });
+    });
+
+    test('an unknown-duration video resumes its elapsed timer at the saved position', () {
+      fakeAsync((async) {
+        final service = connectedService(async);
+        final rpc = clients.single;
+        unawaited(service.startPlayback(testMediaItem(kind: MediaKind.episode, title: 'Episode'), _NoopClient()));
+        unawaited(service.pausePlayback(position: const Duration(seconds: 90)));
+        async.flushMicrotasks();
+        expect(rpc.presences.last.state, 'Paused at 1:30 · Episode');
+        expect(rpc.presences.last.timestamps, isNull);
+        async.elapse(const Duration(minutes: 10));
+        unawaited(service.resumePlayback());
+        async.flushMicrotasks();
+        expect(rpc.presences.last.timestamps!.start, clock.now().millisecondsSinceEpoch ~/ 1000 - 90);
+        expect(rpc.presences.last.timestamps!.end, isNull);
+        unawaited(service.dispose());
+        async.flushMicrotasks();
+      });
+    });
+
+    test('reconnecting Discord keeps an already-paused episode paused', () {
+      fakeAsync((async) {
+        final service = connectedService(async);
+        unawaited(
+          service.startPlayback(
+            testMediaItem(kind: MediaKind.episode, title: 'Episode', durationMs: 600000),
+            _NoopClient(),
+          ),
+        );
+        async.flushMicrotasks();
+        unawaited(service.pausePlayback(position: const Duration(seconds: 42)));
+        async.flushMicrotasks();
+        clients.single.emitDisconnected();
+        async.elapse(const Duration(seconds: 30));
+        clients.last.emitReady();
+        async.elapse(const Duration(milliseconds: 200));
+        final presence = clients.last.presences.last;
+        expect(presence.state, 'Paused at 0:42 / 10:00 · Episode');
+        expect(presence.timestamps, isNull);
+        unawaited(service.dispose());
         async.flushMicrotasks();
       });
     });

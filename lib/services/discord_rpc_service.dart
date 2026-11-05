@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dart_discord_presence/dart_discord_presence.dart';
+import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 
 import '../media/media_item.dart';
@@ -8,6 +9,7 @@ import '../media/media_kind.dart';
 import '../media/media_server_client.dart';
 import '../media/playback_timeline.dart';
 import '../utils/app_logger.dart';
+import '../utils/formatters.dart';
 import '../utils/media_image_helper.dart';
 import '../utils/platform_detector.dart';
 import '../utils/media_server_http_client.dart';
@@ -82,7 +84,7 @@ class DiscordRPCService {
   MediaItem? _currentMetadata;
   MediaServerClient? _currentClient;
   String? _cachedThumbnailUrl;
-  DateTime? _playbackStartTime;
+  bool _isPlaying = false;
   final PlaybackTimeline _timeline = PlaybackTimeline();
   double _playbackSpeed = 1.0;
   int _playbackRevision = 0;
@@ -149,10 +151,11 @@ class DiscordRPCService {
     final revision = ++_playbackRevision;
     _currentMetadata = metadata;
     _currentClient = client;
-    _playbackStartTime = DateTime.now();
+    _isPlaying = true;
     _timeline.reset(duration: metadata.durationMs != null ? Duration(milliseconds: metadata.durationMs!) : null);
     _cachedThumbnailUrl = null;
     _playbackSpeed = 1.0;
+    _lastPresenceUpdate = null;
 
     if (_isEnabled && _isConnected) {
       unawaited(_uploadThumbnailAndUpdatePresence(revision, metadata, client));
@@ -161,10 +164,15 @@ class DiscordRPCService {
 
   /// Update current playback position (for progress bar)
   void updatePosition(Duration position) {
+    final secondsChanged = position.inSeconds != _timeline.position.inSeconds;
     final isSeek = _timeline.updatePosition(position);
+    if (!_isPlaying && _currentMetadata != null && _currentMetadata!.kind != MediaKind.track && secondsChanged) {
+      if (_isEnabled && _isConnected) unawaited(_updatePresence());
+      return;
+    }
 
-    if (_isEnabled && _isConnected && _playbackStartTime != null && isSeek) {
-      final now = DateTime.now();
+    if (_isEnabled && _isConnected && _isPlaying && isSeek) {
+      final now = clock.now();
       if (_lastPresenceUpdate == null || now.difference(_lastPresenceUpdate!) > const Duration(seconds: 1)) {
         _lastPresenceUpdate = now;
         _updatePresence();
@@ -174,28 +182,29 @@ class DiscordRPCService {
 
   /// Update current playback speed (for accurate remaining time calculation)
   void updatePlaybackSpeed(double speed) {
-    if (_playbackSpeed == speed) return;
+    if (!speed.isFinite || speed <= 0 || _playbackSpeed == speed) return;
     _playbackSpeed = speed;
-    if (_isEnabled && _isConnected && _playbackStartTime != null) {
+    if (_isEnabled && _isConnected && _isPlaying) {
       _updatePresence();
     }
   }
 
-  /// Resume playback (restore timestamp)
-  Future<void> resumePlayback() async {
+  /// Resume from the player's position, excluding time spent paused.
+  Future<void> resumePlayback({Duration? position}) async {
     if (_currentMetadata == null) return;
-
-    _playbackStartTime = DateTime.now();
+    if (position != null) _timeline.updatePosition(position);
+    _isPlaying = true;
 
     if (_isEnabled && _isConnected) {
       await _updatePresence();
     }
   }
 
-  /// Pause - clear timestamp. The card is withdrawn while paused (see
-  /// [_updatePresence]) and re-posted on resume.
-  Future<void> pausePlayback() async {
-    _playbackStartTime = null;
+  /// Videos retain a static paused status; music keeps its existing withdraw
+  /// policy. Capture the final player position before replacing the timer.
+  Future<void> pausePlayback({Duration? position}) async {
+    if (position != null) _timeline.updatePosition(position);
+    _isPlaying = false;
 
     if (_isEnabled && _isConnected) {
       await _updatePresence();
@@ -206,9 +215,10 @@ class DiscordRPCService {
     _playbackRevision++;
     _currentMetadata = null;
     _currentClient = null;
-    _playbackStartTime = null;
+    _isPlaying = false;
     _cachedThumbnailUrl = null;
     _playbackSpeed = 1.0;
+    _lastPresenceUpdate = null;
 
     if (_isEnabled && _isConnected) {
       await clearPresence();
@@ -434,12 +444,7 @@ class DiscordRPCService {
   Future<void> _updatePresence() async {
     if (_rpc == null || !_isConnected || _currentMetadata == null) return;
 
-    // No card while paused. Discord runs an "elapsed" counter from the
-    // activity's creation when no timestamps are sent, so a paused card
-    // reads as still playing — and a paused session can sit for hours.
-    // Same convention as Spotify's integration: gone on pause, back on
-    // resume.
-    if (_playbackStartTime == null) {
+    if (!_isPlaying && _currentMetadata!.kind == MediaKind.track) {
       await clearPresence();
       return;
     }
@@ -447,7 +452,7 @@ class DiscordRPCService {
     try {
       final metadata = _currentMetadata!;
       final details = _buildDetails(metadata);
-      final state = _buildState(metadata);
+      final state = _isPlaying ? _buildState(metadata) : _buildPausedState(metadata);
 
       await _rpc!.setPresence(
         DiscordPresence(
@@ -466,30 +471,36 @@ class DiscordRPCService {
     }
   }
 
-  /// Build timestamps for Discord progress bar
-  DiscordTimestamps? _buildTimestamps() {
-    // When paused, don't show timestamps (progress bar would be inaccurate)
-    if (_playbackStartTime == null) return null;
-
+  Duration get _boundedPosition {
+    final position = _timeline.position;
+    if (position < Duration.zero) return Duration.zero;
     final duration = _timeline.duration;
-    if (duration != null) {
-      final now = DateTime.now();
+    if (duration != null && duration > Duration.zero && position > duration) return duration;
+    return position;
+  }
 
-      // Calculate remaining time accounting for playback speed
-      final remainingDuration = duration - _timeline.position;
-      final adjustedRemaining = Duration(microseconds: (remainingDuration.inMicroseconds / _playbackSpeed).round());
+  /// Paused video uses a static position; resume anchors the running timer
+  /// to media time rather than counting the time spent paused.
+  DiscordTimestamps? _buildTimestamps() {
+    if (!_isPlaying) return null;
+    final duration = _timeline.duration;
+    final position = _boundedPosition.inMicroseconds;
+    final start = clock.now().subtract(Duration(microseconds: (position / _playbackSpeed).round()));
+    if (duration == null || duration <= Duration.zero) return DiscordTimestamps.started(start);
+    final end = start.add(Duration(microseconds: (duration.inMicroseconds / _playbackSpeed).round()));
+    return DiscordTimestamps.range(start, end);
+  }
 
-      // Calculate total adjusted duration for progress bar
-      final adjustedTotal = Duration(microseconds: (duration.inMicroseconds / _playbackSpeed).round());
-
-      final effectiveEnd = now.add(adjustedRemaining);
-      final effectiveStart = effectiveEnd.subtract(adjustedTotal);
-
-      return DiscordTimestamps.range(effectiveStart, effectiveEnd);
-    }
-
-    // Fallback: just show elapsed time
-    return DiscordTimestamps.started(_playbackStartTime!);
+  String _buildPausedState(MediaItem metadata) {
+    final position = formatDurationTimestamp(_boundedPosition);
+    final duration = _timeline.duration;
+    final progress = duration != null && duration > Duration.zero
+        ? '$position / ${formatDurationTimestamp(duration)}'
+        : position;
+    final episode = metadata.kind == MediaKind.episode ? _buildState(metadata) : null;
+    final state = 'Paused at $progress${episode == null || episode.isEmpty ? '' : ' · $episode'}';
+    // Keep the pause indicator first even for an unusually long episode title.
+    return String.fromCharCodes(state.runes.take(128));
   }
 
   /// Build the main "details" line (first line of presence)

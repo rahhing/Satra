@@ -817,10 +817,10 @@ extension _VideoPlayerPlaybackServiceMethods on VideoPlayerScreenState {
 
     // Update Discord Rich Presence + real-time trackers
     if (isPlaying) {
-      DiscordRPCService.instance.resumePlayback();
+      DiscordRPCService.instance.resumePlayback(position: player?.state.position);
       TrackerCoordinator.instance.resumePlayback();
     } else {
-      DiscordRPCService.instance.pausePlayback();
+      DiscordRPCService.instance.pausePlayback(position: player?.state.position);
       TrackerCoordinator.instance.pausePlayback();
     }
 
