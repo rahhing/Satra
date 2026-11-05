@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/utils/trailer_urls.dart';
+import 'package:satra/utils/trailer_urls.dart';
 
 void main() {
   group('youTubeVideoId', () {

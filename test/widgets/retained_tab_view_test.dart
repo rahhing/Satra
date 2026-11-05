@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/widgets/retained_tab_view.dart';
+import 'package:satra/widgets/retained_tab_view.dart';
 
 void main() {
   testWidgets('switching tabs retains scroll offsets, form values and state identities', (tester) async {

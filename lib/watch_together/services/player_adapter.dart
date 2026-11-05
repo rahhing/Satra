@@ -22,7 +22,7 @@ class PlayerCommands {
   final Future<void> Function(double rate) setRate;
 }
 
-/// Plezy's player behind the Open Watch Party SDK (SDK.md §16.4): one adapter
+/// Satra's player behind the Open Watch Party SDK (SDK.md §16.4): one adapter
 /// per opened file, attached with the [copy] that file is.
 ///
 /// Reads come from the player's state. Commands finish when the player has
@@ -30,8 +30,8 @@ class PlayerCommands {
 /// seek while it is still opening the file) and then until it lands. Once
 /// [release]d, every command and wait returns at once, so the party's release
 /// completes and the screen can dispose of the player.
-final class PlezyPlayerAdapter extends owp.PlayerAdapter {
-  PlezyPlayerAdapter({required this.player, required this.copy, required this.commands});
+final class SatraPlayerAdapter extends owp.PlayerAdapter {
+  SatraPlayerAdapter({required this.player, required this.copy, required this.commands});
 
   /// The longest a seek waits for the player to take seeks, and then to land.
   static const Duration landingTimeout = Duration(seconds: 10);

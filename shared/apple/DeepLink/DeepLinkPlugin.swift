@@ -5,7 +5,7 @@
   import FlutterMacOS
 #endif
 
-/// Answers `com.plezy/deep_link` on iOS, iPadOS, tvOS and macOS: hands every `plezy:` URL the
+/// Answers `com.satra/deep_link` on iOS, iPadOS, tvOS and macOS: hands every `satra:` URL the
 /// system opens the app with to Dart unchanged.
 ///
 /// Dart owns the link grammar (lib/services/deep_links/deep_link.dart), so only the scheme is
@@ -13,7 +13,7 @@
 /// switches the engine to live delivery, after which `onLink` delivers each new link and only a
 /// `true` reply clears it. Compiled into the iOS, tvOS and macOS Runners.
 final class DeepLinkPlugin: NSObject, FlutterPlugin {
-  private static let scheme = "plezy"
+  private static let scheme = "satra"
   // Process-wide so a link received before a (re)created engine registers is not lost.
   private static let delivery = DeepLinkDeliveryCoordinator()
   private static var channel: FlutterMethodChannel?
@@ -24,7 +24,7 @@ final class DeepLinkPlugin: NSObject, FlutterPlugin {
     #else
       let messenger = registrar.messenger()
     #endif
-    let channel = FlutterMethodChannel(name: "com.plezy/deep_link", binaryMessenger: messenger)
+    let channel = FlutterMethodChannel(name: "com.satra/deep_link", binaryMessenger: messenger)
     Self.channel = channel
     delivery.bindEngine()
     let instance = DeepLinkPlugin()
@@ -36,12 +36,12 @@ final class DeepLinkPlugin: NSObject, FlutterPlugin {
     #endif
   }
 
-  /// The string Dart receives for `url`, or nil when it is not a Plezy link.
+  /// The string Dart receives for `url`, or nil when it is not a Satra link.
   static func forwardedLink(for url: URL) -> String? {
     url.scheme?.lowercased() == scheme ? url.absoluteString : nil
   }
 
-  /// Takes `url` when it is a Plezy link, delivering it now or retaining it for Dart.
+  /// Takes `url` when it is a Satra link, delivering it now or retaining it for Dart.
   static func receive(_ url: URL) -> Bool {
     guard let link = forwardedLink(for: url) else { return false }
     if case let .deliver(event) = delivery.receive(url: link) {

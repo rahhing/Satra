@@ -3,12 +3,12 @@ import 'dart:ui';
 
 import 'package:flutter/painting.dart' show ImageProvider, MemoryImage;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/services/jellyfin_client.dart';
-import 'package:plezy/services/jellyfin_trickplay_service.dart';
-import 'package:plezy/services/scrub_preview_source.dart';
-import 'package:plezy/utils/device_identity.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/services/jellyfin_client.dart';
+import 'package:satra/services/jellyfin_trickplay_service.dart';
+import 'package:satra/services/scrub_preview_source.dart';
+import 'package:satra/utils/device_identity.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 

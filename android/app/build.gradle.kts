@@ -165,7 +165,7 @@ val prepareMpvFfmpegDevelopment = tasks.register("prepareMpvFfmpegDevelopment") 
       }
       File(includeDir, "libavutil/avconfig.h").writeText(
         """
-        |/* Generated for Plezy's little-endian Android ABIs. */
+        |/* Generated for Satra's little-endian Android ABIs. */
         |#ifndef AVUTIL_AVCONFIG_H
         |#define AVUTIL_AVCONFIG_H
         |#define AV_HAVE_BIGENDIAN 0
@@ -285,7 +285,7 @@ val downloadLibdovi = tasks.register("downloadLibdovi") {
 }
 
 android {
-  namespace = "com.edde746.plezy"
+  namespace = "com.edde746.satra"
   compileSdk = flutter.compileSdkVersion
   buildToolsVersion = "36.1.0"
   ndkVersion = "29.0.14206865"
@@ -301,7 +301,7 @@ android {
   }
 
   defaultConfig {
-    applicationId = "com.edde746.plezy"
+    applicationId = "com.edde746.satra"
     minSdk = 25 // Fire OS 6.x (API 25); the mpv-android AAR shares the same floor
     targetSdk = flutter.targetSdkVersion
     versionCode = flutter.versionCode
@@ -393,10 +393,10 @@ android {
   }
 
   // Instrumentation normally runs against `debug`; the R8 reachability gate opts into the
-  // minified variant with -Pplezy.testBuildType=minified. Only one build type can host
+  // minified variant with -Psatra.testBuildType=minified. Only one build type can host
   // androidTest, and the existing playback suites need media3 builder APIs the app itself
   // never calls — which R8 legitimately shrinks — so they stay on debug.
-  testBuildType = (findProperty("plezy.testBuildType") as String?) ?: "debug"
+  testBuildType = (findProperty("satra.testBuildType") as String?) ?: "debug"
 
   packaging {
     jniLibs {

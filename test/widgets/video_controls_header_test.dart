@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/services/jellyfin_mappers.dart';
-import 'package:plezy/watch_together/providers/watch_together_provider.dart';
-import 'package:plezy/widgets/video_controls/widgets/video_controls_header.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/services/jellyfin_mappers.dart';
+import 'package:satra/watch_together/providers/watch_together_provider.dart';
+import 'package:satra/widgets/video_controls/widgets/video_controls_header.dart';
 import 'package:provider/provider.dart';
 
 void main() {

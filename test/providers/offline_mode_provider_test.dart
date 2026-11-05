@@ -1,13 +1,13 @@
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/providers/offline_mode_provider.dart';
-import 'package:plezy/services/jellyfin_client.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/plex_auth_service.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/providers/offline_mode_provider.dart';
+import 'package:satra/services/jellyfin_client.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/plex_auth_service.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/multi_server_fixtures.dart';

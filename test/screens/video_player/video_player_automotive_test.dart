@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:os_media_controls/os_media_controls.dart';
-import 'package:plezy/screens/video_player_screen.dart';
-import 'package:plezy/services/driver_distraction.dart';
-import 'package:plezy/services/media_control_router.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/screens/video_player_screen.dart';
+import 'package:satra/services/driver_distraction.dart';
+import 'package:satra/services/media_control_router.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 void main() {
   setUp(TvDetectionService.debugReset);

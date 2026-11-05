@@ -5,7 +5,7 @@ import { constants } from "node:fs";
 import { open } from "node:fs/promises";
 import { VM, VMError, sleep } from "./perf/vmclient.mjs";
 
-const EXTENSION = "ext.plezy.agent";
+const EXTENSION = "ext.satra.agent";
 const MAX_PAYLOAD_BYTES = 1024 * 1024;
 const MAX_INPUT_BYTES = 768 * 1024;
 const MAX_BINARY_BYTES = 512 * 1024;
@@ -61,8 +61,8 @@ export const HELP = {
     "playback status [--operation ID] [--wait [playing|ready|STAGE]]",
     "playback stop [--operation ID] [--wait [stopped]]",
   ],
-  connection: "Explicit --uri or PLEZY_VM_SERVICE_URI is required. Supply a host-reachable authenticated VM URI; no adb forwarding or app/device selection is performed.",
-  build: "flutter run -d DEVICE --dart-define=PLEZY_AGENT_CONTROL=true (debug/profile only; never release)",
+  connection: "Explicit --uri or SATRA_VM_SERVICE_URI is required. Supply a host-reachable authenticated VM URI; no adb forwarding or app/device selection is performed.",
+  build: "flutter run -d DEVICE --dart-define=SATRA_AGENT_CONTROL=true (debug/profile only; never release)",
   maestro: "python3 scripts/maestro/run_maestro.py basic --device DEVICE --agent-control",
   scope: {
     types: [...SCOPES],
@@ -162,8 +162,8 @@ export function parseArguments(argv, environment = process.env) {
   if (Object.keys(flags).some((name) => !GLOBAL_FLAGS.includes(name) && !allowed.includes(name))) {
     invalid("An option is not supported by this command.");
   }
-  const uri = flags.uri ?? environment.PLEZY_VM_SERVICE_URI;
-  if (!uri) invalid("Supply --uri or PLEZY_VM_SERVICE_URI; no endpoint is selected automatically.");
+  const uri = flags.uri ?? environment.SATRA_VM_SERVICE_URI;
+  if (!uri) invalid("Supply --uri or SATRA_VM_SERVICE_URI; no endpoint is selected automatically.");
   const timeoutMs = flags["timeout-ms"] === undefined ? 30000 : integer(flags["timeout-ms"], "timeout-ms", 1, 600000);
   const pollMs = flags["poll-ms"] === undefined ? 200 : integer(flags["poll-ms"], "poll-ms", 10, 5000);
   let waitStage = flags.wait;

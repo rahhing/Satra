@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider_linux/path_provider_linux.dart';
-import 'package:plezy/services/prefs_recovery.dart';
+import 'package:satra/services/prefs_recovery.dart';
 import 'package:shared_preferences_linux/shared_preferences_linux.dart';
 import 'package:shared_preferences_platform_interface/types.dart';
 
@@ -33,7 +33,7 @@ void main() {
   const options = SharedPreferencesOptions();
 
   setUp(() async {
-    support = await Directory.systemTemp.createTemp('plezy_atomic_write_');
+    support = await Directory.systemTemp.createTemp('satra_atomic_write_');
     store = File(p.join(support.path, prefsStoreFileName));
     staging = File('${store.path}.tmp');
     backend = SharedPreferencesAsyncLinux()..pathProvider = _TempPathProviderLinux(support.path);

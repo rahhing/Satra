@@ -1,4 +1,4 @@
-appId: com.edde746.plezy
+appId: com.edde746.satra
 name: Removing a Jellyfin profile connection leaves no orphaned session
 
 tags:

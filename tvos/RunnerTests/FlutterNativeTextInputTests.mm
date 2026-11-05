@@ -85,7 +85,7 @@
               ]];
   [self invokeTextInput:@"TextInput.setEditingState"
               arguments:@{
-                @"text" : @"plezy.local",
+                @"text" : @"satra.local",
                 @"selectionBase" : @2,
                 @"selectionExtent" : @7,
                 @"selectionAffinity" : @"TextAffinity.downstream",
@@ -96,7 +96,7 @@
   FlutterTextInputView* inputView = (FlutterTextInputView*)[_textInputPlugin textInputView];
   UITextField* proxy = inputView.tvosTextInputProxy;
   XCTAssertNotNil(proxy);
-  XCTAssertEqualObjects(proxy.text, @"plezy.local");
+  XCTAssertEqualObjects(proxy.text, @"satra.local");
   XCTAssertEqual(proxy.keyboardType, UIKeyboardTypeURL);
   XCTAssertEqual(proxy.returnKeyType, UIReturnKeyDone);
   XCTAssertEqual(proxy.autocorrectionType, UITextAutocorrectionTypeNo);

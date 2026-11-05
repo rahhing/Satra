@@ -86,7 +86,7 @@ class PlexImageCacheManager extends ce_cache.DefaultCacheManager {
     int? maxHeight,
     int? maxWidth,
   }) {
-    // Plezy already requests server-sized artwork URLs. Avoid CE's disk-resize
+    // Satra already requests server-sized artwork URLs. Avoid CE's disk-resize
     // path, which decodes downloaded images before writing resized PNG copies.
     return getFileStream(url, key: key, headers: headers, withProgress: withProgress);
   }
@@ -107,7 +107,7 @@ String redactArtworkUrl(String url) => url.replaceAllMapped(_artworkCredentialPa
 /// Request header carrying the credentialed URL from
 /// [PlexImageCacheManager.getFileStream] to [_ArtworkCredentialInterceptor].
 /// Never sent: the interceptor removes it.
-const _credentialedUrlHeader = 'x-plezy-credentialed-url';
+const _credentialedUrlHeader = 'x-satra-credentialed-url';
 
 class _ArtworkCredentialInterceptor extends HttpInterceptor {
   const _ArtworkCredentialInterceptor();

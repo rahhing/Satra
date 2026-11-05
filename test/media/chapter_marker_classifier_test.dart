@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/chapter_marker_classifier.dart';
+import 'package:satra/media/chapter_marker_classifier.dart';
 
 import 'chapter_marker_model_cases.dart';
 

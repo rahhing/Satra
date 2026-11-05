@@ -28,8 +28,8 @@ function endpoint(handler, { advertised = true, rpc } = {}) {
         if (result === undefined && message.method === "getVM") {
           result = { isolates: [{ id: "isolates/main", name: "main" }, { id: "isolates/ui", name: "other" }] };
         } else if (result === undefined && message.method === "getIsolate") {
-          result = { extensionRPCs: advertised && message.params.isolateId === "isolates/ui" ? ["ext.plezy.agent"] : [] };
-        } else if (result === undefined && message.method === "ext.plezy.agent") {
+          result = { extensionRPCs: advertised && message.params.isolateId === "isolates/ui" ? ["ext.satra.agent"] : [] };
+        } else if (result === undefined && message.method === "ext.satra.agent") {
           const request = JSON.parse(message.params.payload);
           commands.push(request);
           if (message.params.isolateId !== "isolates/ui") {
@@ -220,7 +220,7 @@ test("profile-session changes invalidate a correlated operation wait", async () 
     if (request.command === "playback.start") return { operationId: "launch-a", stage: "accepted", item: TARGET };
   }, {
     rpc(message) {
-      if (message.method !== "ext.plezy.agent") return;
+      if (message.method !== "ext.satra.agent") return;
       const request = JSON.parse(message.params.payload);
       if (request.command === "playback.status") {
         return {
@@ -248,7 +248,7 @@ test("invalid batch input causes no mutation, including a contradictory reset an
 
 test("oversized binary resources are rejected before invoking the app", async () => {
   const host = endpoint();
-  const directory = await mkdtemp(join(tmpdir(), "plezy-agent-"));
+  const directory = await mkdtemp(join(tmpdir(), "satra-agent-"));
   directories.push(directory);
   const path = join(directory, "shader.glsl");
   await writeFile(path, Buffer.alloc(512 * 1024 + 1));

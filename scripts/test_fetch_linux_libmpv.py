@@ -15,7 +15,7 @@ HAS_ZSTD = shutil.which("zstd") is not None
 
 class FetchLinuxLibmpvTest(unittest.TestCase):
     def setUp(self) -> None:
-        self._directory = tempfile.TemporaryDirectory(prefix="plezy-fetch-libmpv-test-")
+        self._directory = tempfile.TemporaryDirectory(prefix="satra-fetch-libmpv-test-")
         self.addCleanup(self._directory.cleanup)
         self.root = Path(self._directory.name)
         self.dest = self.root / "prefix"

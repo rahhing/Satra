@@ -20,7 +20,7 @@ FETCH_ENGINE = ROOT / "tvos/scripts/fetch_engine.sh"
 
 class FetchTvosEngineTest(unittest.TestCase):
     def setUp(self) -> None:
-        self.temporary = tempfile.TemporaryDirectory(prefix="plezy-tvos-engine-test-")
+        self.temporary = tempfile.TemporaryDirectory(prefix="satra-tvos-engine-test-")
         self.root = Path(self.temporary.name)
         self.tvos = self.root / "tvos"
         (self.tvos / "scripts").mkdir(parents=True)

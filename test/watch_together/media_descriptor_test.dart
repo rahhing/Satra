@@ -2,19 +2,19 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:openwatchparty/openwatchparty.dart' as owp;
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/services/jellyfin_api_cache.dart';
-import 'package:plezy/services/plex_api_cache.dart';
-import 'package:plezy/utils/external_ids.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/services/media_descriptor.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/services/jellyfin_api_cache.dart';
+import 'package:satra/services/plex_api_cache.dart';
+import 'package:satra/utils/external_ids.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/services/media_descriptor.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/http_fixtures.dart';
@@ -185,7 +185,7 @@ void main() {
       expect(media.file?.sizeBytes, 4200000000);
       expect(media.file?.name, 'The Matrix (1999).mkv');
       expect(media.ext, {
-        plezyExtName: {'server': 'plex-1', 'item': 'movie-1', 'version': '11'},
+        satraExtName: {'server': 'plex-1', 'item': 'movie-1', 'version': '11'},
       });
     });
 
@@ -221,7 +221,7 @@ void main() {
       expect(media.durationMs, 7380000);
       expect(media.file?.sizeBytes, 200);
       expect(media.file?.name, 'Final Cut.mkv');
-      expect((media.ext![plezyExtName]! as Map)['version'], '12');
+      expect((media.ext![satraExtName]! as Map)['version'], '12');
     });
 
     test('an episode carries its numbers and its show as series', () async {
@@ -342,7 +342,7 @@ void main() {
         expect(media.durationMs, 8160000);
         expect(media.file?.name, 'The Matrix.mkv');
         expect(media.ext, {
-          plezyExtName: {'server': item.serverId, 'item': 'movie-1', 'version': 'src-1'},
+          satraExtName: {'server': item.serverId, 'item': 'movie-1', 'version': 'src-1'},
         });
       });
 
@@ -475,7 +475,7 @@ void main() {
       expect(media.durationMs, 7020000);
       expect(media.file, isNull);
       expect(media.ext, {
-        plezyExtName: {'server': 'fake-1', 'item': 'movie-1'},
+        satraExtName: {'server': 'fake-1', 'item': 'movie-1'},
       }, reason: 'an item without versions names no version');
     });
 
@@ -646,7 +646,7 @@ void main() {
     });
   });
 
-  group('plezyExt', () {
+  group('satraExt', () {
     owp.Media media(Map<String, Object?>? ext) =>
         owp.Media(kind: owp.MediaKind.movie, title: 'Alien', durationMs: 1, ext: ext);
 
@@ -659,7 +659,7 @@ void main() {
       );
       final described = await _describe(WatchCopy.of(item, item.mediaVersions!.single), _FakeClient());
       final received = owp.parseMedia(described.toJson());
-      expect(plezyExt(received), (server: 'fake-1', item: 'movie-1', version: 'v1'));
+      expect(satraExt(received), (server: 'fake-1', item: 'movie-1', version: 'v1'));
     });
 
     test('ignores hostile or foreign shapes', () {
@@ -669,33 +669,33 @@ void main() {
         {
           'com.example': {'server': 's', 'item': 'i'},
         },
-        {plezyExtName: 'server:item'},
+        {satraExtName: 'server:item'},
         {
-          plezyExtName: ['s', 'i'],
+          satraExtName: ['s', 'i'],
         },
         {
-          plezyExtName: {'server': 's'},
+          satraExtName: {'server': 's'},
         },
         {
-          plezyExtName: {'item': 'i'},
+          satraExtName: {'item': 'i'},
         },
         {
-          plezyExtName: {'server': '', 'item': 'i'},
+          satraExtName: {'server': '', 'item': 'i'},
         },
         {
-          plezyExtName: {'server': 's', 'item': ''},
+          satraExtName: {'server': 's', 'item': ''},
         },
         {
-          plezyExtName: {'server': 1, 'item': 'i'},
+          satraExtName: {'server': 1, 'item': 'i'},
         },
         {
-          plezyExtName: {
+          satraExtName: {
             'server': 's',
             'item': {'id': 'i'},
           },
         },
       ]) {
-        expect(plezyExt(media(ext)), isNull, reason: '$ext');
+        expect(satraExt(media(ext)), isNull, reason: '$ext');
       }
     });
 
@@ -708,9 +708,9 @@ void main() {
         {'id': 'v'},
       ]) {
         expect(
-          plezyExt(
+          satraExt(
             media({
-              plezyExtName: {'server': 's', 'item': 'i', 'version': version},
+              satraExtName: {'server': 's', 'item': 'i', 'version': version},
             }),
           ),
           (server: 's', item: 'i', version: null),

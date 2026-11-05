@@ -35,7 +35,7 @@ class LibraryLookupIncomplete implements Exception {
 /// every version of every copy is a candidate, with its length so the SDK can
 /// match it by duration.
 ///
-/// 1. The `app.plezy` shortcut: when the descriptor names a server this
+/// 1. The `app.satra` shortcut: when the descriptor names a server this
 ///    profile reaches, that item's versions come first, the shared version
 ///    leading.
 /// 2. Movies and episodes by catalogue identity on every server
@@ -68,7 +68,7 @@ final class LibraryResolver implements owp.Resolver<WatchCopy> {
       }
     }
 
-    final ext = plezyExt(media);
+    final ext = satraExt(media);
     final extClient = ext == null ? null : clientFor(ext.server);
     if (ext != null && extClient != null) {
       try {
@@ -166,7 +166,7 @@ final _imdbId = RegExp(r'^tt\d{1,12}$');
 final _numericId = RegExp(r'^\d{1,12}$');
 final _plexGuidPattern = RegExp(r'^plex://(movie|show|season|episode)/[A-Za-z0-9]{1,64}$');
 
-/// The descriptor's [ids] that Plezy can search by. Untrusted (SDK.md §9.7):
+/// The descriptor's [ids] that Satra can search by. Untrusted (SDK.md §9.7):
 /// only well-formed IDs pass, and they are only ever search terms.
 ExternalIds externalIdsOf(Map<String, String> ids) {
   int? number(String? value) => value != null && _numericId.hasMatch(value) ? int.parse(value) : null;

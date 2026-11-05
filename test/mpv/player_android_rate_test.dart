@@ -1,7 +1,7 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/mpv/player/platform/player_android.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/mpv/player/platform/player_android.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../test_helpers/mock_player_channels.dart';
 import '../test_helpers/prefs.dart';
@@ -23,8 +23,8 @@ void main() {
   Future<void> withPlayer(Future<void> Function(PlayerAndroid player, List<MethodCall> calls) body) async {
     final calls = <MethodCall>[];
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/exo_player',
-      eventChannelName: 'com.plezy/exo_player/events',
+      methodChannelName: 'com.satra/exo_player',
+      eventChannelName: 'com.satra/exo_player/events',
       methodHandler: (call) async {
         calls.add(call);
         return call.method == 'initialize' ? true : null;

@@ -9,7 +9,7 @@
          Only the platform HTTP stack (background_downloader, ExoPlayer's Cronet
          data source) reads this file. The app's own requests run on dart:io,
          which applies the same split through lib/utils/certificate_trust.dart
-         by loading the user store over com.plezy/user_certificates. -->
+         by loading the user store over com.satra/user_certificates. -->
     <base-config cleartextTrafficPermitted="true">
         <trust-anchors>
             <certificates src="system" />
@@ -31,7 +31,7 @@
              Does NOT match *.plex.direct — user PMS keeps base-config. -->
         <domain includeSubdomains="true">plex.tv</domain>
         <!-- ice.plezy.app: /auth OAuth proxy + /logs + /posters
-             (lib/services/plezy_server.dart:4);
+             (lib/services/satra_server.dart:4);
              bugs.plezy.app: Sentry DSN (lib/main.dart:111). -->
         <domain includeSubdomains="true">plezy.app</domain>
         <!-- api.trakt.tv incl. /oauth/device/*, /oauth/token

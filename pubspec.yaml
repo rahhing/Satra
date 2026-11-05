@@ -1,4 +1,4 @@
-name: plezy
+name: satra
 description: "A beautiful Plex and Jellyfin client for Flutter"
 publish_to: "none"
 version: 2.25.0+159
@@ -162,8 +162,8 @@ flutter:
     - assets/satra.svg
     - assets/fonts/OFL.txt
     - assets/licenses/SpatialAudioBridge.txt
-    - assets/plezy.png
-    - assets/plezy_adaptive_foreground.svg
+    - assets/satra.png
+    - assets/satra_adaptive_foreground.svg
     - assets/plex_chevron.svg
     - assets/jellyfin_icon.svg
     - assets/emby_icon.svg

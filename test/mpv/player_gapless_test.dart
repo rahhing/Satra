@@ -2,9 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/mpv/player/player_native.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/mpv/player/player_native.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../test_helpers/mock_player_channels.dart';
 import '../test_helpers/prefs.dart';
@@ -30,8 +30,8 @@ void main() {
 
   Future<void> run(_AudioCoreMock core, Future<void> Function(PlayerNative player, List<String> transitions) body) {
     return withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_audio_player',
-      eventChannelName: 'com.plezy/mpv_audio_player/events',
+      methodChannelName: 'com.satra/mpv_audio_player',
+      eventChannelName: 'com.satra/mpv_audio_player/events',
       methodHandler: core.handle,
       testBody: () async {
         final player = PlayerNative.audio();
@@ -177,7 +177,7 @@ void main() {
     // What each stream request carries is replayed through _MpvHeaderModel,
     // so these assert the headers a server receives, not a command string.
     const plexHeaders = {
-      'X-Plex-Product': 'Plezy',
+      'X-Plex-Product': 'Satra',
       'X-Plex-Device': 'Mac17,9',
       'X-Plex-Device-Name': r"Eddé's Mac, work\",
       'X-Plex-Token': 'secret',

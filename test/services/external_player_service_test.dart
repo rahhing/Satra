@@ -1,20 +1,20 @@
 import 'package:drift/native.dart';
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_part_timeline.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/services/external_player_service.dart';
-import 'package:plezy/services/deep_links/deep_link.dart';
-import 'package:plezy/services/jellyfin_api_cache.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/offline_watch_sync_service.dart';
-import 'package:plezy/utils/active_client_scope.dart';
-import 'package:plezy/utils/watch_state_notifier.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_part_timeline.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/services/external_player_service.dart';
+import 'package:satra/services/deep_links/deep_link.dart';
+import 'package:satra/services/jellyfin_api_cache.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/offline_watch_sync_service.dart';
+import 'package:satra/utils/active_client_scope.dart';
+import 'package:satra/utils/watch_state_notifier.dart';
 import '../test_helpers/media_items.dart';
 import '../test_helpers/playback_report_fakes.dart';
 
@@ -247,7 +247,7 @@ void main() {
 
   group('x-callback-url return links', () {
     Uri link(String result, String session, [String query = '']) =>
-        Uri.parse('plezy://external-player/$result/$session${query.isEmpty ? '' : '?$query'}');
+        Uri.parse('satra://external-player/$result/$session${query.isEmpty ? '' : '?$query'}');
 
     test('cancel reports the position the player stopped at, in seconds', () async {
       final client = _RecordingClient();
@@ -432,14 +432,14 @@ void main() {
       }
     });
 
-    test('other plezy links are not callbacks', () async {
-      expect(await ExternalPlayerService.handleCallbackUrl(Uri.parse('plezy://live?channel=4.1')), isFalse);
+    test('other satra links are not callbacks', () async {
+      expect(await ExternalPlayerService.handleCallbackUrl(Uri.parse('satra://live?channel=4.1')), isFalse);
     });
 
     test('a return link without a session is not a callback', () async {
       ExternalPlayerService.beginCallbackSessionForTesting(metadata: _item(), client: _RecordingClient());
 
-      expect(await ExternalPlayerService.handleCallbackUrl(Uri.parse('plezy://external-player/cancel')), isFalse);
+      expect(await ExternalPlayerService.handleCallbackUrl(Uri.parse('satra://external-player/cancel')), isFalse);
     });
   });
 

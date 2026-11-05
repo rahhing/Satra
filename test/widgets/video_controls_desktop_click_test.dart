@@ -7,24 +7,24 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/focus/transport_keys.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/providers/playback_state_provider.dart';
-import 'package:plezy/services/fullscreen_state_manager.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/video_volume_controller.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/watch_together/providers/watch_together_provider.dart';
-import 'package:plezy/widgets/video_controls/player_chrome_controller.dart';
-import 'package:plezy/widgets/video_controls/video_control_button.dart';
-import 'package:plezy/widgets/video_controls/video_controls.dart';
-import 'package:plezy/widgets/video_controls/widgets/player_toast_indicator.dart';
-import 'package:plezy/widgets/video_controls/widgets/timeline_slider.dart';
-import 'package:plezy/widgets/video_controls/widgets/video_controls_header.dart';
-import 'package:plezy/widgets/video_controls/widgets/video_timeline_bar.dart';
-import 'package:plezy/widgets/video_controls/widgets/volume_control.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/focus/transport_keys.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/providers/playback_state_provider.dart';
+import 'package:satra/services/fullscreen_state_manager.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/video_volume_controller.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/watch_together/providers/watch_together_provider.dart';
+import 'package:satra/widgets/video_controls/player_chrome_controller.dart';
+import 'package:satra/widgets/video_controls/video_control_button.dart';
+import 'package:satra/widgets/video_controls/video_controls.dart';
+import 'package:satra/widgets/video_controls/widgets/player_toast_indicator.dart';
+import 'package:satra/widgets/video_controls/widgets/timeline_slider.dart';
+import 'package:satra/widgets/video_controls/widgets/video_controls_header.dart';
+import 'package:satra/widgets/video_controls/widgets/video_timeline_bar.dart';
+import 'package:satra/widgets/video_controls/widgets/volume_control.dart';
 
 import '../test_helpers/media_items.dart';
 import '../test_helpers/player_streams.dart';
@@ -40,7 +40,7 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   const windowChannel = MethodChannel('window_manager');
-  const macWindowChannel = MethodChannel('com.plezy/window_utils');
+  const macWindowChannel = MethodChannel('com.satra/window_utils');
   const surface = Size(1280, 720);
 
   late SettingsService settings;

@@ -5,12 +5,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/main.dart' as app;
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/screens/auth_screen.dart';
-import 'package:plezy/theme/mono_theme.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/main.dart' as app;
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/screens/auth_screen.dart';
+import 'package:satra/theme/mono_theme.dart';
 import '../test_helpers/prefs.dart';
 
 void main() {
@@ -54,7 +54,7 @@ void main() {
       );
       await tester.pumpAndSettle();
       await tester.runAsync(
-        () => precacheImage(const AssetImage('assets/plezy.png'), tester.element(find.byType(AuthScreen))),
+        () => precacheImage(const AssetImage('assets/satra.png'), tester.element(find.byType(AuthScreen))),
       );
       await tester.pumpAndSettle();
       expect(tester.takeException(), isNull);

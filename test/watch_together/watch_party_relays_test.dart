@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:openwatchparty/openwatchparty.dart' as owp;
-import 'package:plezy/watch_together/services/watch_party_relays.dart';
+import 'package:satra/watch_together/services/watch_party_relays.dart';
 
 void main() {
   group('canonicalRelayBaseUrl', () {

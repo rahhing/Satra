@@ -4,18 +4,18 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/media/account_preferences.dart';
-import 'package:plezy/media/account_ref.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_browser_dialect.dart';
-import 'package:plezy/models/plex/plex_home_user.dart';
-import 'package:plezy/profiles/profile.dart';
-import 'package:plezy/profiles/profile_connection.dart';
-import 'package:plezy/providers/account_preferences_controller.dart';
-import 'package:plezy/services/plex_auth_service.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/media/account_preferences.dart';
+import 'package:satra/media/account_ref.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_browser_dialect.dart';
+import 'package:satra/models/plex/plex_home_user.dart';
+import 'package:satra/profiles/profile.dart';
+import 'package:satra/profiles/profile_connection.dart';
+import 'package:satra/providers/account_preferences_controller.dart';
+import 'package:satra/services/plex_auth_service.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/utils/media_server_http_client.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/http_fixtures.dart';
@@ -140,9 +140,9 @@ void main() {
     });
 
     test('a Jellyfin account with the remember flag off gets it turned on, once, with its other fields kept', () async {
-      // The flag gates whether the server keeps the stream indexes Plezy
+      // The flag gates whether the server keeps the stream indexes Satra
       // reports at all. Jellyfin replaces the whole UserConfiguration on write,
-      // so the sibling flag and the fields Plezy does not model must survive.
+      // so the sibling flag and the fields Satra does not model must survive.
       final fixture = await _Fixture.local();
       addTearDown(fixture.dispose);
       await fixture.controller.ensureActiveLoaded();

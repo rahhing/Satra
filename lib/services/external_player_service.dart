@@ -25,7 +25,7 @@ import 'offline_watch_sync_service.dart';
 import 'playback_initialization_service.dart';
 import 'trackers/tracker_coordinator.dart';
 
-const _externalPlayerChannel = MethodChannel('com.plezy/external_player');
+const _externalPlayerChannel = MethodChannel('com.satra/external_player');
 
 class _ExternalPlayerLaunchResult {
   const _ExternalPlayerLaunchResult({
@@ -84,7 +84,7 @@ class _CallbackSession {
 }
 
 /// How playback in an x-callback-url player ended: the `<result>` of its
-/// return link, `plezy://external-player/<result>/<session>`.
+/// return link, `satra://external-player/<result>/<session>`.
 abstract final class _ReturnResult {
   static const success = 'success';
   static const cancel = 'cancel';
@@ -344,7 +344,7 @@ class ExternalPlayerService {
     ).id;
   }
 
-  /// Handles `plezy://external-player/<result>/<session>?position=&duration=`,
+  /// Handles `satra://external-player/<result>/<session>?position=&duration=`,
   /// the return link an x-callback-url player opens when playback ends, and
   /// syncs the position it reports. `DeepLinkService` hands every
   /// [ExternalPlayerReturnLink] here. Returns whether the link belonged to

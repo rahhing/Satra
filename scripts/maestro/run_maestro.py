@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the Jellyfin fixture and run Plezy's Android Maestro suites."""
+"""Build the Jellyfin fixture and run Satra's Android Maestro suites."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ import urllib.request
 
 
 ROOT_DIR = Path(__file__).resolve().parents[2]
-APP_ID = "com.edde746.plezy"
+APP_ID = "com.edde746.satra"
 FAULTS = ("music-failure", "offline", "recovery")
 ANIMATION_SCALES = (
     "window_animation_scale",
@@ -237,7 +237,7 @@ def parse_config(argv: Optional[Sequence[str]] = None, environment: Optional[Map
         jellyfin_port=jellyfin_port,
         proxy_port=proxy_port,
         jellyfin_image=str(
-            _option(args.jellyfin_image, env, "MAESTRO_JELLYFIN_IMAGE", "plezy-jellyfin-demo:local")
+            _option(args.jellyfin_image, env, "MAESTRO_JELLYFIN_IMAGE", "satra-jellyfin-demo:local")
         ),
         skip_jellyfin=_bool_option(args.skip_jellyfin, env, "MAESTRO_SKIP_JELLYFIN", False),
         skip_jellyfin_build=_bool_option(
@@ -334,10 +334,10 @@ def flutter_build_command(*, agent_control: bool = False) -> tuple[str, ...]:
         "build",
         "apk",
         "--debug",
-        "--dart-define=PLEZY_MAESTRO_E2E=true",
+        "--dart-define=SATRA_MAESTRO_E2E=true",
     )
     if agent_control:
-        command += ("--dart-define=PLEZY_AGENT_CONTROL=true",)
+        command += ("--dart-define=SATRA_AGENT_CONTROL=true",)
     return command
 
 
@@ -455,7 +455,7 @@ class MaestroRunner:
         self.device_id = devices[0]
 
     def _start_jellyfin(self) -> None:
-        name = f"plezy-maestro-jellyfin-{self.config.jellyfin_port}-{os.getpid()}"
+        name = f"satra-maestro-jellyfin-{self.config.jellyfin_port}-{os.getpid()}"
         result = _run_checked(
             (
                 "docker",

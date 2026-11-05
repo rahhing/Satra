@@ -1,11 +1,11 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/app_icon/app_icon_catalog.dart';
-import 'package:plezy/services/app_icon/app_icon_service.dart';
-import 'package:plezy/services/supporter/supporter_mode.dart';
-import 'package:plezy/services/supporter/supporter_service.dart';
+import 'package:satra/services/app_icon/app_icon_catalog.dart';
+import 'package:satra/services/app_icon/app_icon_service.dart';
+import 'package:satra/services/supporter/supporter_mode.dart';
+import 'package:satra/services/supporter/supporter_service.dart';
 
-/// The native side of `com.plezy/app_icon`, as a scoped binary-messenger
+/// The native side of `com.satra/app_icon`, as a scoped binary-messenger
 /// handler: a launcher that can switch (or not) and remembers its icon.
 class FakeAppIconPlatform {
   bool supported = true;

@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_file_info.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/services/plex_playback_mapper.dart';
-import 'package:plezy/services/plex_mappers.dart';
+import 'package:satra/media/media_file_info.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/services/plex_playback_mapper.dart';
+import 'package:satra/services/plex_mappers.dart';
 
 void main() {
   group('parsePlexVideoPlaybackDataFromJson', () {

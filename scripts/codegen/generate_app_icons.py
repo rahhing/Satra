@@ -3,7 +3,7 @@
 
 Sources, one directory per icon under assets/app_icons/source/<id>/ (not bundled into the app):
 
-* icon.svg, background.svg, foreground.svg: the approved designs from plezy-design/logos
+* icon.svg, background.svg, foreground.svg: the approved designs from satra-design/logos
   (L01-L23), copied verbatim. A 1024 canvas with the foreground inside Android's 61% safe circle,
   already optically centred.
 * monochrome.svg: the visible mark as a silhouette, for Android 13 themed icons. Only its alpha is
@@ -18,7 +18,7 @@ Outputs, all committed:
 
 * ios/Runner/AlternateAppIcons.xcassets: one single-size 1024 AppIcon-<id>.appiconset per icon. The
   Runner target compiles every app icon set in it as an alternate
-  (ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS); plezy.icon stays the primary.
+  (ASSETCATALOG_COMPILER_INCLUDE_ALL_APPICON_ASSETS); satra.icon stays the primary.
 * tvos/Runner/AlternateAppIcons.xcassets: one AppIcon-<id>.imagestack per icon, a Front (foreground)
   and Back layer at 400x240 and 800x480. tvOS wants CFBundleAlternateIcons as an array of names,
   but the asset catalog compiler only writes iOS's dictionary form (App Store Connect rejects it
@@ -347,7 +347,7 @@ def _alias_xml(icon: str) -> str:
             android:exported="true"
             android:icon="@mipmap/ic_launcher_{icon}"
             android:banner="@drawable/tv_banner_{icon}"
-            android:targetActivity=".PlezyActivity">
+            android:targetActivity=".SatraActivity">
             <meta-data
                 android:name="io.flutter.embedding.android.NormalTheme"
                 android:resource="@style/NormalTheme" />
@@ -421,7 +421,7 @@ def main() -> None:
     ]
     if missing:
         sys.exit("error: missing sources: " + ", ".join(missing))
-    with tempfile.TemporaryDirectory(prefix="plezy-app-icons-") as scratch:
+    with tempfile.TemporaryDirectory(prefix="satra-app-icons-") as scratch:
         renderer = Renderer(Path(scratch))
         generate_ios(renderer)
         generate_tvos(renderer)

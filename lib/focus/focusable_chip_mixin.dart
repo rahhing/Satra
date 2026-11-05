@@ -41,6 +41,8 @@ class ChipKeyCallbacks {
 /// 3. Implement [debugLabel] to return a debug label for the internal node
 /// 4. Use [focusNode] and [isFocused] in your build method
 mixin FocusableChipStateMixin<T extends StatefulWidget> on State<T> {
+  void revealChipOnFocus() => scrollContextToCenter(context);
+
   final _focusNodeBinding = OwnedFocusNodeBinding();
   bool _isFocused = false;
   final _selectLongPress = DpadSelectLongPressController();
@@ -97,7 +99,7 @@ mixin FocusableChipStateMixin<T extends StatefulWidget> on State<T> {
       // sessions only — pointer-mode focus is programmatic and invisible,
       // so revealing it would yank the strip (issue #2031).
       if (focusNode.hasFocus && InputModeTracker.currentMode == InputMode.keyboard) {
-        scrollContextToCenter(context);
+        revealChipOnFocus();
       }
     }
   }

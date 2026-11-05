@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../widgets/brand_mark.dart';
-import 'package:plezy/widgets/app_icon.dart';
+import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../widgets/focused_scroll_scaffold.dart';

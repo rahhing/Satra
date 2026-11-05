@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/services/subtitle_preference.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/services/subtitle_preference.dart';
 
 void main() {
   group('SubtitleIntent.fromTrack', () {

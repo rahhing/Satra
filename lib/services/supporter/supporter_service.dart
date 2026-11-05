@@ -348,7 +348,7 @@ class SupporterService extends ChangeNotifier with DisposableChangeNotifierMixin
           _failPurchase(store);
         }
       }
-      // Any other product is not Plezy's; leave it to the store.
+      // Any other product is not Satra's; leave it to the store.
     }
   }
 

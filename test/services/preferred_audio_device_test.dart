@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/mpv/models.dart';
-import 'package:plezy/mpv/player/player.dart';
-import 'package:plezy/services/preferred_audio_device.dart';
+import 'package:satra/mpv/models.dart';
+import 'package:satra/mpv/player/player.dart';
+import 'package:satra/services/preferred_audio_device.dart';
 
 /// mpv answers a string read of a node property with JSON, which is what the
 /// native getProperty bridges hand back.

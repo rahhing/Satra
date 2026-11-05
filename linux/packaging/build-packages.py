@@ -13,11 +13,11 @@ OUTPUT_DIR = Path(os.environ.get("OUTPUT_DIR", PROJECT_ROOT))
 ARCH_SUFFIX = os.environ.get("ARCH_SUFFIX", "x64")
 
 METADATA = {
-    "name": "plezy",
+    "name": "satra",
     "license": "GPL-3.0",
     "vendor": "edde746",
     "maintainer": "edde746 <noreply@github.com>",
-    "url": "https://github.com/edde746/plezy",
+    "url": "https://github.com/rahhing/Satra",
     "description": "A modern Plex and Jellyfin client for desktop and mobile",
 }
 
@@ -153,12 +153,12 @@ def get_version() -> str:
 def generate_icons():
     """Generate icons at multiple sizes using ImageMagick."""
     print("Generating icons...")
-    source = PROJECT_ROOT / "assets/plezy.png"
+    source = PROJECT_ROOT / "assets/satra.png"
 
     for size in ICON_SIZES:
         dest_dir = SCRIPT_DIR / f"icons/{size}x{size}"
         dest_dir.mkdir(parents=True, exist_ok=True)
-        dest = dest_dir / "plezy.png"
+        dest = dest_dir / "satra.png"
 
         # Try magick (ImageMagick 7) first, then convert (ImageMagick 6)
         for cmd in ["magick", "convert"]:
@@ -173,14 +173,14 @@ def generate_icons():
 def get_file_mappings() -> list[str]:
     """Get file mappings for fpm."""
     mappings = [
-        f"{BUILD_DIR}/=/opt/plezy/",
-        f"{SCRIPT_DIR}/com.edde746.plezy.desktop=/usr/share/applications/com.edde746.plezy.desktop",
-        f"{SCRIPT_DIR}/plezy.sh=/usr/bin/plezy",
+        f"{BUILD_DIR}/=/opt/satra/",
+        f"{SCRIPT_DIR}/com.edde746.satra.desktop=/usr/share/applications/com.edde746.satra.desktop",
+        f"{SCRIPT_DIR}/satra.sh=/usr/bin/satra",
     ]
 
     for size in ICON_SIZES:
         mappings.append(
-            f"{SCRIPT_DIR}/icons/{size}x{size}/plezy.png=/usr/share/icons/hicolor/{size}x{size}/apps/plezy.png"
+            f"{SCRIPT_DIR}/icons/{size}x{size}/satra.png=/usr/share/icons/hicolor/{size}x{size}/apps/satra.png"
         )
 
     return mappings
@@ -284,31 +284,31 @@ def main():
     # reconcile them before any package exists. As a subprocess under this
     # interpreter, so its exit code and ::error:: annotations arrive unaltered.
     guard = SCRIPT_DIR / "check-bundle-host-deps.py"
-    # Truthy tokens only. `PLEZY_SKIP_HOST_DEP_CHECK=0` reads to almost everyone
+    # Truthy tokens only. `SATRA_SKIP_HOST_DEP_CHECK=0` reads to almost everyone
     # as "do not skip", and a bare non-empty test would have done the opposite -
     # which is the single outcome this whole block exists to prevent.
-    skip = os.environ.get("PLEZY_SKIP_HOST_DEP_CHECK", "").strip().lower()
+    skip = os.environ.get("SATRA_SKIP_HOST_DEP_CHECK", "").strip().lower()
     if skip in {"1", "true", "yes", "on"}:
         # The guard reads deb ownership out of dpkg-query, which Fedora and Arch
         # do not have, so it cannot run there at all. The opt-out is for that
         # case and is an environment variable precisely so it cannot happen by
         # accident: a skip the caller did not ask for would hand back exactly the
         # unverified package this check exists to prevent, so it is never silent.
-        print("WARNING: PLEZY_SKIP_HOST_DEP_CHECK is set, so the host dependency guard did not run.")
+        print("WARNING: SATRA_SKIP_HOST_DEP_CHECK is set, so the host dependency guard did not run.")
         print(f"WARNING: the depends lists in {Path(__file__).name} are unverified against {BUILD_DIR}.")
     else:
         guard_result = subprocess.run([sys.executable, str(guard), str(BUILD_DIR)])
         if guard_result.returncode != 0:
             print(f"Error: {guard.name} failed, so no packages were built.")
             print("Declare the libraries it named, or - only on a host without dpkg-query, such as")
-            print("Fedora or Arch - set PLEZY_SKIP_HOST_DEP_CHECK=1 to package without the check.")
+            print("Fedora or Arch - set SATRA_SKIP_HOST_DEP_CHECK=1 to package without the check.")
             exit(guard_result.returncode)
 
     version = get_version()
     print(f"Building {ARCH_SUFFIX} packages for {METADATA['name']} version {version}")
 
     # Make scripts executable
-    for script in ["plezy.sh", "after-install.sh", "after-remove.sh"]:
+    for script in ["satra.sh", "after-install.sh", "after-remove.sh"]:
         (SCRIPT_DIR / script).chmod(0o755)
 
     # Generate icons

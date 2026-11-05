@@ -1,9 +1,9 @@
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/widgets/artwork_atmosphere.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/widgets/artwork_atmosphere.dart';
 
 MediaItem _movie(String id) =>
     MediaItem(id: id, backend: MediaBackend.plex, kind: MediaKind.movie, artPath: '/art/$id', title: id);

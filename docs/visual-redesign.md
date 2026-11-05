@@ -1,6 +1,6 @@
 # Satra visual design
 
-Satra builds on Plezy's existing screens, providers, navigation destinations,
+Satra builds on Satra's existing screens, providers, navigation destinations,
 and playback services. The visual reference is Nuvio Desktop's compact hover
 sidebar and floating navigation, reinterpreted with stronger frosted surfaces.
 
@@ -66,7 +66,7 @@ python3 linux/packaging/install-local-launcher.py build/linux/x64/release/bundle
 
 This installs a user-level override for the existing GTK application ID and keeps
 profile paths stable. System files are untouched; existing user customizations
-are backed up as `com.edde746.plezy.desktop.before-satra`. Removing the user
+are backed up as `com.edde746.satra.desktop.before-satra`. Removing the user
 override (or restoring that backup) returns to the previous launcher. Keep the
 referenced bundle directory in place after installation.
 

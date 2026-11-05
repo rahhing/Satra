@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/focusable_button.dart';
-import 'package:plezy/providers/playback_state_provider.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/services/playback_coordinator.dart';
-import 'package:plezy/services/playback_subtitle_resolver.dart';
-import 'package:plezy/screens/video_player_screen.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/subtitle_preference.dart';
+import 'package:satra/focus/focusable_button.dart';
+import 'package:satra/providers/playback_state_provider.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/services/playback_coordinator.dart';
+import 'package:satra/services/playback_subtitle_resolver.dart';
+import 'package:satra/screens/video_player_screen.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/subtitle_preference.dart';
 import 'package:provider/provider.dart';
 
 import '../../test_helpers/media_items.dart';
@@ -358,8 +358,8 @@ void main() {
     var initializeCount = 0;
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_player',
-      eventChannelName: 'com.plezy/mpv_player/events',
+      methodChannelName: 'com.satra/mpv_player',
+      eventChannelName: 'com.satra/mpv_player/events',
       methodHandler: (call) {
         calls.add(call);
         switch (call.method) {

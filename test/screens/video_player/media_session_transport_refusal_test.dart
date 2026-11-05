@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:os_media_controls/os_media_controls.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/providers/playback_state_provider.dart';
-import 'package:plezy/screens/video_player_screen.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/providers/playback_state_provider.dart';
+import 'package:satra/screens/video_player_screen.dart';
+import 'package:satra/services/settings_service.dart';
 import 'package:provider/provider.dart';
 
 import '../../test_helpers/media_items.dart';
@@ -31,8 +31,8 @@ void main() {
     final player = _RefusingPlayer();
 
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_player',
-      eventChannelName: 'com.plezy/mpv_player/events',
+      methodChannelName: 'com.satra/mpv_player',
+      eventChannelName: 'com.satra/mpv_player/events',
       testBody: () async {
         final screenKey = GlobalKey<VideoPlayerScreenState>();
         await tester.pumpWidget(_screen(screenKey));

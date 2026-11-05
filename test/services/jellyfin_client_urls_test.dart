@@ -5,24 +5,24 @@ import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/media/artist_discography.dart';
-import 'package:plezy/media/library_query.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_playlist.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/models/transcode_quality_preset.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/services/jellyfin_client.dart';
-import 'package:plezy/services/playback_initialization_types.dart';
-import 'package:plezy/services/subtitle_preference.dart';
-import 'package:plezy/utils/device_identity.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/services/video_decode_capabilities.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/media/artist_discography.dart';
+import 'package:satra/media/library_query.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_playlist.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/models/transcode_quality_preset.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/services/jellyfin_client.dart';
+import 'package:satra/services/playback_initialization_types.dart';
+import 'package:satra/services/subtitle_preference.dart';
+import 'package:satra/utils/device_identity.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/services/video_decode_capabilities.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/http_fixtures.dart';
@@ -1963,7 +1963,7 @@ void main() {
 
     test('single-source direct play still pins MediaSourceId when the source id equals the item id', () async {
       // The real-world shape for an ordinary Jellyfin episode: exactly one
-      // MediaSource whose Id is the item's own GUID. Plezy used to drop
+      // MediaSource whose Id is the item's own GUID. Satra used to drop
       // MediaSourceId here, leaving Jellyfin to resolve its own first sorted
       // source — a different file as soon as the item gains an alternate
       // version. Every official client sends it unconditionally.
@@ -3393,7 +3393,7 @@ void main() {
       final auth = headers['Authorization'];
       expect(auth, isNotNull);
       expect(auth, startsWith('MediaBrowser '));
-      expect(auth, contains('Client="Plezy%20Test"'));
+      expect(auth, contains('Client="Satra%20Test"'));
       expect(auth, contains('Device="Test"'));
       expect(auth, contains('DeviceId="dev-xyz"'));
       expect(auth, contains(RegExp(r'Version="[^"]+"')));
@@ -3417,7 +3417,7 @@ void main() {
       addTearDown(scoped.close);
 
       final auth = scoped.defaultHeadersForTesting['Authorization'];
-      expect(auth, contains('Client="Plezy%20Android%20TV"'));
+      expect(auth, contains('Client="Satra%20Android%20TV"'));
       expect(auth, contains('Device="Living%20Room%20Shield"'));
     });
 
@@ -3428,7 +3428,7 @@ void main() {
       addTearDown(scoped.close);
 
       final auth = scoped.defaultHeadersForTesting['Authorization'];
-      expect(auth, contains('Client="Plezy%20tvOS"'));
+      expect(auth, contains('Client="Satra%20tvOS"'));
       expect(auth, contains('Device="Apple%20TV"'));
     });
 

@@ -108,7 +108,7 @@ bool get debugLoggingEnabled => _productionFilter.isEnabledFor(Level.debug);
 ///
 /// Usage:
 /// ```dart
-/// import 'package:plezy/utils/app_logger.dart';
+/// import 'package:satra/utils/app_logger.dart';
 ///
 /// appLogger.d('Debug message');
 /// appLogger.i('Info message');

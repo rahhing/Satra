@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/live_tv_support.dart';
-import 'package:plezy/screens/video_player/tv_background_suspend_policy.dart';
+import 'package:satra/media/live_tv_support.dart';
+import 'package:satra/screens/video_player/tv_background_suspend_policy.dart';
 
 void main() {
   test('Android TV VOD releases the player after the background grace period', () {

@@ -5,14 +5,14 @@ import 'dart:ui' show Tristate;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/services/playback_subtitle_resolver.dart';
-import 'package:plezy/services/playback_initialization_types.dart';
-import 'package:plezy/widgets/overlay_sheet.dart';
-import 'package:plezy/widgets/video_controls/models/track_controls_state.dart';
-import 'package:plezy/widgets/video_controls/sheets/track_sheet.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/services/playback_subtitle_resolver.dart';
+import 'package:satra/services/playback_initialization_types.dart';
+import 'package:satra/widgets/overlay_sheet.dart';
+import 'package:satra/widgets/video_controls/models/track_controls_state.dart';
+import 'package:satra/widgets/video_controls/sheets/track_sheet.dart';
 
 import '../test_helpers/theme.dart';
 

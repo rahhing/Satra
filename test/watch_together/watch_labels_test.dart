@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/widgets/watch_labels.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/widgets/watch_labels.dart';
 
 import '../test_helpers/media_items.dart';
 

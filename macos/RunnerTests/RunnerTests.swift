@@ -2,7 +2,7 @@ import Libmpv
 import FlutterMacOS
 import XCTest
 
-@testable import Plezy
+@testable import Satra
 
 final class ControllablePropertyCore: MpvPlayerCoreBase {
   var nextResult: Result<Void, Error>?
@@ -167,7 +167,7 @@ final class MpvPlayerContractTests: XCTestCase {
     XCTAssertTrue(core.isPaused, "A rejected raw pause write must not change the cache")
 
     XCTAssertFailure(
-      awaitProperty(core, name: "plezy-property-does-not-exist", value: "ignored")
+      awaitProperty(core, name: "satra-property-does-not-exist", value: "ignored")
     )
     XCTAssertTrue(core.isPaused)
 
@@ -324,7 +324,7 @@ final class MpvPlayerContractTests: XCTestCase {
     }
 
     let missingFile = FileManager.default.temporaryDirectory
-      .appendingPathComponent("plezy-missing-\(UUID().uuidString).mkv").path
+      .appendingPathComponent("satra-missing-\(UUID().uuidString).mkv").path
     let events = eventsOfOpenFailingBehindHeldQueue(core, recorder: recorder, url: missingFile)
 
     guard let endFile = events.firstIndex(where: { $0.name == "end-file" }) else {
@@ -363,13 +363,13 @@ final class MpvPlayerContractTests: XCTestCase {
 
     // Overflow the core's log buffer ahead of the failure. The second client's
     // synchronous commands put nothing in the core's event queue.
-    let rejected = (0..<10_100).filter { mpv_command_string(observer, "print-text plezy-fill-\($0)") < 0 }
+    let rejected = (0..<10_100).filter { mpv_command_string(observer, "print-text satra-fill-\($0)") < 0 }
     XCTAssertTrue(rejected.isEmpty)
     let endFileDelivered = expectation(description: "end-file delivered")
     endFileDelivered.assertForOverFulfill = false
     recorder.onEndFile = { endFileDelivered.fulfill() }
     let missingFile = FileManager.default.temporaryDirectory
-      .appendingPathComponent("plezy-missing-\(UUID().uuidString).mkv").path
+      .appendingPathComponent("satra-missing-\(UUID().uuidString).mkv").path
     core.command(["loadfile", missingFile])
     var endFilePosted = false
     while !endFilePosted, let event = mpv_wait_event(observer, 5), event.pointee.event_id != MPV_EVENT_NONE {
@@ -422,7 +422,7 @@ final class MpvPlayerContractTests: XCTestCase {
     }
 
     let missingFile = FileManager.default.temporaryDirectory
-      .appendingPathComponent("plezy-missing-\(UUID().uuidString).mkv").path
+      .appendingPathComponent("satra-missing-\(UUID().uuidString).mkv").path
     let events = eventsOfOpenFailingBehindHeldQueue(core, recorder: recorder, url: missingFile)
 
     guard let endFile = events.firstIndex(where: { $0.name == "end-file" }) else {

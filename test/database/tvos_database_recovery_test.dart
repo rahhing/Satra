@@ -5,19 +5,19 @@ import 'package:crypto/crypto.dart';
 import 'package:drift/drift.dart' show OrderingTerm, Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/connection/connection_registry.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/database/download_operations.dart';
-import 'package:plezy/database/tvos_database_recovery_store.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/models/download_models.dart';
-import 'package:plezy/profiles/profile.dart';
-import 'package:plezy/profiles/profile_connection.dart';
-import 'package:plezy/profiles/profile_connection_registry.dart';
-import 'package:plezy/profiles/profile_registry.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/credential_vault.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/connection/connection_registry.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/database/download_operations.dart';
+import 'package:satra/database/tvos_database_recovery_store.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/models/download_models.dart';
+import 'package:satra/profiles/profile.dart';
+import 'package:satra/profiles/profile_connection.dart';
+import 'package:satra/profiles/profile_connection_registry.dart';
+import 'package:satra/profiles/profile_registry.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/credential_vault.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_preferences_platform_interface/types.dart';
@@ -215,8 +215,8 @@ void main() {
 
   setUp(() async {
     resetSharedPreferencesForTest();
-    tempDir = await Directory.systemTemp.createTemp('plezy_tvos_recovery_');
-    databaseFile = File('${tempDir.path}/plezy_downloads.db');
+    tempDir = await Directory.systemTemp.createTemp('satra_tvos_recovery_');
+    databaseFile = File('${tempDir.path}/satra_downloads.db');
     prefs = await BaseSharedPreferencesService.sharedCache();
   });
 

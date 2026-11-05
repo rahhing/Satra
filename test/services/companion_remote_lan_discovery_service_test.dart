@@ -3,9 +3,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/companion_remote/lan_discovery_service.dart';
-import 'package:plezy/services/companion_remote/remote_auth_context.dart';
-import 'package:plezy/services/companion_remote/remote_auth_service.dart';
+import 'package:satra/services/companion_remote/lan_discovery_service.dart';
+import 'package:satra/services/companion_remote/remote_auth_context.dart';
+import 'package:satra/services/companion_remote/remote_auth_service.dart';
 
 void main() {
   group('LanDiscoveryService', () {
@@ -197,7 +197,7 @@ class _DiscoveryListener {
     );
     return utf8.encode(
       jsonEncode({
-        'app': 'plezy',
+        'app': 'satra',
         'v': version,
         'homeHash': homeHash,
         'name': name,

@@ -38,6 +38,11 @@ class TvSpotlightController extends ValueNotifier<MediaItem?> {
     }
   }
 
+  void restore(MediaItem? item) {
+    _debouncer.cancel();
+    value = item;
+  }
+
   MediaItem? resolve(Iterable<MediaHub> hubs) {
     MediaItem? fallback;
     final current = value;
@@ -121,32 +126,40 @@ class TvSpotlightScaffold extends StatelessWidget {
                 final foregroundLeft = MainScreenFocusScope.foregroundLeftOf(context);
                 return SideNavigationBleedBuilder(
                   targetBleed: foregroundLeft,
-                  child: Listener(
-                    behavior: HitTestBehavior.translucent,
-                    onPointerSignal: (signal) {
-                      if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
-                        GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
-                          if (event is PointerScrollEvent) {
-                            _findDescendantBrowseRail(context)?.stepHubByScroll(event.scrollDelta.dy);
-                          }
-                        });
-                      }
-                    },
-                    child: RepaintBoundary(
-                      child: ValueListenableBuilder<MediaItem?>(
-                        valueListenable: spotlightListenable,
-                        builder: (context, _, _) {
-                          final spotlight = resolveSpotlight();
-                          return _CatalogSpotlightBackground(
-                            item: spotlight,
-                            client: resolveClient(spotlight),
-                            hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
-                            contentTop: spotlightTop,
-                            contentBottom: spotlightBottom,
-                            contentLeft: spotlightLeft + foregroundLeft,
-                            targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
-                          );
-                        },
+                  child: GestureDetector(
+                    supportedDevices: const {PointerDeviceKind.trackpad},
+                    onVerticalDragStart: (details) => _findDescendantBrowseRail(context)?.startTrackpadScroll(details),
+                    onVerticalDragUpdate: (details) =>
+                        _findDescendantBrowseRail(context)?.updateTrackpadScroll(details),
+                    onVerticalDragEnd: (details) => _findDescendantBrowseRail(context)?.endTrackpadScroll(details),
+                    onVerticalDragCancel: () => _findDescendantBrowseRail(context)?.cancelTrackpadScroll(),
+                    child: Listener(
+                      behavior: HitTestBehavior.translucent,
+                      onPointerSignal: (signal) {
+                        if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
+                          GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
+                            if (event is PointerScrollEvent) {
+                              _findDescendantBrowseRail(context)?.stepHubByScroll(event.scrollDelta.dy);
+                            }
+                          });
+                        }
+                      },
+                      child: RepaintBoundary(
+                        child: ValueListenableBuilder<MediaItem?>(
+                          valueListenable: spotlightListenable,
+                          builder: (context, _, _) {
+                            final spotlight = resolveSpotlight();
+                            return _CatalogSpotlightBackground(
+                              item: spotlight,
+                              client: resolveClient(spotlight),
+                              hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
+                              contentTop: spotlightTop,
+                              contentBottom: spotlightBottom,
+                              contentLeft: spotlightLeft + foregroundLeft,
+                              targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
+                            );
+                          },
+                        ),
                       ),
                     ),
                   ),

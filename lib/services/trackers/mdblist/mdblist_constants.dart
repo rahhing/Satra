@@ -14,7 +14,7 @@ class MdblistConstants {
   static const String apiBase = 'https://api.mdblist.com';
   static const String webBase = 'https://mdblist.com';
 
-  static const String appName = 'plezy';
+  static const String appName = 'satra';
   static const String appVersion = '2';
 
   /// OAuth endpoints. MDBList runs django-oauth-toolkit, whose routes are

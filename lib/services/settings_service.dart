@@ -10,7 +10,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import '../models/hotkey_model.dart';
 import 'image_cache_service.dart';
-import 'package:plezy/utils/app_logger.dart';
+import 'package:satra/utils/app_logger.dart';
 import '../i18n/app_locale_utils.dart';
 import '../i18n/strings.g.dart';
 import '../models/mpv_config_models.dart';
@@ -1159,7 +1159,7 @@ class SettingsService extends BaseSharedPreferencesService {
     await prefs.remove(_legacyUseExoPlayerKey);
     await _resetGlobalsOfKeyedPlayerScopes();
 
-    // The custom relay of Plezy's former Watch Together protocol: no Open
+    // The custom relay of Satra's former Watch Together protocol: no Open
     // Watch Party relay answers there.
     await prefs.remove(_legacyCustomRelayUrlKey);
     final storedRelay = readNullableString(watchPartyRelayUrl.key);

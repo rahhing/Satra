@@ -4,27 +4,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/dpad_navigator.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/focus/locked_hub_controller.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_hub.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/profiles/active_profile_provider.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/services/device_performance.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/widgets/animated_dim_scrim.dart';
-import 'package:plezy/widgets/media_card.dart';
-import 'package:plezy/widgets/rasterized_gradient.dart';
-import 'package:plezy/widgets/side_navigation_rail.dart';
-import 'package:plezy/widgets/tv_browse_rail.dart';
+import 'package:satra/focus/dpad_navigator.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/focus/locked_hub_controller.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_hub.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/profiles/active_profile_provider.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/services/device_performance.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/animated_dim_scrim.dart';
+import 'package:satra/widgets/media_card.dart';
+import 'package:satra/widgets/rasterized_gradient.dart';
+import 'package:satra/widgets/side_navigation_rail.dart';
+import 'package:satra/widgets/tv_browse_rail.dart';
+import 'package:satra/widgets/tv_spotlight_scaffold.dart';
 import 'package:provider/provider.dart';
 
 import '../test_helpers/prefs.dart';
@@ -37,7 +38,7 @@ void main() {
 
   group('TvBrowseRailLayout', () {
     test('every density step changes card width on the 960x540 TV canvas', () {
-      // Every mainstream TV lays Plezy out at 960x540 logical, so the rail
+      // Every mainstream TV lays Satra out at 960x540 logical, so the rail
       // gets the 0.85 scale floor and the width left beside the collapsed
       // sidebar. A card-width floor above the fitted width collapses several
       // densities onto one size, which made densities 1-3 look identical.
@@ -3354,6 +3355,179 @@ void main() {
 
     expect(verticalPos.pixels, greaterThan(80));
     expect(lastActiveHub?.id, 'hub_2');
+  });
+
+  testWidgets('trackpad pans scroll the spotlight rail down and up over horizontal cards', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 720);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final serverManager = MultiServerManager();
+    final multiServerProvider = testMultiServerProvider(serverManager);
+    addTearDown(multiServerProvider.dispose);
+
+    MediaHub buildHub(int hubIdx) => MediaHub(
+      id: 'hub_$hubIdx',
+      title: 'Hub $hubIdx',
+      type: 'movie',
+      items: [
+        for (var i = 0; i < 4; i++)
+          testMediaItem(
+            id: 'movie_${hubIdx}_$i',
+            backend: MediaBackend.plex,
+            kind: MediaKind.movie,
+            title: 'Movie $hubIdx-$i',
+          ),
+      ],
+      size: 4,
+    );
+
+    final hubs = [buildHub(0), buildHub(1), buildHub(2)];
+    MediaHub? lastActiveHub;
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<MultiServerProvider>.value(
+        value: multiServerProvider,
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: Scaffold(
+            body: SizedBox(
+              width: 1280,
+              height: 720,
+              child: TvBrowseRail(
+                focusMemory: focusMemory,
+                hubs: hubs,
+                autofocus: true,
+                iconForHub: (_, _) => Icons.movie_rounded,
+                onActiveHubChanged: (hub, _) => lastActiveHub = hub,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final railCenter = tester.getCenter(find.byType(TvBrowseRail));
+    final verticalPos = _verticalRailPosition(tester);
+    expect(verticalPos.pixels, 0);
+    expect(lastActiveHub?.id, 'hub_0');
+
+    final pointer = TestPointer(8, PointerDeviceKind.trackpad);
+    await tester.sendEventToBinding(pointer.panZoomStart(railCenter));
+    await tester.sendEventToBinding(
+      pointer.panZoomUpdate(railCenter, pan: const Offset(0, -40), timeStamp: const Duration(milliseconds: 16)),
+    );
+    await tester.pump();
+    await tester.sendEventToBinding(
+      pointer.panZoomUpdate(railCenter, pan: const Offset(0, -180), timeStamp: const Duration(milliseconds: 48)),
+    );
+    await tester.pump();
+    expect(verticalPos.pixels, greaterThan(100));
+    final releasedOffset = verticalPos.pixels;
+    await tester.sendEventToBinding(pointer.panZoomEnd(timeStamp: const Duration(milliseconds: 64)));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+    expect(verticalPos.pixels, greaterThan(releasedOffset));
+    await tester.pumpAndSettle();
+    final downOffset = verticalPos.pixels;
+    await tester.sendEventToBinding(pointer.panZoomStart(railCenter));
+    await tester.sendEventToBinding(pointer.panZoomUpdate(railCenter, pan: const Offset(0, 40)));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.panZoomUpdate(railCenter, pan: const Offset(0, 140)));
+    await tester.pump();
+    expect(verticalPos.pixels, lessThan(downOffset));
+    await tester.sendEventToBinding(pointer.panZoomEnd());
+    await tester.pumpAndSettle();
+  });
+
+  testWidgets('trackpad pans over the spotlight artwork scroll the foreground rail', (tester) async {
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1280, 720);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final serverManager = MultiServerManager();
+    final multiServerProvider = testMultiServerProvider(serverManager);
+    addTearDown(multiServerProvider.dispose);
+
+    MediaHub buildHub(int hubIdx) => MediaHub(
+      id: 'hub_$hubIdx',
+      title: 'Hub $hubIdx',
+      type: 'movie',
+      items: [
+        for (var i = 0; i < 4; i++)
+          testMediaItem(
+            id: 'movie_${hubIdx}_$i',
+            backend: MediaBackend.plex,
+            kind: MediaKind.movie,
+            title: 'Movie $hubIdx-$i',
+          ),
+      ],
+      size: 4,
+    );
+
+    final hubs = [buildHub(0), buildHub(1), buildHub(2)];
+    final spotlight = ValueNotifier<MediaItem?>(null);
+    addTearDown(spotlight.dispose);
+    MediaHub? lastActiveHub;
+
+    await tester.pumpWidget(
+      ChangeNotifierProvider<MultiServerProvider>.value(
+        value: multiServerProvider,
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: Scaffold(
+            body: SizedBox(
+              width: 1280,
+              height: 720,
+              child: TvSpotlightScaffold(
+                hubs: hubs,
+                spotlightListenable: spotlight,
+                resolveSpotlight: () => null,
+                resolveClient: (_) => null,
+                foreground: Align(
+                  alignment: Alignment.bottomCenter,
+                  child: TvBrowseRail(
+                    focusMemory: focusMemory,
+                    hubs: hubs,
+                    autofocus: true,
+                    iconForHub: (_, _) => Icons.movie_rounded,
+                    onActiveHubChanged: (hub, _) => lastActiveHub = hub,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    const railCenter = Offset(640, 140);
+    final verticalPos = _verticalRailPosition(tester);
+    expect(verticalPos.pixels, 0);
+    expect(lastActiveHub?.id, 'hub_0');
+
+    final pointer = TestPointer(8, PointerDeviceKind.trackpad);
+    await tester.sendEventToBinding(pointer.panZoomStart(railCenter));
+    await tester.sendEventToBinding(pointer.panZoomUpdate(railCenter, pan: const Offset(0, -40)));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.panZoomUpdate(railCenter, pan: const Offset(0, -180)));
+    await tester.pump();
+    expect(verticalPos.pixels, greaterThan(100));
+    await tester.sendEventToBinding(pointer.panZoomEnd());
+    await tester.pumpAndSettle();
+    final downOffset = verticalPos.pixels;
+    await tester.sendEventToBinding(pointer.panZoomStart(railCenter));
+    await tester.sendEventToBinding(pointer.panZoomUpdate(railCenter, pan: const Offset(0, 40)));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.panZoomUpdate(railCenter, pan: const Offset(0, 140)));
+    await tester.pump();
+    expect(verticalPos.pixels, lessThan(downOffset));
+    await tester.sendEventToBinding(pointer.panZoomEnd());
+    await tester.pumpAndSettle();
   });
 
   testWidgets('mouse wheel scroll cycles one row at a time with 0.25s delay and aligns row to top', (tester) async {

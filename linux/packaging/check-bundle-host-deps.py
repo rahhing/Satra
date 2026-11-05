@@ -57,7 +57,7 @@ BASELINE_PREFIXES = (
 )
 
 # Where the loader actually looks for a soname, relative to the bundle root:
-# linux/CMakeLists.txt gives plezy RPATH $ORIGIN/lib and plezy.sh exports
+# linux/CMakeLists.txt gives satra RPATH $ORIGIN/lib and satra.sh exports
 # $INSTALL_DIR/lib. Nothing in the bundle carries a RUNPATH of its own, so this
 # one directory is the whole search path for every object in it.
 LOADER_DIRECTORIES = ("lib",)
@@ -104,14 +104,14 @@ OTHER_DISTROS = {
 
 
 # ldd and dpkg-query are the entire evidence base for this check, so they have
-# to be substitutable: PLEZY_HOST_TOOLS names a directory searched ahead of
+# to be substitutable: SATRA_HOST_TOOLS names a directory searched ahead of
 # PATH, which is what lets scripts/test_check_bundle_host_deps.py drive real
 # runs of this script against a synthetic bundle on any machine.
-HOST_TOOLS = os.environ.get("PLEZY_HOST_TOOLS")
+HOST_TOOLS = os.environ.get("SATRA_HOST_TOOLS")
 
 
 def locate(program: str) -> str | None:
-    """Where `program` resolves, PLEZY_HOST_TOOLS ahead of PATH."""
+    """Where `program` resolves, SATRA_HOST_TOOLS ahead of PATH."""
     override = shutil.which(program, path=HOST_TOOLS) if HOST_TOOLS else None
     return override or shutil.which(program)
 
@@ -147,7 +147,7 @@ def host_libraries(bundle: Path) -> tuple[dict[str, str], list[str]]:
     # rglob for the objects to inspect, though: those same modules pull in host
     # libraries nothing else in the bundle links, and scanning only lib/*.so*
     # left their dependencies out of ldd entirely.
-    binaries = [bundle / "plezy", *sorted(bundle.rglob("*.so*"))]
+    binaries = [bundle / "satra", *sorted(bundle.rglob("*.so*"))]
     needed: dict[str, str] = {}
     problems: list[str] = []
     for binary in binaries:
@@ -215,8 +215,8 @@ def main() -> int:
     parser.add_argument("--root", type=Path, default=PROJECT_ROOT, help="repository root")
     arguments = parser.parse_args()
 
-    if not (arguments.bundle / "plezy").exists():
-        print(f"::error::{arguments.bundle}/plezy does not exist - nothing to check", file=sys.stderr)
+    if not (arguments.bundle / "satra").exists():
+        print(f"::error::{arguments.bundle}/satra does not exist - nothing to check", file=sys.stderr)
         return 1
 
     # ldd and dpkg-query are the entire evidence base. Without them this walk

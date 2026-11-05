@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/models/livetv_channel.dart';
-import 'package:plezy/profiles/profile.dart';
-import 'package:plezy/screens/video_player/live_tv_session_args.dart';
-import 'package:plezy/services/deep_links/deep_link.dart';
-import 'package:plezy/utils/external_ids.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/models/livetv_channel.dart';
+import 'package:satra/profiles/profile.dart';
+import 'package:satra/screens/video_player/live_tv_session_args.dart';
+import 'package:satra/services/deep_links/deep_link.dart';
+import 'package:satra/utils/external_ids.dart';
 
 LiveTvChannel _channel(String key, {String? identifier, String? number, String? callSign}) =>
     LiveTvChannel(key: key, identifier: identifier, number: number, callSign: callSign, hd: false);
@@ -18,20 +18,20 @@ Profile _home(String id, String name, String uuid) =>
 void main() {
   group('DeepLink.tryParse', () {
     test('reads an item on a server, of any backend', () {
-      final link = DeepLink.tryParse('plezy://play?server=abc123&id=42&mode=shuffle&profile=Kids') as PlayLink;
+      final link = DeepLink.tryParse('satra://play?server=abc123&id=42&mode=shuffle&profile=Kids') as PlayLink;
       expect(link.target, ItemPlayTarget(serverId: ServerId('abc123'), itemId: '42'));
       expect(link.mode, PlayMode.shuffle);
       expect(link.profile, 'Kids');
     });
 
     test('reads the launcher shelf content id', () {
-      final link = DeepLink.tryParse('plezy://play?content_id=plezy_abc123_42') as PlayLink;
+      final link = DeepLink.tryParse('satra://play?content_id=satra_abc123_42') as PlayLink;
       expect(link.target, ItemPlayTarget(serverId: ServerId('abc123'), itemId: '42'));
       expect(link.mode, PlayMode.next);
     });
 
     test('reads a catalogue title and normalizes its ids', () {
-      final link = DeepLink.tryParse('plezy://play?type=Show&tvdb=81189&imdb=TT0903747&plex=5d9c086c46115600200aa2fe');
+      final link = DeepLink.tryParse('satra://play?type=Show&tvdb=81189&imdb=TT0903747&plex=5d9c086c46115600200aa2fe');
       expect(
         (link! as PlayLink).target,
         const CatalogPlayTarget(
@@ -44,25 +44,25 @@ void main() {
     });
 
     test('reads a live channel', () {
-      final link = DeepLink.tryParse('plezy://live?channel=4.1&server=abc123&start=beginning') as LiveLink;
+      final link = DeepLink.tryParse('satra://live?channel=4.1&server=abc123&start=beginning') as LiveLink;
       expect(link.channel, '4.1');
       expect(link.serverId, 'abc123');
       expect(link.startPosition, LiveTvStartPosition.beginning);
-      expect((DeepLink.tryParse('plezy://live?channel=KNTV')! as LiveLink).startPosition, LiveTvStartPosition.ask);
+      expect((DeepLink.tryParse('satra://live?channel=KNTV')! as LiveLink).startPosition, LiveTvStartPosition.ask);
       expect(
-        (DeepLink.tryParse('plezy://live?channel=4&start=live')! as LiveLink).startPosition,
+        (DeepLink.tryParse('satra://live?channel=4&start=live')! as LiveLink).startPosition,
         LiveTvStartPosition.live,
       );
     });
 
     test('reads open with and without a profile', () {
-      expect((DeepLink.tryParse('plezy://open')! as OpenLink).profile, isNull);
-      expect((DeepLink.tryParse('plezy://open?profile=%20Kids%20')! as OpenLink).profile, 'Kids');
-      expect(DeepLink.tryParse('PLEZY://OPEN'), isA<OpenLink>());
+      expect((DeepLink.tryParse('satra://open')! as OpenLink).profile, isNull);
+      expect((DeepLink.tryParse('satra://open?profile=%20Kids%20')! as OpenLink).profile, 'Kids');
+      expect(DeepLink.tryParse('SATRA://OPEN'), isA<OpenLink>());
     });
 
     test('keeps an external player return link whole', () {
-      const url = 'plezy://external-player/success/s1?position=12.5&duration=1420.016';
+      const url = 'satra://external-player/success/s1?position=12.5&duration=1420.016';
       final link = DeepLink.tryParse(url) as ExternalPlayerReturnLink;
       expect(link.uri.toString(), url);
     });
@@ -70,22 +70,22 @@ void main() {
     test('rejects links that do not say what to play', () {
       for (final url in [
         'https://example.com/play?server=a&id=1',
-        'plezy://unknown',
-        'plezy://play',
-        'plezy://play?id=42',
-        'plezy://play?server=abc123',
-        'plezy://play?server=abc123&id=42&mode=random',
-        'plezy://play?content_id=garbage',
-        'plezy://play?type=movie',
-        'plezy://play?type=episode&tmdb=1',
-        'plezy://play?type=movie&tmdb=12a',
-        'plezy://play?type=movie&tmdb=99999999999999999999999',
-        'plezy://play?type=movie&imdb=0903747',
-        'plezy://play?type=movie&plex=not-a-hash',
-        'plezy://live',
-        'plezy://live?channel=',
-        'plezy://live?channel=4&start=sideways',
-        'plezy://play?server=a&id=%E0%A4%A',
+        'satra://unknown',
+        'satra://play',
+        'satra://play?id=42',
+        'satra://play?server=abc123',
+        'satra://play?server=abc123&id=42&mode=random',
+        'satra://play?content_id=garbage',
+        'satra://play?type=movie',
+        'satra://play?type=episode&tmdb=1',
+        'satra://play?type=movie&tmdb=12a',
+        'satra://play?type=movie&tmdb=99999999999999999999999',
+        'satra://play?type=movie&imdb=0903747',
+        'satra://play?type=movie&plex=not-a-hash',
+        'satra://live',
+        'satra://live?channel=',
+        'satra://live?channel=4&start=sideways',
+        'satra://play?server=a&id=%E0%A4%A',
       ]) {
         expect(DeepLink.tryParse(url), isNull, reason: url);
       }

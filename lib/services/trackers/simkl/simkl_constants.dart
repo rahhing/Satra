@@ -31,7 +31,7 @@ class SimklConstants {
 
   static const String apiBase = 'https://api.simkl.com';
   static const String dataBase = 'https://data.simkl.in';
-  static const String appName = 'plezy';
+  static const String appName = 'satra';
 
   /// Sent as `app-version` when the platform cannot report the real one.
   static const String fallbackAppVersion = 'unknown';

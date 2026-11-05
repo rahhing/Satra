@@ -17,32 +17,32 @@ def main():
     parser.add_argument("bundle", type=Path, help="Flutter Linux bundle directory")
     args = parser.parse_args()
     bundle = args.bundle.resolve()
-    executable = bundle / "plezy"
-    icon = bundle / "data/flutter_assets/assets/plezy.png"
+    executable = bundle / "satra"
+    icon = bundle / "data/flutter_assets/assets/satra.png"
     svg_icon = bundle / "data/flutter_assets/assets/satra.svg"
     if not svg_icon.is_file():
-        svg_icon = bundle / "data/flutter_assets/assets/plezy.svg"
+        svg_icon = bundle / "data/flutter_assets/assets/satra.svg"
     if not executable.is_file() or not os.access(executable, os.X_OK) or not icon.is_file():
-        parser.error("Expected an executable plezy and bundled assets/plezy.png")
+        parser.error("Expected an executable satra and bundled assets/satra.png")
 
     data_home = Path(os.environ.get("XDG_DATA_HOME", Path.home() / ".local/share"))
     applications = data_home / "applications"
     applications.mkdir(parents=True, exist_ok=True)
 
     # Install user-local hicolor icons so XDG/KDE/KRunner override any stale
-    # system-wide /usr/share/icons/hicolor/*/apps/plezy.* entries.
+    # system-wide /usr/share/icons/hicolor/*/apps/satra.* entries.
     hicolor = data_home / "icons/hicolor"
     png_apps = hicolor / "1024x1024/apps"
     scalable_apps = hicolor / "scalable/apps"
     png_apps.mkdir(parents=True, exist_ok=True)
     scalable_apps.mkdir(parents=True, exist_ok=True)
-    for icon_name in ("satra", "plezy", "com.edde746.plezy"):
+    for icon_name in ("satra", "satra", "com.edde746.satra"):
         shutil.copy2(icon, png_apps / f"{icon_name}.png")
         if svg_icon.is_file():
             shutil.copy2(svg_icon, scalable_apps / f"{icon_name}.svg")
     installed_icon = png_apps / "satra.png"
 
-    desktop = applications / "com.edde746.plezy.desktop"
+    desktop = applications / "com.edde746.satra.desktop"
     # Back up a pre-existing user customization once; never alter system files.
     backup = desktop.with_suffix(".desktop.before-satra")
     if desktop.exists() and not backup.exists() and "X-Satra-Local=true" not in desktop.read_text():
@@ -61,7 +61,7 @@ def main():
         f'Exec="{value(quoted)}"\nIcon={value(installed_icon)}\n'
         "Terminal=false\nCategories=AudioVideo;Video;Player;\n"
         "Keywords=plex;jellyfin;emby;media;streaming;video;\n"
-        "StartupWMClass=com.edde746.plezy\nX-Satra-Local=true\n",
+        "StartupWMClass=com.edde746.satra\nX-Satra-Local=true\n",
         encoding="utf-8",
     )
     updater = shutil.which("update-desktop-database")

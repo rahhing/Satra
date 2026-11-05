@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_part_timeline.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/screens/video_player/media_reload_outcome.dart';
-import 'package:plezy/screens/video_player/playback_transition_gate.dart';
-import 'package:plezy/screens/video_player/spurious_eof_recovery.dart';
-import 'package:plezy/screens/video_player/wakelock_controller.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_part_timeline.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/screens/video_player/media_reload_outcome.dart';
+import 'package:satra/screens/video_player/playback_transition_gate.dart';
+import 'package:satra/screens/video_player/spurious_eof_recovery.dart';
+import 'package:satra/screens/video_player/wakelock_controller.dart';
 
 import '../../test_helpers/media_items.dart';
 import '../../test_helpers/watch_together_fakes.dart';

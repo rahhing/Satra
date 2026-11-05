@@ -6,9 +6,9 @@ import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:plezy/services/device_performance.dart';
-import 'package:plezy/utils/media_image_helper.dart';
-import 'package:plezy/widgets/optimized_media_image.dart';
+import 'package:satra/services/device_performance.dart';
+import 'package:satra/utils/media_image_helper.dart';
+import 'package:satra/widgets/optimized_media_image.dart';
 
 void main() {
   testWidgets('network widget matches the shared server artwork provider', (tester) async {
@@ -49,7 +49,7 @@ void main() {
     expect(widgetCached.cacheKey, sharedCached.cacheKey);
     expect(widgetCached.cacheKey, isNotNull);
     expect(widgetCached.headers, sharedCached.headers);
-    expect(widgetCached.headers, const {'User-Agent': 'Plezy'});
+    expect(widgetCached.headers, const {'User-Agent': 'Satra'});
     expect(widgetCached.maxWidth, sharedCached.maxWidth);
     expect(widgetCached.maxWidth, isNull);
     expect(widgetCached.maxHeight, sharedCached.maxHeight);
@@ -285,7 +285,7 @@ void main() {
     tester.view.physicalSize = const Size(1280, 720);
     addTearDown(tester.view.resetDevicePixelRatio);
     addTearDown(tester.view.resetPhysicalSize);
-    final directory = Directory.systemTemp.createTempSync('plezy-image-test');
+    final directory = Directory.systemTemp.createTempSync('satra-image-test');
     addTearDown(() => directory.deleteSync(recursive: true));
     final file = File('${directory.path}/poster.png');
     late StateSetter rebuild;

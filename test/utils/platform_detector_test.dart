@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 void main() {
   setUp(() {
@@ -147,7 +147,7 @@ void main() {
     test('a WindowsApps executable path is a packaged install', () {
       expect(
         PlatformDetector.isPackagedExecutablePath(
-          r'C:\Program Files\WindowsApps\edde746.Plezy_2.11.0.0_x64__13q3sv6jzathm\plezy.exe',
+          r'C:\Program Files\WindowsApps\edde746.Satra_2.11.0.0_x64__13q3sv6jzathm\satra.exe',
         ),
         isTrue,
       );
@@ -156,7 +156,7 @@ void main() {
     test('the package directory is matched however it is cased', () {
       expect(
         PlatformDetector.isPackagedExecutablePath(
-          r'c:\program files\windowsapps\edde746.Plezy_2.11.0.0_x64__13q3sv6jzathm\plezy.exe',
+          r'c:\program files\windowsapps\edde746.Satra_2.11.0.0_x64__13q3sv6jzathm\satra.exe',
         ),
         isTrue,
         reason:
@@ -166,13 +166,13 @@ void main() {
     });
 
     test('installed and portable executable paths are not packaged installs', () {
-      expect(PlatformDetector.isPackagedExecutablePath(r'C:\Program Files\Plezy\plezy.exe'), isFalse);
-      expect(PlatformDetector.isPackagedExecutablePath(r'D:\portable\plezy-windows-x64\plezy.exe'), isFalse);
+      expect(PlatformDetector.isPackagedExecutablePath(r'C:\Program Files\Satra\satra.exe'), isFalse);
+      expect(PlatformDetector.isPackagedExecutablePath(r'D:\portable\satra-windows-x64\satra.exe'), isFalse);
     });
 
     test('a directory whose name merely starts the same is not a package', () {
       expect(
-        PlatformDetector.isPackagedExecutablePath(r'C:\Users\someone\Downloads\WindowsApps-backup\plezy.exe'),
+        PlatformDetector.isPackagedExecutablePath(r'C:\Users\someone\Downloads\WindowsApps-backup\satra.exe'),
         isFalse,
       );
     });

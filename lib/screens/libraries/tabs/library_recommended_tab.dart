@@ -2,6 +2,9 @@ import 'dart:async';
 import '../../../media/ids.dart';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../../services/backdrop_cache.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../focus/hub_vertical_navigation.dart';
@@ -55,12 +58,39 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
   final TvSpotlightController _spotlight = TvSpotlightController();
   HubFocusMemory _hubFocusMemory = HubFocusMemory();
 
-  void _setSpotlightItem(MediaItem item) => _spotlight.select(item);
+  BackdropCache? _backdrops;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _backdrops = context.read<BackdropCache?>();
+    if (_spotlight.value == null) _spotlight.restore(_backdrops?.selectionFor(widget.library.globalKey));
+  }
+
+  void _setSpotlightItem(MediaItem item) {
+    _spotlight.select(item);
+    _backdrops?.rememberSelection(widget.library.globalKey, item);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final content = super.build(context);
+    final cached = _backdrops?.selectionFor(widget.library.globalKey);
+    if (!PlatformDetector.isTV() || !isLoading || cached == null) return content;
+    return TvSpotlightScaffold(
+      hubs: const [],
+      spotlightListenable: _spotlight,
+      resolveSpotlight: () => cached,
+      resolveClient: (_) => context.tryGetMediaClientForServer(serverIdOrNull(widget.library.serverId)),
+      foreground: content,
+    );
+  }
 
   @override
   void didUpdateWidget(LibraryRecommendedTab oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.library.globalKey != widget.library.globalKey) {
+      _spotlight.restore(_backdrops?.selectionFor(widget.library.globalKey));
       _hubKeysByIdentity.clear();
       _hubFocusMemory = HubFocusMemory();
     }
@@ -329,7 +359,11 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
     return TvSpotlightScaffold(
       hubs: tvHubs,
       spotlightListenable: _spotlight,
-      resolveSpotlight: () => _spotlight.resolve(tvHubs),
+      resolveSpotlight: () {
+        final item = _spotlight.resolve(tvHubs);
+        if (item != null) _backdrops?.rememberSelection(widget.library.globalKey, item);
+        return item;
+      },
       resolveClient: (spotlight) =>
           context.tryGetMediaClientForServer(serverIdOrNull(spotlight?.serverId ?? widget.library.serverId)),
       foreground: tvHubs.isEmpty

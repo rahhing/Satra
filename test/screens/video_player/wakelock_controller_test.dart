@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/screens/video_player/wakelock_controller.dart';
+import 'package:satra/screens/video_player/wakelock_controller.dart';
 
 void main() {
   group('WakelockController', () {

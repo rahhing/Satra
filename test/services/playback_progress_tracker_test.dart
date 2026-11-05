@@ -1,23 +1,23 @@
 import 'dart:async';
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 
 import 'package:drift/native.dart';
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/media/playback_report_metadata.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/offline_watch_sync_service.dart';
-import 'package:plezy/services/playback_progress_tracker.dart';
-import 'package:plezy/services/plex_client.dart';
-import 'package:plezy/utils/watch_state_notifier.dart';
-import 'package:plezy/utils/active_client_scope.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/media/playback_report_metadata.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/offline_watch_sync_service.dart';
+import 'package:satra/services/playback_progress_tracker.dart';
+import 'package:satra/services/plex_client.dart';
+import 'package:satra/utils/watch_state_notifier.dart';
+import 'package:satra/utils/active_client_scope.dart';
 
 import '../test_helpers/prefs.dart';
 import '../test_helpers/media_items.dart';
@@ -1024,7 +1024,7 @@ void main() {
     test('backend that marks watched on stop skips the explicit server mark (#1287)', () async {
       // Jellyfin: /Sessions/Playing/Stopped marks the item played server-side,
       // so an explicit markWatched here would double-scrobble via the Trakt
-      // plugin. The local watch event must still fire (UI + Plezy's own Trakt
+      // plugin. The local watch event must still fire (UI + Satra's own Trakt
       // sync, which key on `watched` events, not progress).
       final client = _StopMarksWatchedClient();
       final player = _FakePlayer(position: const Duration(seconds: 95), duration: const Duration(seconds: 100));

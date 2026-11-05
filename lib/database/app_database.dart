@@ -1431,7 +1431,7 @@ Future<File> _resolveProductionDatabaseFile() async {
   final dbFolder = (Platform.isAndroid || Platform.isIOS)
       ? await getApplicationDocumentsDirectory()
       : await getApplicationSupportDirectory();
-  return File(p.join(dbFolder.path, 'plezy_downloads.db'));
+  return File(p.join(dbFolder.path, 'satra_downloads.db'));
 }
 
 /// Best-effort removal for sidecars left without a main database after an
@@ -1487,7 +1487,7 @@ Future<void> migrateLegacyDesktopDatabase({
       oldFile = sourceOverride;
     } else {
       final oldFolder = await getApplicationDocumentsDirectory();
-      oldFile = File(p.join(oldFolder.path, 'plezy_downloads.db'));
+      oldFile = File(p.join(oldFolder.path, 'satra_downloads.db'));
     }
     if (!await oldFile.exists()) return;
   } catch (e, st) {

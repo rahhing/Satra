@@ -28,14 +28,14 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.edde746.plezy</string>
+			<string>com.edde746.satra</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>plezy</string>
+				<string>satra</string>
 			</array>
 		</dict>
 	</array>
-	<!-- plezy:// links reach Dart through DeepLinkPlugin (com.plezy/deep_link);
+	<!-- satra:// links reach Dart through DeepLinkPlugin (com.satra/deep_link);
 	     Flutter's router must not also push them as named routes. -->
 	<key>FlutterDeepLinkingEnabled</key>
 	<false/>

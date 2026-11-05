@@ -8,6 +8,8 @@ import '../connection/connection_registry.dart';
 import '../focus/covered_route_focus_boundary.dart';
 import '../focus/key_event_utils.dart';
 import '../media/ids.dart';
+import '../services/backdrop_cache.dart';
+import '../services/device_performance.dart';
 import '../media/media_server_client.dart';
 import '../profiles/active_profile_provider.dart';
 import '../profiles/plex_home_service.dart';
@@ -145,6 +147,10 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
           key: ValueKey<String?>('profile-session:$activeId'),
           child: MultiProvider(
             providers: [
+              Provider(
+                create: (_) => BackdropCache(maximumBytes: (DevicePerformance.isReduced ? 16 : 64) << 20),
+                dispose: (_, cache) => cache.dispose(),
+              ),
               ChangeNotifierProxyProvider<MultiServerProvider, WatchStateStore>(
                 create: (_) => WatchStateStore(),
                 update: (_, multiServer, previous) {
@@ -276,7 +282,7 @@ class _ProfileSessionScreenState extends State<ProfileSessionScreen> {
                   return WatchTogetherProvider(
                     clientFor: (serverId) => multiServer.getClientForServer(ServerId(serverId)),
                     findCopies: multiServer.aggregationService.findTitleCopiesAcrossServers,
-                    displayName: () => activeProfile.active?.displayName ?? 'Plezy',
+                    displayName: () => activeProfile.active?.displayName ?? 'Satra',
                     profileId: () => activeProfile.activeId,
                   );
                 },

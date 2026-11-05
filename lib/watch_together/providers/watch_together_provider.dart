@@ -66,12 +66,12 @@ class WatchTogetherProvider extends ChangeNotifier {
        _displayName = displayName ?? _defaultName,
        _profileId = profileId ?? _noProfile,
        _customRelayBaseUrl = customRelayBaseUrl ?? _relaySetting,
-       _clientName = clientName ?? _plezyClientName,
+       _clientName = clientName ?? _satraClientName,
        _partyFactory = partyFactory ?? _defaultParty,
        _resolver = LibraryResolver(clientFor: clientFor ?? _noClient, findCopies: findCopies ?? _noCopies);
 
   static MediaServerClient? _noClient(String serverId) => null;
-  static String _defaultName() => 'Plezy';
+  static String _defaultName() => 'Satra';
   static String? _noProfile() => null;
   static String? _relaySetting() => SettingsService.instanceOrNull?.read(SettingsService.watchPartyRelayUrl);
   static Future<LibraryLookupResult> _noCopies(TitleQuery query, {AbortController? abort}) async => (
@@ -102,7 +102,7 @@ class WatchTogetherProvider extends ChangeNotifier {
   ({owp.Relays relays, String? base})? _relays;
 
   /// The player that has a file open, whether or not the room follows it.
-  ({PlezyPlayerAdapter adapter, bool shareable})? _player;
+  ({SatraPlayerAdapter adapter, bool shareable})? _player;
   bool _attached = false;
 
   /// Why the user is away from the player (the app in the background, a car
@@ -122,9 +122,9 @@ class WatchTogetherProvider extends ChangeNotifier {
   /// Opens the room's file when no player is open; set by the main screen.
   ChoiceOpener? navigatorOpener;
 
-  static Future<String> _plezyClientName() async {
+  static Future<String> _satraClientName() async {
     final info = await PackageInfo.fromPlatform();
-    return 'Plezy/${info.version}';
+    return 'Satra/${info.version}';
   }
 
   static owp.WatchParty<WatchCopy> _defaultParty({
@@ -174,7 +174,7 @@ class WatchTogetherProvider extends ChangeNotifier {
 
   /// The room drives [adapter]: it is the attached player and has the room's
   /// file open.
-  bool follows(PlezyPlayerAdapter adapter) {
+  bool follows(SatraPlayerAdapter adapter) {
     final choice = _state.choice;
     final match = _state.match?.state;
     return isConnected &&
@@ -452,7 +452,7 @@ class WatchTogetherProvider extends ChangeNotifier {
   /// A host shares the file with the room. A guest's player follows the room
   /// when it opened the room's file, and else sits out so the room doesn't
   /// wait for it.
-  void playerOpened(PlezyPlayerAdapter adapter, {required bool shareable, required bool roomLaunch}) {
+  void playerOpened(SatraPlayerAdapter adapter, {required bool shareable, required bool roomLaunch}) {
     final previous = _player?.adapter;
     if (previous != null && !identical(previous, adapter)) previous.release();
     _player = (adapter: adapter, shareable: shareable);
@@ -498,7 +498,7 @@ class WatchTogetherProvider extends ChangeNotifier {
   /// [continuing] (another player takes over, such as the next episode).
   /// Completes once the party no longer commands [adapter]: dispose of the
   /// player after it.
-  Future<void> playerClosed(PlezyPlayerAdapter adapter, {required bool continuing}) {
+  Future<void> playerClosed(SatraPlayerAdapter adapter, {required bool continuing}) {
     adapter.release();
     if (!identical(_player?.adapter, adapter)) return Future.value();
     _player = null;
@@ -543,7 +543,7 @@ class WatchTogetherProvider extends ChangeNotifier {
   }
 
   /// The player's state changed: the party reads it now.
-  void playerChanged(PlezyPlayerAdapter adapter) {
+  void playerChanged(SatraPlayerAdapter adapter) {
     if (_attached && identical(_player?.adapter, adapter)) _party?.playerChanged();
   }
 
@@ -551,7 +551,7 @@ class WatchTogetherProvider extends ChangeNotifier {
   /// [positionMs]. Waits up to 30 s for the player's length when the server
   /// has none. When the room can't get it, the room's media stops and the
   /// host is told.
-  Future<bool> shareCopy(PlezyPlayerAdapter adapter, {int positionMs = 0}) async {
+  Future<bool> shareCopy(SatraPlayerAdapter adapter, {int positionMs = 0}) async {
     final party = _party;
     final copy = adapter.copy;
     if (party == null || !isHost || copy.item == null) return false;
@@ -748,12 +748,12 @@ class WatchTogetherProvider extends ChangeNotifier {
 }
 
 /// [name] as an Open Watch Party display name: 1 to 32 code points of
-/// protocol text; "Plezy" when nothing is left.
+/// protocol text; "Satra" when nothing is left.
 String _sanitizedName(String name) {
   final text = descriptorText(name);
-  if (text == null) return 'Plezy';
+  if (text == null) return 'Satra';
   final kept = String.fromCharCodes(text.runes.take(32)).trim();
-  return kept.isEmpty ? 'Plezy' : kept;
+  return kept.isEmpty ? 'Satra' : kept;
 }
 
 enum _Away { background, vehicle }

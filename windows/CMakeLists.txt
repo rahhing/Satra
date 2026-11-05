@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.19)
-project(plezy LANGUAGES CXX)
+project(satra LANGUAGES CXX)
 
 # libmpv comes from our unified build repository
 # (https://github.com/edde746/mpv-build), which publishes per-commit,
@@ -99,7 +99,7 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(simdutf)
 
-set(BINARY_NAME "plezy")
+set(BINARY_NAME "satra")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.
@@ -135,7 +135,7 @@ function(APPLY_STANDARD_SETTINGS TARGET)
   target_compile_options(${TARGET} PRIVATE /EHsc)
   target_compile_definitions(${TARGET} PRIVATE "_HAS_EXCEPTIONS=0")
   target_compile_definitions(${TARGET} PRIVATE "$<$<CONFIG:Debug>:_DEBUG>")
-  # Release and Profile link a full PDB, so the CodeView record in plezy.exe
+  # Release and Profile link a full PDB, so the CodeView record in satra.exe
   # and the plugin DLLs gives crash reports a debug_id to symbolicate
   # against. /Z7 keeps compile-time debug info in the objects, so no shared
   # compiler PDB is involved. /DEBUG turns the linker's REF and ICF off by

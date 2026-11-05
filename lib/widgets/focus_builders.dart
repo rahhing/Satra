@@ -33,9 +33,10 @@ class FocusBuilders {
     required EdgeInsetsGeometry padding,
     required Color backgroundColor,
     double borderRadius = 20,
+    Duration? animationDuration,
     required Widget child,
   }) {
-    final duration = FocusTheme.getAnimationDuration(context);
+    final duration = animationDuration ?? FocusTheme.getAnimationDuration(context);
 
     return Focus(
       focusNode: focusNode,

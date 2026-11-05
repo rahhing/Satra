@@ -4,11 +4,11 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/widgets/artwork_atmosphere.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/widgets/artwork_atmosphere.dart';
 
 void main() {
   testWidgets('offline selected artwork colours the black canvas and high contrast removes it', (tester) async {

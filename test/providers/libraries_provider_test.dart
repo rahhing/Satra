@@ -1,18 +1,18 @@
 import 'dart:async';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/library_change_event.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/library_change_event.dart';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_library.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/providers/libraries_provider.dart';
-import 'package:plezy/services/data_aggregation_service.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/storage_service.dart';
-import 'package:plezy/utils/library_content_notifier.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_library.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/providers/libraries_provider.dart';
+import 'package:satra/services/data_aggregation_service.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/storage_service.dart';
+import 'package:satra/utils/library_content_notifier.dart';
 
 import '../test_helpers/media_items.dart';
 import '../test_helpers/multi_server_fixtures.dart';

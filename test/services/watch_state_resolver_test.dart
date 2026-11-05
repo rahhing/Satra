@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/media/media_backend.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/media/media_backend.dart';
 
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/watch_state_resolver.dart';
-import 'package:plezy/utils/watch_state_notifier.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/watch_state_resolver.dart';
+import 'package:satra/utils/watch_state_notifier.dart';
 import '../test_helpers/media_items.dart';
 
 OfflineWatchProgressItem _action({required String actionType, required int updatedAt, int? viewOffset, int? duration}) {

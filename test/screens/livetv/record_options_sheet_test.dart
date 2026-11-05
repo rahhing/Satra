@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/live_tv_support.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_library.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/server_capabilities.dart';
-import 'package:plezy/models/livetv_program.dart';
-import 'package:plezy/models/media_subscription.dart';
-import 'package:plezy/screens/livetv/livetv_recording_actions.dart';
-import 'package:plezy/screens/livetv/record_options_sheet.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/live_tv_support.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_library.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/server_capabilities.dart';
+import 'package:satra/models/livetv_program.dart';
+import 'package:satra/models/media_subscription.dart';
+import 'package:satra/screens/livetv/livetv_recording_actions.dart';
+import 'package:satra/screens/livetv/record_options_sheet.dart';
 
 class _FakeDvr implements LiveTvDvrSupport {
   final List<MediaSubscriptionCreateRequest> created = [];

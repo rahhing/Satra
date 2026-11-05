@@ -1,8 +1,8 @@
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_role.dart';
-import 'package:plezy/media/media_version.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_role.dart';
+import 'package:satra/media/media_version.dart';
 
 /// Canonical backend-neutral [MediaItem] fixture.
 ///

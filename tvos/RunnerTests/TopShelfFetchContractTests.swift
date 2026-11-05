@@ -57,7 +57,7 @@ final class TopShelfFetchContractTests: XCTestCase {
     XCTAssertEqual(items.count, 2)
 
     let episode = items[0]
-    XCTAssertEqual(episode.contentId, "plezy_srv-1_101")
+    XCTAssertEqual(episode.contentId, "satra_srv-1_101")
     XCTAssertEqual(episode.title, "Lost")
     XCTAssertEqual(episode.episodeTitle, "The Beach")
     XCTAssertEqual(episode.seasonNumber, 2)
@@ -74,7 +74,7 @@ final class TopShelfFetchContractTests: XCTestCase {
     )
 
     let movie = items[1]
-    XCTAssertEqual(movie.contentId, "plezy_srv-1_202")
+    XCTAssertEqual(movie.contentId, "satra_srv-1_202")
     XCTAssertEqual(movie.title, "Heat")
     XCTAssertNil(movie.episodeTitle)
     XCTAssertNil(movie.seasonNumber)
@@ -158,7 +158,7 @@ final class TopShelfFetchContractTests: XCTestCase {
       token: token,
       episodePoster: .series
     )
-    XCTAssertEqual(items.map(\.contentId), ["plezy_srv-1_7", "plezy_srv-1_8"])
+    XCTAssertEqual(items.map(\.contentId), ["satra_srv-1_7", "satra_srv-1_8"])
   }
 
   // MARK: - MediaBrowser mapping
@@ -194,7 +194,7 @@ final class TopShelfFetchContractTests: XCTestCase {
       episodePoster: .series
     )
     let episode = try XCTUnwrap(items.first)
-    XCTAssertEqual(episode.contentId, "plezy_srv-1_ep1")
+    XCTAssertEqual(episode.contentId, "satra_srv-1_ep1")
     XCTAssertEqual(episode.title, "Game of Thrones")
     XCTAssertEqual(episode.episodeTitle, "Winter Is Coming")
     XCTAssertEqual(episode.seasonNumber, 1)

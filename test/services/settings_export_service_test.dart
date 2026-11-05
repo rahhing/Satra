@@ -5,13 +5,13 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:plezy/models/audio_channel_limit.dart';
-import 'package:plezy/models/shader_preset.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/file_picker_service.dart';
-import 'package:plezy/services/settings_export_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/trackers/tracker_constants.dart';
+import 'package:satra/models/audio_channel_limit.dart';
+import 'package:satra/models/shader_preset.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/file_picker_service.dart';
+import 'package:satra/services/settings_export_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/trackers/tracker_constants.dart';
 
 import '../test_helpers/prefs.dart';
 
@@ -26,8 +26,8 @@ void main() {
     picker = _FakeFilePicker();
     FilePickerService.setDelegateForTesting(picker);
     PackageInfo.setMockInitialValues(
-      appName: 'Plezy',
-      packageName: 'com.example.plezy',
+      appName: 'Satra',
+      packageName: 'com.example.satra',
       version: '1.2.3',
       buildNumber: '4',
       buildSignature: '',
@@ -930,12 +930,12 @@ void main() {
 
     test('exports captured JSON bytes with package version and requested file contract', () async {
       await seedActiveProfile();
-      picker.saveResult = '/tmp/plezy-settings.json';
+      picker.saveResult = '/tmp/satra-settings.json';
 
       final path = await SettingsExportService.exportToFile();
 
-      expect(path, '/tmp/plezy-settings.json');
-      expect(picker.lastSaveName, matches(RegExp(r'^plezy-settings-\d{8}\.json$')));
+      expect(path, '/tmp/satra-settings.json');
+      expect(picker.lastSaveName, matches(RegExp(r'^satra-settings-\d{8}\.json$')));
       expect(picker.lastSaveExtensions, ['json']);
       final decoded = jsonDecode(utf8.decode(picker.lastSaveBytes!)) as Map<String, dynamic>;
       expect(decoded['appVersion'], '1.2.3');
@@ -965,7 +965,7 @@ void main() {
       expect(memoryResult?.keysImported, 1);
       expect(prefs.getBool('enable_hdr'), isFalse);
 
-      final directory = await Directory.systemTemp.createTemp('plezy-settings-import-');
+      final directory = await Directory.systemTemp.createTemp('satra-settings-import-');
       addTearDown(() => directory.delete(recursive: true));
       final file = File('${directory.path}/settings.json');
       await file.writeAsBytes(importBytes(enableHdr: true));

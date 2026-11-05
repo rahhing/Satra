@@ -4,16 +4,16 @@
 // the compositing cost can be measured without a Plex server. Build with:
 //   flutter build linux --target=lib/dev/harness_main.dart
 // Run with:
-//   PLEZY_HARNESS_MEDIA=/path/to/file.mp4 PLEZY_HARNESS_SECONDS=40 ./plezy
+//   SATRA_HARNESS_MEDIA=/path/to/file.mp4 SATRA_HARNESS_SECONDS=40 ./satra
 //
 // Optional knobs:
-//   PLEZY_HARNESS_MPV_LOG=v|debug             mpv's own log stream
-//   PLEZY_HARNESS_MPV_PROPS=name=value,...     arbitrary mpv properties, so an
+//   SATRA_HARNESS_MPV_LOG=v|debug             mpv's own log stream
+//   SATRA_HARNESS_MPV_PROPS=name=value,...     arbitrary mpv properties, so an
 //                                             option can be swept without a
 //                                             rebuild for each value
-//   PLEZY_HARNESS_HDR=1                       request HDR passthrough
-//   PLEZY_HARNESS_TONEMAP=compositor|player   which side tone-maps; the A/B leg
-//   PLEZY_HARNESS_INSET=<px>                  toggles a padding every 6s, so the
+//   SATRA_HARNESS_HDR=1                       request HDR passthrough
+//   SATRA_HARNESS_TONEMAP=compositor|player   which side tone-maps; the A/B leg
+//   SATRA_HARNESS_INSET=<px>                  toggles a padding every 6s, so the
 //                                             plane has to move, not just resize
 import 'dart:async';
 import 'dart:io';
@@ -58,7 +58,7 @@ class _HarnessAppState extends State<_HarnessApp> {
     _reportTimer = Timer.periodic(const Duration(seconds: 2), (_) => _report());
     _probeTimer = Timer.periodic(const Duration(seconds: 2), (_) => _probe());
 
-    final seconds = int.tryParse(Platform.environment['PLEZY_HARNESS_SECONDS'] ?? '');
+    final seconds = int.tryParse(Platform.environment['SATRA_HARNESS_SECONDS'] ?? '');
     if (seconds != null && seconds > 0) {
       _quitTimer = Timer(Duration(seconds: seconds), () {
         _report();
@@ -66,7 +66,7 @@ class _HarnessAppState extends State<_HarnessApp> {
         exit(0);
       });
     }
-    final inset = double.tryParse(Platform.environment['PLEZY_HARNESS_INSET'] ?? '');
+    final inset = double.tryParse(Platform.environment['SATRA_HARNESS_INSET'] ?? '');
     if (inset != null && inset > 0) {
       _insetTimer = Timer.periodic(const Duration(seconds: 6), (_) {
         setState(() => _inset = _inset == 0 ? inset : 0);
@@ -165,21 +165,21 @@ class _HarnessAppState extends State<_HarnessApp> {
   }
 
   Future<void> _start() async {
-    final media = Platform.environment['PLEZY_HARNESS_MEDIA'];
+    final media = Platform.environment['SATRA_HARNESS_MEDIA'];
     if (media == null || media.isEmpty) {
-      setState(() => _status = 'set PLEZY_HARNESS_MEDIA');
+      setState(() => _status = 'set SATRA_HARNESS_MEDIA');
       return;
     }
     final uri = media.startsWith('/') ? 'file://$media' : media;
     try {
       final player = Player();
       setState(() => _player = player);
-      final level = Platform.environment['PLEZY_HARNESS_MPV_LOG'];
+      final level = Platform.environment['SATRA_HARNESS_MPV_LOG'];
       if (level != null && level.isNotEmpty) {
         await player.setLogLevel(level);
         stdout.writeln('HARNESS_MPV_LOG $level');
       }
-      // Example: PLEZY_HARNESS_MPV_PROPS='tone-mapping=mobius,target-peak=200'.
+      // Example: SATRA_HARNESS_MPV_PROPS='tone-mapping=mobius,target-peak=200'.
       // Names the plugin intercepts (hdr-enabled, hdr-tone-mapping) also have
       // dedicated knobs, and those are applied *after* this block, so the
       // dedicated one wins if both name the same thing. Both writes are logged
@@ -197,10 +197,10 @@ class _HarnessAppState extends State<_HarnessApp> {
       // set itself; for the ones it does, change the code.
       //
       // A malformed or rejected override aborts the leg, for the same reason
-      // PLEZY_HARNESS_TONEMAP does: these captures get labelled with the value
+      // SATRA_HARNESS_TONEMAP does: these captures get labelled with the value
       // that was asked for, and carrying on would file the default curve under
       // whatever was requested. A silently wrong label is worse than no capture.
-      final props = Platform.environment['PLEZY_HARNESS_MPV_PROPS'];
+      final props = Platform.environment['SATRA_HARNESS_MPV_PROPS'];
       if (props != null && props.isNotEmpty) {
         for (final pair in props.split(',')) {
           final split = pair.indexOf('=');
@@ -219,7 +219,7 @@ class _HarnessAppState extends State<_HarnessApp> {
           }
           if (failure != null) {
             stdout.writeln('HARNESS_MPV_PROP_ERROR $pair: $failure');
-            await _abort(player, 'bad PLEZY_HARNESS_MPV_PROPS: $pair');
+            await _abort(player, 'bad SATRA_HARNESS_MPV_PROPS: $pair');
             return;
           }
         }
@@ -230,18 +230,18 @@ class _HarnessAppState extends State<_HarnessApp> {
       // A rejected value aborts instead of carrying on. This harness exists to
       // produce A/B photographs, and continuing in whatever mode happened to be
       // active would label the result with a leg that was never shown.
-      final toneMapping = Platform.environment['PLEZY_HARNESS_TONEMAP'];
+      final toneMapping = Platform.environment['SATRA_HARNESS_TONEMAP'];
       if (toneMapping != null && toneMapping.isNotEmpty) {
         try {
           await player.setProperty('hdr-tone-mapping', toneMapping);
           stdout.writeln('HARNESS_TONEMAP $toneMapping');
         } catch (e) {
           stdout.writeln('HARNESS_TONEMAP_ERROR $e');
-          await _abort(player, 'bad PLEZY_HARNESS_TONEMAP: $toneMapping');
+          await _abort(player, 'bad SATRA_HARNESS_TONEMAP: $toneMapping');
           return;
         }
       }
-      if (Platform.environment['PLEZY_HARNESS_HDR'] == '1') {
+      if (Platform.environment['SATRA_HARNESS_HDR'] == '1') {
         try {
           await player.setProperty('hdr-enabled', 'yes');
           stdout.writeln('HARNESS_HDR requested');

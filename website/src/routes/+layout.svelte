@@ -7,17 +7,17 @@
 	const siteSchema = {
 		"@context": "https://schema.org",
 		"@type": "WebSite",
-		"name": "Plezy",
+		"name": "Satra",
 		"url": "https://plezy.app"
 	};
 
 	const orgSchema = {
 		"@context": "https://schema.org",
 		"@type": "Organization",
-		"name": "Plezy",
+		"name": "Satra",
 		"url": "https://plezy.app",
-		"logo": "https://plezy.app/og/plezy-social.png",
-		"sameAs": ["https://github.com/edde746/plezy"]
+		"logo": "https://plezy.app/og/satra-social.png",
+		"sameAs": ["https://github.com/rahhing/Satra"]
 	};
 </script>
 

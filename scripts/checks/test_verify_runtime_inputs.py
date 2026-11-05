@@ -209,7 +209,7 @@ class RuntimeInputVerifierTest(unittest.TestCase):
         self._write_json("linux/packaging/native-inputs.json", native)
 
         provenance = self._json("packages/wakelock_plus/provenance.json")
-        provenance["plezyDeltas"] = ["Reworded local-change notes."]
+        provenance["satraDeltas"] = ["Reworded local-change notes."]
         provenance["refreshContract"] = ["Reworded refresh guidance."]
         provenance["externalDartClient"]["contract"] = "Reworded client guidance."
         self._write_json("packages/wakelock_plus/provenance.json", provenance)

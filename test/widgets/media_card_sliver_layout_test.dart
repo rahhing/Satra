@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/layout_constants.dart';
-import 'package:plezy/widgets/media_card_sliver_layout.dart';
-import 'package:plezy/widgets/media_grid_delegate.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/layout_constants.dart';
+import 'package:satra/widgets/media_card_sliver_layout.dart';
+import 'package:satra/widgets/media_grid_delegate.dart';
 
 import '../test_helpers/prefs.dart';
 

@@ -3,10 +3,10 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plezy/models/shader_preset.dart';
-import 'package:plezy/mpv/player/player.dart';
-import 'package:plezy/services/shader_asset_loader.dart';
-import 'package:plezy/services/shader_service.dart';
+import 'package:satra/models/shader_preset.dart';
+import 'package:satra/mpv/player/player.dart';
+import 'package:satra/services/shader_asset_loader.dart';
+import 'package:satra/services/shader_service.dart';
 
 import '../test_helpers/io_fakes.dart';
 
@@ -18,7 +18,7 @@ void main() {
 
   setUp(() async {
     originalPathProvider = PathProviderPlatform.instance;
-    root = await Directory.systemTemp.createTemp('plezy_shader_service_test_');
+    root = await Directory.systemTemp.createTemp('satra_shader_service_test_');
     PathProviderPlatform.instance = FakePathProvider(root);
     ShaderAssetLoader.clearCache();
   });

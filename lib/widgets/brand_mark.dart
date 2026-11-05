@@ -13,6 +13,6 @@ class BrandMark extends StatelessWidget {
       color: Theme.of(context).brightness == Brightness.light ? Colors.black : Colors.transparent,
       borderRadius: BorderRadius.circular(size * 0.22),
     ),
-    child: Image.asset('assets/plezy.png', width: size, height: size, semanticLabel: 'Satra'),
+    child: Image.asset('assets/satra.png', width: size, height: size, semanticLabel: 'Satra'),
   );
 }

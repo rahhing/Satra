@@ -3,16 +3,16 @@ import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/media/library_query.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/services/bif_thumbnail_service.dart';
-import 'package:plezy/services/jellyfin_client.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/media/library_query.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/services/bif_thumbnail_service.dart';
+import 'package:satra/services/jellyfin_client.dart';
+import 'package:satra/utils/media_server_http_client.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/bif_fixtures.dart';
@@ -1256,9 +1256,9 @@ void main() {
       ]);
       final bodies = requests.requests.map((request) => jsonDecode(request.body) as Map<String, dynamic>).toList();
       expect(bodies.map((body) => body['PlaySessionId']).toList(), [
-        'plezy-replay-item-1',
-        'plezy-replay-item-1',
-        'plezy-replay-item-1',
+        'satra-replay-item-1',
+        'satra-replay-item-1',
+        'satra-replay-item-1',
       ]);
       expect(bodies.every((body) => body['ItemId'] == 'item-1'), isTrue);
     });

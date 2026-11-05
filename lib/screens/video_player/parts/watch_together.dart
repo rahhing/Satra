@@ -1,6 +1,6 @@
 part of '../../video_player_screen.dart';
 
-/// The player's side of Watch Together: one [PlezyPlayerAdapter] per file the
+/// The player's side of Watch Together: one [SatraPlayerAdapter] per file the
 /// player opened, handed to the room, and the user's presses routed to the
 /// room while it drives this player.
 extension _VideoPlayerWatchTogetherMethods on VideoPlayerScreenState {
@@ -116,7 +116,7 @@ extension _VideoPlayerWatchTogetherMethods on VideoPlayerScreenState {
       watchTogether.playerChanged(previous);
       return;
     }
-    final adapter = PlezyPlayerAdapter(
+    final adapter = SatraPlayerAdapter(
       player: currentPlayer,
       copy: copy,
       commands: _watchTogetherCommands(currentPlayer),

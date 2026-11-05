@@ -1,4 +1,4 @@
-# Plezy Website
+# Satra Website
 
 Source for [plezy.app](https://plezy.app), built with SvelteKit and exported as a static site.
 

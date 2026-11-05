@@ -258,7 +258,7 @@ bool isDebugObject(File file) {
 }
 
 Stream<({String name, SymbolVariant variant})> _packagedLibraries(File package, SymbolCommand command) async* {
-  final temporary = await Directory.systemTemp.createTemp('plezy-package-inspection-');
+  final temporary = await Directory.systemTemp.createTemp('satra-package-inspection-');
   final input = InputFileStream(package.path);
   try {
     final archive = ZipDecoder().decodeStream(input);
@@ -507,13 +507,13 @@ Future<SymbolPlan> createSymbolPlan(
   } else if (apple) {
     final explicitArchive = environment['BUGS_APPLE_ARCHIVE'];
     final product = platform == 'macos'
-        ? path.join(build, 'macos/Build/Products/Release/Plezy.app')
+        ? path.join(build, 'macos/Build/Products/Release/Satra.app')
         : explicitArchive != null && explicitArchive.isNotEmpty
         ? path.join(
             path.isAbsolute(explicitArchive) ? explicitArchive : path.join(sourceRoot, explicitArchive),
-            'Products/Applications/Plezy.app',
+            'Products/Applications/Satra.app',
           )
-        : path.join(build, 'ios/iphoneos/Plezy.app');
+        : path.join(build, 'ios/iphoneos/Satra.app');
     if (!Directory(product).existsSync()) throw SymbolFailure('Missing selected release product: $product');
     for (final file in _files(product).where(isDebugObject)) {
       final artifact = await _inspect(file, command, 10);
@@ -735,7 +735,7 @@ Future<void> executeSymbolPlan(SymbolPlan plan, SymbolCommand command, {StringSi
   await upload(plan.native);
   await upload(plan.dart);
   final sourceJobs = plan.sourceJobs;
-  final temporary = await Directory.systemTemp.createTemp('plezy-symbol-upload-');
+  final temporary = await Directory.systemTemp.createTemp('satra-symbol-upload-');
   try {
     for (var index = 0; index < sourceJobs.length; index++) {
       final artifact = sourceJobs[index];
@@ -798,8 +798,8 @@ Future<int> runUploadSymbols(
     final env = Map<String, String>.of(environment ?? Platform.environment);
     final dryRun = (env['BUGS_UPLOAD_DRY_RUN'] ?? '').isNotEmpty;
     env['SENTRY_URL'] = _first([env['SENTRY_URL'], env['BUGS_URL'], 'https://bugs.plezy.app']);
-    env['SENTRY_ORG'] = _first([env['SENTRY_ORG'], 'plezy']);
-    env['SENTRY_PROJECT'] = _first([env['SENTRY_PROJECT'], 'plezy']);
+    env['SENTRY_ORG'] = _first([env['SENTRY_ORG'], 'satra']);
+    env['SENTRY_PROJECT'] = _first([env['SENTRY_PROJECT'], 'satra']);
     env['SENTRY_AUTH_TOKEN'] = _first([env['SENTRY_AUTH_TOKEN'], env['BUGS_ADMIN_TOKEN'], '']);
     if (!dryRun && env['SENTRY_AUTH_TOKEN']!.isEmpty) {
       throw SymbolFailure('SENTRY_AUTH_TOKEN or BUGS_ADMIN_TOKEN required');
@@ -809,7 +809,7 @@ Future<int> runUploadSymbols(
       if (revision.exitCode != 0 || revision.stdout.toString().trim().isEmpty) {
         throw SymbolFailure('Cannot determine source-root release; set SENTRY_RELEASE');
       }
-      env['SENTRY_RELEASE'] = 'plezy@${revision.stdout.toString().trim()}';
+      env['SENTRY_RELEASE'] = 'satra@${revision.stdout.toString().trim()}';
     }
     final executable = command == null ? await provisionSymbolCli(root, env, dryRun: dryRun) : null;
     final invoke =

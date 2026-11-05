@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:plezy/widgets/app_icon.dart';
+import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import '../../focus/focusable_action_bar.dart';
@@ -107,10 +107,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   final Map<String, FocusNode> _libraryChipFocusNodes = {};
 
   FocusNode _focusNodeForLibraryChip(String globalKey) {
-    return _libraryChipFocusNodes.putIfAbsent(
-      globalKey,
-      () => FocusNode(debugLabel: 'libraries_top_lib_$globalKey'),
-    );
+    return _libraryChipFocusNodes.putIfAbsent(globalKey, () => FocusNode(debugLabel: 'libraries_top_lib_$globalKey'));
   }
 
   @override
@@ -827,6 +824,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               buildTabChip(
                 _getTabLabel(_visibleTabs[i]),
                 i,
+                indicatorGroup: 1,
                 onSelectWhenActive: _focusCurrentTab,
                 onNavigateDown: _focusCurrentTabFromTabBar,
                 onNavigateToActions: () => _actionBarKey.currentState?.requestFocusOnFirst(),
@@ -1164,8 +1162,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               ],
               body: tabs,
             ),
-            if (useTvRecommendedBackdrop)
-              TvToolbarOverlay(child: buildTransparentTvTopBar()),
+            if (useTvRecommendedBackdrop) TvToolbarOverlay(child: buildTransparentTvTopBar()),
           ],
         ),
       );
@@ -1182,9 +1179,6 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       child: body,
     );
 
-    return Scaffold(
-      backgroundColor: useTvRecommendedBackdrop ? Colors.transparent : null,
-      body: scrollBody,
-    );
+    return Scaffold(backgroundColor: useTvRecommendedBackdrop ? Colors.transparent : null, body: scrollBody);
   }
 }

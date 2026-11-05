@@ -3,47 +3,49 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:plezy/exceptions/media_server_exceptions.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/library_filter_result.dart';
-import 'package:plezy/media/library_genre.dart';
-import 'package:plezy/media/library_query.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_hub.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_filter.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_library.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_sort.dart';
-import 'package:plezy/media/server_capabilities.dart';
-import 'package:plezy/mixins/refreshable.dart';
-import 'package:plezy/mixins/tab_visibility_aware.dart';
-import 'package:plezy/navigation/main_screen_scope.dart';
-import 'package:plezy/providers/discover_provider.dart';
-import 'package:plezy/providers/download_provider.dart';
-import 'package:plezy/providers/hidden_libraries_provider.dart';
-import 'package:plezy/providers/libraries_provider.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/screens/libraries/libraries_screen.dart';
-import 'package:plezy/screens/collection_detail_screen.dart';
-import 'package:plezy/screens/libraries/tabs/library_browse_tab.dart';
-import 'package:plezy/screens/libraries/tabs/library_recommended_tab.dart';
-import 'package:plezy/screens/libraries/tabs/base_library_tab.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/library_events/library_event_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/storage_service.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/utils/library_content_notifier.dart';
-import 'package:plezy/media/library_change_event.dart';
-import 'package:plezy/widgets/hub_section.dart';
-import 'package:plezy/widgets/overlay_sheet.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/library_filter_result.dart';
+import 'package:satra/media/library_genre.dart';
+import 'package:satra/media/library_query.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_hub.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_filter.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_library.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_sort.dart';
+import 'package:satra/media/server_capabilities.dart';
+import 'package:satra/mixins/refreshable.dart';
+import 'package:satra/mixins/tab_visibility_aware.dart';
+import 'package:satra/navigation/main_screen_scope.dart';
+import 'package:satra/providers/discover_provider.dart';
+import 'package:satra/providers/download_provider.dart';
+import 'package:satra/providers/hidden_libraries_provider.dart';
+import 'package:satra/providers/libraries_provider.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/screens/libraries/libraries_screen.dart';
+import 'package:satra/screens/collection_detail_screen.dart';
+import 'package:satra/screens/libraries/tabs/library_browse_tab.dart';
+import 'package:satra/screens/libraries/tabs/library_recommended_tab.dart';
+import 'package:satra/services/backdrop_cache.dart';
+import 'package:satra/widgets/tv_spotlight_background.dart';
+import 'package:satra/screens/libraries/tabs/base_library_tab.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/library_events/library_event_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/storage_service.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/utils/library_content_notifier.dart';
+import 'package:satra/media/library_change_event.dart';
+import 'package:satra/widgets/hub_section.dart';
+import 'package:satra/widgets/overlay_sheet.dart';
+import 'package:satra/utils/platform_detector.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -356,6 +358,30 @@ void main() {
 
     expect(tester.state(find.byType(LibraryBrowseTab)), same(browse));
     expect(client.pageRequestCount, loads, reason: 'a kept-alive tab must not reload');
+  });
+
+  testWidgets('Recommended shows its cached spotlight while a revisit reloads hubs', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(true);
+    final gate = Completer<List<MediaHub>>();
+    final client = _HubClient()..nextHubs = gate.future;
+    final harness = await _Harness.create(
+      _GatedPreferences({'selected_library_key': _libraryA.globalKey}),
+      clients: [client],
+      libraryOrder: const [_libraryA],
+    );
+    addTearDown(harness.dispose);
+    final cache = BackdropCache();
+    addTearDown(cache.dispose);
+    final saved = _recommendationHub('Saved').items.first;
+    cache.rememberSelection(_libraryA.globalKey, saved);
+    await harness.pump(tester, backdrops: cache, settle: false);
+    await pumpRequestFrames(tester);
+    expect(find.byType(CircularProgressIndicator), findsWidgets);
+    final background = tester.widget<TvSpotlightBackground>(find.byType(TvSpotlightBackground));
+    expect(background.item?.globalKey, saved.globalKey);
+    gate.complete([_recommendationHub('Saved')]);
+    await tester.pumpAndSettle();
+    expect(tester.widget<TvSpotlightBackground>(find.byType(TvSpotlightBackground)).item?.globalKey, saved.globalKey);
   });
 
   testWidgets('Recommended keeps navigation and selection through pending, failed and successful refreshes', (
@@ -737,6 +763,7 @@ final class _Harness {
     WidgetTester tester, {
     ValueChanged<String>? onLibrarySelected,
     bool settle = true,
+    BackdropCache? backdrops,
     VoidCallback? onFirstPostFrame,
     ValueListenable<bool>? enabled,
   }) async {
@@ -756,6 +783,7 @@ final class _Harness {
     await tester.pumpWidget(
       MultiProvider(
         providers: [
+          if (backdrops != null) Provider<BackdropCache>.value(value: backdrops),
           ChangeNotifierProvider<LibrariesProvider>.value(value: libraries),
           ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: hiddenLibraries),
           ChangeNotifierProvider<MultiServerProvider>.value(value: multiServer),

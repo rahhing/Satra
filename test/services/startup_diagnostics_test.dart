@@ -4,10 +4,10 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:plezy/main.dart';
-import 'package:plezy/services/sensitive_prefs.dart';
-import 'package:plezy/services/startup_diagnostics.dart';
-import 'package:plezy/utils/log_redaction_manager.dart';
+import 'package:satra/main.dart';
+import 'package:satra/services/sensitive_prefs.dart';
+import 'package:satra/services/startup_diagnostics.dart';
+import 'package:satra/utils/log_redaction_manager.dart';
 
 StartupFailureRecord _record({
   StartupPhase? phase = StartupPhase.database,
@@ -29,7 +29,7 @@ void main() {
   setUp(() async {
     LogRedactionManager.clearTrackedValues();
     StartupDiagnosticsStore.resetForTesting();
-    tempDir = await Directory.systemTemp.createTemp('plezy-startup-diagnostics');
+    tempDir = await Directory.systemTemp.createTemp('satra-startup-diagnostics');
     StartupDiagnosticsStore.debugDirectoryOverride = tempDir;
   });
 

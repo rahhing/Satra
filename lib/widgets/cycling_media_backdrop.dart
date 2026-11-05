@@ -3,6 +3,9 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../services/backdrop_cache.dart';
 
 import '../media/media_server_client.dart';
 import '../services/device_performance.dart';
@@ -446,14 +449,13 @@ class _BackdropArtworkCrossfadeState extends State<_BackdropArtworkCrossfade> wi
       excludeFromSemantics: true,
       gaplessPlayback: true,
       opacity: opacity,
-      frameBuilder: !incoming
-          ? null
-          : (context, child, frame, wasSynchronouslyLoaded) {
-              if (frame != null || wasSynchronouslyLoaded) {
-                _startFade();
-              }
-              return child;
-            },
+      frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+        if (frame != null || wasSynchronouslyLoaded) {
+          context.read<BackdropCache?>()?.retain(provider, createLocalImageConfiguration(context));
+          if (incoming) _startFade();
+        }
+        return child;
+      },
       errorBuilder: (context, error, stackTrace) {
         _reportError(imageErrorKey);
         return incoming ? const SizedBox.shrink() : ColoredBox(color: widget.fallbackColor);

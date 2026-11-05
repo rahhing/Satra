@@ -336,7 +336,7 @@ Future<File?> _getLocalDataFile(
 
 /// Suffix of the staging file used by the atomic write below.
 ///
-/// PLEZY DELTA. Deliberately a single fixed name rather than a stamped one:
+/// SATRA DELTA. Deliberately a single fixed name rather than a stamped one:
 /// this file holds the whole preference document, credentials included, so at
 /// most one may ever exist and a later write must reuse it rather than
 /// accumulate copies.
@@ -362,7 +362,7 @@ Future<Map<String, Object>> _reload(
         preferences = data.cast<String, Object>();
       }
     }
-    // PLEZY DELTA: the canonical document just read cleanly, so any staging
+    // SATRA DELTA: the canonical document just read cleanly, so any staging
     // file left by an interrupted write is stale. It is a plaintext copy of
     // the credentials, so it does not get to sit there indefinitely.
     _removeStagingFile(localDataFile);
@@ -372,7 +372,7 @@ Future<Map<String, Object>> _reload(
 
 /// Deletes a stale staging file, best effort.
 ///
-/// PLEZY DELTA. Never allowed to fail a read: the staging file is ours, and a
+/// SATRA DELTA. Never allowed to fail a read: the staging file is ours, and a
 /// locked or already-removed one changes nothing about the document.
 void _removeStagingFile(File localDataFile) {
   try {
@@ -405,7 +405,7 @@ Future<bool> _writePreferences(
     }
     final String stringMap = json.encode(preferences);
 
-    // PLEZY DELTA: stage, flush, then rename over the target.
+    // SATRA DELTA: stage, flush, then rename over the target.
     //
     // Upstream calls `writeAsStringSync` straight onto the live document.
     // That opens with the default `FileMode.write`, which truncates first, so

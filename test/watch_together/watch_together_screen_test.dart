@@ -2,18 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:openwatchparty/openwatchparty.dart' as owp;
-import 'package:plezy/focus/key_event_utils.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/providers/watch_together_provider.dart';
-import 'package:plezy/watch_together/screens/watch_together_screen.dart';
-import 'package:plezy/watch_together/services/recent_rooms_service.dart';
-import 'package:plezy/watch_together/services/watch_party_relays.dart';
-import 'package:plezy/watch_together/widgets/join_session_dialog.dart';
-import 'package:plezy/watch_together/widgets/watch_room_sections.dart';
+import 'package:satra/focus/key_event_utils.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/providers/watch_together_provider.dart';
+import 'package:satra/watch_together/screens/watch_together_screen.dart';
+import 'package:satra/watch_together/services/recent_rooms_service.dart';
+import 'package:satra/watch_together/services/watch_party_relays.dart';
+import 'package:satra/watch_together/widgets/join_session_dialog.dart';
+import 'package:satra/watch_together/widgets/watch_room_sections.dart';
 
 import '../test_helpers/fake_owp_relay.dart';
 import '../test_helpers/library_lookup.dart';
@@ -279,7 +279,7 @@ void main() {
       final anna = _row(t.watchTogether.nameYou(name: 'Anna'));
       expect(find.descendant(of: anna, matching: find.byType(WatchHostBadge)), findsOneWidget);
       expect(find.descendant(of: _row('Ben'), matching: find.byType(WatchHostBadge)), findsNothing);
-      expect(find.descendant(of: _row('Ben'), matching: find.text('Plezy · Connected · Idle')), findsOneWidget);
+      expect(find.descendant(of: _row('Ben'), matching: find.text('Satra · Connected · Idle')), findsOneWidget);
 
       await world.hostPlays(host, alien);
       await world.until(() => guest.isFollowing, 'the guest follows');
@@ -491,7 +491,7 @@ void main() {
       world.relay.drop(guest.myPeerId!);
       await world.until(() => !_seenBy(host, guest).connected, 'the host sees the drop');
       await tester.pump();
-      expect(find.descendant(of: _row('Ben'), matching: find.text('Plezy · Disconnected')), findsOneWidget);
+      expect(find.descendant(of: _row('Ben'), matching: find.text('Satra · Disconnected')), findsOneWidget);
     });
 
     _screenTest('a video without catalogue identity is marked as not shareable; a movie is not', (tester, world) async {

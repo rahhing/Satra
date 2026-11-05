@@ -56,7 +56,7 @@ export function buildSoftwareApplicationOffers({
     },
     {
       '@type': 'Offer',
-      url: 'https://github.com/edde746/plezy',
+      url: 'https://github.com/rahhing/Satra',
       price: '0',
       priceCurrency: 'USD',
       category: 'GitHub',

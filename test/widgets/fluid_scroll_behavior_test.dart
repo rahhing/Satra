@@ -2,10 +2,14 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/device_performance.dart';
-import 'package:plezy/theme/fluid_scroll_behavior.dart';
+import 'package:satra/services/device_performance.dart';
+import 'package:satra/theme/fluid_scroll_behavior.dart';
+import 'package:satra/utils/pointer_scroll_axis.dart';
+
+class _ScrollTestBinding extends AutomatedTestWidgetsFlutterBinding with PointerScrollAxisLock {}
 
 void main() {
+  _ScrollTestBinding();
   tearDown(DevicePerformance.debugReset);
 
   Future<void> wheel(WidgetTester tester, Offset delta, {Offset position = const Offset(200, 150)}) async {
@@ -95,6 +99,16 @@ void main() {
     expect(controller.offset, 100);
   });
 
+  testWidgets('macOS wheel signals move immediately without a second animation', (tester) async {
+    final controller = ScrollController();
+    addTearDown(controller.dispose);
+    await host(tester, controller);
+    await wheel(tester, const Offset(0, 100));
+    expect(controller.offset, 100);
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(controller.offset, 100);
+  }, variant: TargetPlatformVariant.only(TargetPlatform.macOS));
+
   testWidgets('shift-wheel keeps horizontal shelf navigation', (tester) async {
     final vertical = ScrollController();
     final horizontal = ScrollController();
@@ -145,6 +159,41 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('trackpad pans scroll vertically over shelves and horizontally within them', (tester) async {
+    final vertical = ScrollController(initialScrollOffset: 100);
+    final horizontal = ScrollController(initialScrollOffset: 100);
+    addTearDown(vertical.dispose);
+    addTearDown(horizontal.dispose);
+    await host(tester, vertical, horizontal: horizontal);
+    final pointer = TestPointer(1, PointerDeviceKind.trackpad);
+    const position = Offset(200, 100);
+    await tester.sendEventToBinding(pointer.panZoomStart(position));
+    await tester.sendEventToBinding(pointer.panZoomUpdate(position, pan: const Offset(22, -40)));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.panZoomUpdate(position, pan: const Offset(30, -120)));
+    await tester.pump();
+    expect(vertical.offset, greaterThan(100));
+    expect(horizontal.offset, 100);
+    final downOffset = vertical.offset;
+    await tester.sendEventToBinding(pointer.panZoomUpdate(position, pan: const Offset(70, -60)));
+    await tester.pump();
+    expect(vertical.offset, lessThan(downOffset));
+    expect(horizontal.offset, 100);
+    await tester.sendEventToBinding(pointer.panZoomEnd());
+    await tester.pumpAndSettle();
+    vertical.jumpTo(0);
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.panZoomStart(position));
+    await tester.sendEventToBinding(pointer.panZoomUpdate(position, pan: const Offset(-40, -22)));
+    await tester.pump();
+    await tester.sendEventToBinding(pointer.panZoomUpdate(position, pan: const Offset(-120, -30)));
+    await tester.pump();
+    expect(horizontal.offset, greaterThan(100));
+    expect(vertical.offset, 0);
+    await tester.sendEventToBinding(pointer.panZoomEnd());
+    await tester.pumpAndSettle();
+  }, variant: TargetPlatformVariant({TargetPlatform.macOS, TargetPlatform.windows, TargetPlatform.linux}));
+
   testWidgets('touch drags keep native scrolling', (tester) async {
     final controller = ScrollController();
     addTearDown(controller.dispose);
@@ -161,19 +210,11 @@ void main() {
     addTearDown(horizontal.dispose);
     await host(tester, vertical, horizontal: horizontal);
 
-    await tester.dragFrom(
-      const Offset(200, 120),
-      const Offset(-180, 0),
-      kind: PointerDeviceKind.mouse,
-    );
+    await tester.dragFrom(const Offset(200, 120), const Offset(-180, 0), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
     expect(horizontal.offset, greaterThan(100));
 
-    await tester.dragFrom(
-      const Offset(200, 350),
-      const Offset(0, -180),
-      kind: PointerDeviceKind.mouse,
-    );
+    await tester.dragFrom(const Offset(200, 350), const Offset(0, -180), kind: PointerDeviceKind.mouse);
     await tester.pumpAndSettle();
     expect(vertical.offset, greaterThan(100));
   });

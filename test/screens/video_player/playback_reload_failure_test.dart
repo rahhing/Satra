@@ -8,37 +8,37 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:openwatchparty/openwatchparty.dart' as owp;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/play_queue.dart';
-import 'package:plezy/media/server_capabilities.dart';
-import 'package:plezy/models/transcode_quality_preset.dart';
-import 'package:plezy/models/livetv_channel.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/providers/account_preferences_controller.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/providers/companion_remote_provider.dart';
-import 'package:plezy/providers/playback_state_provider.dart';
-import 'package:plezy/screens/video_player_screen.dart';
-import 'package:plezy/screens/video_player/live_tv_session_args.dart';
-import 'package:plezy/services/download_storage_service.dart';
-import 'package:plezy/services/episode_navigation_service.dart';
-import 'package:plezy/services/offline_watch_sync_service.dart';
-import 'package:plezy/services/playback_initialization_types.dart';
-import 'package:plezy/services/playback_coordinator.dart';
-import 'package:plezy/services/plex_client.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/sleep_timer_service.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/utils/active_client_scope.dart';
-import 'package:plezy/utils/external_ids.dart';
-import 'package:plezy/utils/video_player_navigation.dart';
-import 'package:plezy/widgets/video_controls/video_controls.dart';
-import 'package:plezy/watch_together/models/watch_notice.dart';
-import 'package:plezy/watch_together/providers/watch_together_provider.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/play_queue.dart';
+import 'package:satra/media/server_capabilities.dart';
+import 'package:satra/models/transcode_quality_preset.dart';
+import 'package:satra/models/livetv_channel.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/providers/account_preferences_controller.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/providers/companion_remote_provider.dart';
+import 'package:satra/providers/playback_state_provider.dart';
+import 'package:satra/screens/video_player_screen.dart';
+import 'package:satra/screens/video_player/live_tv_session_args.dart';
+import 'package:satra/services/download_storage_service.dart';
+import 'package:satra/services/episode_navigation_service.dart';
+import 'package:satra/services/offline_watch_sync_service.dart';
+import 'package:satra/services/playback_initialization_types.dart';
+import 'package:satra/services/playback_coordinator.dart';
+import 'package:satra/services/plex_client.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/sleep_timer_service.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/utils/active_client_scope.dart';
+import 'package:satra/utils/external_ids.dart';
+import 'package:satra/utils/video_player_navigation.dart';
+import 'package:satra/widgets/video_controls/video_controls.dart';
+import 'package:satra/watch_together/models/watch_notice.dart';
+import 'package:satra/watch_together/providers/watch_together_provider.dart';
 import 'package:provider/provider.dart';
 
 import '../../test_helpers/fake_owp_relay.dart';
@@ -93,7 +93,7 @@ void main() {
     final watchTogether = WatchTogetherProvider(
       clientFor: (serverId) => serverId == client.serverId ? client : null,
       partyFactory: relay.party,
-      clientName: () async => 'Plezy/1.0',
+      clientName: () async => 'Satra/1.0',
       displayName: () => 'Anna',
     );
     final created = watchTogether.createRoom();
@@ -154,8 +154,8 @@ void main() {
           await tester.pump();
         });
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.satra/mpv_player',
+          eventChannelName: 'com.satra/mpv_player/events',
           testBody: () async {
             final key = GlobalKey<VideoPlayerScreenState>();
             await tester.pumpWidget(
@@ -353,8 +353,8 @@ void main() {
       );
       try {
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.satra/mpv_player',
+          eventChannelName: 'com.satra/mpv_player/events',
           testBody: () async {
             final screen = await _pushExitScreen(tester, db: db, client: client, fakePlayer: fakePlayer);
             if (blocked == 'started') {
@@ -448,8 +448,8 @@ void main() {
       final (:watchTogether, :relay) = await hostRoom(tester, client);
       final oldPlayer = _ExitPlayer();
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.satra/mpv_player',
+        eventChannelName: 'com.satra/mpv_player/events',
         testBody: () async {
           final screen = await _pushExitScreen(
             tester,
@@ -526,8 +526,8 @@ void main() {
     addTearDown(timer.cancelTimer);
     final oldPlayer = _ExitPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_player',
-      eventChannelName: 'com.plezy/mpv_player/events',
+      methodChannelName: 'com.satra/mpv_player',
+      eventChannelName: 'com.satra/mpv_player/events',
       testBody: () async {
         final screen = await _pushExitScreen(tester, db: db, client: _ReloadClient(), fakePlayer: oldPlayer);
         timer.armEndOfVideo();
@@ -570,7 +570,7 @@ void main() {
         final (:watchTogether, :relay) = await hostRoom(tester, client);
         final guest = WatchTogetherProvider(
           partyFactory: relay.party,
-          clientName: () async => 'Plezy/1.0',
+          clientName: () async => 'Satra/1.0',
           displayName: () => 'Ben',
         );
         final joining = guest.joinRoom(FakeOwpRelay.code);
@@ -578,8 +578,8 @@ void main() {
         await joining;
         final fakePlayer = _ExitPlayer();
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.satra/mpv_player',
+          eventChannelName: 'com.satra/mpv_player/events',
           testBody: () async {
             final screen = await _pushExitScreen(
               tester,
@@ -625,7 +625,7 @@ void main() {
     final (:watchTogether, :relay) = await hostRoom(tester, client);
     final guest = WatchTogetherProvider(
       partyFactory: relay.party,
-      clientName: () async => 'Plezy/1.0',
+      clientName: () async => 'Satra/1.0',
       displayName: () => 'Ben',
     );
     final joining = guest.joinRoom(FakeOwpRelay.code);
@@ -633,8 +633,8 @@ void main() {
     await joining;
     final fakePlayer = _ExitPlayer();
     await withMockPlayerChannels(
-      methodChannelName: 'com.plezy/mpv_player',
-      eventChannelName: 'com.plezy/mpv_player/events',
+      methodChannelName: 'com.satra/mpv_player',
+      eventChannelName: 'com.satra/mpv_player/events',
       testBody: () async {
         final screen = await _pushExitScreen(
           tester,
@@ -725,8 +725,8 @@ void main() {
       });
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.satra/mpv_player',
+        eventChannelName: 'com.satra/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester);
           final state = screen.key.currentState!;
@@ -816,8 +816,8 @@ void main() {
 
       try {
         await withMockPlayerChannels(
-          methodChannelName: 'com.plezy/mpv_player',
-          eventChannelName: 'com.plezy/mpv_player/events',
+          methodChannelName: 'com.satra/mpv_player',
+          eventChannelName: 'com.satra/mpv_player/events',
           testBody: () async {
             final screen = await _pushExitScreen(tester, db: db, client: client, fakePlayer: fakePlayer);
             final state = screen.key.currentState!;
@@ -857,8 +857,8 @@ void main() {
       final (:watchTogether, :relay) = await hostRoom(tester, client);
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.satra/mpv_player',
+        eventChannelName: 'com.satra/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester, watchTogether: watchTogether, client: client);
           final fakePlayer = screen.player;
@@ -897,8 +897,8 @@ void main() {
       final (:watchTogether, :relay) = await hostRoom(tester, client);
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.satra/mpv_player',
+        eventChannelName: 'com.satra/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester, watchTogether: watchTogether, client: client);
           final fakePlayer = screen.player;
@@ -956,8 +956,8 @@ void main() {
 
     testWidgets("a source reload during the hold owns the replacement's play state", (tester) async {
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.satra/mpv_player',
+        eventChannelName: 'com.satra/mpv_player/events',
         testBody: () async {
           final screen = await pumpReloadScreen(tester);
           final fakePlayer = screen.player;
@@ -1010,8 +1010,8 @@ void main() {
           addTearDown(noticesSubscription.cancel);
 
           await withMockPlayerChannels(
-            methodChannelName: 'com.plezy/mpv_player',
-            eventChannelName: 'com.plezy/mpv_player/events',
+            methodChannelName: 'com.satra/mpv_player',
+            eventChannelName: 'com.satra/mpv_player/events',
             testBody: () async {
               final screen = await pumpReloadScreen(
                 tester,
@@ -1074,8 +1074,8 @@ void main() {
       });
 
       await withMockPlayerChannels(
-        methodChannelName: 'com.plezy/mpv_player',
-        eventChannelName: 'com.plezy/mpv_player/events',
+        methodChannelName: 'com.satra/mpv_player',
+        eventChannelName: 'com.satra/mpv_player/events',
         testBody: () async {
           final key = GlobalKey<VideoPlayerScreenState>();
           await tester.pumpWidget(

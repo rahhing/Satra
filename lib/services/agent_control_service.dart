@@ -17,7 +17,7 @@ import 'agent_scoped_settings_commands.dart';
 import 'agent_settings_commands.dart';
 import 'settings_mutation_service.dart';
 
-const agentControlEnabled = !kReleaseMode && bool.fromEnvironment('PLEZY_AGENT_CONTROL');
+const agentControlEnabled = !kReleaseMode && bool.fromEnvironment('SATRA_AGENT_CONTROL');
 
 /// An opt-in adapter to existing app owners, reachable only through the
 /// authenticated Dart VM service. No listener or adapter is created when off.
@@ -25,7 +25,7 @@ class AgentControlService {
   AgentControlService._();
 
   static final instance = AgentControlService._();
-  static const extensionName = 'ext.plezy.agent';
+  static const extensionName = 'ext.satra.agent';
   static const protocolVersion = 1;
   static const maxPayloadBytes = 1024 * 1024;
   static const scopeTypes = [

@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 import 'dart:convert';
 
 import 'package:drift/native.dart';
@@ -7,26 +7,26 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/connection/connection_registry.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/models/plex/plex_home_user.dart';
-import 'package:plezy/profiles/active_profile_binder.dart';
-import 'package:plezy/profiles/active_profile_provider.dart';
-import 'package:plezy/profiles/plex_home_service.dart';
-import 'package:plezy/profiles/profile.dart';
-import 'package:plezy/profiles/profile_connection.dart';
-import 'package:plezy/profiles/profile_connection_registry.dart';
-import 'package:plezy/profiles/profile_registry.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/plex_api_cache.dart';
-import 'package:plezy/services/plex_auth_service.dart';
-import 'package:plezy/services/plex_client.dart';
-import 'package:plezy/services/storage_service.dart';
-import 'package:plezy/utils/device_identity.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/utils/media_server_timeouts.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/connection/connection_registry.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/models/plex/plex_home_user.dart';
+import 'package:satra/profiles/active_profile_binder.dart';
+import 'package:satra/profiles/active_profile_provider.dart';
+import 'package:satra/profiles/plex_home_service.dart';
+import 'package:satra/profiles/profile.dart';
+import 'package:satra/profiles/profile_connection.dart';
+import 'package:satra/profiles/profile_connection_registry.dart';
+import 'package:satra/profiles/profile_registry.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/plex_api_cache.dart';
+import 'package:satra/services/plex_auth_service.dart';
+import 'package:satra/services/plex_client.dart';
+import 'package:satra/services/storage_service.dart';
+import 'package:satra/utils/device_identity.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/utils/media_server_timeouts.dart';
 
 import '../test_helpers/multi_server_fixtures.dart';
 import '../test_helpers/prefs.dart';
@@ -361,8 +361,8 @@ void main() {
     /// so B still expects `srv-1` but cannot bind it.
     Future<({Profile a, Profile b})> setUpSharedAccount() async {
       PackageInfo.setMockInitialValues(
-        appName: 'Plezy',
-        packageName: 'com.example.plezy',
+        appName: 'Satra',
+        packageName: 'com.example.satra',
         version: '1.0.0',
         buildNumber: '1',
         buildSignature: '',
@@ -491,8 +491,8 @@ void main() {
     /// the cold-start boundary, so any later rebind would need `/switch`.
     Future<void> bindProtectedHomeProfile() async {
       PackageInfo.setMockInitialValues(
-        appName: 'Plezy',
-        packageName: 'com.example.plezy',
+        appName: 'Satra',
+        packageName: 'com.example.satra',
         version: '1.0.0',
         buildNumber: '1',
         buildSignature: '',

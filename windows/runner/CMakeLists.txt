@@ -43,9 +43,9 @@ target_include_directories(${BINARY_NAME} PRIVATE "${CMAKE_SOURCE_DIR}/../shared
 # Run the Flutter tool portions of the build. This must not be removed.
 add_dependencies(${BINARY_NAME} flutter_assemble)
 
-option(PLEZY_BUILD_MPV_PROPERTY_CONTRACT_TESTS
+option(SATRA_BUILD_MPV_PROPERTY_CONTRACT_TESTS
   "Build the focused Windows mpv property-result contract tests" OFF)
-if(PLEZY_BUILD_MPV_PROPERTY_CONTRACT_TESTS)
+if(SATRA_BUILD_MPV_PROPERTY_CONTRACT_TESTS)
   enable_testing()
 
   add_executable(mpv_property_result_contract_test
@@ -88,9 +88,9 @@ if(PLEZY_BUILD_MPV_PROPERTY_CONTRACT_TESTS)
   add_test(NAME mpv_player_property_contract_test COMMAND mpv_player_property_contract_test)
 endif()
 
-option(PLEZY_BUILD_DISPLAY_RECOVERY_TESTS
+option(SATRA_BUILD_DISPLAY_RECOVERY_TESTS
   "Build the focused Windows display recovery transaction tests" OFF)
-if(PLEZY_BUILD_DISPLAY_RECOVERY_TESTS)
+if(SATRA_BUILD_DISPLAY_RECOVERY_TESTS)
   enable_testing()
 
   add_executable(display_mode_manager_test
@@ -99,7 +99,7 @@ if(PLEZY_BUILD_DISPLAY_RECOVERY_TESTS)
   )
   apply_standard_settings(display_mode_manager_test)
   target_compile_definitions(
-    display_mode_manager_test PRIVATE "NOMINMAX" "PLEZY_DISPLAY_MODE_MANAGER_TESTING"
+    display_mode_manager_test PRIVATE "NOMINMAX" "SATRA_DISPLAY_MODE_MANAGER_TESTING"
   )
   target_link_libraries(display_mode_manager_test PRIVATE "advapi32.lib" "user32.lib")
 

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/screens/profile/add_local_profile_screen.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/screens/profile/add_local_profile_screen.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 import '../../test_helpers/prefs.dart';
 

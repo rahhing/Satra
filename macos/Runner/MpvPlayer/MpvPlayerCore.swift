@@ -299,7 +299,7 @@ class MpvPlayerCore: MpvPlayerCoreBase {
     // layers and the hidden frame has reached the screen. On macOS 27,
     // pulling a visible sample-buffer layer out while its video receiver is
     // torn down can stop the display for good: WindowServer's watchdog
-    // fires and the Mac panics (plezy#2823).
+    // fires and the Mac panics (satra#2823).
     setContainerHidden(true)
     let container = containerLayer
     let layer = videoLayer

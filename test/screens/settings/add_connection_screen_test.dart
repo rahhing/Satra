@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/focusable_wrapper.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_browser_dialect.dart';
-import 'package:plezy/profiles/profile.dart';
-import 'package:plezy/screens/settings/add_connection_screen.dart';
-import 'package:plezy/screens/settings/add_jellyfin_screen.dart';
-import 'package:plezy/screens/settings/add_plex_account_screen.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/widgets/backend_badge.dart';
+import 'package:satra/focus/focusable_wrapper.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_browser_dialect.dart';
+import 'package:satra/profiles/profile.dart';
+import 'package:satra/screens/settings/add_connection_screen.dart';
+import 'package:satra/screens/settings/add_jellyfin_screen.dart';
+import 'package:satra/screens/settings/add_plex_account_screen.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/widgets/backend_badge.dart';
 
 /// The "Add connection" picker is the only route to a new server, so a backend
 /// missing from this list is unreachable no matter how complete its client is.

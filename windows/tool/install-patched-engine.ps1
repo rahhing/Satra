@@ -1,7 +1,7 @@
-# Download the published flutter-plezy patched Windows engine (DirectComposition
+# Download the published flutter-satra patched Windows engine (DirectComposition
 # + resize-wedge fix) and install it into the active Flutter SDK's artifact cache.
 #
-# Plezy requires this engine on Windows: it honors the FLUTTER_WINDOWS_DCOMP
+# Satra requires this engine on Windows: it honors the FLUTTER_WINDOWS_DCOMP
 # environment variable (set in windows/runner/main.cpp) and presents the Flutter
 # UI on a topmost DirectComposition visual, so the mpv video window composites
 # *beneath* the UI in a single HWND (window capture works, no transparency
@@ -23,7 +23,7 @@
 #   flutter precache --windows
 #   windows/tool/install-patched-engine.ps1
 param(
-    # Engine zip published at flutter-plezy release windows-v3.47.1+2 - x64 + arm64
+    # Engine zip published at flutter-satra release windows-v3.47.1+2 - x64 + arm64
     # (cache dirs windows-{x64,arm64}{,-release}). The asset name is the same across
     # tags, so a version bump only changes the tag segment of the URL.
     [string]$Url = 'https://github.com/edde746/flutter-plezy/releases/download/windows-v3.47.1%2B2/flutter-plezy-windows-3.47.1.zip',
@@ -46,7 +46,7 @@ if (-not (Test-Path $stampPath)) {
 }
 $stamp = (Get-Content $stampPath -Raw).Trim()
 if ($stamp -ne $ExpectedEngine) {
-    Write-Error "SDK engine.stamp is $stamp but the patched engine targets $ExpectedEngine - this flutter-plezy build is for a different SDK"
+    Write-Error "SDK engine.stamp is $stamp but the patched engine targets $ExpectedEngine - this flutter-satra build is for a different SDK"
 }
 
 $engineDir = Join-Path $sdkRoot 'bin\cache\artifacts\engine'
@@ -54,7 +54,7 @@ if (-not (Test-Path $engineDir)) {
     Write-Error "engine cache not found: $engineDir - run 'flutter precache --windows' first"
 }
 
-$zip = Join-Path ([System.IO.Path]::GetTempPath()) 'flutter-plezy-windows.zip'
+$zip = Join-Path ([System.IO.Path]::GetTempPath()) 'flutter-satra-windows.zip'
 
 # Invoke-WebRequest renders a per-byte progress bar in Windows PowerShell that
 # makes large downloads crawl; silence it.

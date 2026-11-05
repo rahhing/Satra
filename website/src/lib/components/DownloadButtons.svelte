@@ -81,7 +81,7 @@
     </a>
 
     <a
-      href={releaseAsset("plezy-macos.dmg")}
+      href={releaseAsset("satra-macos.dmg")}
       class="desktop-button"
     >
       <AppleIcon />

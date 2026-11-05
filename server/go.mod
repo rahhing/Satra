@@ -1,4 +1,4 @@
-module github.com/edde746/plezy-relay
+module github.com/rahhing/Satra-relay
 
 go 1.27.3
 

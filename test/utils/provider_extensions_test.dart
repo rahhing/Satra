@@ -1,15 +1,15 @@
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_library.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/services/plex_api_cache.dart';
-import 'package:plezy/utils/provider_extensions.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_library.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/services/plex_api_cache.dart';
+import 'package:satra/utils/provider_extensions.dart';
 import 'package:provider/provider.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';

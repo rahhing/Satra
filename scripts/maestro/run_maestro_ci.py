@@ -11,15 +11,15 @@ import run_maestro
 
 
 ANDROID_15_INSTRUMENTATION_CLASSES = (
-    "androidx.media3.decoder.ffmpeg.PlezyFfmpegPlaybackTest,"
-    "com.edde746.plezy.exoplayer.PlezyAudioModePlaybackTest"
+    "androidx.media3.decoder.ffmpeg.SatraFfmpegPlaybackTest,"
+    "com.edde746.satra.exoplayer.SatraAudioModePlaybackTest"
 )
 ANDROID_15_INSTRUMENTATION_TARGET = "android-15-instrumentation"
 # Keep reachability separate from the debug playback suites above: those exercise
 # APIs the app legitimately shrinks. This target guards FFmpeg and MPV's native paths.
 ANDROID_R8_REACHABILITY_CLASSES = (
     "androidx.media3.decoder.ffmpeg.FfmpegDecoderReachabilityTest,"
-    "com.edde746.plezy.mpv.MpvPlayerReachabilityTest"
+    "com.edde746.satra.mpv.MpvPlayerReachabilityTest"
 )
 ANDROID_R8_REACHABILITY_TARGET = "android-r8-reachability"
 
@@ -203,7 +203,7 @@ def run_android_r8_reachability() -> None:
             "-p",
             "android",
             ":app:connectedMinifiedAndroidTest",
-            "-Pplezy.testBuildType=minified",
+            "-Psatra.testBuildType=minified",
             f"-Pandroid.testInstrumentationRunnerArguments.class={ANDROID_R8_REACHABILITY_CLASSES}",
         )
     )

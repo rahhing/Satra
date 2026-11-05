@@ -2,9 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/main.dart';
-import 'package:plezy/services/prefs_recovery.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/main.dart';
+import 'package:satra/services/prefs_recovery.dart';
 
 Future<void> _openDialog(
   WidgetTester tester,
@@ -39,7 +39,7 @@ void main() {
   late File backup;
 
   setUp(() async {
-    tempDir = await Directory.systemTemp.createTemp('plezy-repair-outcome');
+    tempDir = await Directory.systemTemp.createTemp('satra-repair-outcome');
     backup = File('${tempDir.path}/shared_preferences.corrupt-x.json');
     await backup.writeAsString('{"credential_vault_key_v1":"secret"}');
   });

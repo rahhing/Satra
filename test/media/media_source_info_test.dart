@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/chapter_marker_classifier.dart';
-import 'package:plezy/media/media_source_info.dart';
-import 'package:plezy/utils/track_label_builder.dart';
+import 'package:satra/media/chapter_marker_classifier.dart';
+import 'package:satra/media/media_source_info.dart';
+import 'package:satra/utils/track_label_builder.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();

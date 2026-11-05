@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/rendering.dart';
 
 import '../focus/focusable_chip_mixin.dart';
 import '../focus/input_mode_tracker.dart';
-import '../utils/platform_detector.dart';
+import '../theme/app_motion.dart';
 import 'focus_builders.dart';
 
 /// Horizontally scrollable host for a row of [FocusableTabChip]s.
@@ -12,18 +14,76 @@ import 'focus_builders.dart';
 /// indicator). The strip shrink-wraps like `mainAxisSize: min` and scrolls
 /// instead. D-pad stays correct: chips center themselves on focus via the
 /// chip mixin, so LEFT/RIGHT reaches off-screen tabs.
-class TabChipStrip extends StatelessWidget {
+class TabChipStrip extends StatefulWidget {
   final List<Widget> children;
 
   const TabChipStrip({super.key, required this.children});
 
   @override
-  Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: Row(mainAxisSize: .min, children: children),
-    );
+  State<TabChipStrip> createState() => _TabChipStripState();
+}
+
+class _TabChipStripState extends State<TabChipStrip> with TickerProviderStateMixin {
+  late final _controller = AnimationController(vsync: this);
+  late final _indicatorController = AnimationController(vsync: this);
+  late final _progress = CurvedAnimation(parent: _controller, curve: AppMotion.curve);
+  bool _active = false;
+
+  String _labels(TabChipStrip strip) =>
+      strip.children.whereType<FocusableTabChip>().map((chip) => chip.label).join('\n');
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _controller.duration = AppMotion.duration(context);
+    _indicatorController.duration = AppMotion.duration(context);
+    final active = TickerMode.valuesOf(context).enabled;
+    if (active && !_active) _controller.forward(from: 0);
+    _active = active;
   }
+
+  @override
+  void didUpdateWidget(TabChipStrip oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (_active && _labels(oldWidget) != _labels(widget)) _controller.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _progress.dispose();
+    _controller.dispose();
+    _indicatorController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => SingleChildScrollView(
+    scrollDirection: Axis.horizontal,
+    child: AnimatedSize(
+      duration: AppMotion.duration(context),
+      curve: AppMotion.curve,
+      alignment: AlignmentDirectional.centerStart,
+      child: FadeTransition(
+        opacity: _progress,
+        child: SlideTransition(
+          position: Tween(begin: const Offset(0.015, 0), end: Offset.zero).animate(_progress),
+          child: _TabIndicatorScope(
+            child: _TabChipRow(
+              controller: _indicatorController,
+              color: Theme.of(context).colorScheme.primary,
+              textDirection: Directionality.of(context),
+              selections: {
+                for (var i = 0; i < widget.children.length; i++)
+                  if (widget.children[i] case FocusableTabChip(isSelected: true, :final indicatorGroup))
+                    i: indicatorGroup,
+              },
+              children: widget.children,
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
 }
 
 /// A focusable tab chip that shows a color change when focused or selected.
@@ -36,6 +96,7 @@ class TabChipStrip extends StatelessWidget {
 class FocusableTabChip extends StatefulWidget {
   final String label;
   final bool isSelected;
+  final int indicatorGroup;
   final VoidCallback onSelect;
 
   /// Optional external focus node for programmatic focus control.
@@ -69,6 +130,7 @@ class FocusableTabChip extends StatefulWidget {
     super.key,
     required this.label,
     required this.isSelected,
+    this.indicatorGroup = 0,
     required this.onSelect,
     this.focusNode,
     this.onNavigateLeft,
@@ -85,6 +147,19 @@ class FocusableTabChip extends StatefulWidget {
 }
 
 class _FocusableTabChipState extends State<FocusableTabChip> with FocusableChipStateMixin<FocusableTabChip> {
+  @override
+  void revealChipOnFocus() {
+    final box = context.findRenderObject();
+    if (context.getInheritedWidgetOfExactType<_TabIndicatorScope>() != null && box is RenderBox) {
+      final viewport = RenderAbstractViewport.maybeOf(box);
+      if (viewport is RenderBox) {
+        final rect = MatrixUtils.transformRect(box.getTransformTo(viewport), box.paintBounds);
+        if (rect.left >= 0 && rect.right <= (viewport as RenderBox).size.width) return;
+      }
+    }
+    super.revealChipOnFocus();
+  }
+
   @override
   FocusNode? get widgetFocusNode => widget.focusNode;
 
@@ -113,45 +188,22 @@ class _FocusableTabChipState extends State<FocusableTabChip> with FocusableChipS
     // Only show focus effects during keyboard/d-pad navigation
     final showFocus = isFocused && InputModeTracker.isKeyboardMode(context);
 
-    // Determine background color based on focus and selection state
-    // - Selected + Focused: slightly dimmed primary (to show focus distinction)
-    // - Selected only: primary color
-    // - Focused only: primary color
-    // - Neither: surface color
-    Color backgroundColor;
-    Color foregroundColor;
-
-    if (widget.isSelected && showFocus) {
-      // Selected + focused: dim the primary color slightly
-      backgroundColor = Color.lerp(colorScheme.primary, colorScheme.surface, 0.25)!;
-      foregroundColor = colorScheme.onPrimary;
-    } else if (widget.isSelected || showFocus) {
-      // Selected or focused (but not both): full primary
-      backgroundColor = colorScheme.primary;
-      foregroundColor = colorScheme.onPrimary;
-    } else {
-      // Neither selected nor focused
-      if (PlatformDetector.isTV()) {
-        backgroundColor = colorScheme.secondaryContainer.withValues(alpha: 0.38);
-        foregroundColor = colorScheme.onSecondaryContainer;
-      } else {
-        backgroundColor = colorScheme.surfaceContainerHighest;
-        foregroundColor = colorScheme.onSurfaceVariant;
-      }
-    }
-
-    final isHighlighted = showFocus || widget.isSelected;
-
-    final label = Text(
-      widget.label,
-      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+    final sharedIndicator = context.dependOnInheritedWidgetOfExactType<_TabIndicatorScope>() != null;
+    final backgroundColor = widget.isSelected && !sharedIndicator ? colorScheme.primary : Colors.transparent;
+    final foregroundColor = widget.isSelected ? colorScheme.onPrimary : colorScheme.onSurface;
+    final duration = AppMotion.duration(context);
+    final label = AnimatedDefaultTextStyle(
+      duration: duration,
+      curve: AppMotion.curve,
+      style: Theme.of(context).textTheme.labelLarge!.copyWith(
         color: foregroundColor,
-        fontWeight: isHighlighted ? FontWeight.w600 : FontWeight.normal,
+        fontWeight: widget.isSelected ? FontWeight.w600 : FontWeight.w500,
       ),
+      child: Text(widget.label),
     );
 
     final hasImage = widget.topImage != null;
-    return FocusBuilders.buildFocusableChip(
+    final chip = FocusBuilders.buildFocusableChip(
       context: context,
       focusNode: focusNode,
       onKeyEvent: _handleKeyEvent,
@@ -160,6 +212,7 @@ class _FocusableTabChipState extends State<FocusableTabChip> with FocusableChipS
       selected: widget.isSelected,
       padding: hasImage ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       backgroundColor: backgroundColor,
+      animationDuration: duration,
       borderRadius: hasImage ? 12 : 20,
       child: hasImage
           ? Column(
@@ -172,5 +225,124 @@ class _FocusableTabChipState extends State<FocusableTabChip> with FocusableChipS
             )
           : label,
     );
+    return AnimatedContainer(
+      duration: duration,
+      curve: AppMotion.curve,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(hasImage ? 12 : 20),
+        border: Border.all(color: showFocus ? colorScheme.primary : Colors.transparent),
+      ),
+      child: chip,
+    );
+  }
+}
+
+// A single painted pill per navigation group moves between the actual laid-out
+// chip bounds. Foreground widgets keep their focus nodes and hit-test paths.
+class _TabIndicatorScope extends InheritedWidget {
+  const _TabIndicatorScope({required super.child});
+
+  @override
+  bool updateShouldNotify(_TabIndicatorScope oldWidget) => false;
+}
+
+class _TabChipRow extends MultiChildRenderObjectWidget {
+  const _TabChipRow({
+    required this.controller,
+    required this.color,
+    required this.textDirection,
+    required this.selections,
+    required super.children,
+  });
+
+  final AnimationController controller;
+  final Color color;
+  final TextDirection textDirection;
+  final Map<int, int> selections;
+
+  @override
+  RenderObject createRenderObject(BuildContext context) =>
+      _RenderTabChipRow(controller, color, selections, textDirection);
+
+  @override
+  void updateRenderObject(BuildContext context, _RenderTabChipRow renderObject) {
+    renderObject
+      ..indicatorColor = color
+      ..selectedGroups = selections
+      ..textDirection = textDirection;
+  }
+}
+
+class _RenderTabChipRow extends RenderFlex {
+  _RenderTabChipRow(this.controller, this._color, this._selections, TextDirection direction)
+    : super(direction: Axis.horizontal, mainAxisSize: MainAxisSize.min, textDirection: direction);
+
+  final AnimationController controller;
+  Color _color;
+  Map<int, int> _selections;
+  Map<int, Rect> _from = {};
+  Map<int, Rect> _to = {};
+  bool _laidOut = false;
+
+  set indicatorColor(Color color) {
+    if (color == _color) return;
+    _color = color;
+    markNeedsPaint();
+  }
+
+  set selectedGroups(Map<int, int> groups) {
+    if (mapEquals(groups, _selections)) return;
+    _selections = groups;
+    markNeedsLayout();
+  }
+
+  @override
+  void attach(PipelineOwner owner) {
+    super.attach(owner);
+    controller.addListener(markNeedsPaint);
+  }
+
+  @override
+  void detach() {
+    controller.removeListener(markNeedsPaint);
+    super.detach();
+  }
+
+  @override
+  void performLayout() {
+    super.performLayout();
+    final targets = <int, Rect>{};
+    var index = 0;
+    for (var child = firstChild; child != null; child = childAfter(child)) {
+      final group = _selections[index++];
+      if (group == null) continue;
+      final data = child.parentData! as FlexParentData;
+      targets[group] = (data.offset & child.size).deflate(1);
+    }
+    if (mapEquals(targets, _to)) return;
+    final progress = AppMotion.curve.transform(controller.value);
+    _from = _laidOut
+        ? {
+            for (final group in {..._from.keys, ..._to.keys}) group: Rect.lerp(_from[group], _to[group], progress)!,
+          }
+        : targets;
+    _to = targets;
+    if (_laidOut) controller.forward(from: 0);
+    _laidOut = true;
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final progress = AppMotion.curve.transform(controller.value);
+    for (final group in {..._from.keys, ..._to.keys}) {
+      final rect = Rect.lerp(_from[group], _to[group], progress);
+      if (rect == null) continue;
+      final alpha = _from[group] == null ? progress : (_to[group] == null ? 1 - progress : 1.0);
+      context.canvas.drawRRect(
+        RRect.fromRectAndRadius(rect.shift(offset), const Radius.circular(20)),
+        Paint()..color = _color.withValues(alpha: _color.a * alpha),
+      );
+    }
+    super.paint(context, offset);
   }
 }

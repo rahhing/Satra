@@ -1,6 +1,6 @@
 
-PRODUCT_NAME = Plezy
+PRODUCT_NAME = Satra
 
-PRODUCT_BUNDLE_IDENTIFIER = com.edde746.plezy
+PRODUCT_BUNDLE_IDENTIFIER = com.satra.app
 
 PRODUCT_COPYRIGHT = Copyright © 2025 edde746

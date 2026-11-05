@@ -4,24 +4,24 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:openwatchparty/openwatchparty.dart' as owp;
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/media/title_copies.dart';
-import 'package:plezy/services/data_aggregation_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/external_ids.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/models/watch_notice.dart';
-import 'package:plezy/watch_together/providers/watch_together_provider.dart';
-import 'package:plezy/watch_together/services/library_resolver.dart';
-import 'package:plezy/watch_together/services/player_adapter.dart';
-import 'package:plezy/watch_together/services/recent_rooms_service.dart';
-import 'package:plezy/watch_together/services/watch_party_relays.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/media/title_copies.dart';
+import 'package:satra/services/data_aggregation_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/external_ids.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/models/watch_notice.dart';
+import 'package:satra/watch_together/providers/watch_together_provider.dart';
+import 'package:satra/watch_together/services/library_resolver.dart';
+import 'package:satra/watch_together/services/player_adapter.dart';
+import 'package:satra/watch_together/services/recent_rooms_service.dart';
+import 'package:satra/watch_together/services/watch_party_relays.dart';
 
 import '../test_helpers/fake_owp_relay.dart';
 import '../test_helpers/library_lookup.dart';
@@ -72,7 +72,7 @@ final _hostServer = _Server('host-nas', ids: {'alien': const ExternalIds(imdb: '
 final _hostAlien = _alien('alien', 'host-nas');
 final _guestAlien = _alien('g-alien', 'guest-nas', durationMs: _alienMs + 800, version: 'g-hd');
 
-typedef _OpenPlayer = ({PlezyPlayerAdapter adapter, FakeSyncPlayer player});
+typedef _OpenPlayer = ({SatraPlayerAdapter adapter, FakeSyncPlayer player});
 
 /// A player with [copy] open, as the player screen hands it to the provider.
 /// [refusePlay] makes its play command throw, as a car or a browser refusing
@@ -82,7 +82,7 @@ _OpenPlayer _openPlayer(WatchCopy copy, {Duration? duration, bool Function()? re
     hasRenderedFrame: true,
     duration: duration ?? Duration(milliseconds: copy.durationMs ?? 0),
   );
-  final adapter = PlezyPlayerAdapter(
+  final adapter = SatraPlayerAdapter(
     player: player,
     copy: copy,
     commands: PlayerCommands(
@@ -292,7 +292,7 @@ final class _FakeWorld extends _World {
     required Duration shareDurationWait,
   }) => WatchTogetherProvider(
     partyFactory: relay.party,
-    clientName: () async => 'Plezy/9.9.9',
+    clientName: () async => 'Satra/9.9.9',
     displayName: () => name,
     profileId: () => profileId,
     clientFor: clientFor,
@@ -397,7 +397,7 @@ void main() {
           {for (final p in view.provider.participants) p.peerId: p.name},
           {h.peerId: 'Host', g.peerId: 'Guest One'},
         );
-        expect(view.provider.participants.map((p) => p.client).toSet(), {'Plezy/9.9.9'});
+        expect(view.provider.participants.map((p) => p.client).toSet(), {'Satra/9.9.9'});
       }
       expect(world.relay.sent('join').single['name'], 'Guest One');
       await world.noticed<JoinedNotice>(h, 'the host is told', (n) => n.name == 'Guest One');
@@ -413,14 +413,14 @@ void main() {
       }
     });
 
-    _roomTest('a code without a room is refused, and a display name without text is Plezy', (world) async {
+    _roomTest('a code without a room is refused, and a display name without text is Satra', (world) async {
       final h = world.member('\u202E\n');
       await world.settle(h.provider.createRoom());
       final g = world.guest();
 
       expect(await world.refusal(g.provider.joinRoom('K7M-Q2Y')), owp.ErrorCode.roomNotFound);
       expect(g.provider.isInSession, isFalse);
-      expect(h.provider.participants.single.name, 'Plezy');
+      expect(h.provider.participants.single.name, 'Satra');
     });
 
     _roomTest('host transfer, control mode and lock; a guest is refused host commands', (world) async {
@@ -512,7 +512,7 @@ void main() {
       expect((media.kind, media.title, media.year, media.durationMs), (owp.MediaKind.movie, 'Alien', 1979, _alienMs));
       expect(media.ids, {'imdb': 'tt0078748', 'tmdb': '348'});
       expect(media.ext, {
-        'app.plezy': {'server': 'host-nas', 'item': 'alien', 'version': 'hd'},
+        'app.satra': {'server': 'host-nas', 'item': 'alien', 'version': 'hd'},
       });
       expect(h.provider.roomCopy?.id, '');
       expect(h.provider.isFollowing, isTrue);
@@ -890,7 +890,7 @@ final class _RealWorld extends _World {
     required TitleCopyFinder? findCopies,
     required Duration shareDurationWait,
   }) => WatchTogetherProvider(
-    clientName: () async => 'Plezy/9.9.9',
+    clientName: () async => 'Satra/9.9.9',
     displayName: () => name,
     customRelayBaseUrl: () => baseUrl,
     profileId: () => profileId,

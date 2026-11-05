@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/main.dart' as app;
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/desktop_ui_scale.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/main.dart' as app;
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/desktop_ui_scale.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 import '../test_helpers/prefs.dart';
 

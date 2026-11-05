@@ -2,11 +2,11 @@ import 'dart:async';
 
 import 'package:fake_async/fake_async.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/mpv/mpv.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/services/player_adapter.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/mpv/mpv.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/services/player_adapter.dart';
 
 import '../test_helpers/media_items.dart';
 import '../test_helpers/player_streams.dart';
@@ -41,13 +41,13 @@ WatchCopy _copy({int? durationMs = 7020000, List<MediaVersion>? versions}) {
   return WatchCopy.of(item, versions?.first);
 }
 
-({PlezyPlayerAdapter adapter, FakeSyncPlayer player, List<String> commands}) _adapter({
+({SatraPlayerAdapter adapter, FakeSyncPlayer player, List<String> commands}) _adapter({
   FakeSyncPlayer? player,
   WatchCopy? copy,
 }) {
   final fake = player ?? _Player(hasRenderedFrame: true);
   final commands = <String>[];
-  final adapter = PlezyPlayerAdapter(
+  final adapter = SatraPlayerAdapter(
     player: fake,
     copy: copy ?? _copy(),
     commands: PlayerCommands(
@@ -155,7 +155,7 @@ void main() {
       expect(_adapter(player: _Player(seekable: false)).adapter.seekAccuracyMs, 0);
       expect(
         _adapter(player: _Player(seekable: false, hasRenderedFrame: true)).adapter.seekAccuracyMs,
-        PlezyPlayerAdapter.cannotSeekAccuracyMs,
+        SatraPlayerAdapter.cannotSeekAccuracyMs,
       );
     });
   });
@@ -311,7 +311,7 @@ void main() {
         );
         async.flushMicrotasks();
         player.setPosition(Duration.zero);
-        async.elapse(PlezyPlayerAdapter.landingTimeout - const Duration(milliseconds: 100));
+        async.elapse(SatraPlayerAdapter.landingTimeout - const Duration(milliseconds: 100));
         expect(landed, isFalse);
         async.elapse(const Duration(milliseconds: 200));
         expect(landed, isTrue);

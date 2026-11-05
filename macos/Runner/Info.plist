@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIconFile</key>
-	<string></string>
+	<string>satra</string>
 	<key>CFBundleIdentifier</key>
 	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -26,10 +26,10 @@
 	<array>
 		<dict>
 			<key>CFBundleURLName</key>
-			<string>com.edde746.plezy</string>
+			<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>plezy</string>
+				<string>satra</string>
 			</array>
 		</dict>
 	</array>
@@ -51,7 +51,7 @@
 	<key>FLTEnableMergedPlatformUIThread</key>
 	<false/>
 	<!-- Keep rendering with Skia. Flutter 3.47 made Impeller the default macOS
-	     renderer, and Plezy is unusually exposed to that switch: the Flutter view
+	     renderer, and Satra is unusually exposed to that switch: the Flutter view
 	     is cleared to transparent so mpv's video layer behind it stays visible,
 	     so anything Impeller leaves in the presented drawable is composited
 	     straight onto the screen instead of being covered. On the Metal SDF text

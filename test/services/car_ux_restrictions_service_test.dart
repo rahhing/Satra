@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/car_ux_restrictions_service.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/services/car_ux_restrictions_service.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -117,7 +117,7 @@ void main() {
     await CarUxRestrictionsService.instance.ensureResolved(timeout: const Duration(milliseconds: 300));
     expect(CarUxRestrictionsService.instance.state, CarUxRestrictionState.unrestricted);
 
-    // What PlezyActivity pushes when the car service goes away: nothing maintains
+    // What SatraActivity pushes when the car service goes away: nothing maintains
     // the verdict any more, so callers must go back to lifecycle gating rather
     // than keep reading "parked" forever.
     await messenger.handlePlatformMessage(

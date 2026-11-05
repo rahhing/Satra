@@ -7,16 +7,16 @@ import '../../utils/app_logger.dart';
 import '../../utils/external_ids.dart';
 import '../system_shelf_service.dart';
 
-/// A `plezy://` link. The one grammar for every platform: native code
+/// A `satra://` link. The one grammar for every platform: native code
 /// forwards the URL unchanged and only this file reads it.
 ///
 /// ```text
-/// plezy://open
-/// plezy://play?server=<serverId>&id=<itemId>[&mode=next|shuffle]
-/// plezy://play?type=movie|show&tmdb=<n>|tvdb=<n>|imdb=tt<n>|plex=<hash>[&mode=next|shuffle]
-/// plezy://play?content_id=plezy_<serverId>_<itemId>      (launcher shelf rows)
-/// plezy://live?channel=<channel>[&server=<serverId>][&start=beginning|live]
-/// plezy://external-player/<result>/<session>?...           (external player return links)
+/// satra://open
+/// satra://play?server=<serverId>&id=<itemId>[&mode=next|shuffle]
+/// satra://play?type=movie|show&tmdb=<n>|tvdb=<n>|imdb=tt<n>|plex=<hash>[&mode=next|shuffle]
+/// satra://play?content_id=satra_<serverId>_<itemId>      (launcher shelf rows)
+/// satra://live?channel=<channel>[&server=<serverId>][&start=beginning|live]
+/// satra://external-player/<result>/<session>?...           (external player return links)
 /// ```
 ///
 /// Every link except the external-player return link may add
@@ -29,12 +29,12 @@ import '../system_shelf_service.dart';
 sealed class DeepLink {
   const DeepLink({this.profile});
 
-  static const scheme = 'plezy';
+  static const scheme = 'satra';
 
   /// The profile the link names, as written in the link.
   final String? profile;
 
-  /// Parses [link], or returns null when it is not a well-formed Plezy link.
+  /// Parses [link], or returns null when it is not a well-formed Satra link.
   static DeepLink? tryParse(String link) {
     final uri = Uri.tryParse(link.trim());
     if (uri == null || uri.scheme != scheme) return null;
@@ -63,7 +63,7 @@ sealed class DeepLink {
       Uri(scheme: scheme, host: host, queryParameters: params.isEmpty ? null : params);
 }
 
-/// `plezy://open`: bring the app forward, as [profile] when the link names one.
+/// `satra://open`: bring the app forward, as [profile] when the link names one.
 final class OpenLink extends DeepLink {
   const OpenLink({super.profile});
 
@@ -83,7 +83,7 @@ enum PlayMode {
   shuffle,
 }
 
-/// `plezy://play`: play one title.
+/// `satra://play`: play one title.
 final class PlayLink extends DeepLink {
   const PlayLink({required this.target, this.mode = PlayMode.next, super.profile});
 
@@ -212,7 +212,7 @@ final class CatalogPlayTarget extends PlayTarget {
   int get hashCode => Object.hash(kind, ids.tmdb, ids.tvdb, ids.imdb, plexHash);
 }
 
-/// `plezy://live`: tune a live TV channel.
+/// `satra://live`: tune a live TV channel.
 final class LiveLink extends DeepLink {
   const LiveLink({required this.channel, this.serverId, this.startPosition = LiveTvStartPosition.ask, super.profile});
 
@@ -283,8 +283,8 @@ final class LiveLink extends DeepLink {
   });
 }
 
-/// `plezy://external-player/<result>/<session>`: an external player handing
-/// control back to Plezy (x-callback-url). The player appends its own query
+/// `satra://external-player/<result>/<session>`: an external player handing
+/// control back to Satra (x-callback-url). The player appends its own query
 /// parameters, so the whole [uri] is kept for `ExternalPlayerService`.
 final class ExternalPlayerReturnLink extends DeepLink {
   const ExternalPlayerReturnLink(this.uri);

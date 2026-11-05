@@ -4,7 +4,7 @@ import UIKit
 import Flutter
 import XCTest
 
-@testable import Plezy
+@testable import Satra
 
 final class ControllablePropertyCore: MpvPlayerCoreBase {
   var nextResult: Result<Void, Error>?
@@ -214,7 +214,7 @@ final class MpvPlayerContractTests: XCTestCase {
     XCTAssertTrue(core.isPaused, "A rejected raw pause write must not change the cache")
 
     XCTAssertFailure(
-      awaitProperty(core, name: "plezy-property-does-not-exist", value: "ignored")
+      awaitProperty(core, name: "satra-property-does-not-exist", value: "ignored")
     )
     XCTAssertTrue(core.isPaused)
 
@@ -498,7 +498,7 @@ final class MpvPlayerContractTests: XCTestCase {
     }
 
     let missingFile = FileManager.default.temporaryDirectory
-      .appendingPathComponent("plezy-missing-\(UUID().uuidString).mkv").path
+      .appendingPathComponent("satra-missing-\(UUID().uuidString).mkv").path
     let events = eventsOfOpenFailingBehindHeldQueue(core, recorder: recorder, url: missingFile)
 
     guard let endFile = events.firstIndex(where: { $0.name == "end-file" }) else {
@@ -523,7 +523,7 @@ final class MpvPlayerContractTests: XCTestCase {
     }
 
     let missingFile = FileManager.default.temporaryDirectory
-      .appendingPathComponent("plezy-missing-\(UUID().uuidString).mkv").path
+      .appendingPathComponent("satra-missing-\(UUID().uuidString).mkv").path
     let events = eventsOfOpenFailingBehindHeldQueue(core, recorder: recorder, url: missingFile)
 
     guard let endFile = events.firstIndex(where: { $0.name == "end-file" }) else {
@@ -839,7 +839,7 @@ final class MpvPlayerContractTests: XCTestCase {
   /// seconds, long enough to fill the renderer's read-ahead.
   private func startSilentPlayback() throws -> (MpvAudioPlayerCore, URL) {
     let file = FileManager.default.temporaryDirectory
-      .appendingPathComponent("plezy-silence-\(UUID().uuidString).wav")
+      .appendingPathComponent("satra-silence-\(UUID().uuidString).wav")
     try silentWav(seconds: 30).write(to: file)
     let core = MpvAudioPlayerCore()
     XCTAssertTrue(core.initialize())

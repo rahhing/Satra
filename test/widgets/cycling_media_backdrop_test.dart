@@ -4,13 +4,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/device_performance.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/media_image_helper.dart';
-import 'package:plezy/widgets/cycling_media_backdrop.dart';
-import 'package:plezy/widgets/tv_spotlight_background.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/device_performance.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/media_image_helper.dart';
+import 'package:satra/widgets/cycling_media_backdrop.dart';
+import 'package:satra/widgets/tv_spotlight_background.dart';
 
 import '../test_helpers/prefs.dart';
 
@@ -29,7 +29,7 @@ void main() {
     // TvSpotlightBackground reads the corner-backdrop pref during build.
     resetSharedPreferencesForTest();
     await SettingsService.getInstance();
-    directory = Directory.systemTemp.createTempSync('plezy-backdrop-cycle');
+    directory = Directory.systemTemp.createTempSync('satra-backdrop-cycle');
     final bytes = base64Decode(_png);
     first = File('${directory.path}/first.png')..writeAsBytesSync(bytes);
     second = File('${directory.path}/second.png')..writeAsBytesSync(bytes);

@@ -1,5 +1,5 @@
-#ifndef PLEZY_LINUX_MPV_HDR_METADATA_H_
-#define PLEZY_LINUX_MPV_HDR_METADATA_H_
+#ifndef SATRA_LINUX_MPV_HDR_METADATA_H_
+#define SATRA_LINUX_MPV_HDR_METADATA_H_
 
 #include <cstdint>
 
@@ -416,4 +416,4 @@ inline HdrDecision DecideHdr(const HdrInputs& inputs, const HdrMetadata& source)
 
 }  // namespace mpv
 
-#endif  // PLEZY_LINUX_MPV_HDR_METADATA_H_
+#endif  // SATRA_LINUX_MPV_HDR_METADATA_H_

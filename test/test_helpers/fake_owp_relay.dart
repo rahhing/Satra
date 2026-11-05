@@ -4,7 +4,7 @@ import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
 import 'package:openwatchparty/openwatchparty.dart' as owp;
-import 'package:plezy/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
 import 'package:web_socket/testing.dart';
 import 'package:web_socket/web_socket.dart';
 

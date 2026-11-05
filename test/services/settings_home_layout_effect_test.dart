@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/providers/discover_provider.dart';
-import 'package:plezy/providers/hidden_libraries_provider.dart';
-import 'package:plezy/providers/libraries_provider.dart';
-import 'package:plezy/services/settings_mutation_service.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/providers/discover_provider.dart';
+import 'package:satra/providers/hidden_libraries_provider.dart';
+import 'package:satra/providers/libraries_provider.dart';
+import 'package:satra/services/settings_mutation_service.dart';
+import 'package:satra/services/settings_service.dart';
 import 'package:provider/provider.dart';
 
 import '../test_helpers/multi_server_fixtures.dart';

@@ -18,7 +18,7 @@
     "dartPackageName": "wakelock_plus_platform_interface",
     "contract": "The Dart client is external and must not be generated into a sibling package. Refreshes must verify its two message layouts, tags 129/130, error envelopes, and toggle/isEnabled channel names against all host outputs."
   },
-  "plezyDeltas": [
+  "satraDeltas": [
     "tvOS deployment target and CocoaPods target",
     "explicit unawaited wrappers required by the root lint policy",
     "serialized Linux portal lifecycle",
@@ -33,7 +33,7 @@
   },
   "refreshContract": [
     "Audit a new immutable upstream commit and update it together with the package version.",
-    "Reapply every Plezy delta and keep the schema host-only; never add dartOut or dartTestOut.",
+    "Reapply every Satra delta and keep the schema host-only; never add dartOut or dartTestOut.",
     "Update exact Pigeon and platform-interface versions and their nested lock checksums together.",
     "Run flutter pub get --enforce-lockfile, regenerate all three host outputs as one set, and update artifact hashes together.",
     "Run python3 ../../scripts/verify_runtime_inputs.py, compare the external Dart client contract, and smoke Android, iOS, and tvOS before landing."

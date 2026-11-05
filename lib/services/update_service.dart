@@ -3,9 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:auto_updater/auto_updater.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:plezy/utils/app_logger.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/utils/app_logger.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/utils/platform_detector.dart';
 import 'base_shared_preferences_service.dart';
 
 /// Service to check for new versions on GitHub
@@ -15,8 +15,8 @@ import 'base_shared_preferences_service.dart';
 /// via auto_updater for native update dialogs and in-app installs.
 /// On all other platforms: falls back to GitHub API check + browser link dialog.
 class UpdateService {
-  static const String _githubRepo = 'edde746/plezy';
-  static const String _feedUrl = 'https://cdn.jsdelivr.net/gh/edde746/plezy@appcast/appcast.xml';
+  static const String _githubRepo = 'rahhing/Satra';
+  static const String _feedUrl = 'https://cdn.jsdelivr.net/gh/rahhing/Satra@appcast/appcast.xml';
 
   static const String _keySkippedVersion = 'update_skipped_version';
   static const String _keyLastCheckTime = 'update_last_check_time';

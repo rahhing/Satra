@@ -1,10 +1,10 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:logger/logger.dart';
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/services/playback_initialization_types.dart';
-import 'package:plezy/utils/app_logger.dart' as logging;
-import 'package:plezy/utils/error_message_utils.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/services/playback_initialization_types.dart';
+import 'package:satra/utils/app_logger.dart' as logging;
+import 'package:satra/utils/error_message_utils.dart';
 
 void main() {
   late Logger originalLogger;

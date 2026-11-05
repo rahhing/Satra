@@ -4,7 +4,7 @@
 import { spawnSync } from "node:child_process";
 
 const ADB = `${process.env.HOME}/Library/Android/sdk/platform-tools/adb`;
-export const DEVICE = process.env.PLEZY_DEVICE ?? "192.168.1.7:5555";
+export const DEVICE = process.env.SATRA_DEVICE ?? "192.168.1.7:5555";
 
 export function adb(...args) {
   const r = spawnSync(ADB, ["-s", DEVICE, ...args], { encoding: "utf8" });

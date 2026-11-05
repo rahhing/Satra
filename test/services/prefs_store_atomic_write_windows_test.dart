@@ -7,7 +7,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider_windows/path_provider_windows.dart';
-import 'package:plezy/services/prefs_recovery.dart';
+import 'package:satra/services/prefs_recovery.dart';
 import 'package:shared_preferences_platform_interface/types.dart';
 import 'package:shared_preferences_windows/shared_preferences_windows.dart';
 
@@ -30,7 +30,7 @@ void main() {
   const options = SharedPreferencesOptions();
 
   setUp(() async {
-    support = await Directory.systemTemp.createTemp('plezy_atomic_write_win_');
+    support = await Directory.systemTemp.createTemp('satra_atomic_write_win_');
     store = File(p.join(support.path, prefsStoreFileName));
     staging = File('${store.path}.tmp');
     backend = SharedPreferencesAsyncWindows()..pathProvider = _TempPathProviderWindows(support.path);

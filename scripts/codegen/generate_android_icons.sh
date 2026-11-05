@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-# Generate Android notification and monochrome icons from assets/plezy.svg.
+# Generate Android notification and monochrome icons from assets/satra.svg.
 
 set -e
 
-SVG_SOURCE="assets/plezy.svg"
+SVG_SOURCE="assets/satra.svg"
 ANDROID_RES="android/app/src/main/res"
 TEMP_DIR="/tmp/android_icons_$$"
 

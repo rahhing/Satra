@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/models/trackers/device_code.dart';
-import 'package:plezy/services/trackers/device_code_auth_service.dart';
-import 'package:plezy/services/trackers/simkl/simkl_auth_service.dart';
-import 'package:plezy/services/trackers/simkl/simkl_constants.dart';
-import 'package:plezy/services/trackers/tracker_exceptions.dart';
-import 'package:plezy/services/trackers/tracker_session.dart';
+import 'package:satra/models/trackers/device_code.dart';
+import 'package:satra/services/trackers/device_code_auth_service.dart';
+import 'package:satra/services/trackers/simkl/simkl_auth_service.dart';
+import 'package:satra/services/trackers/simkl/simkl_constants.dart';
+import 'package:satra/services/trackers/tracker_exceptions.dart';
+import 'package:satra/services/trackers/tracker_session.dart';
 
 const _code = DeviceCode(
   deviceCode: 'dev-code',
@@ -69,7 +69,7 @@ void main() {
       expect(captured.method, 'POST');
       expect(captured.url.toString(), SimklConstants.deviceAuthorizationUrl);
       expect(captured.bodyFields, {'client_id': SimklConstants.v2ClientId, 'scope': 'media:read media:write'});
-      expect(captured.headers['user-agent'], 'plezy/$appVersion');
+      expect(captured.headers['user-agent'], 'satra/$appVersion');
       expect(code.deviceCode, 'dev-code');
       expect(code.userCode, 'BDWP-HQPK');
       expect(code.verificationUrl, 'https://simkl.com/pin');

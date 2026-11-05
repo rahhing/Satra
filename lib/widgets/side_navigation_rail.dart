@@ -4,7 +4,7 @@ import '../media/ids.dart';
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
-import 'package:plezy/widgets/app_icon.dart';
+import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -968,45 +968,23 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                 decoration: const BoxDecoration(),
                 child: Stack(
                   children: [
-                    // Rail surface. A docked rail is transparent on TV so the
-                    // full-bleed backdrop continues behind it; content is
-                    // pushed clear of it, never covered. A floating panel
-                    // covers content, so it paints its surface on every
-                    // platform (#2079).
+                    // Animate the pane itself. Opacity/saveLayer around a
+                    // backdrop filter hides its input until the fade ends.
                     Positioned.fill(
-                      child: AnimatedOpacity(
-                        opacity: PlatformDetector.isTV() && !_isFloatingPanel ? 0.0 : 1.0,
-                        // Shares the width morph's duration/curve: a shorter
-                        // fade strands a fully grown, fully transparent panel
-                        // over the content part-way through the collapse.
-                        duration: expandDuration,
-                        curve: expandCurve,
-                        child: AnimatedContainer(
+                      child: Padding(
+                        padding: EdgeInsets.fromLTRB(6, PlatformDetector.isTV() ? 68 : 8, 6, 8),
+                        child: TweenAnimationBuilder<double>(
+                          key: const ValueKey('sidebar_glass'),
+                          tween: Tween(end: PlatformDetector.isTV() && !_isFloatingPanel ? 0.0 : 1.0),
                           duration: expandDuration,
                           curve: expandCurve,
-                          decoration: BoxDecoration(
-                            color: Colors.transparent,
-                            // Open rails read as an M3E panel: rounded
-                            // trailing corners, extra-rounded plus an edge
-                            // shadow while floating over content (modal)
-                            // instead of pushing it.
-                            borderRadius: isCollapsed
-                                ? BorderRadius.zero
-                                : BorderRadius.horizontal(
-                                    right: Radius.circular(_isFloatingPanel ? overlayCornerRadius : t.radiusLg),
-                                  ),
-                            boxShadow: _isFloatingPanel
-                                ? [BoxShadow(color: Colors.black.withValues(alpha: 0.25), blurRadius: 32)]
-                                : const [],
-                          ),
-                          child: Padding(
-                            padding: EdgeInsets.fromLTRB(6, PlatformDetector.isTV() ? 68 : 8, 6, 8),
-                            child: GlassSurface(
-                              tint: t.surface,
-                              opacity: _isFloatingPanel ? 0.78 : 0.66,
-                              borderRadius: const BorderRadius.all(Radius.circular(24)),
-                              child: const SizedBox.expand(),
-                            ),
+                          builder: (context, visibility, _) => GlassSurface(
+                            enabled: visibility > 0,
+                            tint: t.surface,
+                            sigma: 28 * visibility,
+                            opacity: (_isFloatingPanel ? 0.42 : 0.28) * visibility,
+                            borderRadius: const BorderRadius.all(Radius.circular(24)),
+                            child: const SizedBox.expand(),
                           ),
                         ),
                       ),

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/providers/companion_remote_provider.dart';
-import 'package:plezy/services/companion_remote/companion_remote_peer_service.dart';
-import 'package:plezy/services/settings_mutation_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/widgets/setting_tile.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/providers/companion_remote_provider.dart';
+import 'package:satra/services/companion_remote/companion_remote_peer_service.dart';
+import 'package:satra/services/settings_mutation_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/widgets/setting_tile.dart';
 import 'package:provider/provider.dart';
 
 import '../test_helpers/prefs.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/models/plex/plex_config.dart';
+import 'package:satra/models/plex/plex_config.dart';
 
 void main() {
   group('PlexConfig.headers', () {
@@ -7,7 +7,7 @@ void main() {
       final config = PlexConfig(
         baseUrl: 'https://plex.example.com',
         clientIdentifier: 'client-1',
-        product: 'Plezy',
+        product: 'Satra',
         version: '1.0',
         platform: 'Windows',
         device: 'Windows',
@@ -22,7 +22,7 @@ void main() {
       final config = PlexConfig(
         baseUrl: 'https://plex.example.com',
         clientIdentifier: 'client-1',
-        product: 'Plezy',
+        product: 'Satra',
         version: '1.0',
       );
       expect(config.headers.containsKey('X-Plex-Device-Name'), isFalse);
@@ -35,7 +35,7 @@ void main() {
       final config = PlexConfig(
         baseUrl: 'https://plex.example.com',
         clientIdentifier: 'client-1',
-        product: 'Plezy',
+        product: 'Satra',
         version: '1.0',
       );
       expect(config.headers['Accept'], 'application/json');

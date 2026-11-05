@@ -3,26 +3,26 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/focus/key_event_utils.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/screens/video_player/widgets/player_prompt_overlays.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/utils/external_ids.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/models/watch_notice.dart';
-import 'package:plezy/watch_together/providers/watch_together_provider.dart';
-import 'package:plezy/watch_together/services/library_resolver.dart';
-import 'package:plezy/watch_together/services/player_adapter.dart';
-import 'package:plezy/watch_together/widgets/watch_together_overlay.dart';
-import 'package:plezy/widgets/overlay_sheet.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/focus/key_event_utils.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/screens/video_player/widgets/player_prompt_overlays.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/utils/external_ids.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/models/watch_notice.dart';
+import 'package:satra/watch_together/providers/watch_together_provider.dart';
+import 'package:satra/watch_together/services/library_resolver.dart';
+import 'package:satra/watch_together/services/player_adapter.dart';
+import 'package:satra/watch_together/widgets/watch_together_overlay.dart';
+import 'package:satra/widgets/overlay_sheet.dart';
 import 'package:provider/provider.dart';
 
 import 'fake_owp_relay.dart';
@@ -85,13 +85,13 @@ final class _HostServer implements MediaServerClient {
 }
 
 /// A player with a file open, as the player screen hands it to the provider.
-typedef WatchTestPlayer = ({PlezyPlayerAdapter adapter, FakeSyncPlayer player});
+typedef WatchTestPlayer = ({SatraPlayerAdapter adapter, FakeSyncPlayer player});
 
 /// A player with [copy] open. While [refusePlay] answers true its play command
 /// throws, as a player that refuses to start does.
 WatchTestPlayer watchTestPlayer(WatchCopy copy, {bool Function()? refusePlay}) {
   final player = FakeSyncPlayer(hasRenderedFrame: true, duration: Duration(milliseconds: copy.durationMs ?? 0));
-  final adapter = PlezyPlayerAdapter(
+  final adapter = SatraPlayerAdapter(
     player: player,
     copy: copy,
     commands: PlayerCommands(
@@ -147,7 +147,7 @@ final class WatchRoomHarness {
   }) {
     final provider = WatchTogetherProvider(
       partyFactory: relay.party,
-      clientName: () async => 'Plezy/1.0',
+      clientName: () async => 'Satra/1.0',
       displayName: () => name,
       profileId: () => profileId,
       customRelayBaseUrl: () => relayBaseUrl,

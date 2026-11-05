@@ -1,14 +1,14 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/services/data_aggregation_service.dart';
-import 'package:plezy/services/deep_links/deep_link.dart';
-import 'package:plezy/services/deep_links/deep_link_launcher.dart';
-import 'package:plezy/utils/external_ids.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/services/data_aggregation_service.dart';
+import 'package:satra/services/deep_links/deep_link.dart';
+import 'package:satra/services/deep_links/deep_link_launcher.dart';
+import 'package:satra/utils/external_ids.dart';
 
 import '../../test_helpers/media_items.dart';
 

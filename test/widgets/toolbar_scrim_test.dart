@@ -4,8 +4,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/widgets/toolbar_scrim.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/widgets/toolbar_scrim.dart';
 
 void main() {
   testWidgets('light scrim only lightens the content beneath it', (tester) async {
@@ -63,4 +63,50 @@ void main() {
       }
     }
   });
+  testWidgets('toolbar keeps background colours visible and blurs their boundary', (tester) async {
+    const key = Key('glass-colours');
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: monoTheme(MonoPalette.dark),
+        home: Center(
+          child: RepaintBoundary(
+            key: key,
+            child: SizedBox(
+              width: 256,
+              height: 128,
+              child: Stack(
+                children: [
+                  const Positioned.fill(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        Expanded(child: ColoredBox(color: Color(0xFFFF0000))),
+                        Expanded(child: ColoredBox(color: Color(0xFF0000FF))),
+                      ],
+                    ),
+                  ),
+                  const Positioned(top: 0, left: 0, right: 0, child: ToolbarScrim(child: SizedBox(height: 72))),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    final boundary = tester.renderObject<RenderRepaintBoundary>(find.byKey(key));
+    late ui.Image image;
+    late ByteData pixels;
+    await tester.runAsync(() async {
+      image = await boundary.toImage();
+      pixels = (await image.toByteData())!;
+    });
+    addTearDown(image.dispose);
+    int channel(int x, int colour) => pixels.getUint8((40 * image.width + x) * 4 + colour);
+    // The tint must preserve most of the background, not flatten it to gray.
+    expect(channel(64, 0), greaterThan(150));
+    expect(channel(192, 2), greaterThan(150));
+    // Both colours must mix across the originally sharp red/blue boundary.
+    expect(channel(124, 2), greaterThan(40));
+    expect(channel(132, 0), greaterThan(40));
+  }, variant: TargetPlatformVariant({TargetPlatform.macOS, TargetPlatform.windows, TargetPlatform.linux}));
 }

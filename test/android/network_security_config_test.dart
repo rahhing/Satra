@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/utils/certificate_trust.dart';
+import 'package:satra/utils/certificate_trust.dart';
 import 'package:xml/xml.dart';
 
 const _configPath = 'android/app/src/main/res/xml/network_security_config.xml';
@@ -30,7 +30,7 @@ const _fixedEndpointSourcePaths = <String>[
   'lib/services/catalog/seerr_catalog_source.dart',
   'lib/services/discord_rpc_service.dart',
   'lib/services/update_service.dart',
-  'lib/services/plezy_server.dart',
+  'lib/services/satra_server.dart',
   'lib/main.dart',
 ];
 

@@ -3,15 +3,15 @@ import 'dart:async';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/models/catalog/catalog_item.dart';
-import 'package:plezy/models/catalog/catalog_metadata.dart';
-import 'package:plezy/models/seerr/seerr_session.dart';
-import 'package:plezy/services/catalog/catalog_source.dart';
-import 'package:plezy/services/catalog/seerr_catalog_source.dart';
-import 'package:plezy/services/seerr/seerr_client.dart';
-import 'package:plezy/services/seerr/seerr_constants.dart';
-import 'package:plezy/utils/external_ids.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/models/catalog/catalog_item.dart';
+import 'package:satra/models/catalog/catalog_metadata.dart';
+import 'package:satra/models/seerr/seerr_session.dart';
+import 'package:satra/services/catalog/catalog_source.dart';
+import 'package:satra/services/catalog/seerr_catalog_source.dart';
+import 'package:satra/services/seerr/seerr_client.dart';
+import 'package:satra/services/seerr/seerr_constants.dart';
+import 'package:satra/utils/external_ids.dart';
 
 import '../../test_helpers/http_fixtures.dart';
 
@@ -237,7 +237,7 @@ void main() {
         await posterWith({'cacheImages': true}),
         'https://seerr.example.com/imageproxy/t/p/w600_and_h900_bestv2/matrix.jpg',
       );
-      // Caching off: the web UI loads from TMDB, and so does Plezy.
+      // Caching off: the web UI loads from TMDB, and so does Satra.
       expect(
         await posterWith({'cacheImages': false, 'mediaServerType': 2, 'youtubeUrl': ''}),
         'https://image.tmdb.org/t/p/w600_and_h900_bestv2/matrix.jpg',

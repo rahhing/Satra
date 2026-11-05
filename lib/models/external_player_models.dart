@@ -20,12 +20,12 @@ class ExternalPlayerLaunchOptions {
   /// identify media by name; stream URLs usually end in `file.mkv`.
   final String? filename;
 
-  /// Where the player hands control back to Plezy; null asks for no return
+  /// Where the player hands control back to Satra; null asks for no return
   /// links.
   final ExternalPlayerReturnLinks? returnLinks;
 }
 
-/// The x-callback-url links a player opens to hand control back to Plezy,
+/// The x-callback-url links a player opens to hand control back to Satra,
 /// one per way playback can end.
 class ExternalPlayerReturnLinks {
   const ExternalPlayerReturnLinks({required this.success, required this.cancel, required this.error});
@@ -110,7 +110,7 @@ class PlayerInstallProbe {
   /// Spotlight is deliberately not consulted: an empty `mdfind` result also
   /// means indexing is off or incomplete, which would hide installed players.
   Future<bool> applicationInstalled(String bundleId) async {
-    const channel = MethodChannel('com.plezy/app_lookup');
+    const channel = MethodChannel('com.satra/app_lookup');
     return await channel.invokeMethod<bool>('isApplicationInstalled', {'bundleId': bundleId}) ?? false;
   }
 
@@ -475,7 +475,7 @@ class KnownPlayers {
   ///
   /// Detection forks `sh` or `where.exe` and calls out over platform channels,
   /// so it is asynchronous and memoised: it runs once per process and a player
-  /// installed while Plezy is running only appears after a restart. Android is
+  /// installed while Satra is running only appears after a restart. Android is
   /// the one platform left unprobed — where there is no reliable check the
   /// player stays listed, because hiding a working player is worse than
   /// listing a missing one.
@@ -550,7 +550,7 @@ class KnownPlayers {
   /// permission classes, ACLs and `noexec` mounts are honoured exactly as they
   /// will be when [Process.start] execs the command.
   static Future<bool> _posixCommandExists(String command) async {
-    final result = await probe.run('sh', ['-c', r'command -v "$1" >/dev/null 2>&1', 'plezy-command-probe', command]);
+    final result = await probe.run('sh', ['-c', r'command -v "$1" >/dev/null 2>&1', 'satra-command-probe', command]);
     return result.exitCode == 0;
   }
 

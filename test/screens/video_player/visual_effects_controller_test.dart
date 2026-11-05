@@ -3,14 +3,14 @@ import 'dart:ui';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plezy/mpv/player/player.dart';
-import 'package:plezy/mpv/player/player_state.dart';
-import 'package:plezy/providers/shader_provider.dart';
-import 'package:plezy/screens/video_player/visual_effects_controller.dart';
-import 'package:plezy/services/ambient_lighting_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/video_filter_manager.dart';
-import 'package:plezy/widgets/video_controls/widgets/player_toast_indicator.dart';
+import 'package:satra/mpv/player/player.dart';
+import 'package:satra/mpv/player/player_state.dart';
+import 'package:satra/providers/shader_provider.dart';
+import 'package:satra/screens/video_player/visual_effects_controller.dart';
+import 'package:satra/services/ambient_lighting_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/video_filter_manager.dart';
+import 'package:satra/widgets/video_controls/widgets/player_toast_indicator.dart';
 
 import '../../test_helpers/io_fakes.dart';
 import '../../test_helpers/media_items.dart';
@@ -28,7 +28,7 @@ void main() {
     final settings = await SettingsService.getInstance();
     await settings.write(SettingsService.ambientLighting, true);
     previousPathProvider = PathProviderPlatform.instance;
-    tmpRoot = Directory.systemTemp.createTempSync('plezy_visual_effects_test_');
+    tmpRoot = Directory.systemTemp.createTempSync('satra_visual_effects_test_');
     PathProviderPlatform.instance = FakePathProvider(tmpRoot);
   });
 

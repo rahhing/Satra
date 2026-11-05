@@ -8,7 +8,7 @@ as bundled while their own host dependencies never reached ldd, and the check
 reported success over exactly the undeclared library it exists to catch.
 
 ldd and dpkg-query only answer on a Debian-family machine, so the checker
-resolves both through PLEZY_HOST_TOOLS and the fixtures here install stubs
+resolves both through SATRA_HOST_TOOLS and the fixtures here install stubs
 there. That keeps "a bundle that needs libpng16" a fixture rather than a
 machine, and keeps the tests exercising the real script end to end.
 """
@@ -45,14 +45,14 @@ PIXBUF_LOADER = "lib/gdk-pixbuf-2.0/2.10.0/loaders/libpixbufloader-png.so"
 # output and really fails on the exit status it would see in CI.
 LDD_STUB = r"""import json, os, sys
 
-answers = json.loads(open(os.environ["PLEZY_TEST_ANSWERS"], encoding="utf-8").read())
+answers = json.loads(open(os.environ["SATRA_TEST_ANSWERS"], encoding="utf-8").read())
 for line in answers["ldd"].get(os.path.basename(sys.argv[1]), []):
     print("\t" + line)
 """
 
 DPKG_QUERY_STUB = r"""import json, os, sys
 
-answers = json.loads(open(os.environ["PLEZY_TEST_ANSWERS"], encoding="utf-8").read())
+answers = json.loads(open(os.environ["SATRA_TEST_ANSWERS"], encoding="utf-8").read())
 if sys.argv[1] == "-S":
     owner = answers["owners"].get(sys.argv[2], "")
     if not owner:
@@ -66,7 +66,7 @@ else:
 
 
 def install_stub(scripts: Path, tools: Path, name: str, source: str) -> None:
-    """Put a fake `name` where the checker's PLEZY_HOST_TOOLS lookup will find it.
+    """Put a fake `name` where the checker's SATRA_HOST_TOOLS lookup will find it.
 
     The stub itself is Python; the file the checker spawns has to be something
     the platform can execute directly, so it gets a wrapper. The two live in
@@ -93,7 +93,7 @@ def stage_bundle(
     """A synthetic bundle plus host-tool stubs, and the environment that finds them."""
     bundle = staging / "bundle"
     bundle.mkdir()
-    (bundle / "plezy").write_bytes(b"")
+    (bundle / "satra").write_bytes(b"")
     for name in shipped:
         library = bundle / name
         library.parent.mkdir(parents=True, exist_ok=True)
@@ -110,8 +110,8 @@ def stage_bundle(
 
     return bundle, {
         **os.environ,
-        "PLEZY_HOST_TOOLS": str(tools),
-        "PLEZY_TEST_ANSWERS": str(answers),
+        "SATRA_HOST_TOOLS": str(tools),
+        "SATRA_TEST_ANSWERS": str(answers),
     }
 
 
@@ -126,7 +126,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         path: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
         """Stage a synthetic bundle plus host-tool stubs and run the real checker."""
-        with tempfile.TemporaryDirectory(prefix="plezy-bundle-deps-test-") as directory:
+        with tempfile.TemporaryDirectory(prefix="satra-bundle-deps-test-") as directory:
             bundle, env = stage_bundle(Path(directory), ldd, owners, shipped, install)
             if path is not None:
                 env["PATH"] = path
@@ -143,7 +143,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
     def test_a_bundle_whose_host_libraries_are_all_declared_passes(self) -> None:
         result = self._check(
             ldd={
-                "plezy": [
+                "satra": [
                     # No "=>" on this one: it must not be read as a soname.
                     "linux-vdso.so.1 (0x00007ffd1b3fe000)",
                     f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)",
@@ -162,7 +162,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
 
     def test_an_undeclared_host_library_is_named(self) -> None:
         result = self._check(
-            ldd={"plezy": [f"{UNDECLARED_SONAME} => {UNDECLARED_PATH} (0x00007f9c2c000000)"]},
+            ldd={"satra": [f"{UNDECLARED_SONAME} => {UNDECLARED_PATH} (0x00007f9c2c000000)"]},
             owners={UNDECLARED_PATH: UNDECLARED_OWNER},
         )
 
@@ -184,7 +184,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         soname = "libGLESv2.so.2"
         path = f"/usr/lib/x86_64-linux-gnu/{soname}"
         result = self._check(
-            ldd={"plezy": [f"{soname} => {path} (0x00007f9c2c000000)"]},
+            ldd={"satra": [f"{soname} => {path} (0x00007f9c2c000000)"]},
             # Owned by a package the deb list does declare, so only the non-deb
             # half can be what rejects this.
             owners={path: "libegl1"},
@@ -203,7 +203,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         bundle cannot need zero host libraries. Reporting success here would make
         every later breakage invisible, which is the worst thing a guard can do.
         """
-        result = self._check(ldd={"plezy": []}, owners={})
+        result = self._check(ldd={"satra": []}, owners={})
 
         self.assertEqual(result.returncode, 1, result.stdout)
         self.assertIn("proved nothing", result.stderr)
@@ -216,7 +216,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         """
         result = self._check(
             ldd={
-                "plezy": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"],
+                "satra": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"],
                 "libpixbufloader-png.so": [f"{UNDECLARED_SONAME} => {UNDECLARED_PATH} (0x00007f9c2b000000)"],
             },
             owners={DECLARED_PATH: DECLARED_OWNER, UNDECLARED_PATH: UNDECLARED_OWNER},
@@ -229,7 +229,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
     def test_a_nested_module_cannot_satisfy_a_top_level_dependency(self) -> None:
         """Only lib/ is on the loader path, so only lib/ can make a soname bundled.
 
-        plezy carries RPATH $ORIGIN/lib and plezy.sh exports $INSTALL_DIR/lib.
+        satra carries RPATH $ORIGIN/lib and satra.sh exports $INSTALL_DIR/lib.
         The gdk-pixbuf loaders two directories below are opened by explicit
         path and resolve nothing for the executable, so a module whose basename
         happens to equal a host soname must not suppress it - otherwise the
@@ -237,7 +237,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         """
         result = self._check(
             ldd={
-                "plezy": [
+                "satra": [
                     f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)",
                     f"{UNDECLARED_SONAME} => {UNDECLARED_PATH} (0x00007f9c2b000000)",
                 ]
@@ -262,7 +262,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         """
         result = self._check(
             ldd={
-                "plezy": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"],
+                "satra": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"],
                 # The bundled libmpv needs a bundled shaderc, and sees nothing.
                 "libmpv.so.2": ["libshaderc_shared.so.1 => not found"],
             },
@@ -276,9 +276,9 @@ class BundleHostDepsGuardTest(unittest.TestCase):
     def test_a_library_that_resolves_to_nothing_fails(self) -> None:
         """`=> not found` is the failure this check exists to prevent, already happened."""
         result = self._check(
-            ldd={"libplezyextra.so.1": ["libfoo.so.1 => not found"]},
+            ldd={"libsatraextra.so.1": ["libfoo.so.1 => not found"]},
             owners={},
-            shipped=("lib/libplezyextra.so.1",),
+            shipped=("lib/libsatraextra.so.1",),
         )
 
         self.assertEqual(result.returncode, 1, result.stdout)
@@ -288,7 +288,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
     def test_the_checker_reads_build_packages_from_any_working_directory(self) -> None:
         """--root defaulted to cwd, so running the check from the build tree crashed."""
         result = self._check(
-            ldd={"plezy": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"]},
+            ldd={"satra": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"]},
             owners={DECLARED_PATH: DECLARED_OWNER},
             cwd=Path(tempfile.gettempdir()),
         )
@@ -304,7 +304,7 @@ class BundleHostDepsGuardTest(unittest.TestCase):
         skip and never a traceback.
         """
         result = self._check(
-            ldd={"plezy": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"]},
+            ldd={"satra": [f"{DECLARED_SONAME} => {DECLARED_PATH} (0x00007f9c2c000000)"]},
             owners={DECLARED_PATH: DECLARED_OWNER},
             install=("ldd",),
             path="",
@@ -324,11 +324,11 @@ class BuildPackagesGuardWiringTest(unittest.TestCase):
     """
 
     def test_an_undeclared_host_library_stops_packaging(self) -> None:
-        with tempfile.TemporaryDirectory(prefix="plezy-packaging-test-") as directory:
+        with tempfile.TemporaryDirectory(prefix="satra-packaging-test-") as directory:
             staging = Path(directory)
             bundle, env = stage_bundle(
                 staging,
-                ldd={"plezy": [f"{UNDECLARED_SONAME} => {UNDECLARED_PATH} (0x00007f9c2c000000)"]},
+                ldd={"satra": [f"{UNDECLARED_SONAME} => {UNDECLARED_PATH} (0x00007f9c2c000000)"]},
                 owners={UNDECLARED_PATH: UNDECLARED_OWNER},
                 shipped=("lib/libmpv.so.2",),
             )
@@ -357,7 +357,7 @@ class BuildPackagesGuardWiringTest(unittest.TestCase):
         A skip nobody can see in the log is indistinguishable from the guard
         having passed, which is the whole failure this wiring removes.
         """
-        with tempfile.TemporaryDirectory(prefix="plezy-packaging-optout-test-") as directory:
+        with tempfile.TemporaryDirectory(prefix="satra-packaging-optout-test-") as directory:
             staging = Path(directory)
             # A copy, not the checkout's script: past this point main() writes
             # generated icons next to itself, and a test has no business dirtying
@@ -381,11 +381,11 @@ class BuildPackagesGuardWiringTest(unittest.TestCase):
                     **os.environ,
                     "BUILD_DIR": str(bundle),
                     "OUTPUT_DIR": str(staging / "packages"),
-                    "PLEZY_SKIP_HOST_DEP_CHECK": "1",
+                    "SATRA_SKIP_HOST_DEP_CHECK": "1",
                 },
             )
 
-        self.assertIn("PLEZY_SKIP_HOST_DEP_CHECK is set", result.stdout)
+        self.assertIn("SATRA_SKIP_HOST_DEP_CHECK is set", result.stdout)
         self.assertIn("unverified", result.stdout)
 
     def test_a_falsey_opt_out_does_not_skip(self) -> None:
@@ -396,7 +396,7 @@ class BuildPackagesGuardWiringTest(unittest.TestCase):
         back the unverified package this wiring exists to withhold.
         """
         for value in ("0", "false", "no", "off", ""):
-            with self.subTest(value=value), tempfile.TemporaryDirectory(prefix="plezy-packaging-falsey-") as directory:
+            with self.subTest(value=value), tempfile.TemporaryDirectory(prefix="satra-packaging-falsey-") as directory:
                 staging = Path(directory)
                 packaging = staging / "linux/packaging"
                 packaging.mkdir(parents=True)
@@ -416,11 +416,11 @@ class BuildPackagesGuardWiringTest(unittest.TestCase):
                         **os.environ,
                         "BUILD_DIR": str(bundle),
                         "OUTPUT_DIR": str(staging / "packages"),
-                        "PLEZY_SKIP_HOST_DEP_CHECK": value,
+                        "SATRA_SKIP_HOST_DEP_CHECK": value,
                     },
                 )
 
-                self.assertNotIn("PLEZY_SKIP_HOST_DEP_CHECK is set", result.stdout)
+                self.assertNotIn("SATRA_SKIP_HOST_DEP_CHECK is set", result.stdout)
                 # The guard ran, so packaging stopped on its verdict rather than
                 # continuing past an unverified bundle.
                 self.assertNotEqual(result.returncode, 0)

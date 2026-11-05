@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/artist_discography.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
+import 'package:satra/media/artist_discography.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
 
 void main() {
   MediaItem album(String id) => MediaItem.plex(id: id, kind: MediaKind.album, title: id);

@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/models/livetv_channel.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/favorite_channels_repository.dart';
-import 'package:plezy/services/prefs_recovery.dart';
+import 'package:satra/models/livetv_channel.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/favorite_channels_repository.dart';
+import 'package:satra/services/prefs_recovery.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../test_helpers/prefs.dart';
@@ -27,7 +27,7 @@ String _list(List<String> ids) => jsonEncode([
 /// [legacy] written to the legacy store afterwards by an older build, and
 /// [async] already in the shared cache.
 void _seedPostMigrationStores({required Map<String, Object> legacy, Map<String, Object> async = const {}}) {
-  resetSharedPreferencesForTest(initialAsync: {'plezy_legacy_prefs_migrated_v1': true, ...async});
+  resetSharedPreferencesForTest(initialAsync: {'satra_legacy_prefs_migrated_v1': true, ...async});
   SharedPreferences.setMockInitialValues(legacy);
 }
 

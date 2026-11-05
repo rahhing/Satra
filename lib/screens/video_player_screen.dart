@@ -5,7 +5,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:plezy/widgets/app_icon.dart';
+import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
 import 'package:os_media_controls/os_media_controls.dart';
@@ -938,7 +938,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   /// Android TV: release the native AV pipeline once the app stays
   /// backgrounded past the grace window. A merely paused player keeps its
   /// MediaCodec decoders and (tunneled passthrough) AudioTrack alive, which
-  /// on shared-pipeline TV SoCs degrades every other app until Plezy is
+  /// on shared-pipeline TV SoCs degrades every other app until Satra is
   /// force-stopped. The grace absorbs transient hidden/paused blips
   /// (assistant overlay, HDMI-CEC events) so quick app switches don't churn
   /// codecs.
@@ -1010,7 +1010,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
 
   /// The room's view of the file the player has open; see
   /// [_VideoPlayerWatchTogetherMethods._bindWatchTogether].
-  PlezyPlayerAdapter? _wtAdapter;
+  SatraPlayerAdapter? _wtAdapter;
 
   /// The open under way is the room's file, which the room asked for.
   bool _wtRoomOpen = false;
@@ -1243,7 +1243,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   void debugBindWatchTogetherForTesting() => _bindWatchTogether();
 
   @visibleForTesting
-  PlezyPlayerAdapter? get debugWatchTogetherAdapter => _wtAdapter;
+  SatraPlayerAdapter? get debugWatchTogetherAdapter => _wtAdapter;
 
   /// The Windows display-switch hold otherwise runs only behind a real
   /// display-mode change on entering fullscreen.

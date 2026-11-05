@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/utils/web_socket_connect.dart';
+import 'package:satra/utils/web_socket_connect.dart';
 
 void main() {
   /// Accepts TCP connections and never answers the upgrade.
@@ -250,12 +250,12 @@ void main() {
       final attempt = WebSocketConnectAttempt(
         Uri.parse('ws://${server.address.address}:${server.port}/socket'),
         connectTimeout: const Duration(seconds: 30),
-        headers: const {'Authorization': 'MediaBrowser Client="Plezy Android TV"'},
+        headers: const {'Authorization': 'MediaBrowser Client="Satra Android TV"'},
       );
       final webSocket = await attempt.socket;
       addTearDown(webSocket.close);
 
-      expect(await authorization.future.timeout(const Duration(seconds: 5)), 'MediaBrowser Client="Plezy Android TV"');
+      expect(await authorization.future.timeout(const Duration(seconds: 5)), 'MediaBrowser Client="Satra Android TV"');
     });
 
     test('redirected upgrade transfers ownership of the delivered transport', () async {

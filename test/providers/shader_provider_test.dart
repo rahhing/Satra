@@ -5,11 +5,11 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/models/shader_preset.dart';
-import 'package:plezy/providers/shader_provider.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/settings_export_service.dart';
+import 'package:satra/models/shader_preset.dart';
+import 'package:satra/providers/shader_provider.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/settings_export_service.dart';
 
 import '../test_helpers/io_fakes.dart';
 import '../test_helpers/prefs.dart';
@@ -162,7 +162,7 @@ void main() {
 
     test('refreshes a stable merged catalog when custom presets change', () async {
       final originalPathProvider = PathProviderPlatform.instance;
-      final root = await Directory.systemTemp.createTemp('plezy_shader_provider_test_');
+      final root = await Directory.systemTemp.createTemp('satra_shader_provider_test_');
       PathProviderPlatform.instance = FakePathProvider(root);
       addTearDown(() async {
         PathProviderPlatform.instance = originalPathProvider;
@@ -188,7 +188,7 @@ void main() {
 
     test('deleting a scoped custom shader keeps the global default', () async {
       final originalPathProvider = PathProviderPlatform.instance;
-      final root = await Directory.systemTemp.createTemp('plezy_shader_provider_test_');
+      final root = await Directory.systemTemp.createTemp('satra_shader_provider_test_');
       PathProviderPlatform.instance = FakePathProvider(root);
       addTearDown(() async {
         PathProviderPlatform.instance = originalPathProvider;
@@ -213,7 +213,7 @@ void main() {
 
     test('deleting the saved custom shader resets the global default', () async {
       final originalPathProvider = PathProviderPlatform.instance;
-      final root = await Directory.systemTemp.createTemp('plezy_shader_provider_test_');
+      final root = await Directory.systemTemp.createTemp('satra_shader_provider_test_');
       PathProviderPlatform.instance = FakePathProvider(root);
       addTearDown(() async {
         PathProviderPlatform.instance = originalPathProvider;

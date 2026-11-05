@@ -1,10 +1,10 @@
 import 'dart:convert';
 
 import '../utils/media_server_http_client.dart';
-import 'plezy_server.dart';
+import 'satra_server.dart';
 
-/// Plezy server endpoint that returns a short, quotable Log ID.
-const String logUploadEndpoint = '$plezyServerBaseUrl/logs';
+/// Satra server endpoint that returns a short, quotable Log ID.
+const String logUploadEndpoint = '$satraServerBaseUrl/logs';
 
 /// The server's `/logs` accepts 1 MiB. The in-memory buffer intentionally remains
 /// larger for local viewing and copying; uploads retain the device header and

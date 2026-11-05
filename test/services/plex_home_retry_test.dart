@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 import 'dart:convert';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/models/plex/plex_config.dart';
-import 'package:plezy/services/plex_api_cache.dart';
-import 'package:plezy/services/plex_client.dart';
-import 'package:plezy/utils/active_client_scope.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/models/plex/plex_config.dart';
+import 'package:satra/services/plex_api_cache.dart';
+import 'package:satra/services/plex_client.dart';
+import 'package:satra/utils/active_client_scope.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 
@@ -39,7 +39,7 @@ void main() {
         baseUrl: 'http://server:32400',
         token: 'token',
         clientIdentifier: 'client-id',
-        product: 'Plezy',
+        product: 'Satra',
         version: 'test',
         languageCode: 'fr',
       );
@@ -53,7 +53,7 @@ void main() {
         baseUrl: 'http://server:32400',
         token: 'old-token',
         clientIdentifier: 'client-id',
-        product: 'Plezy',
+        product: 'Satra',
         version: 'test',
         languageCode: 'es',
       ).copyWith(token: 'new-token');

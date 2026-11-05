@@ -84,9 +84,9 @@ function(check_mpv_sanitizer_support SANITIZER_FLAG RESULT_VARIABLE)
   set(${RESULT_VARIABLE} "${${RESULT_VARIABLE}}" PARENT_SCOPE)
 endfunction()
 
-option(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS
+option(SATRA_BUILD_MPV_PLAYER_LIFECYCLE_TESTS
   "Build the focused Linux mpv callback lifecycle and output colour space tests" OFF)
-if(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
+if(SATRA_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
   find_package(Threads REQUIRED)
 
   add_executable(mpv_player_lifecycle_test
@@ -94,7 +94,7 @@ if(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
     "mpv/mpv_player_lifecycle_test.cc"
   )
   apply_standard_settings(mpv_player_lifecycle_test)
-  target_compile_definitions(mpv_player_lifecycle_test PRIVATE PLEZY_MPV_PLAYER_LIFECYCLE_TEST=1)
+  target_compile_definitions(mpv_player_lifecycle_test PRIVATE SATRA_MPV_PLAYER_LIFECYCLE_TEST=1)
   target_link_libraries(mpv_player_lifecycle_test PRIVATE flutter)
   target_link_libraries(mpv_player_lifecycle_test PRIVATE PkgConfig::GTK)
   target_link_libraries(mpv_player_lifecycle_test PRIVATE PkgConfig::MPV)
@@ -104,7 +104,7 @@ if(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
   target_include_directories(mpv_player_lifecycle_test PRIVATE "${CMAKE_SOURCE_DIR}")
   target_include_directories(mpv_player_lifecycle_test PRIVATE "${CMAKE_SOURCE_DIR}/../shared/cpp")
 
-  # The output-colour-space transaction reuses PLEZY_MPV_PLAYER_LIFECYCLE_TEST
+  # The output-colour-space transaction reuses SATRA_MPV_PLAYER_LIFECYCLE_TEST
   # rather than defining its own: that define already means "mpv_player.cc is
   # being built for a focused test and exposes its injection seams", and the
   # transaction's seam is one more of those, in the same translation unit. A
@@ -115,7 +115,7 @@ if(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
     "mpv/mpv_player_hdr_output_test.cc"
   )
   apply_standard_settings(mpv_player_hdr_output_test)
-  target_compile_definitions(mpv_player_hdr_output_test PRIVATE PLEZY_MPV_PLAYER_LIFECYCLE_TEST=1)
+  target_compile_definitions(mpv_player_hdr_output_test PRIVATE SATRA_MPV_PLAYER_LIFECYCLE_TEST=1)
   target_link_libraries(mpv_player_hdr_output_test PRIVATE flutter)
   target_link_libraries(mpv_player_hdr_output_test PRIVATE PkgConfig::GTK)
   target_link_libraries(mpv_player_hdr_output_test PRIVATE PkgConfig::MPV)
@@ -125,9 +125,9 @@ if(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
   target_include_directories(mpv_player_hdr_output_test PRIVATE "${CMAKE_SOURCE_DIR}")
   target_include_directories(mpv_player_hdr_output_test PRIVATE "${CMAKE_SOURCE_DIR}/../shared/cpp")
 
-  option(PLEZY_MPV_LIFECYCLE_SANITIZERS
+  option(SATRA_MPV_LIFECYCLE_SANITIZERS
     "Enable ASan and UBSan for the focused mpv_player.cc tests" ON)
-  if(PLEZY_MPV_LIFECYCLE_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
+  if(SATRA_MPV_LIFECYCLE_SANITIZERS AND CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU")
     check_mpv_sanitizer_support(
       "-fsanitize=address,undefined" MPV_LIFECYCLE_SANITIZERS_SUPPORTED)
     if(MPV_LIFECYCLE_SANITIZERS_SUPPORTED)
@@ -144,39 +144,39 @@ if(PLEZY_BUILD_MPV_PLAYER_LIFECYCLE_TESTS)
   set_tests_properties(mpv_player_hdr_output_test PROPERTIES TIMEOUT 30)
 endif()
 
-option(PLEZY_BUILD_MPV_PROPERTY_CONTRACT_TESTS
+option(SATRA_BUILD_MPV_PROPERTY_CONTRACT_TESTS
   "Build the focused desktop mpv property-result contract test" OFF)
-option(PLEZY_BUILD_MPV_RELIABILITY_TESTS
+option(SATRA_BUILD_MPV_RELIABILITY_TESTS
   "Build focused Linux HDR metadata, plane geometry and video params tests" OFF)
-set(PLEZY_MPV_RELIABILITY_SANITIZER "none" CACHE STRING
+set(SATRA_MPV_RELIABILITY_SANITIZER "none" CACHE STRING
   "Sanitizer for focused mpv reliability tests: none, address, or thread")
-set_property(CACHE PLEZY_MPV_RELIABILITY_SANITIZER PROPERTY STRINGS none address thread)
+set_property(CACHE SATRA_MPV_RELIABILITY_SANITIZER PROPERTY STRINGS none address thread)
 
 function(apply_mpv_reliability_sanitizer TARGET)
   if(NOT CMAKE_CXX_COMPILER_ID MATCHES "Clang|GNU" OR
-     PLEZY_MPV_RELIABILITY_SANITIZER STREQUAL "none")
+     SATRA_MPV_RELIABILITY_SANITIZER STREQUAL "none")
     return()
   endif()
-  if(PLEZY_MPV_RELIABILITY_SANITIZER STREQUAL "address")
+  if(SATRA_MPV_RELIABILITY_SANITIZER STREQUAL "address")
     set(SANITIZER_FLAG "-fsanitize=address,undefined")
     set(SANITIZER_SUPPORT_VARIABLE MPV_RELIABILITY_ADDRESS_SANITIZER_SUPPORTED)
-  elseif(PLEZY_MPV_RELIABILITY_SANITIZER STREQUAL "thread")
+  elseif(SATRA_MPV_RELIABILITY_SANITIZER STREQUAL "thread")
     set(SANITIZER_FLAG "-fsanitize=thread")
     set(SANITIZER_SUPPORT_VARIABLE MPV_RELIABILITY_THREAD_SANITIZER_SUPPORTED)
   else()
-    message(FATAL_ERROR "Unknown PLEZY_MPV_RELIABILITY_SANITIZER value")
+    message(FATAL_ERROR "Unknown SATRA_MPV_RELIABILITY_SANITIZER value")
   endif()
   check_mpv_sanitizer_support("${SANITIZER_FLAG}" ${SANITIZER_SUPPORT_VARIABLE})
   if(NOT ${SANITIZER_SUPPORT_VARIABLE})
     message(WARNING
-      "${PLEZY_MPV_RELIABILITY_SANITIZER} sanitizer is unavailable; focused tests will be unsanitized")
+      "${SATRA_MPV_RELIABILITY_SANITIZER} sanitizer is unavailable; focused tests will be unsanitized")
     return()
   endif()
   target_compile_options(${TARGET} PRIVATE -fno-omit-frame-pointer ${SANITIZER_FLAG})
   target_link_options(${TARGET} PRIVATE ${SANITIZER_FLAG})
 endfunction()
 
-if(PLEZY_BUILD_MPV_PROPERTY_CONTRACT_TESTS OR PLEZY_BUILD_MPV_RELIABILITY_TESTS)
+if(SATRA_BUILD_MPV_PROPERTY_CONTRACT_TESTS OR SATRA_BUILD_MPV_RELIABILITY_TESTS)
   find_package(Threads REQUIRED)
   add_executable(mpv_property_result_contract_test
     "../../shared/mpv/mpv_player_common_test.cpp"
@@ -189,7 +189,7 @@ if(PLEZY_BUILD_MPV_PROPERTY_CONTRACT_TESTS OR PLEZY_BUILD_MPV_RELIABILITY_TESTS)
   add_test(NAME mpv_property_result_contract_test COMMAND mpv_property_result_contract_test)
 endif()
 
-if(PLEZY_BUILD_MPV_RELIABILITY_TESTS)
+if(SATRA_BUILD_MPV_RELIABILITY_TESTS)
   add_executable(hdr_metadata_test
     "mpv/hdr_metadata_test.cc"
   )
@@ -232,7 +232,7 @@ if(PLEZY_BUILD_MPV_RELIABILITY_TESTS)
   target_link_libraries(plane_render_executor_test PRIVATE PkgConfig::GTK Threads::Threads)
   apply_mpv_reliability_sanitizer(plane_render_executor_test)
   add_test(NAME plane_render_executor_test COMMAND plane_render_executor_test)
-  if(PLEZY_MPV_RELIABILITY_SANITIZER STREQUAL "thread")
+  if(SATRA_MPV_RELIABILITY_SANITIZER STREQUAL "thread")
     # GLib's futex-based GMutex is invisible to TSan; suppress reports that
     # originate inside libglib. Inert when the sanitizer probe fell back to an
     # unsanitized build. See mpv/tsan_suppressions.txt.

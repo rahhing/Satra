@@ -1,13 +1,13 @@
 import 'dart:io';
 
 import 'package:drift/drift.dart' hide isNull, isNotNull;
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as path;
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/database/download_operations.dart';
-import 'package:plezy/models/download_models.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/database/download_operations.dart';
+import 'package:satra/models/download_models.dart';
 
 import '../test_helpers/download_fixtures.dart';
 
@@ -25,7 +25,7 @@ void main() {
   group('insertQueuedDownload', () {
     test('atomically persists media identity, scope, policy, and queue state', () async {
       await db.close();
-      final tempDir = await Directory.systemTemp.createTemp('plezy_atomic_queue_');
+      final tempDir = await Directory.systemTemp.createTemp('satra_atomic_queue_');
       final databaseFile = File(path.join(tempDir.path, 'downloads.sqlite'));
       try {
         db = AppDatabase.forTesting(NativeDatabase(databaseFile));
@@ -319,7 +319,7 @@ void main() {
 
     test('rolls back both new and replacement media rows when queue insertion fails', () async {
       await db.close();
-      final tempDir = await Directory.systemTemp.createTemp('plezy_atomic_rollback_');
+      final tempDir = await Directory.systemTemp.createTemp('satra_atomic_rollback_');
       final databaseFile = File(path.join(tempDir.path, 'downloads.sqlite'));
       try {
         db = AppDatabase.forTesting(NativeDatabase(databaseFile));

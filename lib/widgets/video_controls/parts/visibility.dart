@@ -68,7 +68,7 @@ extension _PlexVideoControlsVisibilityMethods on _PlexVideoControlsState {
   /// Maestro builds extend the delay because accessibility-tree queries can
   /// take longer than the production timeout on physical devices.
   Duration get _hideDelay {
-    if (const bool.fromEnvironment('PLEZY_MAESTRO_E2E')) {
+    if (const bool.fromEnvironment('SATRA_MAESTRO_E2E')) {
       return const Duration(seconds: 30);
     }
     final isMobile = (Platform.isIOS || Platform.isAndroid) && !PlatformDetector.isTV();

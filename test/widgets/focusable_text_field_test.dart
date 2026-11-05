@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:plezy/focus/dpad_navigator.dart';
-import 'package:plezy/focus/focusable_text_field.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/focus/key_event_utils.dart';
-import 'package:plezy/services/gamepad_service.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/focus/dpad_navigator.dart';
+import 'package:satra/focus/focusable_text_field.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/focus/key_event_utils.dart';
+import 'package:satra/services/gamepad_service.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 void main() {
   tearDown(() {
@@ -1252,7 +1252,7 @@ void main() {
 
     // Remote keys reach Flutter only when the IME is not consuming them
     // (keyboard dismissed, or a broken key session already repaired and eaten
-    // by PlezyActivity). Back closes the session and is consumed once so the
+    // by SatraActivity). Back closes the session and is consumed once so the
     // same press cannot also pop the route underneath.
     final backResult = handler(fieldFocusNode, _remoteKey(LogicalKeyboardKey.goBack));
     await tester.pump();
@@ -1487,7 +1487,7 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(null);
     await TvDetectionService.getInstance(forceTv: true);
     TvDetectionService.setForceTVSync(true);
-    const channel = MethodChannel('com.plezy/text_input');
+    const channel = MethodChannel('com.satra/text_input');
     final sentStates = <bool>[];
     GamepadService.debugNativeTextInputFocusHandler = (_) async {};
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(channel, (call) async {
@@ -1524,7 +1524,7 @@ void main() {
     );
 
     // First focus is suppressed by afterFirstFocus: no live input session, so
-    // the platform hint stays silent — PlezyActivity keeps the pre-IME D-pad
+    // the platform hint stays silent — SatraActivity keeps the pre-IME D-pad
     // intercept and the gamepad bridge active for plain navigation.
     fieldFocusNode.requestFocus();
     await tester.pump();
@@ -1532,7 +1532,7 @@ void main() {
     expect(sentStates, isEmpty);
 
     // An explicit Select opens the session: only now does the platform learn
-    // about it (arming the soft-input show-retry in PlezyActivity).
+    // about it (arming the soft-input show-retry in SatraActivity).
     await tester.sendKeyEvent(LogicalKeyboardKey.select);
     await tester.pump();
     await tester.pump();
@@ -1548,7 +1548,7 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(null);
     await TvDetectionService.getInstance(forceTv: true);
     TvDetectionService.setForceTVSync(true);
-    const channel = MethodChannel('com.plezy/text_input');
+    const channel = MethodChannel('com.satra/text_input');
     final calls = <MethodCall>[];
     final gamepadFocusStates = <bool>[];
     GamepadService.debugNativeTextInputFocusHandler = (focused) async {
@@ -1676,7 +1676,7 @@ void main() {
   testWidgets('tvOS synthesized Select opens an explicit Flutter overlay', (tester) async {
     // The custom Flutter tvOS engine emits Siri Remote center-dpad presses
     // as `LogicalKeyboardKey.select` with `deviceType=keyboard` (via the
-    // legacy `flutter/keyevent` path). Fields that explicitly retain Plezy's
+    // legacy `flutter/keyevent` path). Fields that explicitly retain Satra's
     // Flutter overlay must open it rather than submit the form.
     // `isPhysicalKeyboardEnter` matched select+keyboard and routed through
     // `_submitTextInput`, which silently triggered form submit on every

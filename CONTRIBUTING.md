@@ -87,14 +87,14 @@ diagnostics directory under `build/maestro-profile-regressions/`.
 
 ### Agent controls
 
-Opted-in debug and profile builds expose `ext.plezy.agent` over Flutter's authenticated Dart VM service.
+Opted-in debug and profile builds expose `ext.satra.agent` over Flutter's authenticated Dart VM service.
 Release builds never register it. Use a disposable installation/profile: a worktree does not isolate installed app data.
 Sign in through the ordinary UI; these commands do not expose credentials, bypass profile locks, or perform onboarding.
 
 ```bash
-flutter run -d DEVICE --dart-define=PLEZY_AGENT_CONTROL=true
+flutter run -d DEVICE --dart-define=SATRA_AGENT_CONTROL=true
 # Add --profile when testing a profile build on a supported device.
-export PLEZY_VM_SERVICE_URI='AUTHENTICATED_VM_URI_FROM_FLUTTER'
+export SATRA_VM_SERVICE_URI='AUTHENTICATED_VM_URI_FROM_FLUTTER'
 
 bun scripts/agent.mjs app status
 bun scripts/agent.mjs app status --wait
@@ -114,7 +114,7 @@ bun scripts/agent.mjs playback stop --wait
 ```
 
 `app status` reports readiness and authentication/profile blockers; `--wait` waits for a usable profile session.
-The CLI requires an explicit `--uri` or `PLEZY_VM_SERVICE_URI`. It never selects a device, restarts an app, clears data,
+The CLI requires an explicit `--uri` or `SATRA_VM_SERVICE_URI`. It never selects a device, restarts an app, clears data,
 or changes ADB forwarding. Supply a host-reachable URI, preserving its authentication token, and keep it private.
 Do not expose the VM service publicly. The Maestro runner can build the same opt-in variant with `--agent-control`.
 

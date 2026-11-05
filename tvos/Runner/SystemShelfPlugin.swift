@@ -266,10 +266,10 @@ import TVServices
 
   final class SystemShelfPlugin: NSObject, FlutterPlugin {
     static let schemaVersion = 3
-    static let appGroupIdentifier = "group.com.edde746.plezy"
-    static let cacheDataKey = "PlezySystemShelfCacheData"
-    static let sourcesKey = "PlezySystemShelfSources"
-    static let tokenKeychainService = "com.edde746.plezy.systemshelf.tokens"
+    static let appGroupIdentifier = "group.com.edde746.satra"
+    static let cacheDataKey = "SatraSystemShelfCacheData"
+    static let sourcesKey = "SatraSystemShelfSources"
+    static let tokenKeychainService = "com.edde746.satra.systemshelf.tokens"
     static let artworkDirectoryName = "SystemShelfArtwork"
     private static let maxItems = 20
     /// English fallback for caches written before the localized title existed.
@@ -279,7 +279,7 @@ import TVServices
     private static let syncTimeout: TimeInterval = 8
     private static let imageTimeout: TimeInterval = 2.5
     private static let staleArtworkGracePeriod: TimeInterval = 60
-    private static let mutationQueue = DispatchQueue(label: "com.plezy.system-shelf", qos: .utility)
+    private static let mutationQueue = DispatchQueue(label: "com.satra.system-shelf", qos: .utility)
     private static var mutationState = SystemShelfMutationState()
     private let engineEpoch: UInt64
 
@@ -289,7 +289,7 @@ import TVServices
     }
 
     static func register(with registrar: FlutterPluginRegistrar) {
-      let channel = FlutterMethodChannel(name: "com.plezy/system_shelf", binaryMessenger: registrar.messenger())
+      let channel = FlutterMethodChannel(name: "com.satra/system_shelf", binaryMessenger: registrar.messenger())
       let engineEpoch = mutationQueue.sync {
         mutationState.beginEngineSession()
       }

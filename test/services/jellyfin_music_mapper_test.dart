@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/jellyfin_client.dart';
-import 'package:plezy/services/jellyfin_mappers.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/jellyfin_client.dart';
+import 'package:satra/services/jellyfin_mappers.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 

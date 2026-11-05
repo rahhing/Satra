@@ -9,7 +9,7 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 # Overridable for scripts/test_run_tests.py fixtures.
-: "${PLEZY_CGROUP_ROOT:=/sys/fs/cgroup}"
+: "${SATRA_CGROUP_ROOT:=/sys/fs/cgroup}"
 
 # Use the smallest available limit: cgroup quota, legacy quota, or affinity.
 online_cpus() {
@@ -42,17 +42,17 @@ detect_cpus() {
     *) limits+=("$value") ;;
   esac
 
-  if [ -r "$PLEZY_CGROUP_ROOT/cpu.max" ]; then
-    read -r quota period <"$PLEZY_CGROUP_ROOT/cpu.max" || true
+  if [ -r "$SATRA_CGROUP_ROOT/cpu.max" ]; then
+    read -r quota period <"$SATRA_CGROUP_ROOT/cpu.max" || true
     if value="$(quota_cpus "${quota:-}" "${period:-}")"; then
       limits+=("$value")
     fi
   fi
 
-  if [ -r "$PLEZY_CGROUP_ROOT/cpu/cpu.cfs_quota_us" ] &&
-    [ -r "$PLEZY_CGROUP_ROOT/cpu/cpu.cfs_period_us" ]; then
-    read -r quota <"$PLEZY_CGROUP_ROOT/cpu/cpu.cfs_quota_us" || true
-    read -r period <"$PLEZY_CGROUP_ROOT/cpu/cpu.cfs_period_us" || true
+  if [ -r "$SATRA_CGROUP_ROOT/cpu/cpu.cfs_quota_us" ] &&
+    [ -r "$SATRA_CGROUP_ROOT/cpu/cpu.cfs_period_us" ]; then
+    read -r quota <"$SATRA_CGROUP_ROOT/cpu/cpu.cfs_quota_us" || true
+    read -r period <"$SATRA_CGROUP_ROOT/cpu/cpu.cfs_period_us" || true
     if value="$(quota_cpus "${quota:-}" "${period:-}")"; then
       limits+=("$value")
     fi

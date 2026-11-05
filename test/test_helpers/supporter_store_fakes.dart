@@ -6,7 +6,7 @@ import 'package:in_app_purchase_android/in_app_purchase_android.dart';
 import 'package:in_app_purchase_platform_interface/in_app_purchase_platform_interface.dart';
 import 'package:in_app_purchase_storekit/in_app_purchase_storekit.dart';
 import 'package:in_app_purchase_storekit/store_kit_2_wrappers.dart';
-import 'package:plezy/services/supporter/supporter_store.dart';
+import 'package:satra/services/supporter/supporter_store.dart';
 
 /// An in-memory store behind in_app_purchase's platform interface. Counts
 /// every billing call so a suite can prove a build never touched billing.
@@ -124,7 +124,7 @@ GooglePlayPurchaseDetails playPurchase({
 }) => GooglePlayPurchaseDetails.fromPurchase(
   PurchaseWrapper(
     orderId: 'GPA.0000-$productId',
-    packageName: 'com.edde746.plezy',
+    packageName: 'com.edde746.satra',
     purchaseTime: 0,
     purchaseToken: 'token-$productId',
     signature: 'signature',

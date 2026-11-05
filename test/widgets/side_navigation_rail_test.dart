@@ -1,28 +1,29 @@
 import 'dart:async';
 import 'dart:ui' show PointerDeviceKind;
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:satra/widgets/glass_surface.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_library.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/server_capabilities.dart';
-import 'package:plezy/navigation/navigation_tabs.dart';
-import 'package:plezy/providers/catalog_sources_provider.dart';
-import 'package:plezy/providers/hidden_libraries_provider.dart';
-import 'package:plezy/providers/libraries_provider.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/widgets/app_icon.dart';
-import 'package:plezy/widgets/side_navigation_rail.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_library.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/server_capabilities.dart';
+import 'package:satra/navigation/navigation_tabs.dart';
+import 'package:satra/providers/catalog_sources_provider.dart';
+import 'package:satra/providers/hidden_libraries_provider.dart';
+import 'package:satra/providers/libraries_provider.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/app_icon.dart';
+import 'package:satra/widgets/side_navigation_rail.dart';
 import 'package:provider/provider.dart';
 
 import '../test_helpers/multi_server_fixtures.dart';
@@ -88,13 +89,8 @@ BoxDecoration? _railItemDecoration(WidgetTester tester, Finder item) {
       as BoxDecoration?;
 }
 
-AnimatedOpacity _railSurfaceOpacity(WidgetTester tester) {
-  return tester
-      .widgetList<AnimatedOpacity>(
-        find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedOpacity)),
-      )
-      .singleWhere((widget) => widget.child is AnimatedContainer);
-}
+TweenAnimationBuilder<double> _railSurfaceTween(WidgetTester tester) =>
+    tester.widget<TweenAnimationBuilder<double>>(find.byKey(const ValueKey('sidebar_glass')));
 
 /// The Libraries header's expand/collapse chevron, matched by the symbol that
 /// only the given state renders.
@@ -231,7 +227,7 @@ void main() {
     final indicatorColor = (selectedItemContainer.decoration as BoxDecoration?)?.color;
     expect(indicatorColor?.a ?? 0.0, 0.0);
 
-    expect(_railSurfaceOpacity(tester).opacity, 0.0);
+    expect(_railSurfaceTween(tester).tween.end, 0.0);
   });
 
   testWidgets('closed non-TV rail keeps an opaque surface', (tester) async {
@@ -239,7 +235,7 @@ void main() {
 
     final rail = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedContainer)).first;
     expect(tester.getSize(rail).width, SideNavigationRailState.collapsedWidth);
-    expect(_railSurfaceOpacity(tester).opacity, 1.0);
+    expect(_railSurfaceTween(tester).tween.end, 1.0);
   });
 
   testWidgets('closed desktop rail shows icon-only rounded destinations', (tester) async {
@@ -318,7 +314,7 @@ void main() {
     final rail = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedContainer)).first;
     expect(tester.getSize(rail).width, SideNavigationRailState.expandedWidth);
 
-    expect(_railSurfaceOpacity(tester).opacity, 0.0);
+    expect(_railSurfaceTween(tester).tween.end, 0.0);
   });
 
   testWidgets('expanded rail keeps selected background outside sidebar keyboard focus', (tester) async {
@@ -663,14 +659,11 @@ void main() {
     await tester.pumpAndSettle();
 
     // Floating overlays read as an M3E modal panel: extra-rounded trailing
-    // corners and an edge shadow, and the shell is told to scrim content.
-    final surface = _railSurfaceOpacity(tester).child! as AnimatedContainer;
-    final surfaceDecoration = surface.decoration! as BoxDecoration;
-    expect(
-      surfaceDecoration.borderRadius,
-      const BorderRadius.horizontal(right: Radius.circular(SideNavigationRailState.overlayCornerRadius)),
-    );
-    expect(surfaceDecoration.boxShadow, isNotEmpty);
+    // corners; the shell is told to scrim content without painting a shadow
+    // outside the frosted pane.
+    final glass = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(GlassSurface));
+    expect(tester.widget<GlassSurface>(glass).enabled, isTrue);
+    expect(find.ancestor(of: glass, matching: find.byType(AnimatedOpacity)), findsNothing);
     expect(scrimReports.last, isTrue);
 
     expect(tester.getSize(rail).width, SideNavigationRailState.expandedWidth);
@@ -729,7 +722,7 @@ void main() {
 
     final rail = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedContainer)).first;
     expect(tester.getSize(rail).width, SideNavigationRailState.tvCollapsedWidth);
-    expect(_railSurfaceOpacity(tester).opacity, 0.0);
+    expect(_railSurfaceTween(tester).tween.end, 0.0);
 
     final gesture = await tester.createGesture(kind: PointerDeviceKind.mouse);
     addTearDown(gesture.removePointer);
@@ -739,7 +732,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.getSize(rail).width, SideNavigationRailState.expandedWidth);
-    expect(_railSurfaceOpacity(tester).opacity, 1.0);
+    expect(_railSurfaceTween(tester).tween.end, 1.0);
 
     await gesture.moveTo(tester.getBottomRight(rail) + const Offset(100, -10));
     // The rail deliberately waits 150ms before collapsing. Do not rely on an
@@ -748,7 +741,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(tester.getSize(rail).width, SideNavigationRailState.tvCollapsedWidth);
-    expect(_railSurfaceOpacity(tester).opacity, 0.0);
+    expect(_railSurfaceTween(tester).tween.end, 0.0);
   });
 
   /// The surface fade must not outrun the width morph: a shorter fade would
@@ -766,9 +759,17 @@ void main() {
     await gesture.addPointer(location: const Offset(799, 599));
     await tester.pump();
     await gesture.moveTo(tester.getCenter(rail));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 80));
+    final glassFinder = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(GlassSurface));
+    final glass = tester.widget<GlassSurface>(glassFinder);
+    expect(glass.enabled, isTrue);
+    expect(glass.sigma, inExclusiveRange(0, 28));
+    expect(tester.getTopLeft(glassFinder).dy, greaterThanOrEqualTo(68));
+    expect(find.ancestor(of: glassFinder, matching: find.byType(AnimatedOpacity)), findsNothing);
     await tester.pumpAndSettle();
 
-    final surface = _railSurfaceOpacity(tester);
+    final surface = _railSurfaceTween(tester);
     expect(surface.duration, SideNavigationRailState.expandDuration);
     expect(surface.curve, SideNavigationRailState.expandCurve);
   });
@@ -781,7 +782,7 @@ void main() {
 
     final rail = find.descendant(of: find.byType(SideNavigationRail), matching: find.byType(AnimatedContainer)).first;
     expect(tester.getSize(rail).width, SideNavigationRailState.expandedWidth);
-    expect(_railSurfaceOpacity(tester).opacity, 0.0);
+    expect(_railSurfaceTween(tester).tween.end, 0.0);
   });
 
   testWidgets('TV rail pushes top navigation item below the overlaid top bar', (tester) async {

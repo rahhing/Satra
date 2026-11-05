@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart' as material;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/providers/theme_provider.dart';
-import 'package:plezy/screens/settings/settings_utils.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/settings_service.dart' as settings;
-import 'package:plezy/services/supporter/supporter_mode.dart';
-import 'package:plezy/services/supporter/supporter_service.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/providers/theme_provider.dart';
+import 'package:satra/screens/settings/settings_utils.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/settings_service.dart' as settings;
+import 'package:satra/services/supporter/supporter_mode.dart';
+import 'package:satra/services/supporter/supporter_service.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 import '../test_helpers/prefs.dart';
 import '../test_helpers/supporter_store_fakes.dart';
@@ -184,7 +184,7 @@ void main() {
     });
 
     test('every theme choice launches on a native splash mode Android knows', () {
-      // PlezyActivity / ThemeHelper only map these four; anything else would
+      // SatraActivity / ThemeHelper only map these four; anything else would
       // leave the launch window on the platform default.
       const known = {'system', 'light', 'dark', 'oled'};
       for (final mode in settings.ThemeMode.values) {

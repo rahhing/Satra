@@ -5,10 +5,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider_linux/path_provider_linux.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/prefs_recovery.dart';
-import 'package:plezy/services/sensitive_prefs.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/prefs_recovery.dart';
+import 'package:satra/services/sensitive_prefs.dart';
+import 'package:satra/services/settings_service.dart';
 import 'package:shared_preferences_linux/shared_preferences_linux.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_platform_interface.dart';
@@ -39,7 +39,7 @@ void main() {
   final validVaultKey = base64Encode(List<int>.generate(32, (i) => i));
 
   setUp(() async {
-    root = await Directory.systemTemp.createTemp('plezy_prefs_repair_flow_');
+    root = await Directory.systemTemp.createTemp('satra_prefs_repair_flow_');
     support = Directory(p.join(root.path, 'support'))..createSync(recursive: true);
     store = File(p.join(support.path, prefsStoreFileName));
 

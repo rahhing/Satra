@@ -7,9 +7,9 @@
 // `includeGuids=1` demonstrably does add `Guid[]`. That asymmetry is why the
 // dashboard shows fewer scores than the detail screen, and this suite pins it.
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/services/plex_mappers.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/services/plex_mappers.dart';
 
 const _serverId = 'plex-machine-1';
 

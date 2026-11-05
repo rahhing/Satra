@@ -6,19 +6,19 @@ import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/io_client.dart';
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/database/download_collection_operations.dart';
-import 'package:plezy/database/download_operations.dart';
-import 'package:plezy/database/tvos_database_recovery_store.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/models/download_models.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/credential_vault.dart';
-import 'package:plezy/services/download_manager_service.dart';
-import 'package:plezy/services/download_storage_service.dart';
-import 'package:plezy/services/plex_api_cache.dart';
-import 'package:plezy/utils/active_client_scope.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/database/download_collection_operations.dart';
+import 'package:satra/database/download_operations.dart';
+import 'package:satra/database/tvos_database_recovery_store.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/models/download_models.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/credential_vault.dart';
+import 'package:satra/services/download_manager_service.dart';
+import 'package:satra/services/download_storage_service.dart';
+import 'package:satra/services/plex_api_cache.dart';
+import 'package:satra/utils/active_client_scope.dart';
+import 'package:satra/utils/media_server_http_client.dart';
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import '../test_helpers/download_fixtures.dart';
@@ -134,8 +134,8 @@ class _AppDatabaseTestSuite {
       test('desktop open removes orphaned sidecars when the main database is absent', () async {
         await db.close();
         resetSharedPreferencesForTest();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_orphaned_sidecars_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_orphaned_sidecars_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         final wal = File('${file.path}-wal');
         final shm = File('${file.path}-shm');
         AppDatabase? opened;
@@ -167,8 +167,8 @@ class _AppDatabaseTestSuite {
       test('desktop open preserves sidecars when the main database exists', () async {
         await db.close();
         resetSharedPreferencesForTest();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_live_sidecars_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_live_sidecars_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         final wal = File('${file.path}-wal');
         final shm = File('${file.path}-shm');
         AppDatabase? opened;
@@ -200,8 +200,8 @@ class _AppDatabaseTestSuite {
 
       test('retried v14 migration tolerates an existing connections table', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_existing_connections_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_existing_connections_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -232,8 +232,8 @@ class _AppDatabaseTestSuite {
 
       test('retried v14 migration tolerates existing indices', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -259,8 +259,8 @@ class _AppDatabaseTestSuite {
       });
       test('v17 migration scopes pinned Plex metadata for every owner and removes bare rows', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v17_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v17_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
         AppDatabase? reopenedAgain;
@@ -335,8 +335,8 @@ class _AppDatabaseTestSuite {
         'schema-v13 ownerless Plex download upgrades through sanitized transfer scope and stays adoptable on retry',
         () async {
           await db.close();
-          final tempDir = await Directory.systemTemp.createTemp('plezy_db_v13_plex_transfer_test_');
-          final file = File('${tempDir.path}/plezy_downloads.db');
+          final tempDir = await Directory.systemTemp.createTemp('satra_db_v13_plex_transfer_test_');
+          final file = File('${tempDir.path}/satra_downloads.db');
           AppDatabase? seeded;
           AppDatabase? reopened;
           AppDatabase? reopenedAgain;
@@ -540,8 +540,8 @@ class _AppDatabaseTestSuite {
         await db.close();
         resetSharedPreferencesForTest();
         CredentialVault.resetKeyForTesting();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_credential_recovery_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_credential_recovery_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         final prefs = await BaseSharedPreferencesService.sharedCache();
         AppDatabase? seeded;
         AppDatabase? opened;
@@ -636,8 +636,8 @@ class _AppDatabaseTestSuite {
       });
       test('v18 migration preserves v17 downloads and adds nullable SAF roots', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v18_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v18_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -708,8 +708,8 @@ class _AppDatabaseTestSuite {
 
       test('v19 migration derives cache scope independently for every download owner', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v19_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v19_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -880,8 +880,8 @@ class _AppDatabaseTestSuite {
       });
       test('v20 migration creates sync download associations without claiming legacy rules', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v20_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v20_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -929,8 +929,8 @@ class _AppDatabaseTestSuite {
       });
       test('v21 migration drops connections.is_default without touching api_cache.cached_at', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v21_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v21_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -991,8 +991,8 @@ class _AppDatabaseTestSuite {
       });
       test('v22 migration adds the music_sessions table', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v22_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v22_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -1034,8 +1034,8 @@ class _AppDatabaseTestSuite {
       });
       test('v23 migration adds library identity columns and leaves existing rows unstamped', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v23_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v23_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -1088,8 +1088,8 @@ class _AppDatabaseTestSuite {
       });
       test('v24 migration adds stacked file paths and leaves existing rows single-file', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v24_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v24_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -1141,8 +1141,8 @@ class _AppDatabaseTestSuite {
       });
       test('v25 migration adds profile-scoped download collection membership', () async {
         await db.close();
-        final tempDir = await Directory.systemTemp.createTemp('plezy_db_v25_migration_test_');
-        final file = File('${tempDir.path}/plezy_downloads.db');
+        final tempDir = await Directory.systemTemp.createTemp('satra_db_v25_migration_test_');
+        final file = File('${tempDir.path}/satra_downloads.db');
         AppDatabase? seeded;
         AppDatabase? reopened;
 
@@ -1205,7 +1205,7 @@ class _AppDatabaseTestSuite {
       late Directory tempDir;
 
       setUp(() async {
-        tempDir = await Directory.systemTemp.createTemp('plezy_legacy_migration_test_');
+        tempDir = await Directory.systemTemp.createTemp('satra_legacy_migration_test_');
       });
 
       tearDown(() async {
@@ -1215,8 +1215,8 @@ class _AppDatabaseTestSuite {
       });
 
       test('no-op when source does not exist', () async {
-        final source = File('${tempDir.path}/Documents/plezy_downloads.db');
-        final target = File('${tempDir.path}/AppData/plezy_downloads.db');
+        final source = File('${tempDir.path}/Documents/satra_downloads.db');
+        final target = File('${tempDir.path}/AppData/satra_downloads.db');
         await target.parent.create(recursive: true);
 
         await migrateLegacyDesktopDatabase(sourceOverride: source, target: target);
@@ -1226,8 +1226,8 @@ class _AppDatabaseTestSuite {
       });
 
       test('rename happy path moves the file and preserves content', () async {
-        final source = File('${tempDir.path}/Documents/plezy_downloads.db');
-        final target = File('${tempDir.path}/AppData/plezy_downloads.db');
+        final source = File('${tempDir.path}/Documents/satra_downloads.db');
+        final target = File('${tempDir.path}/AppData/satra_downloads.db');
         await source.parent.create(recursive: true);
         await target.parent.create(recursive: true);
         await source.writeAsBytes([1, 2, 3, 4, 5]);
@@ -1243,8 +1243,8 @@ class _AppDatabaseTestSuite {
         // Simulate Windows ERROR_NOT_SAME_DEVICE by throwing the same
         // exception shape `File.rename` would emit when source and target
         // live on different volumes.
-        final source = File('${tempDir.path}/Documents/plezy_downloads.db');
-        final target = File('${tempDir.path}/AppData/plezy_downloads.db');
+        final source = File('${tempDir.path}/Documents/satra_downloads.db');
+        final target = File('${tempDir.path}/AppData/satra_downloads.db');
         await source.parent.create(recursive: true);
         await target.parent.create(recursive: true);
         await source.writeAsBytes([9, 8, 7]);
@@ -1265,8 +1265,8 @@ class _AppDatabaseTestSuite {
       });
 
       test('interrupted fallback copy leaves no canonical partial file and retry succeeds', () async {
-        final source = File('${tempDir.path}/Documents/plezy_downloads.db');
-        final target = File('${tempDir.path}/AppData/plezy_downloads.db');
+        final source = File('${tempDir.path}/Documents/satra_downloads.db');
+        final target = File('${tempDir.path}/AppData/satra_downloads.db');
         const sourceBytes = [0xAA, 0xBB, 0xCC, 0xDD];
         await source.parent.create(recursive: true);
         await target.parent.create(recursive: true);
@@ -1312,7 +1312,7 @@ class _AppDatabaseTestSuite {
       test('overlapping fallback publisher cannot replace canonical updates with its stale copy', () async {
         final staleSource = File('${tempDir.path}/Documents/stale.db');
         final winnerSource = File('${tempDir.path}/Documents/winner.db');
-        final target = File('${tempDir.path}/AppData/plezy_downloads.db');
+        final target = File('${tempDir.path}/AppData/satra_downloads.db');
         const staleBytes = [0x10, 0x20, 0x30];
         const winnerBytes = [0x40, 0x50, 0x60];
         const updatedCanonicalBytes = [0x70, 0x80, 0x90];
@@ -1376,7 +1376,7 @@ class _AppDatabaseTestSuite {
 
       test('documents directory lookup failure is a silent no-op', () async {
         final previousPathProvider = PathProviderPlatform.instance;
-        final target = File('${tempDir.path}/AppData/plezy_downloads.db');
+        final target = File('${tempDir.path}/AppData/satra_downloads.db');
         PathProviderPlatform.instance = _ThrowingDocumentsPathProvider();
 
         try {

@@ -109,6 +109,7 @@ mixin TabNavigationMixin<T extends StatefulWidget> on State<T>, TickerProviderSt
   Widget buildTabChip(
     String label,
     int index, {
+    int indicatorGroup = 0,
     required VoidCallback onSelectWhenActive,
     required VoidCallback onNavigateDown,
     VoidCallback? onNavigateToActions,
@@ -116,6 +117,7 @@ mixin TabNavigationMixin<T extends StatefulWidget> on State<T>, TickerProviderSt
   }) {
     final isSelected = tabController.index == index;
     return FocusableTabChip(
+      indicatorGroup: indicatorGroup,
       label: label,
       isSelected: isSelected,
       focusNode: getTabChipFocusNode(index),

@@ -1,4 +1,4 @@
-appId: com.edde746.plezy
+appId: com.edde746.satra
 ---
 - tapOn: "M"
 - tapOn:
@@ -8,7 +8,7 @@ appId: com.edde746.plezy
 - extendedWaitUntil:
     visible: "Switch Profile"
     timeout: 10000
-- tapOn: "Add Plezy profile"
+- tapOn: "Add Satra profile"
 - extendedWaitUntil:
     visible: "New profile"
     timeout: 10000

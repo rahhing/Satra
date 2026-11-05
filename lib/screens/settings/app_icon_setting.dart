@@ -249,7 +249,7 @@ class _AppIconPreview extends StatelessWidget {
 ///   scripts/codegen/generate_app_icons.py renders from the shipping image
 ///   stack and banner.
 /// * Phones: the white Satra mark on its black launcher plate in both system
-///   appearances (Android adaptive resources and ios/plezy.icon).
+///   appearances (Android adaptive resources and ios/satra.icon).
 class _DefaultIconPreview extends StatelessWidget {
   const _DefaultIconPreview();
 
@@ -263,7 +263,7 @@ class _DefaultIconPreview extends StatelessWidget {
     if (tvPreview != null) return Image.asset(tvPreview, fit: BoxFit.cover, filterQuality: FilterQuality.medium);
     return ColoredBox(
       color: Colors.black,
-      child: SvgPicture.asset('assets/plezy_adaptive_foreground.svg', fit: BoxFit.contain),
+      child: SvgPicture.asset('assets/satra_adaptive_foreground.svg', fit: BoxFit.contain),
     );
   }
 }

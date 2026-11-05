@@ -4,17 +4,17 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/i18n/app_locale_utils.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/models/seerr/seerr_media.dart';
-import 'package:plezy/models/seerr/seerr_page.dart';
-import 'package:plezy/models/seerr/seerr_request.dart';
-import 'package:plezy/models/seerr/seerr_session.dart';
-import 'package:plezy/services/seerr/seerr_auth_service.dart';
-import 'package:plezy/services/seerr/seerr_client.dart';
-import 'package:plezy/services/seerr/seerr_constants.dart';
-import 'package:plezy/services/seerr/seerr_exceptions.dart';
-import 'package:plezy/services/seerr/seerr_http_client.dart';
+import 'package:satra/i18n/app_locale_utils.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/models/seerr/seerr_media.dart';
+import 'package:satra/models/seerr/seerr_page.dart';
+import 'package:satra/models/seerr/seerr_request.dart';
+import 'package:satra/models/seerr/seerr_session.dart';
+import 'package:satra/services/seerr/seerr_auth_service.dart';
+import 'package:satra/services/seerr/seerr_client.dart';
+import 'package:satra/services/seerr/seerr_constants.dart';
+import 'package:satra/services/seerr/seerr_exceptions.dart';
+import 'package:satra/services/seerr/seerr_http_client.dart';
 
 SeerrSession _session({
   SeerrAuthMethod method = SeerrAuthMethod.jellyfin,
@@ -1169,7 +1169,7 @@ void main() {
       expect(page.totalResults, 37);
     });
 
-    test('adds the current Plezy locale to the catalog GETs Seerr localizes', () async {
+    test('adds the current Satra locale to the catalog GETs Seerr localizes', () async {
       final urls = <Uri>[];
       final client = clientWith(
         MockClient((request) async {

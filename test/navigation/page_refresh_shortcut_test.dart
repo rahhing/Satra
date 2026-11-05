@@ -2,9 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/mixins/refreshable.dart';
-import 'package:plezy/navigation/page_refresh_shortcut.dart';
-import 'package:plezy/utils/platform_detector.dart';
+import 'package:satra/mixins/refreshable.dart';
+import 'package:satra/navigation/page_refresh_shortcut.dart';
+import 'package:satra/utils/platform_detector.dart';
 
 class _ManualRefreshTarget with ManualRefreshable {
   int refreshes = 0;

@@ -45,9 +45,9 @@ NOT A VALID LINE
 
     def test_expands_references_to_earlier_keys(self) -> None:
         # The real .env relies on this: SUPPLY_PACKAGE_NAME=${DELIVER_APP_IDENTIFIER}
-        text = "DELIVER_APP_IDENTIFIER=com.edde746.plezy\nSUPPLY_PACKAGE_NAME=${DELIVER_APP_IDENTIFIER}\n"
+        text = "DELIVER_APP_IDENTIFIER=com.edde746.satra\nSUPPLY_PACKAGE_NAME=${DELIVER_APP_IDENTIFIER}\n"
         values = parse_env_text(text)
-        self.assertEqual(values["SUPPLY_PACKAGE_NAME"], "com.edde746.plezy")
+        self.assertEqual(values["SUPPLY_PACKAGE_NAME"], "com.edde746.satra")
 
     def test_expands_from_base_environment(self) -> None:
         values = parse_env_text("A=${HOME_LIKE}/sub\n", {"HOME_LIKE": "/base"})
@@ -67,7 +67,7 @@ class LoadEnvFileTest(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / ".env").write_text(
-                "DELIVER_APP_IDENTIFIER=com.edde746.plezy\n"
+                "DELIVER_APP_IDENTIFIER=com.edde746.satra\n"
                 "SUPPLY_PACKAGE_NAME=${DELIVER_APP_IDENTIFIER}\n"
                 "APPLE_TEAM_ID=G88U5B5783\n",
                 encoding="utf-8",
@@ -83,8 +83,8 @@ class LoadEnvFileTest(unittest.TestCase):
             ):
                 loaded = deploy.load_env_file()
 
-        self.assertEqual(loaded["DELIVER_APP_IDENTIFIER"], "com.edde746.plezy")
-        self.assertEqual(loaded["SUPPLY_PACKAGE_NAME"], "com.edde746.plezy")
+        self.assertEqual(loaded["DELIVER_APP_IDENTIFIER"], "com.edde746.satra")
+        self.assertEqual(loaded["SUPPLY_PACKAGE_NAME"], "com.edde746.satra")
         self.assertEqual(loaded["APPLE_TEAM_ID"], "G88U5B5783")
 
 
@@ -129,7 +129,7 @@ class AppleUploadTest(unittest.TestCase):
             deploy_dir = Path(tmp) / "deploy"
             archive = Path(tmp) / "Runner.xcarchive"
             archive.mkdir()
-            ipa = deploy_dir / "export-tvos/Plezy.ipa"
+            ipa = deploy_dir / "export-tvos/Satra.ipa"
             with (
                 mock.patch.object(deploy, "DEPLOY_DIR", deploy_dir),
                 mock.patch.object(deploy, "run") as run_command,
@@ -148,7 +148,7 @@ class AppleUploadTest(unittest.TestCase):
 
     def test_upload_uses_altool_with_api_key(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
-            ipa = Path(tmp) / "Plezy.ipa"
+            ipa = Path(tmp) / "Satra.ipa"
             ipa.write_bytes(b"ipa")
             with mock.patch.object(deploy, "run") as run_command:
                 deploy._upload_ipa(self._context(), ipa, "tvos")
@@ -194,7 +194,7 @@ class AppleUploadTest(unittest.TestCase):
 
 class BumpPubspecTextTest(unittest.TestCase):
     PUBSPEC = """\
-name: plezy
+name: satra
 description: A media client.
 version: 2.12.1+230
 environment:
@@ -213,7 +213,7 @@ dependencies:
 
     def test_rejects_pubspec_without_version(self) -> None:
         with self.assertRaises(ValueError):
-            bump_pubspec_text("name: plezy\n", "2.13.0", 231)
+            bump_pubspec_text("name: satra\n", "2.13.0", 231)
 
 
 
@@ -413,13 +413,13 @@ class GitHubReleaseTest(unittest.TestCase):
 
     def test_rejects_incomplete_draft_before_editing(self) -> None:
         assets = set(deploy.RELEASE_ASSET_NAMES)
-        assets.remove("plezy-macos.dmg")
+        assets.remove("satra-macos.dmg")
         with mock.patch.object(
             deploy,
             "run",
             return_value=self._release_info(assets),
         ) as run_command:
-            with self.assertRaisesRegex(DeployError, "plezy-macos.dmg"):
+            with self.assertRaisesRegex(DeployError, "satra-macos.dmg"):
                 deploy.phase_release(self._context())
 
         run_command.assert_called_once()

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/utils/rating_utils.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/utils/rating_utils.dart';
 
 void main() {
   setUpAll(() => LocaleSettings.setLocaleRaw('en'));

@@ -10,16 +10,16 @@ import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:plezy/focus/focusable_action_bar.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/screens/settings/logs_screen.dart';
-import 'package:plezy/services/log_upload_service.dart';
-import 'package:plezy/services/startup_diagnostics.dart';
-import 'package:plezy/utils/app_logger.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/widgets/app_bar_back_button.dart';
+import 'package:satra/focus/focusable_action_bar.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/screens/settings/logs_screen.dart';
+import 'package:satra/services/log_upload_service.dart';
+import 'package:satra/services/startup_diagnostics.dart';
+import 'package:satra/utils/app_logger.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/app_bar_back_button.dart';
 
 void main() {
   setUpAll(() {
@@ -34,7 +34,7 @@ void main() {
     MemoryLogOutput.clearLogs();
   });
   test('log upload payload preserves the header and newest complete lines', () {
-    const header = 'Plezy test device\n---\n';
+    const header = 'Satra test device\n---\n';
     const logs = 'oldest line that should be removed\nmiddle line that should be removed\nnewest 🚀 line';
 
     final payload = constrainLogUploadPayload(header: header, logs: logs, maxBytes: 52);
@@ -59,8 +59,8 @@ void main() {
     String? clipboardText;
 
     PackageInfo.setMockInitialValues(
-      appName: 'Plezy',
-      packageName: 'com.plezy.test',
+      appName: 'Satra',
+      packageName: 'com.satra.test',
       version: '1.2.3',
       buildNumber: '45',
       buildSignature: '',
@@ -171,8 +171,8 @@ void main() {
 
     Future<void> pumpLogs(WidgetTester tester) async {
       PackageInfo.setMockInitialValues(
-        appName: 'Plezy',
-        packageName: 'com.plezy.test',
+        appName: 'Satra',
+        packageName: 'com.satra.test',
         version: '2.11.0',
         buildNumber: '124',
         buildSignature: '',
@@ -237,8 +237,8 @@ void main() {
 
     setUp(() {
       PackageInfo.setMockInitialValues(
-        appName: 'Plezy',
-        packageName: 'com.plezy.test',
+        appName: 'Satra',
+        packageName: 'com.satra.test',
         version: '1.2.3',
         buildNumber: '45',
         buildSignature: '',
@@ -501,8 +501,8 @@ void main() {
       await TvDetectionService.getInstance(forceTv: true);
       TvDetectionService.setForceTVSync(true);
       PackageInfo.setMockInitialValues(
-        appName: 'Plezy',
-        packageName: 'com.plezy.test',
+        appName: 'Satra',
+        packageName: 'com.satra.test',
         version: '1.2.3',
         buildNumber: '45',
         buildSignature: '',

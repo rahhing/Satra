@@ -47,7 +47,7 @@ TOOLS = {"deb": "dpkg-deb", "rpm": "rpm", "pacman": "bsdtar"}
 # the arguments, so it cannot accidentally pass by echoing its input.
 STUB = """import json, os, sys
 
-answers = json.loads(open(os.environ["PLEZY_TEST_ANSWERS"], encoding="utf-8").read())
+answers = json.loads(open(os.environ["SATRA_TEST_ANSWERS"], encoding="utf-8").read())
 answer = answers.get({name!r})
 if answer is None:
     sys.stderr.write({name!r} + ": cannot read this archive\\n")
@@ -109,7 +109,7 @@ class PackageDepsReadBackTest(unittest.TestCase):
         path: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
         """Stage packages plus tool stubs and run the real guard over them."""
-        with tempfile.TemporaryDirectory(prefix="plezy-package-deps-test-") as directory:
+        with tempfile.TemporaryDirectory(prefix="satra-package-deps-test-") as directory:
             staging = Path(directory)
             packages = staging / "packages"
             packages.mkdir()
@@ -136,7 +136,7 @@ class PackageDepsReadBackTest(unittest.TestCase):
                     # answers from the fixture. `path=""` leaves only the stubs,
                     # which is how a tool is made genuinely absent.
                     "PATH": str(tools) + os.pathsep + (os.environ.get("PATH", "") if path is None else path),
-                    "PLEZY_TEST_ANSWERS": str(answers),
+                    "SATRA_TEST_ANSWERS": str(answers),
                 },
             )
 

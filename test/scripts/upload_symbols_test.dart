@@ -180,7 +180,7 @@ void main() {
   Future<SymbolPlan> plan([String platform = 'android-aab']) => createSymbolPlan(
     platform,
     repository.path,
-    {'SENTRY_RELEASE': 'plezy@fixture', 'SENTRY_DIST': 'play-store'},
+    {'SENTRY_RELEASE': 'satra@fixture', 'SENTRY_DIST': 'play-store'},
     cli,
     warnings: warnings,
     download: download,
@@ -197,14 +197,14 @@ void main() {
   // engine's PDB in the ephemeral directory.
   void windows() {
     const bundle = 'build/windows/x64/runner/Release';
-    put('$bundle/plezy.exe', elf(10, machine: 62), info: 'symtab, unwind');
+    put('$bundle/satra.exe', elf(10, machine: 62), info: 'symtab, unwind');
     put('$bundle/window_manager_plugin.dll', elf(11, machine: 62), info: 'symtab, unwind');
     put('$bundle/flutter_windows.dll', elf(12, machine: 62), info: 'symtab, unwind');
     put('$bundle/screen_retriever_windows_plugin.dll', elf(13, machine: 62), info: 'symtab, unwind');
     put('$bundle/libmpv-2.dll', elf(14, machine: 62), info: 'symtab, unwind');
     put('$bundle/data/app.so', elf(1, machine: 62));
     put('debug-info/windows-x64/app.windows-x64.symbols', elf(1, machine: 62));
-    put('build/windows/x64/link-artifacts/Release/plezy.pdb', elf(10, machine: 62), info: 'debug, symtab');
+    put('build/windows/x64/link-artifacts/Release/satra.pdb', elf(10, machine: 62), info: 'debug, symtab');
     put(
       'build/windows/x64/plugins/window_manager/Release/window_manager_plugin.pdb',
       elf(11, machine: 62),
@@ -214,7 +214,7 @@ void main() {
   }
 
   setUp(() async {
-    repository = await Directory.systemTemp.createTemp('plezy_upload_symbols_');
+    repository = await Directory.systemTemp.createTemp('satra_upload_symbols_');
     features = {};
     operations = [];
     uploadedMaps = [];
@@ -358,7 +358,7 @@ void main() {
 
     final libmpv = sized('libmpv-2.pdb', 369782784, 1);
     final engine = sized('flutter_windows.dll.pdb', 264859648, 2);
-    final runner = sized('plezy.pdb', 4 * 1024 * 1024, 3);
+    final runner = sized('satra.pdb', 4 * 1024 * 1024, 3);
     expect(withinUploadCapacity([runner, libmpv, engine], warnings: warnings), [runner, libmpv, engine]);
     expect(warnings.toString(), isEmpty);
     expect(batchSymbolArtifacts([runner, libmpv, engine]), [
@@ -404,7 +404,7 @@ void main() {
     final before = map.readAsBytesSync();
     final dryOutput = StringBuffer();
     final executionOutput = StringBuffer();
-    final common = {'SENTRY_RELEASE': 'plezy@fixture', 'SENTRY_DIST': 'play-store'};
+    final common = {'SENTRY_RELEASE': 'satra@fixture', 'SENTRY_DIST': 'play-store'};
     expect(
       await runUploadSymbols(
         ['android-aab'],
@@ -442,7 +442,7 @@ void main() {
   });
 
   test('non-obfuscated iOS does not invent a map and cannot consume Android map', () async {
-    put('build/ios/iphoneos/Plezy.app/Frameworks/App.framework/App', elf(1));
+    put('build/ios/iphoneos/Satra.app/Frameworks/App.framework/App', elf(1));
     put('build/ios/Release-iphoneos/App.framework.dSYM/Contents/Resources/DWARF/App', elf(1));
     put('debug-info/ios/app.ios-arm64.symbols', elf(1));
     put('debug-info/android-aab/obfuscation.map.json', utf8.encode('["Wrong","a"]'));
@@ -596,7 +596,7 @@ void main() {
     final selected = await plan('windows-x64');
     final pdbs = selected.native.where((a) => a.type == 'pdb').map((a) => a.file.path).toSet();
     expect(pdbs, {
-      path.join(repository.path, 'build/windows/x64/link-artifacts/Release/plezy.pdb'),
+      path.join(repository.path, 'build/windows/x64/link-artifacts/Release/satra.pdb'),
       path.join(repository.path, 'build/windows/x64/plugins/window_manager/Release/window_manager_plugin.pdb'),
       path.join(repository.path, 'windows/flutter/ephemeral/flutter_windows.dll.pdb'),
       libmpv,
@@ -618,7 +618,7 @@ void main() {
         ['windows-x64'],
         repositoryRoot: repository,
         environment: {
-          'SENTRY_RELEASE': 'plezy@fixture',
+          'SENTRY_RELEASE': 'satra@fixture',
           'SENTRY_DIST': 'github-windows-x64',
           'BUGS_UPLOAD_DRY_RUN': '1',
         },
@@ -636,7 +636,7 @@ void main() {
         for (final artifact in (batch as List).cast<Map<String, Object?>>())
           if (artifact['class'] == 'pdb') path.basename(artifact['path']! as String),
     ];
-    expect(planned, unorderedEquals(['plezy.pdb', 'window_manager_plugin.pdb', 'flutter_windows.dll.pdb']));
+    expect(planned, unorderedEquals(['satra.pdb', 'window_manager_plugin.pdb', 'flutter_windows.dll.pdb']));
     expect(warnings.toString(), contains('mpv-build.lock.json has no windows symbols for x86_64'));
   });
 

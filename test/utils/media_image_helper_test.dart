@@ -3,14 +3,14 @@ import 'dart:math' as math;
 import 'package:cached_network_image_ce/cached_network_image.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/services/device_performance.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/media_image_helper.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/utils/tone_mapped_logo_image.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/services/device_performance.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/media_image_helper.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/utils/tone_mapped_logo_image.dart';
 
 import '../test_helpers/media_items.dart';
 
@@ -435,7 +435,7 @@ void main() {
       expect(firstCached.url, secondCached.url);
       expect(firstCached.url, url);
       expect(firstCached.headers, secondCached.headers);
-      expect(firstCached.headers, const {'User-Agent': 'Plezy'});
+      expect(firstCached.headers, const {'User-Agent': 'Satra'});
       expect(firstCached.cacheKey, secondCached.cacheKey);
       expect(firstCached.cacheKey, isNotNull);
       expect(firstCached.maxWidth, secondCached.maxWidth);

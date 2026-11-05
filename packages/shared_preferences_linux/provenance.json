@@ -5,13 +5,13 @@
     "packageVersion": "2.4.1",
     "source": "pub.dev"
   },
-  "plezyDeltas": [
+  "satraDeltas": [
     "atomic store replacement: stage to a sibling .tmp, flush, then rename over the target",
     "stale staging files are swept once the canonical document has been read cleanly",
     "the published example app is not vendored"
   ],
   "refreshContract": [
-    "Diff against the new upstream version and reapply every PLEZY DELTA block in lib/shared_preferences_linux.dart verbatim.",
+    "Diff against the new upstream version and reapply every SATRA DELTA block in lib/shared_preferences_linux.dart verbatim.",
     "Never reintroduce a bare writeAsStringSync onto the live document: it truncates before writing, which is the corruption in issue #1732.",
     "Keep the staging name fixed and single. The file is a plaintext copy of the credential-vault key, tracker refresh tokens and Seerr cookies; stamped names would accumulate them.",
     "Keep the flush before the rename. A rename can otherwise publish contents that were never committed.",

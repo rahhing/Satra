@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:openwatchparty/openwatchparty.dart' as owp;
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/media/title_copies.dart';
-import 'package:plezy/services/data_aggregation_service.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/watch_together/models/watch_copy.dart';
-import 'package:plezy/watch_together/services/library_resolver.dart';
-import 'package:plezy/watch_together/services/media_descriptor.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/media/title_copies.dart';
+import 'package:satra/services/data_aggregation_service.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/watch_together/models/watch_copy.dart';
+import 'package:satra/watch_together/services/library_resolver.dart';
+import 'package:satra/watch_together/services/media_descriptor.dart';
 
 import '../test_helpers/library_lookup.dart';
 import '../test_helpers/media_items.dart';
@@ -79,7 +79,7 @@ owp.Media _movieMedia({Map<String, String> ids = const {}, Map<String, Object?>?
     owp.Media(kind: owp.MediaKind.movie, title: 'Alien', year: 1979, ids: ids, durationMs: 7020000, ext: ext);
 
 Map<String, Object?> _ext(String server, String item, [String? version]) => {
-  plezyExtName: {'server': server, 'item': item, 'version': ?version},
+  satraExtName: {'server': server, 'item': item, 'version': ?version},
 };
 
 List<String> _ids(List<owp.Candidate<WatchCopy>> candidates) => [for (final c in candidates) c.id];
@@ -106,7 +106,7 @@ void main() {
     answer = (_) async => libraryLookupResult(const []);
   });
 
-  group('the app.plezy shortcut', () {
+  group('the app.satra shortcut', () {
     test('the shared item comes first, its shared version leading, and is not listed twice', () async {
       final shared = _movie(
         'm1',

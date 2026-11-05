@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart' show SelectedContent;
-import 'package:plezy/utils/media_server_http_client.dart';
+import 'package:satra/utils/media_server_http_client.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
@@ -144,7 +144,7 @@ class _LogsScreenState extends State<LogsScreen> with MountedSetStateMixin {
       // device" into something answerable from any uploaded log (#1349).
       String renderer;
       try {
-        renderer = await const MethodChannel('com.plezy/theme').invokeMethod<String>('getRenderer') ?? 'unknown';
+        renderer = await const MethodChannel('com.satra/theme').invokeMethod<String>('getRenderer') ?? 'unknown';
       } catch (_) {
         renderer = 'unknown';
       }

@@ -24,8 +24,12 @@ class FluidScrollBehavior extends MaterialScrollBehavior {
   };
 
   @override
-  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) =>
-      _WheelScroll(details: details, child: child);
+  Widget buildOverscrollIndicator(BuildContext context, Widget child, ScrollableDetails details) {
+    // AppKit already supplies continuous trackpad input. Do not put a second
+    // animation (or a custom hit-test wrapper) between it and Scrollable.
+    if (getPlatform(context) == TargetPlatform.macOS) return child;
+    return _WheelScroll(details: details, child: child);
+  }
 }
 
 class _WheelScroll extends StatefulWidget {

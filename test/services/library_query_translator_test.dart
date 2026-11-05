@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/library_query.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/library_query_translator.dart';
-import 'package:plezy/utils/url_utils.dart';
+import 'package:satra/media/library_query.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/library_query_translator.dart';
+import 'package:satra/utils/url_utils.dart';
 
 void main() {
   group('PlexLibraryQueryTranslator', () {

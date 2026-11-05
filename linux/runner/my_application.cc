@@ -64,7 +64,7 @@ static void my_application_activate(GApplication* application) {
   if (executable != nullptr) {
     g_autofree gchar* directory = g_path_get_dirname(executable);
     g_autofree gchar* icon =
-        g_build_filename(directory, "data", "flutter_assets", "assets", "plezy.png", nullptr);
+        g_build_filename(directory, "data", "flutter_assets", "assets", "satra.png", nullptr);
     g_autoptr(GError) icon_error = nullptr;
     if (!gtk_window_set_icon_from_file(window, icon, &icon_error)) {
       g_warning("Could not load the Satra window icon: %s", icon_error->message);

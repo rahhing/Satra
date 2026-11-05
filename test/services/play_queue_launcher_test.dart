@@ -2,19 +2,19 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_library.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_library.dart';
 
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_playlist.dart';
-import 'package:plezy/models/plex/play_queue_response.dart';
-import 'package:plezy/providers/playback_state_provider.dart';
-import 'package:plezy/services/media_list_playback_launcher.dart';
-import 'package:plezy/services/play_queue_launcher.dart';
-import 'package:plezy/services/plex_client.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_playlist.dart';
+import 'package:satra/models/plex/play_queue_response.dart';
+import 'package:satra/providers/playback_state_provider.dart';
+import 'package:satra/services/media_list_playback_launcher.dart';
+import 'package:satra/services/play_queue_launcher.dart';
+import 'package:satra/services/plex_client.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../test_helpers/media_items.dart';
 import '../test_helpers/prefs.dart';

@@ -13,7 +13,7 @@ export type StoreOption = {
 };
 
 export const APP_STORE_ID = '6754315964';
-export const ANDROID_PACKAGE = 'com.edde746.plezy';
+export const ANDROID_PACKAGE = 'com.edde746.satra';
 export const AMAZON_URL = 'https://www.amazon.com/gp/product/B0GK65CVS1';
 
 // Structured data uses canonical URLs; clicked links carry campaign tags.
@@ -25,7 +25,7 @@ export const MICROSOFT_STORE_URL =
   'https://get.microsoft.com/installer/download/9n5r1s1t68h7?referrer=appbadge&cid=landing';
 
 export const releaseAsset = (name: string) =>
-  `https://github.com/edde746/plezy/releases/latest/download/${name}`;
+  `https://github.com/rahhing/Satra/releases/latest/download/${name}`;
 
 export const storeOptions = {
   ios: {
@@ -76,6 +76,6 @@ export const linuxArchitectures = [
   label,
   formats: LINUX_FORMATS.map((format) => ({
     label: format.label,
-    url: releaseAsset(`plezy-linux-${slug}.${format.extension}`),
+    url: releaseAsset(`satra-linux-${slug}.${format.extension}`),
   })),
 }));

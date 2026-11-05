@@ -1,12 +1,12 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/screens/video_player/media_controls_screen_controller.dart';
-import 'package:plezy/screens/video_player/wakelock_controller.dart';
-import 'package:plezy/services/media_controls_manager.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/screens/video_player/media_controls_screen_controller.dart';
+import 'package:satra/screens/video_player/wakelock_controller.dart';
+import 'package:satra/services/media_controls_manager.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../../test_helpers/media_items.dart';
 import '../../test_helpers/prefs.dart';

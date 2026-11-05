@@ -3,12 +3,12 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/models/trackers/anime_ids.dart';
-import 'package:plezy/models/trackers/tracker_context.dart';
-import 'package:plezy/services/trackers/mal/mal_tracker.dart';
-import 'package:plezy/services/trackers/tracker_exceptions.dart';
-import 'package:plezy/services/trackers/tracker_session.dart';
-import 'package:plezy/utils/external_ids.dart';
+import 'package:satra/models/trackers/anime_ids.dart';
+import 'package:satra/models/trackers/tracker_context.dart';
+import 'package:satra/services/trackers/mal/mal_tracker.dart';
+import 'package:satra/services/trackers/tracker_exceptions.dart';
+import 'package:satra/services/trackers/tracker_session.dart';
+import 'package:satra/utils/external_ids.dart';
 
 TrackerSession _session() {
   final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;

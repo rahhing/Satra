@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/services/background_work_diagnostics_service.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/widgets/background_download_warning_banner.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/services/background_work_diagnostics_service.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/widgets/background_download_warning_banner.dart';
 
 import '../test_helpers/prefs.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  const channel = MethodChannel('com.plezy/device.background-warning-test');
+  const channel = MethodChannel('com.satra/device.background-warning-test');
   late Map<String, Object?> signals;
   late List<MethodCall> calls;
 

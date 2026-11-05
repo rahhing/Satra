@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/models/player_setting_scope.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/scoped_player_prefs.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/models/player_setting_scope.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/scoped_player_prefs.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../test_helpers/media_items.dart';
 import '../test_helpers/prefs.dart';

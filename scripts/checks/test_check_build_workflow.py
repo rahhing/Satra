@@ -22,7 +22,7 @@ class BuildWorkflowGuardTest(unittest.TestCase):
         action: str | None = None,
         cmake: str | None = None,
     ) -> subprocess.CompletedProcess[str]:
-        with tempfile.TemporaryDirectory(prefix="plezy-build-workflow-test-") as directory:
+        with tempfile.TemporaryDirectory(prefix="satra-build-workflow-test-") as directory:
             # The checker resolves the shared bootstrap and the Windows CMake
             # file beside the workflow, so the fixture has to mirror the real
             # repository layout.
@@ -103,8 +103,8 @@ class BuildWorkflowGuardTest(unittest.TestCase):
 
     def test_downloaded_signer_execution_is_rejected(self) -> None:
         workflow = self._workflow().replace(
-            "dart run auto_updater:sign_update plezy-windows-installer.exe $keyPath",
-            "dart run sign.dart plezy-windows-installer.exe $keyPath",
+            "dart run auto_updater:sign_update satra-windows-installer.exe $keyPath",
+            "dart run sign.dart satra-windows-installer.exe $keyPath",
             1,
         )
 

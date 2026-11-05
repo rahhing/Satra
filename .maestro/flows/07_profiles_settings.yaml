@@ -1,4 +1,4 @@
-appId: com.edde746.plezy
+appId: com.edde746.satra
 name: Manage profiles and open settings
 tags:
   - e2e
@@ -15,7 +15,7 @@ tags:
     visible: "Switch Profile"
     timeout: 10000
 - assertVisible: "(?s).*Maestro.*"
-- tapOn: "Add Plezy profile"
+- tapOn: "Add Satra profile"
 - extendedWaitUntil:
     visible: "New profile"
     timeout: 10000

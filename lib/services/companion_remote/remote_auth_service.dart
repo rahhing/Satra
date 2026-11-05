@@ -57,7 +57,7 @@ class RemoteAuthService {
 
     final secretKey = await hkdf.deriveKey(
       secretKey: SecretKey(ikm),
-      nonce: utf8.encode('plezy-remote-v1'),
+      nonce: utf8.encode('satra-remote-v1'),
       info: utf8.encode('home-secret'),
     );
 
@@ -99,7 +99,7 @@ class RemoteAuthService {
 
     final secretKey = await _hkdf.deriveKey(
       secretKey: SecretKey(buf.toBytes()),
-      nonce: utf8.encode('plezy-remote-v1'),
+      nonce: utf8.encode('satra-remote-v1'),
       info: utf8.encode('jellyfin-secret'),
     );
 
@@ -122,7 +122,7 @@ class RemoteAuthService {
     final sessionSecretKey = await hkdf.deriveKey(
       secretKey: SecretKey(homeSecret),
       nonce: salt,
-      info: utf8.encode('plezy-session-v1'),
+      info: utf8.encode('satra-session-v1'),
     );
     final sessionSecret = await sessionSecretKey.extractBytes();
 
@@ -184,7 +184,7 @@ class RemoteAuthService {
   }
 
   /// Compute auth tag (HMAC-SHA256) over the full handshake transcript.
-  /// Domain-separated with "plezy-auth-v1|" prefix.
+  /// Domain-separated with "satra-auth-v1|" prefix.
   String computeAuthTag({
     required List<int> homeSecret,
     required List<int> hostNonce,
@@ -244,7 +244,7 @@ class RemoteAuthService {
     required String platform,
   }) {
     final buf = BytesWriter();
-    buf.writeBytes(utf8.encode('plezy-auth-v1|'));
+    buf.writeBytes(utf8.encode('satra-auth-v1|'));
     // Fixed-length nonces (32 bytes each) — no prefix needed
     buf.writeBytes(hostNonce);
     buf.writeBytes(clientNonce);

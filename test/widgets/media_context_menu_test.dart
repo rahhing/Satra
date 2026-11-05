@@ -2,7 +2,7 @@ import '../test_helpers/paged_fakes.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:plezy/services/playback_launch_observer.dart';
+import 'package:satra/services/playback_launch_observer.dart';
 import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -10,55 +10,55 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:plezy/connection/connection.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/focus/focusable_wrapper.dart';
-import 'package:plezy/i18n/strings.g.dart';
-import 'package:plezy/navigation/profile_navigation_scope.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/library_query.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_file_info.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_part.dart';
-import 'package:plezy/media/media_playlist.dart';
-import 'package:plezy/media/media_server_client.dart';
-import 'package:plezy/media/media_version.dart';
-import 'package:plezy/media/server_capabilities.dart';
-import 'package:plezy/metadata_edit/metadata_edit_adapters.dart';
-import 'package:plezy/models/plex/plex_home_user.dart';
-import 'package:plezy/models/plex/plex_config.dart';
-import 'package:plezy/models/catalog/catalog_item.dart';
-import 'package:plezy/profiles/profile.dart';
-import 'package:plezy/profiles/active_profile_provider.dart';
-import 'package:plezy/providers/download_provider.dart';
-import 'package:plezy/providers/catalog_sources_provider.dart';
-import 'package:plezy/providers/multi_server_provider.dart';
-import 'package:plezy/providers/offline_mode_provider.dart';
-import 'package:plezy/providers/playback_state_provider.dart';
-import 'package:plezy/screens/music/album_detail_screen.dart';
-import 'package:plezy/screens/music/artist_detail_screen.dart';
-import 'package:plezy/services/deep_links/deep_link.dart';
-import 'package:plezy/services/download_manager_service.dart';
-import 'package:plezy/services/download_storage_service.dart';
-import 'package:plezy/services/jellyfin_client.dart';
-import 'package:plezy/services/jellyfin_api_cache.dart';
-import 'package:plezy/services/music/music_playback_service.dart';
-import 'package:plezy/services/multi_server_manager.dart';
-import 'package:plezy/services/plex_api_cache.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/catalog/catalog_source.dart';
-import 'package:plezy/utils/deletion_notifier.dart';
-import 'package:plezy/utils/external_ids.dart';
-import 'package:plezy/theme/mono_theme.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
-import 'package:plezy/utils/media_server_timeouts.dart';
-import 'package:plezy/utils/platform_detector.dart';
-import 'package:plezy/widgets/deep_link_dialog.dart';
-import 'package:plezy/widgets/file_info_bottom_sheet.dart';
-import 'package:plezy/widgets/media_context_menu.dart';
-import 'package:plezy/widgets/tag_edit_dialog.dart';
+import 'package:satra/connection/connection.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/focus/focusable_wrapper.dart';
+import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/navigation/profile_navigation_scope.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/library_query.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_file_info.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_part.dart';
+import 'package:satra/media/media_playlist.dart';
+import 'package:satra/media/media_server_client.dart';
+import 'package:satra/media/media_version.dart';
+import 'package:satra/media/server_capabilities.dart';
+import 'package:satra/metadata_edit/metadata_edit_adapters.dart';
+import 'package:satra/models/plex/plex_home_user.dart';
+import 'package:satra/models/plex/plex_config.dart';
+import 'package:satra/models/catalog/catalog_item.dart';
+import 'package:satra/profiles/profile.dart';
+import 'package:satra/profiles/active_profile_provider.dart';
+import 'package:satra/providers/download_provider.dart';
+import 'package:satra/providers/catalog_sources_provider.dart';
+import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/providers/offline_mode_provider.dart';
+import 'package:satra/providers/playback_state_provider.dart';
+import 'package:satra/screens/music/album_detail_screen.dart';
+import 'package:satra/screens/music/artist_detail_screen.dart';
+import 'package:satra/services/deep_links/deep_link.dart';
+import 'package:satra/services/download_manager_service.dart';
+import 'package:satra/services/download_storage_service.dart';
+import 'package:satra/services/jellyfin_client.dart';
+import 'package:satra/services/jellyfin_api_cache.dart';
+import 'package:satra/services/music/music_playback_service.dart';
+import 'package:satra/services/multi_server_manager.dart';
+import 'package:satra/services/plex_api_cache.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/catalog/catalog_source.dart';
+import 'package:satra/utils/deletion_notifier.dart';
+import 'package:satra/utils/external_ids.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/utils/media_server_timeouts.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/deep_link_dialog.dart';
+import 'package:satra/widgets/file_info_bottom_sheet.dart';
+import 'package:satra/widgets/media_context_menu.dart';
+import 'package:satra/widgets/tag_edit_dialog.dart';
 import 'package:provider/provider.dart';
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/media_items.dart';
@@ -829,7 +829,7 @@ void main() {
 
       expect(find.byType(ItemLinkDialog), findsOneWidget);
       // The test server knows no catalogue ids, so the Plex GUID names the movie.
-      const link = 'plezy://play?type=movie&plex=5d776825880197001ec967c2';
+      const link = 'satra://play?type=movie&plex=5d776825880197001ec967c2';
       expect(find.text(link), findsOneWidget);
       expect(
         (DeepLink.tryParse(link)! as PlayLink).target,
@@ -1736,7 +1736,7 @@ Future<GlobalKey<MediaContextMenuState>> _pumpPlexMovieMenu(
       baseUrl: 'https://plex.example.com',
       token: 'token',
       clientIdentifier: 'client-id',
-      product: 'Plezy',
+      product: 'Satra',
       version: '1',
     ),
     serverId: ServerId('plex-1'),

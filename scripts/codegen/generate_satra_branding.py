@@ -35,8 +35,8 @@ def main():
     with tempfile.TemporaryDirectory(prefix="satra-brand-") as temp:
         raster = Path(temp) / "mark.png"
         run("rsvg-convert", "-w", 1024, "-h", 1024, SOURCE, "-o", raster)
-        run("magick", raster, "-resize", "512x512", ROOT / "assets/plezy.png")
-        for alias in ("plezy.svg", "plezy_adaptive_foreground.svg"):
+        run("magick", raster, "-resize", "512x512", ROOT / "assets/satra.png")
+        for alias in ("satra.svg", "satra_adaptive_foreground.svg"):
             (ROOT / "assets" / alias).write_text(SOURCE.read_text())
 
         def canvas(path, width, height, *, black=True):
@@ -69,8 +69,8 @@ def main():
             canvas(path, *dimensions(path))
 
         for platform in ("ios", "macos"):
-            icon = ROOT / platform / "plezy.icon"
-            (icon / "Assets/plezy-cropped.svg").write_text(SOURCE.read_text())
+            icon = ROOT / platform / "satra.icon"
+            (icon / "Assets/satra-cropped.svg").write_text(SOURCE.read_text())
             config = json.loads((icon / "icon.json").read_text())
             config["fill"]["solid"] = "gray:0.00000,1.00000"
             (icon / "icon.json").write_text(json.dumps(config, indent=2) + "\n")

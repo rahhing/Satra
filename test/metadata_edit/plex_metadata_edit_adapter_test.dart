@@ -1,13 +1,13 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/metadata_edit/metadata_edit_models.dart';
-import 'package:plezy/metadata_edit/plex_metadata_edit_adapter.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/services/plex_api_cache.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/metadata_edit/metadata_edit_models.dart';
+import 'package:satra/metadata_edit/plex_metadata_edit_adapter.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/services/plex_api_cache.dart';
 
 import '../test_helpers/backend_client_fixtures.dart';
 import '../test_helpers/http_fixtures.dart';

@@ -4,16 +4,16 @@ import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/media/catalog_item_ref.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/media/media_rating.dart';
-import 'package:plezy/models/catalog/catalog_item.dart';
-import 'package:plezy/models/catalog/catalog_metadata.dart';
-import 'package:plezy/services/catalog/catalog_source.dart';
-import 'package:plezy/services/catalog/trakt_catalog_source.dart';
-import 'package:plezy/services/trackers/tracker_exceptions.dart';
-import 'package:plezy/services/trackers/tracker_session.dart';
-import 'package:plezy/services/trackers/trakt/trakt_client.dart';
+import 'package:satra/media/catalog_item_ref.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/media/media_rating.dart';
+import 'package:satra/models/catalog/catalog_item.dart';
+import 'package:satra/models/catalog/catalog_metadata.dart';
+import 'package:satra/services/catalog/catalog_source.dart';
+import 'package:satra/services/catalog/trakt_catalog_source.dart';
+import 'package:satra/services/trackers/tracker_exceptions.dart';
+import 'package:satra/services/trackers/tracker_session.dart';
+import 'package:satra/services/trackers/trakt/trakt_client.dart';
 
 TrackerSession _session() {
   final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;

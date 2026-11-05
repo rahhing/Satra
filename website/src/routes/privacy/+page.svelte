@@ -2,8 +2,8 @@
   import Logo from '$lib/components/Logo.svelte';
   import PageMetadata from '$lib/components/PageMetadata.svelte';
 
-  const title = 'Privacy Policy - Plezy';
-  const description = 'How Plezy stores data on your device and shares data when you use connected services.';
+  const title = 'Privacy Policy - Satra';
+  const description = 'How Satra stores data on your device and shares data when you use connected services.';
   const url = 'https://plezy.app/privacy';
 </script>
 
@@ -12,7 +12,7 @@
 <article class="privacy-article">
   <a href="/" class="back-link">
     <span class="back-logo"><Logo /></span>
-    <span>Back to Plezy</span>
+    <span>Back to Satra</span>
   </a>
 
   <h1>Privacy Policy</h1>
@@ -22,12 +22,12 @@
     <section aria-labelledby="overview">
       <h2 id="overview">Overview</h2>
       <p>
-        Plezy is a third-party Plex and Jellyfin client. Most account, library, playback, streaming, and
+        Satra is a third-party Plex and Jellyfin client. Most account, library, playback, streaming, and
         download traffic travels directly between your device and the services or media servers you choose.
-        Plezy servers are not in the normal media-streaming path.
+        Satra servers are not in the normal media-streaming path.
       </p>
       <p>
-        We do not sell personal data or use it for advertising. The Plezy website does not use analytics or
+        We do not sell personal data or use it for advertising. The Satra website does not use analytics or
         advertising trackers.
       </p>
     </section>
@@ -35,21 +35,21 @@
     <section aria-labelledby="device-data">
       <h2 id="device-data">Data on your device</h2>
       <p>
-        To provide its features, Plezy saves server addresses, access tokens and other sign-in data, profiles,
+        To provide its features, Satra saves server addresses, access tokens and other sign-in data, profiles,
         settings, integration sessions, playback state, downloads, and cached artwork on your device. Sensitive
         credentials use platform-provided protected storage where available. TV versions may also publish
         Continue Watching titles, progress, and artwork to the system home screen.
       </p>
       <p>
         Downloads in a custom folder and copies kept by the operating system or a backup provider may remain
-        outside storage controlled by Plezy.
+        outside storage controlled by Satra.
       </p>
     </section>
 
     <section aria-labelledby="connections">
       <h2 id="connections">Connections and third parties</h2>
       <p>
-        When you use a connected feature, Plezy sends the data needed for it to the relevant provider. This can
+        When you use a connected feature, Satra sends the data needed for it to the relevant provider. This can
         include authentication data, searches, library requests, media identifiers, playback state, and changes
         you make. Providers can include Plex, the Jellyfin or Seerr server you select, TMDB, Trakt, Simkl,
         MyAnimeList, AniList, Discord, GitHub, jsDelivr, and artwork hosts returned by those services. They also
@@ -76,10 +76,10 @@
       </p>
     </section>
 
-    <section aria-labelledby="plezy-services">
-      <h2 id="plezy-services">Optional Plezy services</h2>
+    <section aria-labelledby="satra-services">
+      <h2 id="satra-services">Optional Satra services</h2>
       <p>
-        Plezy-hosted services are used for Watch Together, MyAnimeList and AniList sign-in handoff, temporary
+        Satra-hosted services are used for Watch Together, MyAnimeList and AniList sign-in handoff, temporary
         Discord artwork, optional crash reporting, and support logs you explicitly upload. Watch Together
         exchanges room, participant, server and media identifiers, and playback timing; it does not carry the
         media stream or your media-server credentials. A custom relay is controlled by its operator.
@@ -88,7 +88,7 @@
         Crash reports can include app, device, error, and recent diagnostic information. Support logs may still
         contain sensitive details after automatic redaction, and anyone with the retrieval ID can access an
         uploaded log while it is available. Discord artwork is available through a temporary public URL.
-        Plezy-hosted services also keep limited operational logs for security and reliability.
+        Satra-hosted services also keep limited operational logs for security and reliability.
       </p>
     </section>
 
@@ -109,13 +109,13 @@
       <p>
         Local connection and profile data remains until you remove it or delete app data. Downloads have no
         automatic expiry. Cached artwork is removed through cache maintenance or the Clear Cache action, and TV
-        home-screen data remains until a later update or clear succeeds. Plezy-hosted crash events are configured
+        home-screen data remains until a later update or clear succeeds. Satra-hosted crash events are configured
         for up to 90 days, support logs can be retrieved for three days, and Discord artwork is available for no
         more than three hours. OAuth handoffs and inactive Watch Together rooms are short-lived. Other providers
         set their own retention periods.
       </p>
       <p>
-        Plezy uses HTTPS for its hosted services and supported cloud providers, limits sensitive uploads, and
+        Satra uses HTTPS for its hosted services and supported cloud providers, limits sensitive uploads, and
         redacts known secrets from diagnostics. No system is completely secure, and user-configured servers,
         relays, the public Watch Together relays, external players, storage locations, and platform backups
         remain under their respective operators’ control. Watch Together rooms are not end-to-end encrypted, so
@@ -127,7 +127,7 @@
       <h2 id="contact">Contact and changes</h2>
       <p>
         For privacy questions or requests, contact us through the
-        <a href="https://github.com/edde746/plezy" target="_blank" rel="noopener noreferrer">Plezy GitHub project</a>.
+        <a href="https://github.com/rahhing/Satra" target="_blank" rel="noopener noreferrer">Satra GitHub project</a>.
         GitHub activity is public, so do not include passwords, access tokens, support-log IDs, or other sensitive
         information. Material changes to this policy will be posted here with a new date.
       </p>

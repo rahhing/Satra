@@ -46,18 +46,49 @@ PointerScrollEvent lockScrollSignalToDominantAxis(PointerScrollEvent event) {
 /// time a [Scrollable] sees the event it has already registered with the
 /// [PointerSignalResolver], and only the first (deepest) registration runs.
 ///
-/// Pan/zoom events are left alone — trackpad panning is resolved by the gesture
-/// arena, which already prefers the axis the viewer moved along.
+/// Trackpad pans also need an axis lock: nested horizontal and vertical drag
+/// recognizers can both cross their drag threshold in one diagonal update.
+/// The deepest recognizer wins even when its axis is the smaller movement.
 mixin PointerScrollAxisLock on GestureBinding {
+  final Map<int, Axis> _trackpadAxes = {};
+
   @override
   void handlePointerEvent(PointerEvent event) {
+    if (event is PointerPanZoomStartEvent || event is PointerPanZoomEndEvent || event is PointerCancelEvent) {
+      _trackpadAxes.remove(event.pointer);
+    } else if (event is PointerPanZoomUpdateEvent) {
+      // Leave pinch/rotation gestures intact. Wait through the normal drag
+      // slop before choosing, so initial finger jitter cannot lock the axis.
+      if (event.scale != 1.0 || event.rotation != 0.0) {
+        _trackpadAxes.remove(event.pointer);
+      } else {
+        var axis = _trackpadAxes[event.pointer];
+        if (axis == null && event.pan.distanceSquared > kTouchSlop * kTouchSlop) {
+          axis = event.pan.dx.abs() > event.pan.dy.abs() ? Axis.horizontal : Axis.vertical;
+          _trackpadAxes[event.pointer] = axis;
+        }
+        if (axis != null) {
+          event = PointerPanZoomUpdateEvent(
+            viewId: event.viewId,
+            timeStamp: event.timeStamp,
+            device: event.device,
+            pointer: event.pointer,
+            position: event.position,
+            embedderId: event.embedderId,
+            synthesized: event.synthesized,
+            pan: axis == Axis.horizontal ? Offset(event.pan.dx, 0) : Offset(0, event.pan.dy),
+            panDelta: axis == Axis.horizontal ? Offset(event.panDelta.dx, 0) : Offset(0, event.panDelta.dy),
+          );
+        }
+      }
+    }
     super.handlePointerEvent(event is PointerScrollEvent ? lockScrollSignalToDominantAxis(event) : event);
   }
 }
 
 /// The app's binding: installs [PointerScrollAxisLock], [SemanticsTreeGate] and
 /// [MemoryPressureBreadcrumbs].
-class PlezyWidgetsBinding extends WidgetsFlutterBinding
+class SatraWidgetsBinding extends WidgetsFlutterBinding
     with PointerScrollAxisLock, SemanticsTreeGate, MemoryPressureBreadcrumbs {
   static bool _initialized = false;
 
@@ -65,7 +96,7 @@ class PlezyWidgetsBinding extends WidgetsFlutterBinding
   /// [WidgetsFlutterBinding.ensureInitialized].
   static WidgetsBinding ensureInitialized() {
     if (!_initialized) {
-      PlezyWidgetsBinding();
+      SatraWidgetsBinding();
       _initialized = true;
     }
     return WidgetsBinding.instance;

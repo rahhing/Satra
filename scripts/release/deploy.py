@@ -9,7 +9,7 @@
 #   "cryptography>=42",
 # ]
 # ///
-"""Plezy production deployment pipeline.
+"""Satra production deployment pipeline.
 
 One command releases to every channel:
 
@@ -104,7 +104,7 @@ STATE_PATH = DEPLOY_DIR / "state.json"
 NOTES_DIR = DEPLOY_DIR / "notes"
 ARTIFACTS_DIR = DEPLOY_DIR / "artifacts"
 
-REPO = "edde746/plezy"
+REPO = "rahhing/Satra"
 
 PHASES = [
     "preflight",
@@ -138,24 +138,24 @@ MSSTORE_API_BASE = "https://manage.devcenter.microsoft.com/v1.0/my/applications"
 RELEASE_ASSET_NAMES = frozenset(
     {
         "appcast.xml",
-        "plezy-android-arm64-v8a.tar.gz",
-        "plezy-android-armeabi-v7a.tar.gz",
-        "plezy-android-x86_64.tar.gz",
-        "plezy-ios.ipa",
-        "plezy-linux-arm64.deb",
-        "plezy-linux-arm64.flatpak",
-        "plezy-linux-arm64.pkg.tar.zst",
-        "plezy-linux-arm64.rpm",
-        "plezy-linux-arm64.tar.gz",
-        "plezy-linux-x64.deb",
-        "plezy-linux-x64.flatpak",
-        "plezy-linux-x64.pkg.tar.zst",
-        "plezy-linux-x64.rpm",
-        "plezy-linux-x64.tar.gz",
-        "plezy-macos.dmg",
-        "plezy-windows-arm64-portable.7z",
-        "plezy-windows-installer.exe",
-        "plezy-windows-x64-portable.7z",
+        "satra-android-arm64-v8a.tar.gz",
+        "satra-android-armeabi-v7a.tar.gz",
+        "satra-android-x86_64.tar.gz",
+        "satra-ios.ipa",
+        "satra-linux-arm64.deb",
+        "satra-linux-arm64.flatpak",
+        "satra-linux-arm64.pkg.tar.zst",
+        "satra-linux-arm64.rpm",
+        "satra-linux-arm64.tar.gz",
+        "satra-linux-x64.deb",
+        "satra-linux-x64.flatpak",
+        "satra-linux-x64.pkg.tar.zst",
+        "satra-linux-x64.rpm",
+        "satra-linux-x64.tar.gz",
+        "satra-macos.dmg",
+        "satra-windows-arm64-portable.7z",
+        "satra-windows-installer.exe",
+        "satra-windows-x64-portable.7z",
     }
 )
 
@@ -506,9 +506,9 @@ def phase_preflight(ctx: Context) -> None:
         if not (env.get("SUPPLY_JSON_KEY_DATA") or env.get("SUPPLY_JSON_KEY")):
             raise DeployError("play: set SUPPLY_JSON_KEY_DATA or SUPPLY_JSON_KEY in .env")
         require_env(env, ["SUPPLY_PACKAGE_NAME"], "play")
-        if env["SUPPLY_PACKAGE_NAME"] != "com.edde746.plezy":
+        if env["SUPPLY_PACKAGE_NAME"] != "com.edde746.satra":
             raise DeployError(
-                "play: SUPPLY_PACKAGE_NAME must be com.edde746.plezy; "
+                "play: SUPPLY_PACKAGE_NAME must be com.edde746.satra; "
                 f"got {env['SUPPLY_PACKAGE_NAME']!r}"
             )
     if "amazon" in pending:
@@ -522,9 +522,9 @@ def phase_preflight(ctx: Context) -> None:
             ],
             "amazon",
         )
-        if env["AMAZON_APPSTORE_PACKAGE_NAME"] != "com.edde746.plezy3":
+        if env["AMAZON_APPSTORE_PACKAGE_NAME"] != "com.edde746.satra3":
             raise DeployError(
-                "amazon: AMAZON_APPSTORE_PACKAGE_NAME must be com.edde746.plezy3; "
+                "amazon: AMAZON_APPSTORE_PACKAGE_NAME must be com.edde746.satra3; "
                 f"got {env['AMAZON_APPSTORE_PACKAGE_NAME']!r}"
             )
         if not env["AMAZON_APPSTORE_APP_ID"].startswith("amzn1.devportal.mobileapp."):
@@ -540,9 +540,9 @@ def phase_preflight(ctx: Context) -> None:
             "app store connect",
         )
         require_env(env, ["DELIVER_APP_IDENTIFIER"], "app store connect")
-        if env["DELIVER_APP_IDENTIFIER"] != "com.edde746.plezy":
+        if env["DELIVER_APP_IDENTIFIER"] != "com.edde746.satra":
             raise DeployError(
-                "app store connect: DELIVER_APP_IDENTIFIER must be com.edde746.plezy; "
+                "app store connect: DELIVER_APP_IDENTIFIER must be com.edde746.satra; "
                 f"got {env['DELIVER_APP_IDENTIFIER']!r}"
             )
         key_path = Path(env["ASC_KEY_PATH"]).expanduser()
@@ -1242,9 +1242,9 @@ def phase_ios(ctx: Context) -> None:
     ])
     run(
         [str(SCRIPTS_DIR / "upload-symbols.sh"), "ios"],
-        env={"SENTRY_DIST": "app-store", "BUGS_APPLE_ARCHIVE": "build/ios/archive/Plezy.xcarchive"},
+        env={"SENTRY_DIST": "app-store", "BUGS_APPLE_ARCHIVE": "build/ios/archive/Satra.xcarchive"},
     )
-    _upload_ipa(ctx, ROOT / "build/ios/ipa/Plezy.ipa", "ios")
+    _upload_ipa(ctx, ROOT / "build/ios/ipa/Satra.ipa", "ios")
 
 
 def phase_tvos(ctx: Context) -> None:
@@ -1571,7 +1571,7 @@ def _msstore_token(env: dict[str, str]) -> str:
 def phase_msstore(ctx: Context) -> None:
     if dry_guard(ctx, "create a Store submission, upload the msixbundle, commit it"):
         return
-    bundle = ARTIFACTS_DIR / "windows-msix/plezy-windows.msixbundle"
+    bundle = ARTIFACTS_DIR / "windows-msix/satra-windows.msixbundle"
     if not bundle.is_file():
         raise DeployError(f"msstore: msixbundle not found at {bundle}; run farm_wait first")
 
@@ -1867,7 +1867,7 @@ def cmd_clean(_args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="deploy.py",
-        description="Plezy production deployment pipeline",
+        description="Satra production deployment pipeline",
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="phases: " + " ".join(PHASES),
     )

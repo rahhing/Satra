@@ -6,7 +6,7 @@ import 'package:cached_network_image_ce/cached_network_image.dart' show FileInfo
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/testing.dart';
-import 'package:plezy/services/image_cache_service.dart';
+import 'package:satra/services/image_cache_service.dart';
 
 /// Pins the artwork request limiter's permit lifecycle. CE's cache manager
 /// abandons non-200/202 responses without listening to the body, so the
@@ -216,7 +216,7 @@ void main() {
 
       expect(requests.single.url.queryParameters['X-Plex-Token'], token);
       expect(requests.single.url.queryParameters['url'], contains('X-Plex-Token=$token'));
-      expect(requests.single.headers.keys.map((k) => k.toLowerCase()), isNot(contains('x-plezy-credentialed-url')));
+      expect(requests.single.headers.keys.map((k) => k.toLowerCase()), isNot(contains('x-satra-credentialed-url')));
       expect(downloaded.originalUrl, isNot(contains(token)));
       expect(cached?.originalUrl, redactArtworkUrl(plexUrl));
 

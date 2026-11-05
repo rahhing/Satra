@@ -15,7 +15,7 @@ SCRIPT = ROOT / "windows/build-msix.ps1"
 
 class WindowsMsixGuardTest(unittest.TestCase):
     def _run(self, script: str) -> subprocess.CompletedProcess[str]:
-        with tempfile.TemporaryDirectory(prefix="plezy-windows-msix-test-") as directory:
+        with tempfile.TemporaryDirectory(prefix="satra-windows-msix-test-") as directory:
             fixture = Path(directory) / "build-msix.ps1"
             fixture.write_text(script, encoding="utf-8")
             return subprocess.run(
@@ -88,7 +88,7 @@ class WindowsMsixGuardTest(unittest.TestCase):
     def test_underscored_identity_name_is_rejected(self) -> None:
         # makeappx enforces the schema pattern on Identity/@Name before it reads
         # any payload, so an underscore makes the package unbuildable.
-        script = self._mutate('$IdentityName = "edde746.Plezy"', '$IdentityName = "edde746_Plezy"')
+        script = self._mutate('$IdentityName = "edde746.Satra"', '$IdentityName = "edde746_Satra"')
 
         result = self._run(script)
 
@@ -142,7 +142,7 @@ class WindowsMsixGuardTest(unittest.TestCase):
     def test_unresolved_interpolation_is_rejected(self) -> None:
         # A new variable in the template has to be declared where the checker
         # can see it, or the manifest it validates is not the one that ships.
-        script = self._mutate("<DisplayName>Plezy</DisplayName>", "<DisplayName>$AppName</DisplayName>")
+        script = self._mutate("<DisplayName>Satra</DisplayName>", "<DisplayName>$AppName</DisplayName>")
 
         result = self._run(script)
 

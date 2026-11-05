@@ -79,16 +79,16 @@ describe('Linux download inventory', () => {
 		expect(linuxArchitectures.map(({ label }) => label)).toEqual(['x64 (Intel/AMD)', 'ARM64']);
 		expect(artifactNames).toEqual([
 			[
-				'plezy-linux-x64.deb',
-				'plezy-linux-x64.rpm',
-				'plezy-linux-x64.pkg.tar.zst',
-				'plezy-linux-x64.tar.gz'
+				'satra-linux-x64.deb',
+				'satra-linux-x64.rpm',
+				'satra-linux-x64.pkg.tar.zst',
+				'satra-linux-x64.tar.gz'
 			],
 			[
-				'plezy-linux-arm64.deb',
-				'plezy-linux-arm64.rpm',
-				'plezy-linux-arm64.pkg.tar.zst',
-				'plezy-linux-arm64.tar.gz'
+				'satra-linux-arm64.deb',
+				'satra-linux-arm64.rpm',
+				'satra-linux-arm64.pkg.tar.zst',
+				'satra-linux-arm64.tar.gz'
 			]
 		]);
 
@@ -98,7 +98,7 @@ describe('Linux download inventory', () => {
 		expect(new Set(urls).size).toBe(8);
 		expect(
 			urls.every((url) =>
-				url.startsWith('https://github.com/edde746/plezy/releases/latest/download/')
+				url.startsWith('https://github.com/rahhing/Satra/releases/latest/download/')
 			)
 		).toBe(true);
 	});
@@ -130,7 +130,7 @@ describe('software application offers', () => {
 		});
 		expect(offers.find(({ category }) => category === 'Google Play')).toEqual({
 			'@type': 'Offer',
-			url: 'https://play.google.com/store/apps/details?id=com.edde746.plezy',
+			url: 'https://play.google.com/store/apps/details?id=com.edde746.satra',
 			category: 'Google Play'
 		});
 		expect(offers.filter(({ price }) => price === '0').map(({ category }) => category)).toEqual([

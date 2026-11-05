@@ -11,6 +11,10 @@ class ForwardingView: NSView {
   override func mouseUp(with event: NSEvent) {
     flutterViewController?.mouseUp(with: event)
   }
+
+  override func scrollWheel(with event: NSEvent) {
+    flutterViewController?.scrollWheel(with: event)
+  }
 }
 
 class ForwardingToolbar: NSToolbar, NSToolbarDelegate {
@@ -71,7 +75,7 @@ class WindowUtilsPlugin: NSObject, FlutterPlugin {
 
   static func register(with registrar: FlutterPluginRegistrar) {
     let channel = FlutterMethodChannel(
-      name: "com.plezy/window_utils",
+      name: "com.satra/window_utils",
       binaryMessenger: registrar.messenger
     )
     let instance = WindowUtilsPlugin()

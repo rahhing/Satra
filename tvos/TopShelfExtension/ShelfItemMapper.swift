@@ -89,7 +89,7 @@ enum ShelfItemMapper {
       .compactMap { metadata[$0] as? String }
       .first { !$0.isEmpty }
     return ShelfFetchedItem(
-      contentId: "plezy_\(serverId)_\(ratingKey)",
+      contentId: "satra_\(serverId)_\(ratingKey)",
       title: isEpisode ? seriesTitle! : rawTitle,
       episodeTitle: isEpisode ? rawTitle : nil,
       type: type,
@@ -151,7 +151,7 @@ enum ShelfItemMapper {
       .compactMap { flexibleString(item[$0]) }
       .first { !$0.isEmpty } ?? id
     return ShelfFetchedItem(
-      contentId: "plezy_\(serverId)_\(id)",
+      contentId: "satra_\(serverId)_\(id)",
       title: isEpisode ? seriesName! : name,
       episodeTitle: isEpisode ? name : nil,
       type: type,

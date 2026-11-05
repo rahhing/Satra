@@ -903,7 +903,7 @@ class AgentSettingsCommands {
     Uint8List bytes,
   ) async {
     _checkShaderOwner(context, owner);
-    final temporary = await Directory.systemTemp.createTemp('plezy-agent-shader-');
+    final temporary = await Directory.systemTemp.createTemp('satra-agent-shader-');
     try {
       _checkShaderOwner(context, owner);
       final input = File(path.join(temporary.path, fileName));

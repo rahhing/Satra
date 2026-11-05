@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/models/transcode_quality_preset.dart';
-import 'package:plezy/screens/video_player/playback_failure_action.dart';
+import 'package:satra/models/transcode_quality_preset.dart';
+import 'package:satra/screens/video_player/playback_failure_action.dart';
 
 bool offers({
   bool isLive = false,

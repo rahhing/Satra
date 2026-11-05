@@ -1,9 +1,9 @@
 import 'dart:convert';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/watch_together/services/recent_rooms_service.dart';
-import 'package:plezy/watch_together/services/watch_party_relays.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/watch_together/services/recent_rooms_service.dart';
+import 'package:satra/watch_together/services/watch_party_relays.dart';
 
 import '../test_helpers/prefs.dart';
 

@@ -1,11 +1,11 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/database/app_database.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/music/music_playback_service.dart';
-import 'package:plezy/services/music/music_queue_controller.dart';
-import 'package:plezy/services/music/music_session_store.dart';
+import 'package:satra/database/app_database.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/music/music_playback_service.dart';
+import 'package:satra/services/music/music_queue_controller.dart';
+import 'package:satra/services/music/music_session_store.dart';
 import '../../test_helpers/media_items.dart';
 
 void main() {

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:plezy/media/ids.dart';
+import 'package:satra/media/ids.dart';
 
 import 'package:background_downloader/background_downloader.dart';
 import 'package:crypto/crypto.dart';
@@ -8,11 +8,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider_platform_interface/path_provider_platform_interface.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/download_storage_service.dart';
-import 'package:plezy/services/settings_service.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/download_storage_service.dart';
+import 'package:satra/services/settings_service.dart';
 
 import '../test_helpers/io_fakes.dart';
 import '../test_helpers/prefs.dart';
@@ -237,7 +237,7 @@ void main() {
   });
 
   group('backup exclusion', () {
-    const channel = MethodChannel('com.plezy/backup_exclusion');
+    const channel = MethodChannel('com.satra/backup_exclusion');
     late List<String> excluded;
 
     void handleExclusion(Future<Object?> Function(MethodCall call) handler) {
@@ -404,7 +404,7 @@ void main() {
     test('keeps a custom download root absolute because it does not move with the app', () async {
       final settings = await SettingsService.getInstance();
       await settings.write(SettingsService.customDownloadPathType, 'file');
-      final customRoot = p.join(tmpRoot.path, 'external', 'PlezyDownloads');
+      final customRoot = p.join(tmpRoot.path, 'external', 'SatraDownloads');
       await settings.write(SettingsService.customDownloadPath, customRoot);
 
       final dss = DownloadStorageService.instance;

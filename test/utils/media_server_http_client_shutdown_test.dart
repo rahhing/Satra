@@ -3,9 +3,9 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
-import 'package:plezy/exceptions/media_server_exceptions.dart';
-import 'package:plezy/utils/managed_http_client.dart';
-import 'package:plezy/utils/media_server_http_client.dart';
+import 'package:satra/exceptions/media_server_exceptions.dart';
+import 'package:satra/utils/managed_http_client.dart';
+import 'package:satra/utils/media_server_http_client.dart';
 
 void main() {
   group('MediaServerHttpClient shutdown', () {
@@ -83,7 +83,7 @@ void main() {
     });
 
     test('downloadFile cancellation fails without committing a renamed file', () async {
-      final dir = await Directory.systemTemp.createTemp('plezy_download_cancel_test');
+      final dir = await Directory.systemTemp.createTemp('satra_download_cancel_test');
       addTearDown(() => dir.delete(recursive: true));
       final filePath = '${dir.path}${Platform.pathSeparator}subtitle.srt';
 

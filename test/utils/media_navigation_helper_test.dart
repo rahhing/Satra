@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/media/media_backend.dart';
+import 'package:satra/media/media_backend.dart';
 
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/utils/media_navigation_helper.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/utils/media_navigation_helper.dart';
 import '../test_helpers/media_items.dart';
 
 void main() {

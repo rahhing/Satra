@@ -454,6 +454,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   late final FocusNode _focusNode = LockedFocusRowNode(debugLabel: 'tv_browse_rail', focusedItemRect: _focusedCardRect);
   final Map<String, ScrollController> _scrollControllers = {};
   final ScrollController _verticalController = ScrollController();
+  Drag? _trackpadDrag;
   final SnapshotController _verticalScrollSnapshotController = SnapshotController();
   final Map<int, GlobalKey> _hubSectionKeys = {};
   final Map<String, GlobalKey<MediaCardState>> _mediaCardKeys = {};
@@ -713,6 +714,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
       controller.dispose();
     }
     _verticalController.removeListener(_handleVerticalScroll);
+    _trackpadDrag?.cancel();
     _verticalController.dispose();
     _verticalScrollGeneration++;
     _verticalScrollSnapshotController.dispose();
@@ -1064,6 +1066,34 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     _notifyActiveHubChanged();
   }
 
+  // The TV layout deliberately disables ListView's touch drag so D-pad
+  // navigation stays row-aligned. Trackpads still need a real ScrollPosition
+  // drag: it preserves direct movement and native ballistic momentum.
+  void startTrackpadScroll(DragStartDetails details) {
+    if (!_verticalController.hasClients) return;
+    _trackpadDrag?.cancel();
+    _isUserVerticalScrollActive = true;
+    _hasUserInteracted = true;
+    _hasUserChangedHub = true;
+    _focusModel.verticalScrollActive = false;
+    _verticalScrollSnapshotController.allowSnapshotting = false;
+    _wheelScrollTarget = null;
+    _wheelScrollGeneration++;
+    _trackpadDrag = _verticalController.position.drag(details, () => _trackpadDrag = null);
+  }
+
+  void updateTrackpadScroll(DragUpdateDetails details) => _trackpadDrag?.update(details);
+
+  void endTrackpadScroll(DragEndDetails details) {
+    _trackpadDrag?.end(details);
+    _trackpadDrag = null;
+  }
+
+  void cancelTrackpadScroll() {
+    _trackpadDrag?.cancel();
+    _trackpadDrag = null;
+  }
+
   /// Steps the active hub row up or down by one row on mouse wheel / trackpad
   /// scroll, enforcing a 0.25s ([wheelRowStepDelay]) cooldown between steps so
   /// each scroll cycles cleanly to the next row without cutting off the top of
@@ -1109,11 +1139,11 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     final generation = ++_wheelScrollGeneration;
     _wheelScrollTarget = target;
     unawaited(
-      position
-          .animateTo(target, duration: const Duration(milliseconds: 240), curve: Curves.easeOutCubic)
-          .whenComplete(() {
-            if (generation == _wheelScrollGeneration) _wheelScrollTarget = null;
-          }),
+      position.animateTo(target, duration: const Duration(milliseconds: 240), curve: Curves.easeOutCubic).whenComplete(
+        () {
+          if (generation == _wheelScrollGeneration) _wheelScrollTarget = null;
+        },
+      ),
     );
   }
 
@@ -1534,69 +1564,76 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     required double railViewportWidth,
     required double bottomPadding,
   }) {
-    return Listener(
-      onPointerSignal: (signal) {
-        if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0 && !HardwareKeyboard.instance.isShiftPressed) {
-          GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
-            if (event is PointerScrollEvent) {
-              stepHubByScroll(event.scrollDelta.dy);
-            }
-          });
-        }
-      },
-      child: ListView.builder(
-        key: const ValueKey('tv_browse_rail_vertical'),
-        controller: _verticalController,
-        physics: const NeverScrollableScrollPhysics(),
-        // Inert on media lists (no keep-alive clients): dropping the per-child
-        // wrappers shrinks build + semantics work per item.
-        addAutomaticKeepAlives: false,
-        addSemanticIndexes: false,
-        clipBehavior: Clip.none,
-        padding: .only(bottom: bottomPadding),
-        itemExtentBuilder: (index, _) => sectionHeights[index],
-        itemCount: widget.hubs.length,
-        itemBuilder: (context, hubIndex) {
-          final hub = widget.hubs[hubIndex];
-          final metrics = metricsByHub[hubIndex];
-          final sectionHeight = sectionHeights[hubIndex];
-          // Active-hub state is observed through _focusModel so a hub move
-          // repaints only the two affected headers/artwork tints; the row content
-          // below is passed through as a stable child.
-          bool isActiveHub() => _focusModel.hubIndex == hubIndex;
-
-          return SnapshotWidget(
-            controller: _verticalScrollSnapshotController,
-            mode: SnapshotMode.permissive,
-            autoresize: true,
-            child: SizedBox(
-              key: _hubSectionKeys.putIfAbsent(hubIndex, () => GlobalKey()),
-              height: sectionHeight,
-              child: Column(
-                crossAxisAlignment: .stretch,
-                children: [
-                  ListenableSelector<bool>(
-                    listenable: _focusModel,
-                    selector: isActiveHub,
-                    builder: (context, isActive, _) =>
-                        _buildHubHeader(context, hub: hub, hubIndex: hubIndex, isActive: isActive, scale: scale),
-                  ),
-                  _buildHubRail(
-                    hub: hub,
-                    hubIndex: hubIndex,
-                    episodePosterMode: modes[hubIndex],
-                    metrics: metrics,
-                    scale: scale,
-                    fullCardLayout: fullCardLayout,
-                    leftOverflow: leftOverflow,
-                    interactionExpansion: interactionExpansion,
-                    railViewportWidth: railViewportWidth,
-                  ),
-                ],
-              ),
-            ),
-          );
+    return GestureDetector(
+      supportedDevices: const {PointerDeviceKind.trackpad},
+      onVerticalDragStart: startTrackpadScroll,
+      onVerticalDragUpdate: updateTrackpadScroll,
+      onVerticalDragEnd: endTrackpadScroll,
+      onVerticalDragCancel: cancelTrackpadScroll,
+      child: Listener(
+        onPointerSignal: (signal) {
+          if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0 && !HardwareKeyboard.instance.isShiftPressed) {
+            GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
+              if (event is PointerScrollEvent) {
+                stepHubByScroll(event.scrollDelta.dy);
+              }
+            });
+          }
         },
+        child: ListView.builder(
+          key: const ValueKey('tv_browse_rail_vertical'),
+          controller: _verticalController,
+          physics: const NeverScrollableScrollPhysics(),
+          // Inert on media lists (no keep-alive clients): dropping the per-child
+          // wrappers shrinks build + semantics work per item.
+          addAutomaticKeepAlives: false,
+          addSemanticIndexes: false,
+          clipBehavior: Clip.none,
+          padding: .only(bottom: bottomPadding),
+          itemExtentBuilder: (index, _) => sectionHeights[index],
+          itemCount: widget.hubs.length,
+          itemBuilder: (context, hubIndex) {
+            final hub = widget.hubs[hubIndex];
+            final metrics = metricsByHub[hubIndex];
+            final sectionHeight = sectionHeights[hubIndex];
+            // Active-hub state is observed through _focusModel so a hub move
+            // repaints only the two affected headers/artwork tints; the row content
+            // below is passed through as a stable child.
+            bool isActiveHub() => _focusModel.hubIndex == hubIndex;
+
+            return SnapshotWidget(
+              controller: _verticalScrollSnapshotController,
+              mode: SnapshotMode.permissive,
+              autoresize: true,
+              child: SizedBox(
+                key: _hubSectionKeys.putIfAbsent(hubIndex, () => GlobalKey()),
+                height: sectionHeight,
+                child: Column(
+                  crossAxisAlignment: .stretch,
+                  children: [
+                    ListenableSelector<bool>(
+                      listenable: _focusModel,
+                      selector: isActiveHub,
+                      builder: (context, isActive, _) =>
+                          _buildHubHeader(context, hub: hub, hubIndex: hubIndex, isActive: isActive, scale: scale),
+                    ),
+                    _buildHubRail(
+                      hub: hub,
+                      hubIndex: hubIndex,
+                      episodePosterMode: modes[hubIndex],
+                      metrics: metrics,
+                      scale: scale,
+                      fullCardLayout: fullCardLayout,
+                      leftOverflow: leftOverflow,
+                      interactionExpansion: interactionExpansion,
+                      railViewportWidth: railViewportWidth,
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

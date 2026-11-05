@@ -129,7 +129,7 @@ class CommandTests(unittest.TestCase):
                 "build",
                 "apk",
                 "--debug",
-                "--dart-define=PLEZY_MAESTRO_E2E=true",
+                "--dart-define=SATRA_MAESTRO_E2E=true",
             ),
         )
 

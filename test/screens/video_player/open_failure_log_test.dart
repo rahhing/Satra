@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/mpv/models.dart';
-import 'package:plezy/screens/video_player/open_failure_log.dart';
+import 'package:satra/mpv/models.dart';
+import 'package:satra/screens/video_player/open_failure_log.dart';
 
 // mpv's error_on_track deselects a stream whose chain failed to initialize
 // and, with the other stream alive, keeps the file going: no end-file
@@ -46,7 +46,7 @@ void main() {
   });
 
   test('a filter mpv bypassed is not a failure', () {
-    // f_output_chain.c drops the filter and the chain keeps running; Plezy
+    // f_output_chain.c drops the filter and the chain keeps running; Satra
     // inserts loudnorm, so this line is reachable on a working open.
     expect(classify('Disabling filter loudnorm because it has failed.', prefix: 'af'), isNull);
   });

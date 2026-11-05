@@ -1,11 +1,11 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/providers/trackers_provider.dart';
-import 'package:plezy/services/base_shared_preferences_service.dart';
-import 'package:plezy/services/trackers/tracker_account_store.dart';
-import 'package:plezy/services/trackers/tracker_constants.dart';
-import 'package:plezy/services/trackers/tracker_coordinator.dart';
-import 'package:plezy/services/trackers/tracker_session.dart';
-import 'package:plezy/services/trackers/trakt/trakt_tracker.dart';
+import 'package:satra/providers/trackers_provider.dart';
+import 'package:satra/services/base_shared_preferences_service.dart';
+import 'package:satra/services/trackers/tracker_account_store.dart';
+import 'package:satra/services/trackers/tracker_constants.dart';
+import 'package:satra/services/trackers/tracker_coordinator.dart';
+import 'package:satra/services/trackers/tracker_session.dart';
+import 'package:satra/services/trackers/trakt/trakt_tracker.dart';
 
 import '../test_helpers/io_fakes.dart';
 import '../test_helpers/prefs.dart';

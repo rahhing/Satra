@@ -1,15 +1,15 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/settings_service.dart';
-import 'package:plezy/services/video_decode_capabilities.dart';
-import 'package:plezy/utils/device_channel.dart';
+import 'package:satra/services/settings_service.dart';
+import 'package:satra/services/video_decode_capabilities.dart';
+import 'package:satra/utils/device_channel.dart';
 
 import '../test_helpers/prefs.dart';
 
 void main() {
   final binding = TestWidgetsFlutterBinding.ensureInitialized();
 
-  /// Answers `com.plezy/device` with [reply] and records each call. A null
+  /// Answers `com.satra/device` with [reply] and records each call. A null
   /// [reply] leaves the method unimplemented, which is what desktop and a
   /// stale native build look like.
   List<String> stubProbe(Object? reply) {

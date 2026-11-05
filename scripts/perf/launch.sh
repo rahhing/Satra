@@ -4,9 +4,9 @@
 set -euo pipefail
 
 ADB="$HOME/Library/Android/sdk/platform-tools/adb"
-DEVICE="${PLEZY_DEVICE:-192.168.1.7:5555}"
-PKG=com.edde746.plezy
-HOST_PORT="${PLEZY_VM_PORT:-9223}"
+DEVICE="${SATRA_DEVICE:-192.168.1.7:5555}"
+PKG=com.edde746.satra
+HOST_PORT="${SATRA_VM_PORT:-9223}"
 
 a() { "$ADB" -s "$DEVICE" "$@"; }
 
@@ -20,7 +20,7 @@ a shell input keyevent 224 >/dev/null 2>&1 || true
 # `am start` must supply explicitly (only `flutter run` passes it for us).
 # Start the activity itself: the launcher alias (.MainActivity) is disabled
 # while an alternate app icon is chosen.
-a shell am start -W -S --ez enable-dart-profiling true -n "$PKG/$PKG.PlezyActivity" >/dev/null 2>&1
+a shell am start -W -S --ez enable-dart-profiling true -n "$PKG/$PKG.SatraActivity" >/dev/null 2>&1
 
 LINE=""
 for _ in $(seq 1 40); do
@@ -38,7 +38,7 @@ a forward --remove "tcp:$HOST_PORT" >/dev/null 2>&1 || true
 a forward "tcp:$HOST_PORT" "tcp:$DEV_PORT" >/dev/null
 
 # Let the app reach its settled home screen before anyone measures it.
-sleep "${PLEZY_SETTLE:-14}"
+sleep "${SATRA_SETTLE:-14}"
 a shell input keyevent 224 >/dev/null 2>&1 || true
 
 echo "http://127.0.0.1:$HOST_PORT/$TOKEN"

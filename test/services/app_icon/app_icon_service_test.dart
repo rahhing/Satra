@@ -1,9 +1,9 @@
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/services/app_icon/app_icon_catalog.dart';
-import 'package:plezy/services/app_icon/app_icon_service.dart';
-import 'package:plezy/services/supporter/supporter_mode.dart';
-import 'package:plezy/services/supporter/supporter_service.dart';
+import 'package:satra/services/app_icon/app_icon_catalog.dart';
+import 'package:satra/services/app_icon/app_icon_service.dart';
+import 'package:satra/services/supporter/supporter_mode.dart';
+import 'package:satra/services/supporter/supporter_service.dart';
 
 import '../../test_helpers/app_icon_fakes.dart';
 

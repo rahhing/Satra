@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:plezy/focus/input_mode_tracker.dart';
-import 'package:plezy/media/ids.dart';
-import 'package:plezy/media/media_backend.dart';
-import 'package:plezy/media/media_item.dart';
-import 'package:plezy/media/media_kind.dart';
-import 'package:plezy/models/download_models.dart';
-import 'package:plezy/widgets/download_tree_view.dart';
+import 'package:satra/focus/input_mode_tracker.dart';
+import 'package:satra/media/ids.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
+import 'package:satra/models/download_models.dart';
+import 'package:satra/widgets/download_tree_view.dart';
 import '../test_helpers/media_items.dart';
 
 DownloadTreeNode _episodeNode(String globalKey) => DownloadTreeNode(
