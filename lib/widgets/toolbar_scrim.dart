@@ -7,6 +7,10 @@ import 'glass_surface.dart';
 class ToolbarScrim extends StatelessWidget {
   const ToolbarScrim({super.key, required this.child});
 
+  static const contentHeight = 48.0;
+
+  static double layoutHeight(BuildContext context) => MediaQuery.paddingOf(context).top + 8 + contentHeight + 8 + 16;
+
   final Widget child;
 
   @override
@@ -23,7 +27,13 @@ class ToolbarScrim extends StatelessWidget {
         borderRadius: const BorderRadius.all(Radius.circular(22)),
         sigma: 20,
         opacity: 0.24,
-        child: Padding(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4), child: child),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: contentHeight),
+            child: child,
+          ),
+        ),
       ),
     );
   }

@@ -6,7 +6,6 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:satra/widgets/app_icon.dart';
-import '../widgets/server_activities_button.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import '../focus/focusable_action_bar.dart';
@@ -25,7 +24,7 @@ import '../widgets/cycling_media_backdrop.dart';
 import '../widgets/hero_carousel_backdrop.dart';
 import '../widgets/optimized_media_image.dart' show ClearLogoImage, blurArtwork;
 import '../widgets/toolbar_scrim.dart';
-import '../widgets/system_clock.dart';
+import '../widgets/browse_toolbar_actions.dart';
 import '../widgets/focusable_tab_chip.dart';
 import '../media/media_library.dart';
 import '../providers/discover_provider.dart';
@@ -35,16 +34,9 @@ import '../providers/multi_server_provider.dart';
 import '../providers/watch_state_store.dart';
 import '../utils/library_grouping.dart';
 import '../widgets/hub_section.dart';
-import '../widgets/app_menu.dart';
 import '../widgets/clickable_cursor.dart';
 import '../widgets/loading_indicator_box.dart';
 import '../widgets/profile_switching_overlay.dart';
-import 'profile/profile_switch_screen.dart';
-import 'profile/profile_teardown.dart';
-import '../profiles/active_profile_provider.dart';
-import '../profiles/profile.dart';
-import '../profiles/profile_activation.dart';
-import '../profiles/profile_avatar.dart';
 import '../services/settings_service.dart';
 import '../widgets/settings_builder.dart';
 import '../widgets/fitting_title_text.dart';
@@ -54,7 +46,6 @@ import '../mixins/refreshable.dart';
 import '../mixins/tab_visibility_aware.dart';
 import '../i18n/strings.g.dart';
 import '../utils/app_logger.dart';
-import '../utils/dialogs.dart';
 import '../utils/formatters.dart';
 import '../utils/hub_icons.dart';
 import '../utils/media_navigation_helper.dart';
@@ -68,11 +59,6 @@ import '../theme/mono_tokens.dart';
 import 'libraries/content_state_builder.dart';
 import 'libraries/state_messages.dart';
 import 'main_screen.dart';
-import '../navigation/settings_shortcut.dart';
-import '../watch_together/watch_together.dart';
-import '../providers/companion_remote_provider.dart';
-import '../widgets/companion_remote/remote_session_dialog.dart';
-import 'companion_remote/mobile_remote_screen.dart';
 
 class DiscoverScreen extends StatefulWidget {
   const DiscoverScreen({super.key});
@@ -132,14 +118,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   final FocusNode _homeChipFocusNode = FocusNode(debugLabel: 'discover_top_home_chip');
   final Map<String, FocusNode> _libraryChipFocusNodes = {};
   final _actionBarKey = GlobalKey<FocusableActionBarState>();
-  final _serverActivitiesButtonKey = GlobalKey<ServerActivitiesButtonState>();
-  final _userMenuKey = GlobalKey<AppMenuButtonState<String>>();
 
   FocusNode _focusNodeForLibraryChip(String globalKey) {
-    return _libraryChipFocusNodes.putIfAbsent(
-      globalKey,
-      () => FocusNode(debugLabel: 'discover_top_lib_$globalKey'),
-    );
+    return _libraryChipFocusNodes.putIfAbsent(globalKey, () => FocusNode(debugLabel: 'discover_top_lib_$globalKey'));
   }
 
   List<MediaLibrary> _currentMainServerLibraries(BuildContext context, {required bool listen}) {
@@ -719,125 +700,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     return serverIds.length > 1;
   }
 
-  Future<void> _handleLogout() async {
-    final confirm = await showConfirmDialog(
-      context,
-      title: t.common.logout,
-      message: t.messages.logoutConfirm,
-      confirmText: t.common.logout,
-      isDestructive: true,
-    );
-
-    if (confirm && mounted) {
-      await logoutAllProfiles(context);
-    }
-  }
-
-  void _handleSwitchProfile(BuildContext context) {
-    Navigator.of(
-      context,
-      rootNavigator: true,
-    ).push(MaterialPageRoute(builder: (context) => const ProfileSwitchScreen()));
-  }
-
-  void _handleOpenSettings(BuildContext context) {
-    final mainScope = MainScreenFocusScope.of(context, listen: false);
-    if (mainScope != null) {
-      mainScope.openSettings?.call();
-      return;
-    }
-
-    Navigator.push(context, buildSettingsRoute());
-  }
-
-  /// Build the [FocusableAction] wrapping the user menu.
-  /// Pulls live state from [ActiveProfileProvider]; the menu reuses
-  /// [_userMenuItems] for the menu contents so d-pad and tap paths
-  /// stay in sync.
-  FocusableAction _buildUserMenuAction(BuildContext context) {
-    final activeProvider = context.watch<ActiveProfileProvider>();
-    final active = activeProvider.active;
-    final profiles = activeProvider.profiles;
-
-    return FocusableAction(
-      onPressed: _switchingProfile ? null : () => _userMenuKey.currentState?.showButtonMenu(focusFirstItem: true),
-      child: AppMenuButton<String>(
-        key: _userMenuKey,
-        enabled: !_switchingProfile,
-        icon: active != null
-            ? ProfileAvatar(profile: active, size: 32, avatarUrl: activeProvider.avatarUrlFor(active.id))
-            : const AppIcon(Symbols.account_circle_rounded, fill: 1, size: 32, color: Colors.white),
-        tooltip: t.profiles.sectionTitle,
-        adaptiveSheet: true,
-        anchorAlignment: AppMenuAnchorAlignment.end,
-        onSelected: (value) => unawaited(_handleUserMenuAction(context, value)),
-        entriesBuilder: (context) =>
-            _userMenuItems(context, activeProfile: active, profiles: profiles, activeProvider: activeProvider),
-      ),
-    );
-  }
-
-  List<AppMenuEntry<String>> _userMenuItems(
-    BuildContext context, {
-    required Profile? activeProfile,
-    required List<Profile> profiles,
-    required ActiveProfileProvider activeProvider,
-  }) {
-    final theme = Theme.of(context);
-    final switchable = profiles.where((p) => p.id != activeProfile?.id).toList();
-
-    return [
-      for (final p in switchable)
-        AppMenuItem<String>(
-          value: 'profile:${p.id}',
-          leading: ProfileAvatar(profile: p, size: 24, avatarUrl: activeProvider.avatarUrlFor(p.id)),
-          label: p.displayName,
-          trailing: p.isPinProtected
-              ? AppIcon(Symbols.lock_rounded, fill: 1, size: 14, color: theme.colorScheme.onSurfaceVariant)
-              : null,
-        ),
-      if (switchable.isNotEmpty) const AppMenuDivider(),
-      AppMenuItem<String>(value: 'manage_profiles', icon: Symbols.group_rounded, label: t.profiles.sectionTitle),
-      AppMenuItem<String>(value: 'settings', icon: Symbols.settings_rounded, label: t.common.settings),
-      AppMenuItem<String>(value: 'logout', icon: Symbols.logout_rounded, label: t.common.logout),
-    ];
-  }
-
-  Future<void> _handleUserMenuAction(BuildContext context, String value) async {
-    if (_switchingProfile) return;
-    if (value == 'logout') {
-      unawaited(_handleLogout());
-      return;
-    }
-    if (value == 'manage_profiles') {
-      _handleSwitchProfile(context);
-      return;
-    }
-    if (value == 'settings') {
-      _handleOpenSettings(context);
-      return;
-    }
-    if (value.startsWith('profile:')) {
-      final id = value.substring('profile:'.length);
-      final active = context.read<ActiveProfileProvider>();
-      final target = active.profiles.where((p) => p.id == id).firstOrNull;
-      if (target == null) return;
-      await _switchProfileFromMenu(target);
-    }
-  }
-
-  Future<void> _switchProfileFromMenu(Profile profile) async {
-    if (_switchingProfile) return;
-    setState(() => _switchingProfile = true);
-    try {
-      await switchProfileFromUi(context, profile);
-    } finally {
-      if (mounted) {
-        setState(() => _switchingProfile = false);
-      }
-    }
-  }
-
   Widget _buildOverlaidAppBar() {
     final colorScheme = Theme.of(context).colorScheme;
     final foregroundColor = colorScheme.onSurface;
@@ -860,7 +722,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                     alignment: AlignmentDirectional.centerStart,
                     child: Text(
                       t.discover.title,
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foregroundColor, fontWeight: .bold),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.titleLarge?.copyWith(color: foregroundColor, fontWeight: .bold),
                     ),
                   );
                 }
@@ -909,131 +773,27 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             ),
           ),
           const SizedBox(width: 12),
-          // TV only: a fullscreen leanback app hides the system clock, while a
-          // phone status bar and a desktop menu bar already show one.
-          if (PlatformDetector.isTV()) ...[
-            SystemClock(
-              style: Theme.of(context).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w500),
-            ),
-            const SizedBox(width: 12),
-          ],
-          Consumer2<WatchTogetherProvider, CompanionRemoteProvider>(
-            builder: (context, watchTogether, companionRemote, _) {
-              final isDesktop = PlatformDetector.shouldActAsRemoteHost(context);
-              void openWatchTogether() =>
-                  Navigator.push(context, MaterialPageRoute(builder: (_) => const WatchTogetherScreen()));
-              void openCompanionRemote() {
-                if (isDesktop) {
-                  RemoteSessionDialog.show(context);
-                } else {
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => const MobileRemoteScreen()));
+          BrowseToolbarActions(
+            actionBarKey: _actionBarKey,
+            onRefresh: manualRefresh,
+            onNavigateLeft: () {
+              final libs = _currentMainServerLibraries(context, listen: false);
+              if (libs.isNotEmpty) {
+                final node = _focusNodeForLibraryChip(libs.last.globalKey);
+                if (node.context != null) {
+                  node.requestFocus();
+                  return;
                 }
               }
-
-              return FocusableActionBar(
-                key: _actionBarKey,
-                onNavigateLeft: () {
-                  final libs = _currentMainServerLibraries(context, listen: false);
-                  if (libs.isNotEmpty) {
-                    final node = _focusNodeForLibraryChip(libs.last.globalKey);
-                    if (node.context != null) {
-                      node.requestFocus();
-                      return;
-                    }
-                  }
-                  if (_homeChipFocusNode.context != null) {
-                    _homeChipFocusNode.requestFocus();
-                    return;
-                  }
-                  _navigateToSidebar();
-                },
-                onNavigateDown: _focusContentFromAppBar,
-                actions: [
-                  FocusableAction(icon: Symbols.refresh_rounded, iconColor: foregroundColor, onPressed: manualRefresh),
-                  // Watch Together
-                  FocusableAction(
-                    onPressed: openWatchTogether,
-                    child: Stack(
-                      children: [
-                        IconButton(
-                          icon: AppIcon(
-                            Symbols.group_rounded,
-                            fill: watchTogether.isInSession ? 1 : 0,
-                            color: watchTogether.isInSession ? colorScheme.primary : foregroundColor,
-                          ),
-                          onPressed: openWatchTogether,
-                          tooltip: t.watchTogether.title,
-                        ),
-                        // Badges sit over the button they label, so they must
-                        // not swallow its hover and clicks (#2846).
-                        if (watchTogether.isInSession && watchTogether.participantCount > 1)
-                          Positioned(
-                            top: 6,
-                            right: 6,
-                            child: IgnorePointer(
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                decoration: BoxDecoration(
-                                  color: colorScheme.primary,
-                                  borderRadius: const BorderRadius.all(Radius.circular(8)),
-                                ),
-                                child: Text(
-                                  '${watchTogether.participantCount}',
-                                  style: TextStyle(color: colorScheme.onPrimary, fontSize: 10, fontWeight: .bold),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // Companion Remote
-                  FocusableAction(
-                    onPressed: openCompanionRemote,
-                    child: Stack(
-                      children: [
-                        IconButton(
-                          icon: AppIcon(
-                            Symbols.phone_android_rounded,
-                            fill: companionRemote.isConnected ? 1 : 0,
-                            color: companionRemote.isConnected ? colorScheme.primary : foregroundColor,
-                          ),
-                          onPressed: openCompanionRemote,
-                          tooltip: t.companionRemote.title,
-                        ),
-                        if (companionRemote.isConnected)
-                          Positioned(
-                            top: 6,
-                            right: 6,
-                            child: IgnorePointer(
-                              child: Container(
-                                width: 8,
-                                height: 8,
-                                decoration: BoxDecoration(
-                                  color: Colors.green,
-                                  shape: BoxShape.circle,
-                                  border: Border.fromBorderSide(BorderSide(color: foregroundColor, width: 1)),
-                                ),
-                              ),
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                  // Server Tasks — Plex-only (`/activities` API has no
-                  // Jellyfin equivalent), hide the button entirely on
-                  // Jellyfin-only profiles so the chrome doesn't show
-                  // a permanently empty popover.
-                  if (PlatformDetector.isDesktop(context) &&
-                      context.select<MultiServerProvider, bool>((p) => p.hasOnlinePlexServers))
-                    FocusableAction(
-                      onPressed: () => _serverActivitiesButtonKey.currentState?.togglePanel(),
-                      child: ServerActivitiesButton(key: _serverActivitiesButtonKey),
-                    ),
-                  // User menu — profiles + sign out
-                  _buildUserMenuAction(context),
-                ],
-              );
+              if (_homeChipFocusNode.context != null) {
+                _homeChipFocusNode.requestFocus();
+              } else {
+                _navigateToSidebar();
+              }
+            },
+            onNavigateDown: _focusContentFromAppBar,
+            onProfileSwitchingChanged: (busy) {
+              if (mounted) setState(() => _switchingProfile = busy);
             },
           ),
         ],

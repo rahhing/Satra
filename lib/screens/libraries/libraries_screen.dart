@@ -29,6 +29,8 @@ import '../../widgets/desktop_app_bar.dart';
 import '../../widgets/focusable_tab_chip.dart';
 import '../../widgets/library_management_sheet.dart';
 import '../../widgets/toolbar_scrim.dart';
+import '../../widgets/browse_toolbar_actions.dart';
+import '../../widgets/profile_switching_overlay.dart';
 import '../../widgets/tv_spotlight_scaffold.dart';
 import '../../services/media_list_playback_launcher.dart';
 import '../../services/storage_service.dart';
@@ -86,6 +88,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
   /// Flag to prevent onTabChanged from focusing when we're programmatically changing tabs
   bool _isRestoringTab = false;
+  bool _switchingProfile = false;
 
   /// Whether a post-frame [_initializeWithLibraries] is already queued.
   bool _initializeScheduled = false;
@@ -942,7 +945,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       return provider.getClientForServer(serverId)?.capabilities.folderGrouping ?? false;
     });
 
-    List<FocusableAction> appBarActions() => [
+    List<FocusableAction> appBarActions({bool includeRefresh = true}) => [
       if (allLibraries.isNotEmpty)
         FocusableAction(
           icon: Symbols.edit_rounded,
@@ -987,7 +990,8 @@ class _LibrariesScreenState extends State<LibrariesScreen>
           tooltip: t.libraries.shuffleLibrary,
           onPressed: () => unawaited(MediaListPlaybackLauncher.shuffleLibrary(context, selectedLibrary)),
         ),
-      FocusableAction(icon: Symbols.refresh_rounded, tooltip: t.common.refresh, onPressed: manualRefresh),
+      if (includeRefresh)
+        FocusableAction(icon: Symbols.refresh_rounded, tooltip: t.common.refresh, onPressed: manualRefresh),
     ];
 
     Widget appBar({required bool floating}) => DesktopSliverAppBar(
@@ -1021,13 +1025,16 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       return CustomScrollView(
         controller: _outerScrollController,
         slivers: [
-          appBar(floating: false),
+          if (useSideNavigation)
+            SliverToBoxAdapter(child: SizedBox(height: ToolbarScrim.layoutHeight(context)))
+          else
+            appBar(floating: false),
           SliverFillRemaining(child: body),
         ],
       );
     }
 
-    Widget buildTransparentTvTopBar() {
+    Widget buildSharedTopBar() {
       return ToolbarScrim(
         child: Row(
           children: [
@@ -1043,11 +1050,31 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               ),
             ),
             const SizedBox(width: 12),
-            FocusableActionBar(
-              key: _actionBarKey,
-              onNavigateLeft: () => getTabChipFocusNode(_visibleTabs.length - 1).requestFocus(),
-              onNavigateDown: _focusCurrentTab,
-              actions: appBarActions(),
+            BrowseToolbarActions(
+              actionBarKey: _actionBarKey,
+              onRefresh: manualRefresh,
+              extraActions: appBarActions(includeRefresh: false),
+              onNavigateLeft: () {
+                for (var i = _visibleTabs.length - 1; i >= 0; i--) {
+                  final node = getTabChipFocusNode(i);
+                  if (node.context != null) {
+                    node.requestFocus();
+                    return;
+                  }
+                }
+                if (mainServerLibraries.isNotEmpty) {
+                  final node = _focusNodeForLibraryChip(mainServerLibraries.last.globalKey);
+                  if (node.context != null) {
+                    node.requestFocus();
+                    return;
+                  }
+                }
+                _homeChipFocusNode.requestFocus();
+              },
+              onNavigateDown: _focusCurrentTabFromTabBar,
+              onProfileSwitchingChanged: (busy) {
+                if (mounted) setState(() => _switchingProfile = busy);
+              },
             ),
           ],
         ),
@@ -1103,11 +1130,9 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         children: [for (int i = 0; i < _visibleTabs.length; i++) buildTab(i)],
       );
 
-      // One tree shape for both layouts: the TV Recommended backdrop only
-      // drops the header slivers and overlays a transparent top bar. Swapping
-      // in a different body there unmounted the TabBarView and with it every
-      // kept-alive sibling tab, so each switch in or out of Recommended
-      // reloaded them from scratch and lost their scroll and filter state.
+      // Keep one NestedScrollView/TabBarView tree across sections. Recommended
+      // keeps its full-bleed artwork; other sections reserve toolbar space
+      // without replacing their retained scroll and filter state.
       body = Focus(
         canRequestFocus: false,
         skipTraversal: true,
@@ -1126,7 +1151,9 @@ class _LibrariesScreenState extends State<LibrariesScreen>
                 if (!useTvRecommendedBackdrop)
                   SliverOverlapAbsorber(
                     handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
-                    sliver: appBar(floating: true),
+                    sliver: useSideNavigation
+                        ? SliverToBoxAdapter(child: SizedBox(height: ToolbarScrim.layoutHeight(context)))
+                        : appBar(floating: true),
                   ),
                 if (showMobileTabsRow && !useTvRecommendedBackdrop)
                   SliverToBoxAdapter(
@@ -1162,7 +1189,6 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               ],
               body: tabs,
             ),
-            if (useTvRecommendedBackdrop) TvToolbarOverlay(child: buildTransparentTvTopBar()),
           ],
         ),
       );
@@ -1179,6 +1205,19 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       child: body,
     );
 
-    return Scaffold(backgroundColor: useTvRecommendedBackdrop ? Colors.transparent : null, body: scrollBody);
+    return Scaffold(
+      backgroundColor: useTvRecommendedBackdrop ? Colors.transparent : null,
+      body: useSideNavigation
+          ? Stack(
+              fit: StackFit.expand,
+              clipBehavior: Clip.none,
+              children: [
+                scrollBody,
+                TvToolbarOverlay(child: buildSharedTopBar()),
+                if (_switchingProfile) const ProfileSwitchingOverlay(),
+              ],
+            )
+          : scrollBody,
+    );
   }
 }

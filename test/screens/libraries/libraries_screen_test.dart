@@ -1,6 +1,13 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:satra/providers/companion_remote_provider.dart';
+import 'package:satra/profiles/active_profile_provider.dart';
+import 'package:satra/watch_together/watch_together.dart';
+import 'package:satra/widgets/browse_toolbar_actions.dart';
+import 'package:satra/widgets/toolbar_scrim.dart';
+import 'package:satra/widgets/system_clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:satra/exceptions/media_server_exceptions.dart';
@@ -56,6 +63,7 @@ import '../../test_helpers/library_tab_scaffold.dart';
 import '../../test_helpers/media_items.dart';
 import '../../test_helpers/multi_server_fixtures.dart';
 import '../../test_helpers/prefs.dart';
+import '../../test_helpers/profile_stack.dart';
 
 const _libraryA = MediaLibrary(
   id: 'movies',
@@ -102,6 +110,8 @@ const _jellyfinMovies = MediaLibrary(
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
+
+  setUpAll(() => initializeDateFormatting('en'));
 
   setUp(() {
     resetSharedPreferencesForTest();
@@ -609,6 +619,7 @@ void main() {
     addTearDown(downloads.dispose);
 
     var homeSelected = false;
+    var settingsOpened = false;
     String? librarySelectedFromTopBar;
 
     tester.view.physicalSize = const Size(1280, 720);
@@ -623,6 +634,9 @@ void main() {
           ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: harness.hiddenLibraries),
           ChangeNotifierProvider<MultiServerProvider>.value(value: harness.multiServer),
           ChangeNotifierProvider<DownloadProvider>.value(value: downloads),
+          ChangeNotifierProvider<WatchTogetherProvider>.value(value: harness.watchTogether),
+          ChangeNotifierProvider<CompanionRemoteProvider>.value(value: harness.remote),
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: harness.profiles.active),
         ],
         child: InputModeTracker(
           child: MaterialApp(
@@ -632,6 +646,7 @@ void main() {
                 focusSidebar: () {},
                 sideNavigationWidth: 64,
                 selectHome: () => homeSelected = true,
+                openSettings: () => settingsOpened = true,
                 selectLibrary: (key) => librarySelectedFromTopBar = key,
                 child: const LibrariesScreen(),
               ),
@@ -654,6 +669,27 @@ void main() {
     await tester.tap(find.text(t.common.home));
     await tester.pump();
     expect(homeSelected, isTrue);
+
+    final toolbar = find.byType(ToolbarScrim);
+    final originalBounds = tester.getRect(toolbar);
+    for (final section in LibraryTabType.values) {
+      harness.controller(tester).index = section.index;
+      await tester.pumpAndSettle();
+      expect(find.byType(BrowseToolbarActions), findsOneWidget, reason: section.name);
+      expect(find.byType(SystemClock), findsOneWidget, reason: section.name);
+      expect(find.byTooltip(t.watchTogether.title), findsOneWidget, reason: section.name);
+      expect(find.byTooltip(t.companionRemote.title), findsOneWidget, reason: section.name);
+      expect(find.byTooltip(t.profiles.sectionTitle), findsOneWidget, reason: section.name);
+      expect(find.byTooltip(t.common.refresh), findsOneWidget, reason: section.name);
+      expect(find.byTooltip(t.libraries.manageLibraries), findsOneWidget, reason: section.name);
+      expect(tester.getRect(toolbar), originalBounds, reason: 'toolbar geometry changed for ${section.name}');
+      expect(tester.getSize(toolbar).height, ToolbarScrim.layoutHeight(tester.element(toolbar)));
+    }
+    await tester.tap(find.byTooltip(t.profiles.sectionTitle));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.common.settings));
+    await tester.pumpAndSettle();
+    expect(settingsOpened, isTrue);
   });
 
   testWidgets('clicking on a library defaults to Recommended even with a saved non-recommended tab', (tester) async {
@@ -699,6 +735,9 @@ void main() {
           ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: harness.hiddenLibraries),
           ChangeNotifierProvider<MultiServerProvider>.value(value: harness.multiServer),
           ChangeNotifierProvider<DownloadProvider>.value(value: downloads),
+          ChangeNotifierProvider<WatchTogetherProvider>.value(value: harness.watchTogether),
+          ChangeNotifierProvider<CompanionRemoteProvider>.value(value: harness.remote),
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: harness.profiles.active),
         ],
         child: InputModeTracker(
           child: MaterialApp(
@@ -733,7 +772,11 @@ void main() {
 }
 
 final class _Harness {
-  _Harness({required this.libraries, required this.hiddenLibraries, required this.multiServer});
+  _Harness({required this.libraries, required this.hiddenLibraries, required this.multiServer, required this.profiles});
+
+  final ProfileStack profiles;
+  final watchTogether = WatchTogetherProvider();
+  final remote = CompanionRemoteProvider();
 
   final LibrariesProvider libraries;
   final HiddenLibrariesProvider hiddenLibraries;
@@ -756,7 +799,12 @@ final class _Harness {
       manager.debugRegisterClientForTesting(client);
     }
     final multiServer = testMultiServerProvider(manager);
-    return _Harness(libraries: libraries, hiddenLibraries: hiddenLibraries, multiServer: multiServer);
+    return _Harness(
+      libraries: libraries,
+      hiddenLibraries: hiddenLibraries,
+      multiServer: multiServer,
+      profiles: await ProfileStack.create(),
+    );
   }
 
   Future<void> pump(
@@ -788,6 +836,9 @@ final class _Harness {
           ChangeNotifierProvider<HiddenLibrariesProvider>.value(value: hiddenLibraries),
           ChangeNotifierProvider<MultiServerProvider>.value(value: multiServer),
           ChangeNotifierProvider<DownloadProvider>.value(value: downloads),
+          ChangeNotifierProvider<WatchTogetherProvider>.value(value: watchTogether),
+          ChangeNotifierProvider<CompanionRemoteProvider>.value(value: remote),
+          ChangeNotifierProvider<ActiveProfileProvider>.value(value: profiles.active),
         ],
         child: InputModeTracker(
           child: MaterialApp(
@@ -815,7 +866,10 @@ final class _Harness {
     return state.tabController as TabController;
   }
 
-  void dispose() {
+  Future<void> dispose() async {
+    watchTogether.dispose();
+    remote.dispose();
+    await profiles.dispose();
     libraries.dispose();
     hiddenLibraries.dispose();
     multiServer.dispose();
