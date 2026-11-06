@@ -105,7 +105,7 @@ void main() {
       expect(delegate.mainAxisSpacing, GridSpacing.spacious.gridGap);
     });
 
-    testWidgets('square grids keep at least their base gutter; full-bleed is unaffected', (tester) async {
+    testWidgets('square and full-bleed grids honor every spacing choice', (tester) async {
       tester.view.devicePixelRatio = 1.0;
       tester.view.physicalSize = const Size(1280, 720);
       addTearDown(() {
@@ -132,12 +132,14 @@ void main() {
       }
 
       expect(byGridSpacing[GridSpacing.tight]!.$1, GridLayoutConstants.squareGridSpacing);
-      // Normal (6) is below the square base gutter (8), so square keeps 8.
-      expect(byGridSpacing[GridSpacing.normal]!.$1, GridLayoutConstants.squareGridSpacing);
-      expect(byGridSpacing[GridSpacing.spacious]!.$1, GridSpacing.spacious.gridGap);
-      // Full-bleed TV grids keep their own scale-derived gutter.
+      expect(byGridSpacing[GridSpacing.normal]!.$1, GridLayoutConstants.squareGridSpacing + GridSpacing.normal.gridGap);
+      expect(
+        byGridSpacing[GridSpacing.spacious]!.$1,
+        GridLayoutConstants.squareGridSpacing + GridSpacing.spacious.gridGap,
+      );
+      // Full-bleed grids also respond to all three spacing choices.
       final fullBleedGutters = byGridSpacing.values.map((v) => v.$2).toSet();
-      expect(fullBleedGutters, hasLength(1));
+      expect(fullBleedGutters, hasLength(3));
     });
 
     testWidgets('hub-row cells pack with the grid gutter so rows match their grid at every setting', (tester) async {

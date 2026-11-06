@@ -311,6 +311,7 @@ class MediaDetailScreen extends StatefulWidget {
 
 PageRoute<bool> mediaDetailRoute({
   required MediaItem metadata,
+  bool instant = false,
   bool isOffline = false,
   int? initialSeasonIndex,
   String? initialSeasonId,
@@ -323,9 +324,19 @@ PageRoute<bool> mediaDetailRoute({
     initialSeasonId: initialSeasonId,
     initialEpisodeId: initialEpisodeId,
   );
-  if (!PlatformDetector.isTV()) return MaterialPageRoute<bool>(builder: (_) => page);
+  final settings = RouteSettings(name: '/media_detail', arguments: metadata.globalKey);
+  if (instant) {
+    return PageRouteBuilder<bool>(
+      settings: settings,
+      pageBuilder: (_, _, _) => page,
+      transitionDuration: Duration.zero,
+      reverseTransitionDuration: Duration.zero,
+    );
+  }
+  if (!PlatformDetector.isTV()) return MaterialPageRoute<bool>(settings: settings, builder: (_) => page);
 
   return PageRouteBuilder<bool>(
+    settings: settings,
     // Opaque so the covered route stops painting/building once the fade
     // completes (the framework only offstages routes below after the
     // transition settles, so push/pop fades still composite over live

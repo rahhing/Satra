@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../services/device_performance.dart';
 import '../services/settings_service.dart';
 import 'focus_theme.dart';
+import '../widgets/settings_builder.dart';
 
 /// Renders the focus glow for a focused card in the root [Overlay] so it paints
 /// ABOVE sibling cards on all four sides.
@@ -116,10 +117,24 @@ class _FocusGlowOverlayState extends State<FocusGlowOverlay> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      SettingValueBuilder<bool>(pref: SettingsService.focusGlow, builder: (context, _, _) => _buildContent(context));
+
+  Widget _buildContent(BuildContext context) {
     if (_disabled) {
       _portalInTree = false;
       return widget.child;
+    }
+
+    // The controller is detached after disabling the effect. Reconcile it
+    // with current focus when the setting is enabled again.
+    if (!_portalInTree) {
+      _visible = widget.isFocused;
+      if (widget.isFocused) {
+        _controller.show();
+      } else if (_controller.isShowing) {
+        _controller.hide();
+      }
     }
 
     // Gate the LeaderLayer to the focused card only: when not focused and not

@@ -467,6 +467,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
       prefs: const [
         SettingsService.viewMode,
         SettingsService.libraryDensity,
+        SettingsService.gridSpacing,
         SettingsService.episodePosterMode,
         SettingsService.showEpisodeNumberOnCards,
         SettingsService.hideSpoilers,
@@ -848,7 +849,8 @@ class _MediaCardList extends StatelessWidget {
       if (mi.kind == MediaKind.track) return mi.trackArtistTitle;
 
       if (mi.parentIndex != null && mi.index != null) {
-        return 'S${mi.parentIndex}${_episodeNumberSuffix(mi)}';
+        final number = _episodeNumberLabel(mi);
+        if (number.isNotEmpty) return number;
       }
 
       if (mi.displaySubtitle != null) {
@@ -1289,13 +1291,16 @@ class _MediaCardHelpers {
     }
 
     if (mi.isEpisode && mi.parentIndex != null) {
-      final number = 'S${mi.parentIndex}${_episodeNumberSuffix(mi)}';
+      final number = _episodeNumberLabel(mi);
       if (showTitleImplied) {
         // The headline already names the episode; identify it by number and
         // runtime instead of repeating the title.
-        return [number, if (mi.durationMs case final durationMs?) formatDurationTextual(durationMs)].join(' · ');
+        return [
+          if (number.isNotEmpty) number,
+          if (mi.durationMs case final durationMs?) formatDurationTextual(durationMs),
+        ].join(' · ');
       }
-      return '$number · ${mi.displaySubtitle ?? mi.displayTitle}';
+      return [if (number.isNotEmpty) number, mi.displaySubtitle ?? mi.displayTitle].join(' · ');
     }
 
     if (mi.displaySubtitle != null) return mi.displaySubtitle;
@@ -1516,6 +1521,11 @@ Widget _buildEpisodeSubtitleRow(
   required bool enableDetailLinks,
   required bool isOffline,
 }) {
+  if (!SettingsService.instance.read(SettingsService.showEpisodeNumberOnCards)) {
+    return ExcludeSemantics(
+      child: Text(mi.displaySubtitle ?? mi.displayTitle, maxLines: 1, overflow: .ellipsis, style: style),
+    );
+  }
   final seasonLabel = 'S${mi.parentIndex}';
   return Row(
     children: [
@@ -1527,7 +1537,7 @@ Widget _buildEpisodeSubtitleRow(
         )
       else
         ExcludeSemantics(child: Text(seasonLabel, style: style)),
-      ExcludeSemantics(child: Text('${_episodeNumberSuffix(mi)} · ', style: style)),
+      ExcludeSemantics(child: Text('${mi.index == null ? '' : ' E${mi.index}'} · ', style: style)),
       Expanded(
         child: ExcludeSemantics(
           child: Text(mi.displaySubtitle ?? mi.displayTitle, maxLines: 1, overflow: .ellipsis, style: style),
@@ -1538,9 +1548,9 @@ Widget _buildEpisodeSubtitleRow(
 }
 
 /// Empty unless [SettingsService.showEpisodeNumberOnCards] is on.
-String _episodeNumberSuffix(MediaItem mi) {
-  final showEp = SettingsService.instance.read(SettingsService.showEpisodeNumberOnCards);
-  return (showEp && mi.index != null) ? ' E${mi.index}' : '';
+String _episodeNumberLabel(MediaItem mi) {
+  if (!SettingsService.instance.read(SettingsService.showEpisodeNumberOnCards)) return '';
+  return [if (mi.parentIndex != null) 'S${mi.parentIndex}', if (mi.index != null) 'E${mi.index}'].join(' ');
 }
 
 /// Whether the card renders any pointer detail link for this item.

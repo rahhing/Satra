@@ -622,7 +622,15 @@ bool MpvPlayer::InitRenderContextForSurface(EGLDisplay display, EGLConfig config
   return true;
 }
 
-bool MpvPlayer::RenderToSurface(EGLSurface surface, int width, int height) {
+void MpvPlayer::SetVideoBlurRegion(int64_t id, const VideoBlurRegion* region) {
+  std::lock_guard<std::mutex> lock(native_mutex_);
+  if (region)
+    video_blur_regions_[id] = *region;
+  else
+    video_blur_regions_.erase(id);
+}
+
+bool MpvPlayer::RenderToSurface(EGLSurface surface, int width, int height, double left, double top) {
   // Runs on the plane render thread. Deliberately not holding native_mutex_
   // across the render: a 4K HDR tone-map takes tens of milliseconds, and the
   // mutex has main-thread callers on every seek (ReadSourceHdrMetadata,
@@ -636,6 +644,7 @@ bool MpvPlayer::RenderToSurface(EGLSurface surface, int width, int height) {
   EGLDisplay display = EGL_NO_DISPLAY;
   EGLContext context = EGL_NO_CONTEXT;
   int depth_bits = 8;
+  std::vector<VideoBlurRegion> blur_regions;
   {
     std::lock_guard<std::mutex> lock(native_mutex_);
     if (disposed_ || !mpv_gl_ || egl_context_ == EGL_NO_CONTEXT || surface == EGL_NO_SURFACE) return false;
@@ -644,6 +653,7 @@ bool MpvPlayer::RenderToSurface(EGLSurface surface, int width, int height) {
     display = egl_display_;
     context = egl_context_;
     depth_bits = surface_depth_bits_;
+    for (const auto& entry : video_blur_regions_) blur_regions.push_back(entry.second);
   }
 
   if (!eglBindAPI(EGL_OPENGL_ES_API) || !eglMakeCurrent(display, surface, surface, context)) {
@@ -677,6 +687,7 @@ bool MpvPlayer::RenderToSurface(EGLSurface surface, int width, int height) {
       {MPV_RENDER_PARAM_INVALID, nullptr},
   };
   mpv_render_context_render(render_context, params);
+  video_overlay_blur_.Apply(width, height, depth_bits, blur_regions, left, top);
   return true;
 }
 

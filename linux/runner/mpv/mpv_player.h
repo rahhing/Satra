@@ -13,6 +13,7 @@
 #include <cstdint>
 #include <deque>
 #include <functional>
+#include <map>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -22,6 +23,7 @@
 
 #include "../../../shared/mpv/mpv_player_common.h"
 #include "hdr_metadata.h"
+#include "video_overlay_blur.h"
 #include "video_params.h"
 
 // Forward declaration for Flutter types
@@ -107,7 +109,9 @@ class MpvPlayer {
   /// then Dispose) that the render context outlives every call. The EGL
   /// context becomes current on the calling thread and stays there.
   /// @return true if the frame was rendered.
-  bool RenderToSurface(EGLSurface surface, int width, int height);
+  bool RenderToSurface(EGLSurface surface, int width, int height, double left = 0, double top = 0);
+
+  void SetVideoBlurRegion(int64_t id, const VideoBlurRegion* region);
 
   /// Disposes mpv and releases resources.
   void Dispose();
@@ -498,6 +502,8 @@ class MpvPlayer {
   // Bits per colour channel of the video plane, told to mpv on every render so
   // it dithers to the plane's real precision instead of the assumed 8.
   int surface_depth_bits_ = 8;
+  std::map<int64_t, VideoBlurRegion> video_blur_regions_;
+  VideoOverlayBlur video_overlay_blur_;
   // What `video-params` last reported, parsed once on the change event instead
   // of read back from the core on every HDR decision. Guarded by native_mutex_:
   // written from event handling, read by ReadSourceHdrMetadata.

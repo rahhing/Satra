@@ -6,6 +6,7 @@ import 'package:flutter/rendering.dart' show PlatformViewHitTestBehavior;
 import 'package:flutter/services.dart';
 
 import '../theme/app_motion.dart';
+import 'linux_video_blur.dart';
 
 /// A translucent pane with one GPU backdrop blur clipped to its bounds.
 class GlassSurface extends StatelessWidget {
@@ -29,8 +30,8 @@ class GlassSurface extends StatelessWidget {
   final bool border;
   final bool enabled;
 
-  /// macOS video is composited below Flutter, outside a BackdropFilter's
-  /// input. Player overlays use an AppKit material to sample that surface.
+  /// Native video is composited below Flutter, outside a BackdropFilter's
+  /// input. macOS uses an AppKit material; Linux blurs the video plane itself.
   final bool blurNativeVideo;
 
   @override
@@ -57,7 +58,7 @@ class GlassSurface extends StatelessWidget {
       ),
       child: Material(type: MaterialType.transparency, child: child),
     );
-    return ClipRRect(
+    final glass = ClipRRect(
       borderRadius: borderRadius,
       child: effects && blurNativeVideo && !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS
           ? Stack(
@@ -82,5 +83,9 @@ class GlassSurface extends StatelessWidget {
               child: pane,
             ),
     );
+    if (effects && blurNativeVideo && !kIsWeb && defaultTargetPlatform == TargetPlatform.linux) {
+      return LinuxVideoBlur(borderRadius: borderRadius, sigma: sigma, child: glass);
+    }
+    return glass;
   }
 }

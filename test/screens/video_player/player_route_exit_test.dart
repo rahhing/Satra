@@ -54,7 +54,13 @@ void main() {
                 create: (_) => PlaybackStateProvider(),
                 child: MaterialApp(
                   navigatorKey: navigator,
-                  home: pushed ? const Scaffold(body: Text('Browse')) : screen,
+                  onGenerateRoute: (_) => MaterialPageRoute<void>(
+                    settings: RouteSettings(
+                      name: pushed ? '/media_detail' : '/',
+                      arguments: pushed ? testMediaItem().globalKey : null,
+                    ),
+                    builder: (_) => pushed ? const Scaffold(body: Text('Details')) : screen,
+                  ),
                 ),
               ),
             );
@@ -70,7 +76,7 @@ void main() {
               await tester.pump(const Duration(seconds: 1));
               await tester.pump();
               expect(key.currentState, isNull);
-              expect(find.text('Browse'), findsOneWidget);
+              expect(find.text('Details'), findsOneWidget);
               expect(player.pauseCalls, 1);
               var stoppedDone = false;
               final stopped = expectLater(
@@ -80,7 +86,7 @@ void main() {
               player.pauseGate.completeError(PlatformException(code: 'late_pause_failure'));
               await pumpUntil(tester, () => stoppedDone);
               await stopped;
-              expect(find.text('Browse'), findsOneWidget);
+              expect(find.text('Details'), findsOneWidget);
               expect(tester.takeException(), isNull);
             } else {
               await tester.pump(const Duration(seconds: 2));

@@ -458,7 +458,7 @@ void main() {
     expect(FocusTheme.focusGlowShadows(const Color(0xFFFFFFFF)), hasLength(2));
   });
 
-  testWidgets('non full bleed card does not use the overlay glow', (tester) async {
+  testWidgets('standard TV cards honor the focus glow setting too', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(true);
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);
@@ -468,8 +468,8 @@ void main() {
     await tester.pump();
     await tester.pump();
 
-    expect(find.byType(FocusGlowOverlay), findsNothing);
-    expect(find.byType(CompositedTransformFollower), findsNothing);
+    expect(find.byType(FocusGlowOverlay), findsOneWidget);
+    expect(find.byType(CompositedTransformFollower), findsOneWidget);
   });
 
   testWidgets('overlay glow fades out and unmounts when focus is lost', (tester) async {

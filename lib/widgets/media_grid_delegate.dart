@@ -1,5 +1,3 @@
-import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import '../media/media_item.dart' show CardShape;
 import '../services/settings_service.dart';
@@ -71,7 +69,7 @@ class MediaGridDelegate {
   /// room; every other shape starts from the platform default (0, or 24 on
   /// automotive). Full-bleed TV grids use the scaled full-card gutter.
   ///
-  /// On top of the non-automotive, non-full-bleed base, the user's
+  /// On top of the non-automotive base, the user's
   /// [SettingsService.gridSpacing] setting widens the gutter (#2083).
   static double spacingFor({
     required BuildContext context,
@@ -80,11 +78,15 @@ class MediaGridDelegate {
     CardShape? shape,
   }) {
     if (PlatformDetector.isAutomotive()) return GridLayoutConstants.crossAxisSpacing;
-    if (fullBleedImage) return GridLayoutConstants.fullCardGridSpacingForScale(TvLayoutConstants.scaleOf(context));
+    final gap = SettingsService.instance.read(SettingsService.gridSpacing).gridGap;
+    if (fullBleedImage) {
+      final scale = TvLayoutConstants.scaleOf(context);
+      return GridLayoutConstants.fullCardGridSpacingForScale(scale) + (gap - GridSpacing.normal.gridGap) * scale;
+    }
     final base = _resolveShape(shape, useWideAspectRatio) == CardShape.square
         ? GridLayoutConstants.squareGridSpacing
         : GridLayoutConstants.crossAxisSpacing;
-    return math.max(base, SettingsService.instance.read(SettingsService.gridSpacing).gridGap);
+    return base + gap;
   }
 
   /// Height of a grid cell [itemWidth] wide. A full-bleed cell is the artwork

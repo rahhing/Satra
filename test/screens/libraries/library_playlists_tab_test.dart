@@ -198,7 +198,7 @@ void main() {
     expect(
       tester.getTopLeft(find.byKey(const Key('playlist-1'))).dx -
           tester.getTopRight(find.byKey(const Key('playlist-0'))).dx,
-      GridLayoutConstants.squareGridSpacing,
+      GridLayoutConstants.squareGridSpacing + SettingsService.instance.read(SettingsService.gridSpacing).gridGap,
     );
   });
 }

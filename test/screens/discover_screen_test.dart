@@ -196,6 +196,7 @@ void main() {
       density: LibraryDensity.max,
       episodePosterMode: settings.read(SettingsService.episodePosterMode),
       fullCardLayout: settings.read(SettingsService.tvFullCardLayout),
+      gridSpacing: settings.read(SettingsService.gridSpacing),
       tallPosterScale: TvBrowseRailLayout.compactTallPosterScale,
       widePosterScale: TvBrowseRailLayout.compactEpisodeThumbnailScale,
     );

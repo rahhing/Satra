@@ -141,7 +141,7 @@ class _FocusableMediaCardState extends State<FocusableMediaCard> {
       enableLongPress: true,
       disableScale: widget.disableScale,
       focusScale: widget.fullBleedImage ? FocusTheme.fullCardFocusScale : FocusTheme.focusScale,
-      useFocusGlow: widget.fullBleedImage,
+      useFocusGlow: PlatformDetector.isTV() || widget.fullBleedImage,
       // MediaCard draws the focus border itself, on the rect its layout
       // highlights (poster for standard grid cards, whole card otherwise).
       delegateFocusBorder: true,

@@ -4,6 +4,7 @@ project(runner LANGUAGES CXX)
 add_executable(${BINARY_NAME}
   "main.cc"
   "my_application.cc"
+  "vsync/flutter_vsync.cc"
   "mpv/mpv_player.cc"
   "mpv/mpv_plugin.cc"
   "mpv/plane_render_executor.cc"
@@ -12,6 +13,14 @@ add_executable(${BINARY_NAME}
 )
 
 apply_standard_settings(${BINARY_NAME})
+
+# Check the actual mode-specific library after Flutter has assembled it.
+add_custom_target(satra_vsync_engine_check
+  COMMAND ${CMAKE_COMMAND} -DENGINE_LIBRARY=${FLUTTER_LIBRARY}
+    -P ${CMAKE_CURRENT_SOURCE_DIR}/vsync/check_engine.cmake
+)
+add_dependencies(satra_vsync_engine_check flutter_assemble)
+add_dependencies(${BINARY_NAME} satra_vsync_engine_check)
 
 # apply_standard_settings asks for cxx_std_14, which current compilers satisfy
 # with a gnu++17 default and so add no -std flag for. mpv_plugin.cc uses
@@ -30,6 +39,15 @@ pkg_check_modules(WAYLAND_EGL REQUIRED IMPORTED_TARGET wayland-egl)
 pkg_check_modules(EGL REQUIRED IMPORTED_TARGET egl)
 pkg_check_modules(MPV REQUIRED IMPORTED_TARGET mpv)
 pkg_check_modules(EPOXY REQUIRED IMPORTED_TARGET epoxy)
+
+option(SATRA_BUILD_VIDEO_OVERLAY_BLUR_TESTS "Build offscreen EGL video overlay blur tests" OFF)
+if(SATRA_BUILD_VIDEO_OVERLAY_BLUR_TESTS)
+  add_executable(video_overlay_blur_test "mpv/video_overlay_blur_test.cc")
+  apply_standard_settings(video_overlay_blur_test)
+  target_link_libraries(video_overlay_blur_test PRIVATE PkgConfig::EGL PkgConfig::EPOXY PkgConfig::GTK)
+  add_test(NAME video_overlay_blur_test COMMAND video_overlay_blur_test)
+  set_tests_properties(video_overlay_blur_test PROPERTIES ENVIRONMENT "EGL_PLATFORM=surfaceless")
+endif()
 
 # Vendored wayland-scanner output for color-management-v1 (staging), which backs
 # HDR on the native video plane. Built separately because it is C (the runner is

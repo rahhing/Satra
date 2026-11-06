@@ -39,6 +39,23 @@ void main() {
     await settings.write(SettingsService.liveTvDefaultFavorites, true);
   });
 
+  testWidgets('changing the favorites default updates an already opened guide', (tester) async {
+    final harness = await _pumpLiveTvScreen(tester, channelKeys: const ['channel-a', 'channel-b']);
+    addTearDown(() async {
+      await tester.pumpWidget(const SizedBox.shrink());
+      harness.dispose();
+    });
+    harness.liveTv.favorites.complete([FavoriteChannel(id: 'channel-a', source: 'server://server-a/provider-a')]);
+    await tester.pumpAndSettle();
+    expect(_guideChannels(tester).map((channel) => channel.key), ['channel-a']);
+    await SettingsService.instance.write(SettingsService.liveTvDefaultFavorites, false);
+    await tester.pumpAndSettle();
+    expect(_guideChannels(tester).map((channel) => channel.key), ['channel-a', 'channel-b']);
+    await SettingsService.instance.write(SettingsService.liveTvDefaultFavorites, true);
+    await tester.pumpAndSettle();
+    expect(_guideChannels(tester).map((channel) => channel.key), ['channel-a']);
+  });
+
   testWidgets('loaded empty favorites shows the favorites empty state and can restore all channels', (tester) async {
     final harness = await _pumpLiveTvScreen(tester);
     addTearDown(() async {

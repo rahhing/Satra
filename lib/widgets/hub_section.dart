@@ -490,7 +490,12 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SettingValueBuilder<bool>(
+    pref: SettingsService.showServerNameOnHubs,
+    builder: (context, showServerName, _) => _buildContent(context, showServerName || widget.showServerName),
+  );
+
+  Widget _buildContent(BuildContext context, bool showServerName) {
     final hasFocus = _hubFocusNode.hasFocus;
     final isKeyboardMode = InputModeTracker.isKeyboardMode(context);
     final isTv = PlatformDetector.isTV();
@@ -543,7 +548,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                           ),
                         ),
                       ],
-                      if (widget.showServerName && widget.hub.serverName != null) ...[
+                      if (showServerName && widget.hub.serverName != null) ...[
                         const SizedBox(width: 8),
                         Text(
                           '•',

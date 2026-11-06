@@ -50,7 +50,7 @@ Widget buildFocusChrome(
     card = AnimatedContainer(duration: duration, curve: Curves.easeOutCubic, decoration: decoration, child: child);
   }
 
-  // Glow (full-bleed cards) renders in an overlay above siblings so it stays
+  // Card glow renders in an overlay above siblings so it stays
   // symmetric; the in-card decoration only carries the border. [showGlow] lets
   // callers hold back just the glow (e.g. while a viewport scroll animates)
   // without touching the border or scale chrome.

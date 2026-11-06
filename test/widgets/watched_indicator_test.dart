@@ -29,6 +29,25 @@ void main() {
 
   final watchedMovie = testMediaItem(id: 'movie', kind: MediaKind.movie, viewCount: 1);
 
+  testWidgets('mounted indicators follow both visibility settings live', (tester) async {
+    await pump(tester, WatchedIndicator(item: watchedMovie));
+    await SettingsService.instance.write(SettingsService.showWatchedIndicators, false);
+    await tester.pump();
+    expect(find.byIcon(Symbols.check_rounded), findsNothing);
+    await SettingsService.instance.write(SettingsService.showWatchedIndicators, true);
+    await tester.pump();
+    expect(find.byIcon(Symbols.check_rounded), findsOneWidget);
+
+    await pump(tester, WatchedIndicator(item: testMediaItem(kind: MediaKind.show, leafCount: 10, viewedLeafCount: 3)));
+    expect(find.byType(UnwatchedCountBadge), findsOneWidget);
+    await SettingsService.instance.write(SettingsService.showUnwatchedCount, false);
+    await tester.pump();
+    expect(find.byType(UnwatchedCountBadge), findsNothing);
+    await SettingsService.instance.write(SettingsService.showUnwatchedCount, true);
+    await tester.pump();
+    expect(find.byType(UnwatchedCountBadge), findsOneWidget);
+  });
+
   testWidgets('shows the watched checkmark by default', (tester) async {
     await pump(tester, WatchedIndicator(item: watchedMovie));
 

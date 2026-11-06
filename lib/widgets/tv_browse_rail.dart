@@ -151,8 +151,11 @@ class TvBrowseRailLayout {
     required double itemGap,
   }) {
     final f = LibraryDensity.factor(density);
-    final minWidth = (useWideLayout ? 200 : 130) * scale;
-    final maxWidth = (useWideLayout ? 420 : 250) * scale;
+    // Scale the bounds too: fixed bounds made several slider positions
+    // identical on large displays (or narrow windows).
+    final densityScale = 0.8 + 0.4 * f;
+    final minWidth = (useWideLayout ? 200 : 130) * scale * densityScale;
+    final maxWidth = (useWideLayout ? 420 : 250) * scale * densityScale;
     final targetCards = useWideLayout ? 4.2 - (f * 1.4) : 7.0 - (f * 2.0);
     final usableWidth = (availableWidth - horizontalPadding).clamp(1.0, double.infinity).toDouble();
     final gapCount = targetCards > 1 ? targetCards - 1 : 0.0;
@@ -174,10 +177,11 @@ class TvBrowseRailLayout {
   }) {
     final focusExtra = FocusTheme.focusBorderWidth * 2 * scale;
     final railEdgePadding = focusExtra + (12 * scale);
-    // Full-card rails keep their own scale-derived gutter, like full-bleed
-    // grids; every other rail follows the user's grid-spacing setting, scaled
-    // with the rest of the rail metrics (#2226).
-    final itemGap = fullCardLayout ? fullCardItemGapForScale(scale) : gridSpacing.gridGap * scale;
+    // Full-card rails retain their scale-derived normal gutter; Tight and
+    // Spacious adjust it just as they adjust captioned cards.
+    final itemGap = fullCardLayout
+        ? fullCardItemGapForScale(scale) + (gridSpacing.gridGap - GridSpacing.normal.gridGap) * scale
+        : gridSpacing.gridGap * scale;
     final isPersonHub = TvBrowseRailLayout.isPersonHub(hub);
     final emptyEpisodeThumbnailHub =
         hub.items.isEmpty && hub.type == 'episode' && episodePosterMode == EpisodePosterMode.episodeThumbnail;
@@ -1391,6 +1395,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
         SettingsService.episodePosterMode,
         SettingsService.tvFullCardLayout,
         SettingsService.gridSpacing,
+        SettingsService.showServerNameOnHubs,
       ],
       builder: (context) => LayoutBuilder(
         builder: (context, constraints) {
@@ -1712,7 +1717,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     final colorScheme = Theme.of(context).colorScheme;
     final titleColor = isActive ? colorScheme.onSurface : colorScheme.onSurface.withValues(alpha: 0.54);
     final iconColor = isActive ? colorScheme.onSurface : colorScheme.onSurface.withValues(alpha: 0.42);
-    final showServerName = widget.showServerName && hub.serverName != null;
+    final showServerName =
+        (widget.showServerName || SettingsService.instance.read(SettingsService.showServerNameOnHubs)) &&
+        hub.serverName != null;
     final serverColor = colorScheme.primary.withValues(alpha: isActive ? 0.7 : 0.4);
     final serverStyle = Theme.of(
       context,
@@ -1994,7 +2001,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
         isFocused: focus.$1,
         borderRadius: tokens(context).radiusSm,
         focusScale: fullCardLayout ? TvBrowseRailLayout.fullCardFocusScale : FocusTheme.focusScale,
-        useFocusGlow: fullCardLayout,
+        useFocusGlow: true,
         showGlow: focus.$2,
         // The card draws the border itself (poster rect for
         // standard cards, whole card when full-bleed).

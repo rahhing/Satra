@@ -116,9 +116,10 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
 
   @override
   Widget build(BuildContext context) {
-    return SettingValueBuilder<bool>(
-      pref: SettingsService.hideSpoilers,
-      builder: (context, hideSpoilers, _) => _buildContent(context, hideSpoilers: hideSpoilers),
+    return SettingsBuilder(
+      prefs: const [SettingsService.hideSpoilers, SettingsService.showEpisodeNumberOnCards],
+      builder: (context) =>
+          _buildContent(context, hideSpoilers: SettingsService.instance.read(SettingsService.hideSpoilers)),
     );
   }
 
@@ -255,7 +256,11 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
                               final index = episode.index;
                               // The prefix mirrors the server-provided episode
                               // number verbatim, including a genuine episode 0.
-                              final titleText = index != null ? '$index. ${episode.title!}' : episode.title!;
+                              final titleText =
+                                  index != null &&
+                                      SettingsService.instance.read(SettingsService.showEpisodeNumberOnCards)
+                                  ? '$index. ${episode.title!}'
+                                  : episode.title!;
                               return Row(
                                 children: [
                                   if (downloadStatusIcon != null) ...[downloadStatusIcon, const SizedBox(width: 8)],

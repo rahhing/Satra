@@ -1,5 +1,6 @@
 #include "mpv_plugin.h"
 
+#include <cmath>
 #include <cstring>
 #include <deque>
 #include <functional>
@@ -8,6 +9,7 @@
 #include <new>
 #include <optional>
 
+#include "plane_geometry.h"
 #include "plane_render_executor.h"
 #include "wayland_video_surface.h"
 
@@ -47,6 +49,7 @@ struct _MpvPlugin {
   // stale or absent. Sticky, because the render it asks for may first have to
   // wait out an unacknowledged frame.
   gboolean plane_needs_render;
+  guint64 forced_render_serial;
   // The worker that runs mpv's render + the plane's eglSwapBuffers off the
   // GTK main thread (issue #2057: an expensive per-frame render - a 4K HDR
   // tone-map - on the main thread starves input dispatch and Flutter's
@@ -391,7 +394,10 @@ static void schedule_render_retry(MpvPlugin* self) {
 // raster, which share the GTK main thread. Everything up to PreparePresent()
 // and everything from the completion on stays here on the main thread.
 static void render_video_plane(MpvPlugin* self, gboolean force) {
-  if (force) self->plane_needs_render = TRUE;
+  if (force) {
+    self->plane_needs_render = TRUE;
+    ++self->forced_render_serial;
+  }
   if (!self->player || !self->video_surface || !self->video_surface->valid()) return;
   // One job at a time. The flight owns the plane's EGL surface, and a second
   // prepare would arm a frame callback over a commit that has not happened.
@@ -433,12 +439,17 @@ static void render_video_plane(MpvPlugin* self, gboolean force) {
   EGLSurface egl_surface = self->video_surface->egl_surface();
   const int width = self->video_surface->width();
   const int height = self->video_surface->height();
+  // The plane's origin is rounded down to whole surface units at HiDPI.
+  const int scale = self->pending_rect.scale;
+  const double left = double(mpv::PlaneOriginUnits(self->pending_rect.x, scale)) * scale;
+  const double top = double(mpv::PlaneOriginUnits(self->pending_rect.y, scale)) * scale;
+  const guint64 forced_render_serial = self->forced_render_serial;
   const guint64 generation = self->generation;
   self->render_in_flight = TRUE;
   const bool posted = post_render_job(
       self,
-      [player, display, egl_surface, width, height]() -> bool {
-        if (!player->RenderToSurface(egl_surface, width, height)) return false;
+      [player, display, egl_surface, width, height, left, top]() -> bool {
+        if (!player->RenderToSurface(egl_surface, width, height, left, top)) return false;
         // The swap is the child surface's commit. Non-throttled
         // (eglSwapInterval 0), so it never blocks on the compositor; its cost
         // is the render's, which is exactly what this thread is for.
@@ -448,7 +459,7 @@ static void render_video_plane(MpvPlugin* self, gboolean force) {
         }
         return true;
       },
-      [self, generation](bool swapped) {
+      [self, generation, forced_render_serial](bool swapped) {
         // The plane this job rendered for may be gone: release_video_resources
         // bumps the generation, and completions outlive the executor.
         if (self->generation != generation) return;
@@ -457,7 +468,11 @@ static void render_video_plane(MpvPlugin* self, gboolean force) {
         // A swap failure leaves plane_needs_render set, so the retry - and the
         // frame callback CompletePresent just cleared - are owed to the next
         // event that moves the plane, or to the delayed retry scheduled below.
-        if (self->video_surface->CompletePresent(swapped)) self->plane_needs_render = FALSE;
+        // A pane can move or close while this frame is rendering, including
+        // over paused video. Keep the newer forced redraw owed in that case.
+        if (self->video_surface->CompletePresent(swapped) && self->forced_render_serial == forced_render_serial) {
+          self->plane_needs_render = FALSE;
+        }
         // Work that had to wait out the flight, in dependency order: geometry
         // first (wl_egl_window_resize must not race a swap), then the HDR
         // transaction pump (a transition staged mid-flight would pair an
@@ -1502,6 +1517,35 @@ static void mpv_plugin_handle_method_call(FlMethodChannel* channel, FlMethodCall
     // on an SDR panel, where enabling it only invites the compositor to tone-map
     // a plane that never needed to be PQ in the first place.
     response = bool_success_response(hdr_available(self));
+  } else if (strcmp(method, "setVideoBlurRegion") == 0) {
+    FlValue* id = fl_value_lookup_string(args, "id");
+    FlValue* rect = fl_value_lookup_string(args, "rect");
+    mpv::VideoBlurRegion region{};
+    double values[9] = {};
+    bool valid = id && fl_value_get_type(id) == FL_VALUE_TYPE_INT;
+    if (rect) {
+      valid = valid && fl_value_get_type(rect) == FL_VALUE_TYPE_LIST && fl_value_get_length(rect) == 9;
+      for (size_t i = 0; valid && i < 9; ++i) {
+        FlValue* value = fl_value_get_list_value(rect, i);
+        if (fl_value_get_type(value) == FL_VALUE_TYPE_FLOAT)
+          values[i] = fl_value_get_float(value);
+        else if (fl_value_get_type(value) == FL_VALUE_TYPE_INT)
+          values[i] = fl_value_get_int(value);
+        else
+          valid = false;
+        valid = valid && std::isfinite(values[i]) && std::abs(values[i]) <= 1000000 && (i < 2 || values[i] >= 0);
+      }
+      region = {values[0], values[1], values[2], values[3], values[4], {values[5], values[6], values[7], values[8]}};
+    }
+    if (!valid) {
+      response = FL_METHOD_RESPONSE(fl_method_error_response_new("INVALID_ARGS", "Invalid video blur region", nullptr));
+    } else {
+      if (self->player) {
+        self->player->SetVideoBlurRegion(fl_value_get_int(id), rect ? &region : nullptr);
+        render_video_plane(self, TRUE);
+      }
+      response = FL_METHOD_RESPONSE(fl_method_success_response_new(nullptr));
+    }
   } else if (strcmp(method, "setVideoRect") == 0) {
     {
       auto read_int = [args](const char* key, int64_t* out) {

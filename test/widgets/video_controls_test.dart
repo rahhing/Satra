@@ -572,6 +572,7 @@ void main() {
       bool Function()? isChromePresented,
       Future<bool> Function()? exitFullscreenIfActive,
       bool physicalEscapeExitsFullscreen = true,
+      bool physicalEscapeExitsPlayer = false,
       bool Function()? physicalEscapeExitsFullscreenProvider,
       bool Function()? exitPlayerBeforeChrome,
       bool Function()? backLeavesPrompt,
@@ -586,6 +587,7 @@ void main() {
         isChromePresented: isChromePresented ?? () => chromeController.controlsPresented,
         exitFullscreenIfActive: exitFullscreenIfActive ?? () async => false,
         physicalEscapeExitsFullscreen: physicalEscapeExitsFullscreenProvider ?? () => physicalEscapeExitsFullscreen,
+        physicalEscapeExitsPlayer: physicalEscapeExitsPlayer,
         exitPlayerBeforeChrome: exitPlayerBeforeChrome,
         backLeavesPrompt: backLeavesPrompt,
         exitPlayer: exitPlayer ?? () {},
@@ -720,6 +722,26 @@ void main() {
       await tester.sendKeyEvent(LogicalKeyboardKey.gameButtonB);
 
       expect(exits, 1, reason: 'a TV start has no chrome to hide, so back belongs to the route (#1765)');
+    });
+
+    testWidgets('physical Escape exits directly with chrome visible and fullscreen active', (tester) async {
+      final chromeController = PlayerChromeController();
+      addTearDown(chromeController.dispose);
+      var exits = 0;
+      var fullscreenChecks = 0;
+      final coordinator = coordinatorFor(
+        chromeController,
+        physicalEscapeExitsPlayer: true,
+        exitPlayer: () => exits++,
+        exitFullscreenIfActive: () async {
+          fullscreenChecks++;
+          return true;
+        },
+      );
+      await pumpNavigationFocus(tester, coordinator);
+      await tester.sendKeyEvent(LogicalKeyboardKey.escape);
+      expect(exits, 1);
+      expect(fullscreenChecks, 0);
     });
 
     testWidgets('physical Escape outside fullscreen hides presented chrome without exiting', (tester) async {

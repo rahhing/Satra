@@ -277,6 +277,7 @@ void main() {
         episodePosterMode: EpisodePosterMode.episodeThumbnail,
         scale: 0.85,
         fullCardLayout: true,
+        gridSpacing: GridSpacing.normal,
       );
 
       expect(full.height, lessThan(detailed.height));
@@ -286,7 +287,7 @@ void main() {
       expect(full.posterHeight, closeTo(full.posterWidth * 9 / 16, 0.001));
     });
 
-    test('grid spacing widens the rail gap and narrows cards; full card rails keep their own gutter', () {
+    test('grid spacing widens rail gaps and narrows cards in both card layouts', () {
       // #2226: the TV home rail follows the grid-spacing setting like the
       // library grid. Full-card rails already carry a scale-derived gutter,
       // mirroring how full-bleed grids ignore the setting.
@@ -318,8 +319,8 @@ void main() {
 
       final fullTight = metrics(GridSpacing.tight, fullCardLayout: true);
       final fullSpacious = metrics(GridSpacing.spacious, fullCardLayout: true);
-      expect(fullSpacious.itemGap, fullTight.itemGap);
-      expect(fullSpacious.cardWidth, fullTight.cardWidth);
+      expect(fullSpacious.itemGap, greaterThan(fullTight.itemGap));
+      expect(fullSpacious.cardWidth, lessThan(fullTight.cardWidth));
 
       // Height reservations follow the same metrics.
       final tightEstimate = TvBrowseRailLayout.estimateHeight(
@@ -725,6 +726,7 @@ void main() {
       episodePosterMode: EpisodePosterMode.seriesPoster,
       scale: scale,
       fullCardLayout: true,
+      gridSpacing: SettingsService.instance.read(SettingsService.gridSpacing),
     );
 
     // The focused card mounts a leader (CompositedTransformTarget); scope to it

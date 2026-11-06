@@ -87,4 +87,32 @@ void main() {
     await tester.tap(find.byKey(const Key('target')));
     expect(taps, 2);
   });
+
+  testWidgets('automotive display scale changes the mounted interface live', (tester) async {
+    PlatformDetector.debugSetIsDesktopOSOverride(false);
+    TvDetectionService.debugSetAutomotiveOverride(true);
+    tester.view.physicalSize = const Size(1280, 720);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    var size = Size.zero;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.android),
+        home: app.FormFactorScale(
+          child: Builder(
+            builder: (context) {
+              size = MediaQuery.sizeOf(context);
+              return const SizedBox.expand();
+            },
+          ),
+        ),
+      ),
+    );
+    for (final scale in [1.0, 1.5, 2.0]) {
+      await SettingsService.instance.write(SettingsService.automotiveUiScale, scale);
+      await tester.pumpAndSettle();
+      expect(size.width, closeTo(1280 / scale, 0.001));
+      expect(size.height, closeTo(720 / scale, 0.001));
+    }
+  });
 }

@@ -1,4 +1,7 @@
 import 'dart:async';
+import 'media_detail_screen.dart';
+import '../utils/media_navigation_helper.dart' show mediaDetailNavigationTargetFor;
+import '../navigation/profile_navigation_scope.dart';
 import '../services/playback_launch_observer.dart';
 import '../media/ids.dart';
 import 'dart:io';
@@ -1399,6 +1402,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
       // closing the player).
       exitPlayerBeforeChrome: () => PlatformDetector.isMobile(context),
       exitFullscreenIfActive: FullscreenStateManager().exitFullscreenIfActive,
+      physicalEscapeExitsPlayer: true,
       // macOS fullscreen belongs to the app window, while HTPC-style player
       // navigation treats physical Escape as semantic Back. In both cases the
       // player must leave native fullscreen alone. So must it when the window
@@ -2281,7 +2285,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
   /// The returned future completes once navigation has been attempted. Accept
   /// once: the entry guard below only admits an exit that can remove its own
   /// route, and [_removePlayerRoute] removes it whatever ends up on top (#2290).
-  Future<void> _exitPlayerRoute({required bool navigateHome, bool stop = false}) {
+  Future<void> _exitPlayerRoute({required bool navigateHome, bool stop = false, bool returnToDetails = false}) {
     final existing = _routeExitOperation;
     if (existing != null) return existing;
     if (!mounted) return Future<void>.value();
@@ -2292,6 +2296,11 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
     final completer = Completer<void>();
     _routeExitOperation = completer.future;
     final onHome = _companionRemote.savedOnHome;
+    // Details requires a profile navigator. A standalone player has no details
+    // surface to open, so retain its original route as the fallback.
+    final details = returnToDetails && !widget.isLive && ProfileNavigationScope.maybeOf(context) != null
+        ? mediaDetailNavigationTargetFor(_currentMetadata)
+        : null;
     final navigationReady = Completer<void>();
     final deadline = Timer(_routeExitNavigationBudget, navigationReady.complete);
     final cleanup = Future<void>.sync(() => _shutdownVideo(pauseForRouteExit: !stop));
@@ -2309,7 +2318,23 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
       try {
         await navigationReady.future;
         deadline.cancel();
-        _removePlayerRoute(navigator, route, navigateHome: navigateHome, onHome: onHome);
+        _removePlayerRoute(
+          navigator,
+          route,
+          navigateHome: navigateHome,
+          onHome: onHome,
+          detailsRoute: details == null
+              ? null
+              : () => mediaDetailRoute(
+                  instant: true,
+                  metadata: details.metadata,
+                  isOffline: widget.isOffline,
+                  initialSeasonIndex: details.initialSeasonIndex,
+                  initialSeasonId: details.initialSeasonId,
+                  initialEpisodeId: details.initialEpisodeId,
+                ),
+          detailsKey: details?.metadata.globalKey,
+        );
         completer.complete();
       } catch (error, stackTrace) {
         completer.completeError(error, stackTrace);
@@ -2336,7 +2361,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
     _isHandlingBack = true;
     try {
       if (!mounted) return;
-      await _exitPlayerRoute(navigateHome: navigateHome);
+      await _exitPlayerRoute(navigateHome: navigateHome, returnToDetails: !navigateHome);
     } finally {
       if (mounted && _routeExitOperation == null) _isHandlingBack = false;
     }
@@ -2353,6 +2378,8 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
     Route<dynamic> route, {
     required bool navigateHome,
     VoidCallback? onHome,
+    PageRoute<bool> Function()? detailsRoute,
+    String? detailsKey,
   }) {
     // The navigator or the route went away on its own; nothing of ours is left.
     if (!navigator.mounted || !route.isActive) return;
@@ -2361,7 +2388,16 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
         navigator.popUntil((r) => r.isFirst);
         onHome?.call();
       } else {
-        navigator.pop(true);
+        if (detailsRoute != null) {
+          returnPlayerToDetails(
+            navigator,
+            playerRoute: route,
+            detailsKey: detailsKey!,
+            buildDetailsRoute: detailsRoute,
+          );
+        } else {
+          navigator.pop(true);
+        }
       }
       return;
     }

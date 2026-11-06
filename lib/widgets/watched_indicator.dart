@@ -7,6 +7,7 @@ import '../media/media_kind.dart';
 import '../services/settings_service.dart';
 import '../theme/mono_tokens.dart';
 import 'app_icon.dart';
+import 'settings_builder.dart';
 import 'media_progress_bar.dart';
 import 'unwatched_count_badge.dart';
 
@@ -55,9 +56,8 @@ enum WatchedIndicatorSize {
 /// Watched/progress overlay for media artwork: watched checkmark,
 /// unwatched-count pill (shows/seasons), active-progress bar, and season
 /// completion bar. The single implementation behind every surface that
-/// stamps watch state onto a poster/thumbnail. Callers that must react to
-/// [SettingsService.showWatchedIndicators] or [SettingsService.showUnwatchedCount]
-/// flipping wrap themselves in a [SettingsBuilder] on those prefs.
+/// stamps watch state onto a poster/thumbnail. Watches its appearance settings
+/// directly, including when mounted in a retained episode list.
 class WatchedIndicator extends StatelessWidget {
   final MediaItem item;
   final WatchedIndicatorSize size;
@@ -75,7 +75,12 @@ class WatchedIndicator extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SettingsBuilder(
+    prefs: const [SettingsService.showWatchedIndicators, SettingsService.showUnwatchedCount],
+    builder: _buildContent,
+  );
+
+  Widget _buildContent(BuildContext context) {
     final bool showCount = showUnwatchedCount ?? SettingsService.instance.read(SettingsService.showUnwatchedCount);
     final bool showWatched = SettingsService.instance.read(SettingsService.showWatchedIndicators);
     final hasActiveProgress = item.hasActiveProgress;

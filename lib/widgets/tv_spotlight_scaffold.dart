@@ -14,6 +14,7 @@ import '../utils/debouncer.dart';
 import '../utils/layout_constants.dart';
 import '../utils/formatters.dart';
 import 'tv_browse_rail.dart';
+import 'settings_builder.dart';
 import 'tv_spotlight_background.dart';
 
 class TvSpotlightController extends ValueNotifier<MediaItem?> {
@@ -86,7 +87,18 @@ class TvSpotlightScaffold extends StatelessWidget {
   final bool? hideSpoilers;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => SettingsBuilder(
+    prefs: const [
+      SettingsService.libraryDensity,
+      SettingsService.episodePosterMode,
+      SettingsService.tvFullCardLayout,
+      SettingsService.gridSpacing,
+      SettingsService.hideSpoilers,
+    ],
+    builder: _buildContent,
+  );
+
+  Widget _buildContent(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final settings = SettingsService.instance;
     final scale = TvLayoutConstants.scaleForSize(size);

@@ -306,6 +306,7 @@ class PlayerNavigationCoordinator {
   final Future<bool> Function() exitFullscreenIfActive;
   final bool Function() _physicalEscapeExitsFullscreen;
   final bool Function() _exitPlayerBeforeChrome;
+  final bool physicalEscapeExitsPlayer;
   final VoidCallback exitPlayer;
   final VoidCallback navigateHome;
   final bool Function() isActive;
@@ -319,6 +320,7 @@ class PlayerNavigationCoordinator {
     required this.isChromePresented,
     required this.exitFullscreenIfActive,
     bool Function()? physicalEscapeExitsFullscreen,
+    this.physicalEscapeExitsPlayer = false,
     bool Function()? exitPlayerBeforeChrome,
     bool Function()? backLeavesPrompt,
     required this.exitPlayer,
@@ -334,6 +336,10 @@ class PlayerNavigationCoordinator {
   static bool _alwaysFalse() => false;
 
   void handle(PlayerNavigationKey navigationKey) {
+    if (navigationKey == PlayerNavigationKey.physicalEscape && physicalEscapeExitsPlayer) {
+      exitPlayer();
+      return;
+    }
     if (navigationKey == PlayerNavigationKey.home) {
       navigateHome();
       return;

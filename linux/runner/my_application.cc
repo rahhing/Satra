@@ -8,6 +8,7 @@
 
 #include "flutter/generated_plugin_registrant.h"
 #include "mpv/mpv_plugin.h"
+#include "vsync/flutter_vsync.h"
 
 // On Wayland the mpv video plane is a wl_subsurface stacked *below* this
 // window's surface, so the window needs an alpha channel for it to show
@@ -93,6 +94,7 @@ static void my_application_activate(GApplication* application) {
   fl_dart_project_set_dart_entrypoint_arguments(project, self->dart_entrypoint_arguments);
 
   self->flutter_view = fl_view_new(project);
+  satra_install_flutter_vsync(self->flutter_view);
   enable_video_plane_transparency(window, self->flutter_view);
   gtk_widget_show(GTK_WIDGET(self->flutter_view));
   gtk_container_add(GTK_CONTAINER(window), GTK_WIDGET(self->flutter_view));

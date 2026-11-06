@@ -18,7 +18,6 @@ import '../../mixins/refreshable.dart';
 import '../../mixins/tab_navigation_mixin.dart';
 import '../../providers/multi_server_provider.dart';
 import '../../services/settings_service.dart';
-import '../../widgets/settings_builder.dart';
 import '../../utils/app_logger.dart';
 import '../../utils/error_message_utils.dart';
 import '../../utils/desktop_window_padding.dart';
@@ -79,6 +78,7 @@ class _LiveTvScreenState extends State<LiveTvScreen>
 
   // Favorites
   bool _showFavoritesOnly = false;
+  late final ValueListenable<bool> _defaultFavorites;
   Set<String> _favoriteKeys = {};
   List<FavoriteChannel> _favoriteChannels = [];
 
@@ -145,7 +145,9 @@ class _LiveTvScreenState extends State<LiveTvScreen>
   void initState() {
     super.initState();
     suppressAutoFocus = true;
-    _showFavoritesOnly = context.settingsRead(SettingsService.liveTvDefaultFavorites);
+    _defaultFavorites = SettingsService.instance.listenable(SettingsService.liveTvDefaultFavorites);
+    _showFavoritesOnly = _defaultFavorites.value;
+    _defaultFavorites.addListener(_handleDefaultFavoritesChanged);
     final initialTabs = _tabStateFor(context.read<MultiServerProvider>());
     _visibleTabs = initialTabs.tabs;
     _canProcessRules = initialTabs.canProcessRules;
@@ -153,8 +155,13 @@ class _LiveTvScreenState extends State<LiveTvScreen>
     _loadChannels();
   }
 
+  void _handleDefaultFavoritesChanged() {
+    if (mounted) setState(() => _showFavoritesOnly = _defaultFavorites.value);
+  }
+
   @override
   void dispose() {
+    _defaultFavorites.removeListener(_handleDefaultFavoritesChanged);
     _guideTabFocusNode.dispose();
     _whatsOnTabFocusNode.dispose();
     _recordingsTabFocusNode.dispose();

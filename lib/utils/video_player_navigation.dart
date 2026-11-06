@@ -36,11 +36,45 @@ import '../i18n/strings.g.dart';
 
 const String kVideoPlayerRouteName = '/video_player';
 
+/// Leave playback for its media details, including when playback began from a
+/// library or Home. Retain an existing matching details page and its state.
+void returnPlayerToDetails(
+  NavigatorState navigator, {
+  required Route<dynamic> playerRoute,
+  required String detailsKey,
+  required PageRoute<bool> Function() buildDetailsRoute,
+}) {
+  final previous = playerRoute is VideoPlayerRoute ? playerRoute.previousRoute : null;
+  if (previous?.settings.name == '/media_detail' && previous?.settings.arguments == detailsKey) {
+    navigator.pop(true);
+    return;
+  }
+  final PageRoute<bool> details;
+  try {
+    details = buildDetailsRoute();
+  } catch (error, stackTrace) {
+    appLogger.w('Could not open playback details', error: error, stackTrace: stackTrace);
+    navigator.pop(true);
+    return;
+  }
+  // Keep the player above the original page throughout the incoming details
+  // transition. Popping first briefly resumes and paints Home or the library.
+  unawaited(navigator.pushReplacement<bool, bool>(details, result: true));
+}
+
 /// One video route per navigator, shared by VOD and Live TV.
 ///
 /// Commit through [push], not Navigator.push: a covered player still owns the
 /// native channel and must leave before another playback can take ownership.
 class VideoPlayerRoute extends PageRouteBuilder<bool> {
+  Route<dynamic>? previousRoute;
+
+  @override
+  void didChangePrevious(Route<dynamic>? previousRoute) {
+    this.previousRoute = previousRoute;
+    super.didChangePrevious(previousRoute);
+  }
+
   /// [joinsWatchTogether]: the player can take part in a Watch Together
   /// room (video on demand, streamed or downloaded; not Live TV).
   VideoPlayerRoute({required WidgetBuilder builder, this.joinsWatchTogether = false})

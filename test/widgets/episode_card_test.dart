@@ -41,6 +41,19 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(null);
   });
 
+  testWidgets('episode number can be hidden and restored on a mounted episode card', (tester) async {
+    final episode = testMediaItem(kind: MediaKind.episode, title: 'Episode title', index: 0);
+    await _pumpEpisodeCard(tester, episode);
+    expect(find.text('0. Episode title'), findsOneWidget);
+    await SettingsService.instance.write(SettingsService.showEpisodeNumberOnCards, false);
+    await tester.pump();
+    expect(find.text('0. Episode title'), findsNothing);
+    expect(find.text('Episode title'), findsOneWidget);
+    await SettingsService.instance.write(SettingsService.showEpisodeNumberOnCards, true);
+    await tester.pump();
+    expect(find.text('0. Episode title'), findsOneWidget);
+  });
+
   testWidgets('overflowing summary stays in card semantics without an Expand label', (tester) async {
     final semantics = tester.ensureSemantics();
     const summary =
