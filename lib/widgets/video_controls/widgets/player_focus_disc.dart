@@ -9,7 +9,7 @@ import '../../../focus/focus_theme.dart';
 /// surfaces; over a scrim on top of a bright frame it disappears (#2383). Over
 /// video the focused control instead becomes a solid disc with the icon
 /// inverted — the treatment the tvOS system player, Netflix and Plex use — so
-/// it reads at ten feet on any frame. An active control fills amber so that
+/// it reads at ten feet on any frame. An active control uses the theme accent so that
 /// state survives the inversion.
 ///
 /// Reads the [CardFocusScope] installed by
@@ -30,7 +30,7 @@ class PlayerFocusDisc extends StatelessWidget {
   /// (unavailable) control stays visibly dimmed on the disc.
   final Color iconColor;
 
-  /// Whether the control represents an engaged state (amber icon when idle).
+  /// Whether the control represents an engaged state (accent icon when idle).
   final bool isActive;
 
   /// Rounds a rectangular fill instead of the default disc, for a labelled
@@ -40,21 +40,24 @@ class PlayerFocusDisc extends StatelessWidget {
   final Widget Function(BuildContext context, Color iconColor) builder;
 
   static const Color _fill = Colors.white;
-  static const Color _activeFill = Colors.amber;
 
   @override
   Widget build(BuildContext context) {
     final showFocus = CardFocusScope.maybeOf(context) ?? false;
+    final scheme = Theme.of(context).colorScheme;
     return AnimatedContainer(
       duration: FocusTheme.getAnimationDuration(context),
       curve: Curves.easeOutCubic,
       decoration: BoxDecoration(
         shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
         borderRadius: borderRadius,
-        color: showFocus ? (isActive ? _activeFill : _fill) : Colors.transparent,
+        color: showFocus ? (isActive ? scheme.primary : _fill) : Colors.transparent,
         boxShadow: showFocus ? const [playerFocusShadow] : const [],
       ),
-      child: builder(context, showFocus ? Colors.black.withValues(alpha: iconColor.a) : iconColor),
+      child: builder(
+        context,
+        showFocus ? (isActive ? scheme.onPrimary : Colors.black).withValues(alpha: iconColor.a) : iconColor,
+      ),
     );
   }
 }

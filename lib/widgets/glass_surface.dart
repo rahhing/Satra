@@ -1,6 +1,9 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show PlatformViewHitTestBehavior;
+import 'package:flutter/services.dart';
 
 import '../theme/app_motion.dart';
 
@@ -15,6 +18,7 @@ class GlassSurface extends StatelessWidget {
     this.opacity = 0.42,
     this.border = true,
     this.enabled = true,
+    this.blurNativeVideo = false,
   });
 
   final Widget child;
@@ -24,6 +28,10 @@ class GlassSurface extends StatelessWidget {
   final double opacity;
   final bool border;
   final bool enabled;
+
+  /// macOS video is composited below Flutter, outside a BackdropFilter's
+  /// input. Player overlays use an AppKit material to sample that surface.
+  final bool blurNativeVideo;
 
   @override
   Widget build(BuildContext context) {
@@ -51,11 +59,28 @@ class GlassSurface extends StatelessWidget {
     );
     return ClipRRect(
       borderRadius: borderRadius,
-      child: BackdropFilter(
-        enabled: effects,
-        filter: ui.ImageFilter.blur(sigmaX: sigma, sigmaY: sigma, tileMode: ui.TileMode.clamp),
-        child: pane,
-      ),
+      child: effects && blurNativeVideo && !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS
+          ? Stack(
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: AppKitView(
+                      key: ValueKey(scheme.brightness),
+                      viewType: 'com.satra/video_sheet_blur',
+                      hitTestBehavior: PlatformViewHitTestBehavior.transparent,
+                      creationParams: {'dark': scheme.brightness == Brightness.dark},
+                      creationParamsCodec: const StandardMessageCodec(),
+                    ),
+                  ),
+                ),
+                pane,
+              ],
+            )
+          : BackdropFilter(
+              enabled: effects,
+              filter: ui.ImageFilter.blur(sigmaX: sigma, sigmaY: sigma, tileMode: ui.TileMode.clamp),
+              child: pane,
+            ),
     );
   }
 }

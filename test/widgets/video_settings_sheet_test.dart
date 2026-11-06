@@ -22,6 +22,8 @@ import 'package:satra/services/base_shared_preferences_service.dart';
 import 'package:satra/services/multi_server_manager.dart';
 import 'package:satra/services/settings_service.dart';
 import 'package:satra/services/sleep_timer_service.dart';
+import 'package:satra/theme/mono_theme.dart';
+import 'package:satra/widgets/app_icon.dart';
 import 'package:satra/widgets/overlay_sheet.dart';
 import 'package:satra/widgets/video_controls/models/track_controls_state.dart';
 import 'package:satra/widgets/video_controls/sheets/video_settings_sheet.dart';
@@ -54,6 +56,24 @@ void main() {
     SleepTimerService().cancelTimer();
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
+
+  for (final palette in [MonoPalette.oled, MonoPalette.ember, MonoPalette.paper]) {
+    testWidgets('playback selection and switches follow palette ${palette.accent}', (tester) async {
+      await _pumpSheet(tester, supportsHdrControl: true, theme: monoTheme(palette));
+      final tile = find.ancestor(of: find.text('HDR'), matching: find.byType(ListTile)).first;
+      await tester.ensureVisible(tile);
+      await tester.pumpAndSettle();
+
+      final icon = find.descendant(of: tile, matching: find.byType(AppIcon));
+      expect(tester.widget<AppIcon>(icon).color, palette.accent);
+      final toggle = find.descendant(of: tile, matching: find.byType(Switch));
+      // Let Material resolve thumb/track/disabled colours from the palette.
+      expect(tester.widget<Switch>(toggle).activeThumbColor, isNull);
+      await tester.tap(toggle);
+      await tester.pumpAndSettle();
+      expect(tester.widget<AppIcon>(icon).color, palette.textMuted);
+    });
+  }
 
   testWidgets('keeps audio passthrough out of the in-player sheet', (tester) async {
     // It configures the audio output route, not this playback, and applying it
@@ -637,6 +657,7 @@ Future<void> _pumpSheet(
   // row present without dragging to it pass a taller sheet, which builds all of
   // them.
   double height = 700,
+  ThemeData? theme,
 }) async {
   final sheet = SizedBox(
     width: 900,
@@ -649,7 +670,7 @@ Future<void> _pumpSheet(
   );
   await tester.pumpWidget(
     MaterialApp(
-      theme: ThemeData(extensions: const [testMonoTokensAnimated]),
+      theme: theme ?? ThemeData(extensions: const [testMonoTokensAnimated]),
       home: Scaffold(body: withSheetHost ? OverlaySheetHost(child: sheet) : sheet),
     ),
   );

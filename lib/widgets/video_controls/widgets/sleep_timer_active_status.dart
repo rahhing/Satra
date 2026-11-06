@@ -35,13 +35,13 @@ class SleepTimerActiveStatus extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.amber.withValues(alpha: 0.1),
+      color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.1),
       child: Column(
         mainAxisSize: .min,
         children: [
           Text(
             t.videoControls.timerActive,
-            style: const TextStyle(color: Colors.amber, fontSize: 16, fontWeight: .bold),
+            style: TextStyle(color: Theme.of(context).colorScheme.primary, fontSize: 16, fontWeight: .bold),
           ),
           const SizedBox(height: 8),
           Text(

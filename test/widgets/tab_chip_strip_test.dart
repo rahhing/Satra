@@ -7,8 +7,88 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:satra/theme/mono_theme.dart';
 import 'package:satra/theme/app_motion.dart';
 import 'package:satra/widgets/focusable_tab_chip.dart';
+import 'package:satra/widgets/retained_tab_view.dart';
 
 void main() {
+  testWidgets('retained Home and library bars hand off the sliding pill without an entrance fade', (tester) async {
+    final page = ValueNotifier(0);
+    addTearDown(page.dispose);
+    const key = Key('handoff');
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: monoTheme(MonoPalette.dark),
+        home: Center(
+          child: RepaintBoundary(
+            key: key,
+            child: SizedBox(
+              width: 500,
+              height: 48,
+              child: ColoredBox(
+                color: Colors.black,
+                child: TabChipMotionScope(
+                  child: ValueListenableBuilder<int>(
+                    valueListenable: page,
+                    builder: (_, index, _) => RetainedTabView(
+                      index: index,
+                      children: [
+                        for (var tab = 0; tab < 2; tab++)
+                          Align(
+                            alignment: Alignment.topLeft,
+                            child: TabChipStrip(
+                              motionId: 'browse',
+                              children: [
+                                FocusableTabChip(label: 'Home', isSelected: tab == 0, onSelect: () {}),
+                                const SizedBox(width: 100),
+                                FocusableTabChip(label: 'Movies', isSelected: tab == 1, onSelect: () {}),
+                              ],
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    Future<int> pillLeft() async {
+      final boundary = tester.renderObject<RenderRepaintBoundary>(find.byKey(key));
+      late ui.Image img;
+      late ByteData data;
+      await tester.runAsync(() async {
+        img = await boundary.toImage();
+        data = (await img.toByteData())!;
+      });
+      final x = List.generate(img.width, (x) => x).firstWhere((x) => data.getUint8((5 * img.width + x) * 4) > 200);
+      img.dispose();
+      return x;
+    }
+
+    final home = await pillLeft();
+    page.value = 1;
+    await tester.pump();
+    expect(await pillLeft(), closeTo(home, 1));
+    final fade = tester.widget<FadeTransition>(
+      find.descendant(of: find.byType(TabChipStrip), matching: find.byType(FadeTransition)),
+    );
+    expect(fade.opacity.value, 1);
+    await tester.pump(const Duration(milliseconds: 140));
+    final middle = await pillLeft();
+    await tester.pumpAndSettle();
+    final library = await pillLeft();
+    expect(middle, inExclusiveRange(home, library));
+    page.value = 0;
+    await tester.pump();
+    expect(await pillLeft(), closeTo(library, 1));
+    await tester.pump(const Duration(milliseconds: 140));
+    expect(await pillLeft(), inExclusiveRange(home, library));
+    await tester.pumpAndSettle();
+    expect(await pillLeft(), home);
+  });
+
   testWidgets('only the selected tab paints a pill, including when another tab has focus', (tester) async {
     final homeFocus = FocusNode();
     addTearDown(homeFocus.dispose);

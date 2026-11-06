@@ -1,6 +1,28 @@
 import Cocoa
 import FlutterMacOS
 
+/// A player sheet must sample the native video below Flutter's transparent
+/// surface. Within-window compositing keeps the effect inside Satra.
+private final class VideoSheetMaterialView: NSVisualEffectView {
+  override func hitTest(_ point: NSPoint) -> NSView? { nil }
+}
+
+private final class VideoSheetMaterialFactory: NSObject, FlutterPlatformViewFactory {
+  func createArgsCodec() -> FlutterMessageCodec & NSObjectProtocol {
+    FlutterStandardMessageCodec.sharedInstance()
+  }
+
+  func create(withViewIdentifier viewId: Int64, arguments args: Any?) -> NSView {
+    let dark = (args as? [String: Any])?["dark"] as? Bool ?? true
+    let view = VideoSheetMaterialView()
+    view.material = .hudWindow
+    view.blendingMode = .withinWindow
+    view.state = .active
+    view.appearance = NSAppearance(named: dark ? .darkAqua : .aqua)
+    return view
+  }
+}
+
 class ForwardingView: NSView {
   weak var flutterViewController: NSViewController?
 
@@ -74,6 +96,7 @@ class WindowUtilsPlugin: NSObject, FlutterPlugin {
   ]
 
   static func register(with registrar: FlutterPluginRegistrar) {
+    registrar.register(VideoSheetMaterialFactory(), withId: "com.satra/video_sheet_blur")
     let channel = FlutterMethodChannel(
       name: "com.satra/window_utils",
       binaryMessenger: registrar.messenger

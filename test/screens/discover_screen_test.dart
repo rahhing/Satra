@@ -3,6 +3,11 @@ import 'package:drift/native.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:satra/media/ids.dart';
+import 'package:satra/media/library_filter_result.dart';
+import 'package:satra/media/library_genre.dart';
+import 'package:satra/media/library_query.dart';
+import 'package:satra/media/media_sort.dart' as media_sort;
+import 'package:satra/media/media_playlist.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -35,6 +40,9 @@ import 'package:satra/providers/libraries_provider.dart';
 import 'package:satra/providers/multi_server_provider.dart';
 import 'package:satra/screens/discover_screen.dart';
 import 'package:satra/screens/main_screen.dart';
+import 'package:satra/screens/libraries/libraries_screen.dart';
+import 'package:satra/widgets/focusable_tab_chip.dart';
+import 'package:satra/utils/media_server_http_client.dart';
 import 'package:satra/services/data_aggregation_service.dart';
 import 'package:satra/services/multi_server_manager.dart';
 import 'package:satra/services/settings_service.dart';
@@ -46,6 +54,7 @@ import 'package:satra/watch_together/watch_together.dart';
 import 'package:satra/widgets/side_navigation_rail.dart';
 import 'package:satra/widgets/tv_browse_rail.dart';
 import 'package:satra/widgets/system_clock.dart';
+import 'package:satra/widgets/toolbar_scrim.dart';
 import 'package:satra/widgets/tv_spotlight_background.dart';
 import 'package:provider/provider.dart';
 
@@ -221,7 +230,7 @@ void main() {
 
     tester.state<FocusableActionBarState>(find.byType(FocusableActionBar)).requestFocusOnFirst();
     await tester.pump();
-    expect(FocusManager.instance.primaryFocus?.debugLabel, 'ActionBar[0]');
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'refresh');
 
     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
     expect(FocusManager.instance.primaryFocus?.debugLabel, 'tv_browse_rail');
@@ -230,14 +239,14 @@ void main() {
 
     tester.state<FocusableActionBarState>(find.byType(FocusableActionBar)).requestFocusOnFirst();
     await tester.pump();
-    expect(FocusManager.instance.primaryFocus?.debugLabel, 'ActionBar[0]');
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'refresh');
 
     (discoverKey.currentState! as FocusableTab).focusActiveTabIfReady();
     (discoverKey.currentState! as TabVisibilityAware).onTabHidden();
     await tester.pump();
     await tester.pump();
 
-    expect(FocusManager.instance.primaryFocus?.debugLabel, 'ActionBar[0]');
+    expect(FocusManager.instance.primaryFocus?.debugLabel, 'refresh');
 
     (discoverKey.currentState! as TabVisibilityAware).onTabShown();
     (discoverKey.currentState! as FocusableTab).focusActiveTabIfReady();
@@ -754,6 +763,9 @@ void main() {
   });
 
   testWidgets('top bar displays Home and the main server libraries, selecting a library on tap', (tester) async {
+    tester.view.physicalSize = const Size(1920, 1080);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
     final settings = await SettingsService.getInstance();
     await settings.write(SettingsService.mainServerId, null);
 
@@ -762,7 +774,7 @@ void main() {
       backend: MediaBackend.plex,
       title: 'Movies',
       kind: MediaKind.movie,
-      serverId: 'server_main',
+      serverId: 'server_1',
       serverName: 'home',
     );
     const mainShows = MediaLibrary(
@@ -770,7 +782,7 @@ void main() {
       backend: MediaBackend.plex,
       title: 'TV Shows',
       kind: MediaKind.show,
-      serverId: 'server_main',
+      serverId: 'server_1',
       serverName: 'home',
     );
     const secondServerLib = MediaLibrary(
@@ -783,7 +795,6 @@ void main() {
     );
 
     final librariesProvider = LibrariesProvider();
-    await librariesProvider.updateLibraryOrder(const [mainMovies, mainShows, secondServerLib]);
     final hiddenLibrariesProvider = HiddenLibrariesProvider();
     await hiddenLibrariesProvider.ensureInitialized();
 
@@ -851,10 +862,62 @@ void main() {
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 100));
 
+    expect(find.byTooltip(t.libraries.manageLibraries), findsNothing);
+    final toolbarBounds = tester.getRect(find.byType(ToolbarScrim));
+    tester.state<FocusableActionBarState>(find.byType(FocusableActionBar)).requestFocusOnFirst();
+    await tester.pump();
+    final refreshFocus = FocusManager.instance.primaryFocus;
+    expect(refreshFocus?.debugLabel, 'refresh');
+    // At launch Home mounts before the server's libraries arrive. A cached
+    // toolbar must still update its controls when that first load completes.
+    await librariesProvider.updateLibraryOrder(const [mainMovies, mainShows, secondServerLib]);
+    await tester.pumpAndSettle();
+    expect(find.byTooltip(t.libraries.manageLibraries), findsOneWidget);
+    expect(tester.getRect(find.byType(ToolbarScrim)), toolbarBounds);
+    expect(FocusManager.instance.primaryFocus, same(refreshFocus));
     expect(find.text(t.common.home), findsOneWidget);
     expect(find.text('Movies'), findsOneWidget);
     expect(find.text('TV Shows'), findsOneWidget);
     expect(find.text('Secondary Movies'), findsNothing, reason: 'only main server libraries appear in top bar');
+    for (final section in LibraryTabType.values) {
+      expect(find.text(section.label), findsOneWidget);
+    }
+    expect(find.byTooltip(t.common.shuffle), findsOneWidget);
+    expect(client.sectionCalls, isEmpty, reason: 'Recommended must not eagerly load the other sections');
+
+    for (final section in [
+      LibraryTabType.collections,
+      LibraryTabType.playlists,
+      LibraryTabType.genres,
+      LibraryTabType.browse,
+    ]) {
+      await tester.tap(find.text(section.label));
+      await tester.pumpAndSettle();
+      expect(tester.takeException(), isNull, reason: section.name);
+      final selected = tester
+          .widgetList<FocusableTabChip>(find.byType(FocusableTabChip))
+          .where((chip) => chip.isSelected);
+      expect(selected.map((chip) => chip.label), [t.common.home, section.label]);
+      expect(tester.getRect(find.byType(ToolbarScrim)), toolbarBounds);
+      expect(client.sectionCalls.where((call) => call == section.name), hasLength(1));
+    }
+    await tester.tap(find.text(t.libraries.tabs.recommended));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text(t.libraries.tabs.collections));
+    await tester.pumpAndSettle();
+    expect(client.sectionCalls.where((call) => call == 'collections'), hasLength(1), reason: 'retain loaded sections');
+    await tester.tap(find.text(t.common.home));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byTooltip(t.libraries.manageLibraries));
+    await tester.pumpAndSettle();
+    expect(
+      find.text('Secondary Movies'),
+      findsOneWidget,
+      reason: 'Home can manage all libraries, including other servers',
+    );
+    Navigator.of(tester.element(find.text('Secondary Movies'))).pop();
+    await tester.pumpAndSettle();
 
     await tester.tap(find.text('TV Shows'));
     await tester.pump();
@@ -1246,6 +1309,7 @@ Future<void> _pumpDiscoverShell(WidgetTester tester, {required bool isTv, WatchT
 class _FakeMediaServerClient implements MediaServerClient {
   final List<MediaHub> hubs;
   List<MediaItem> continueWatching;
+  final sectionCalls = <String>[];
 
   _FakeMediaServerClient({required this.hubs, this.continueWatching = const []});
 
@@ -1260,6 +1324,53 @@ class _FakeMediaServerClient implements MediaServerClient {
 
   @override
   ServerCapabilities get capabilities => ServerCapabilities.plex;
+
+  @override
+  Future<LibraryPage<MediaItem>> fetchCollectionsPage(
+    String libraryId, {
+    int? start,
+    int? size,
+    AbortController? abort,
+  }) async {
+    sectionCalls.add('collections');
+    return const LibraryPage(items: [], totalCount: 0);
+  }
+
+  @override
+  Future<LibraryPage<MediaPlaylist>> fetchPlaylistsPage({
+    String playlistType = 'video',
+    bool? smart,
+    int? start,
+    int? size,
+    AbortController? abort,
+  }) async {
+    sectionCalls.add('playlists');
+    return const LibraryPage(items: [], totalCount: 0);
+  }
+
+  @override
+  Future<List<LibraryGenre>> fetchLibraryGenres(String libraryId, {required MediaKind libraryKind}) async {
+    sectionCalls.add('genres');
+    return const [];
+  }
+
+  @override
+  Future<LibraryPage<MediaItem>> fetchLibraryPagedContent(
+    String libraryId, {
+    required LibraryQuery query,
+    MediaKind? libraryKind,
+    AbortController? abort,
+  }) async {
+    sectionCalls.add('browse');
+    return const LibraryPage(items: [], totalCount: 0);
+  }
+
+  @override
+  Future<List<media_sort.MediaSort>> fetchSortOptions(String libraryId, {String? libraryType}) async => const [];
+
+  @override
+  Future<LibraryFilterResult> fetchLibraryFiltersWithValues(String libraryId, {MediaKind? libraryKind}) async =>
+      LibraryFilterResult.empty;
 
   @override
   Future<List<MediaItem>> fetchContinueWatching({int? count = 20, Set<String> excludedLibraryIds = const {}}) async =>

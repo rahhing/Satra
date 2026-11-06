@@ -85,12 +85,12 @@ class _SettingsMenuItem extends StatelessWidget {
     final t = tokens(context);
     final valueWidget = Text(
       valueText,
-      style: TextStyle(color: isHighlighted ? Colors.amber : t.textMuted, fontSize: 14),
+      style: TextStyle(color: isHighlighted ? Theme.of(context).colorScheme.primary : t.textMuted, fontSize: 14),
       overflow: allowValueOverflow ? TextOverflow.ellipsis : null,
     );
 
     return FocusableListTile(
-      leading: AppIcon(icon, fill: 1, color: isHighlighted ? Colors.amber : t.textMuted),
+      leading: AppIcon(icon, fill: 1, color: isHighlighted ? Theme.of(context).colorScheme.primary : t.textMuted),
       title: Text(title),
       trailing: Row(
         mainAxisSize: .min,
@@ -259,12 +259,16 @@ class _SettingsToggleItemState extends State<_SettingsToggleItem> {
         final displayedValue = _pendingValue ?? value;
         final isPending = _pendingValue != null;
         return FocusableListTile(
-          leading: AppIcon(widget.icon, fill: 1, color: displayedValue ? Colors.amber : tokens(context).textMuted),
+          leading: AppIcon(
+            widget.icon,
+            fill: 1,
+            color: displayedValue ? Theme.of(context).colorScheme.primary : tokens(context).textMuted,
+          ),
           title: Text(widget.title),
           subtitle: widget.subtitle == null
               ? null
               : Text(widget.subtitle!, style: TextStyle(color: tokens(context).textMuted, fontSize: 12)),
-          trailing: Switch(value: displayedValue, onChanged: isPending ? null : _write, activeThumbColor: Colors.amber),
+          trailing: Switch(value: displayedValue, onChanged: isPending ? null : _write),
           onTap: isPending ? null : () => _write(!displayedValue),
         );
       },
@@ -326,7 +330,7 @@ class _AudioRenderingModeItemState extends State<_AudioRenderingModeItem> {
       leading: AppIcon(
         Symbols.spatial_audio_rounded,
         fill: 1,
-        color: highlighted ? Colors.amber : tokens(context).textMuted,
+        color: highlighted ? Theme.of(context).colorScheme.primary : tokens(context).textMuted,
       ),
       title: Text(t.videoSettings.audioOutput),
       trailing: Text(label, style: TextStyle(color: tokens(context).textMuted)),
@@ -973,7 +977,9 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
             leading: AppIcon(
               Symbols.blur_on_rounded,
               fill: 1,
-              color: _state.isAmbientLightingEnabled ? Colors.amber : tokens(context).textMuted,
+              color: _state.isAmbientLightingEnabled
+                  ? Theme.of(context).colorScheme.primary
+                  : tokens(context).textMuted,
             ),
             title: Text(t.videoControls.ambientLighting),
             trailing: Switch(
@@ -982,7 +988,6 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
                 _state.onToggleAmbientLighting?.call();
                 OverlaySheetController.of(context).close();
               },
-              activeThumbColor: Colors.amber,
             ),
             onTap: () {
               _state.onToggleAmbientLighting?.call();
@@ -1383,14 +1388,17 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
             final presetName = _shaderPresetTitle(preset);
 
             return FocusableListTile(
-              title: Text(presetName, style: TextStyle(color: isSelected ? Colors.amber : null)),
+              title: Text(
+                presetName,
+                style: TextStyle(color: isSelected ? Theme.of(context).colorScheme.primary : null),
+              ),
               subtitle: _getShaderSubtitle(preset) != null
                   ? Text(_getShaderSubtitle(preset)!, style: TextStyle(color: tokens(context).textMuted, fontSize: 12))
                   : null,
               trailing: Row(
                 mainAxisSize: .min,
                 children: [
-                  if (isSelected) const AppIcon(Symbols.check_rounded, fill: 1, color: Colors.amber),
+                  if (isSelected) AppIcon(Symbols.check_rounded, fill: 1, color: Theme.of(context).colorScheme.primary),
                   if (isCustom) ...[
                     if (isSelected) const SizedBox(width: 8),
                     GestureDetector(
@@ -1533,8 +1541,8 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
       title: _getTitle(),
       icon: _getIcon(),
       iconColor: () {
-        if (isIconActive) return Colors.amber;
-        if (_currentView == _SettingsView.shader && isShaderActive) return Colors.amber;
+        if (isIconActive) return Theme.of(context).colorScheme.primary;
+        if (_currentView == _SettingsView.shader && isShaderActive) return Theme.of(context).colorScheme.primary;
         return null;
       }(),
       onBack: _currentView != _SettingsView.menu ? _navigateBack : null,

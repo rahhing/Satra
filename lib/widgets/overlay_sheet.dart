@@ -72,6 +72,7 @@ class OverlaySheetController {
     FocusNode? initialFocusNode,
     Alignment alignment = Alignment.bottomCenter,
     bool showDragHandle = false,
+    bool blurNativeVideo = false,
   }) {
     return _state._show<T>(
       builder: builder,
@@ -81,6 +82,7 @@ class OverlaySheetController {
       initialFocusNode: initialFocusNode,
       alignment: alignment,
       showDragHandle: showDragHandle,
+      blurNativeVideo: blurNativeVideo,
     );
   }
 
@@ -308,6 +310,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
   bool _showDragHandle = false;
   BoxConstraints? _constraints;
   Color? _explicitBackgroundColor;
+  bool _blurNativeVideo = false;
   Alignment _alignment = Alignment.bottomCenter;
   Offset? _lastPointerPosition;
   double? _sheetHorizontalAnchor;
@@ -369,6 +372,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
     FocusNode? initialFocusNode,
     Alignment alignment = Alignment.bottomCenter,
     bool showDragHandle = false,
+    bool blurNativeVideo = false,
   }) {
     BackKeyCoordinator.clear();
     // If already open, close first (instant)
@@ -396,6 +400,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
       _showDragHandle = showDragHandle;
       _constraints = constraints;
       _explicitBackgroundColor = backgroundColor;
+      _blurNativeVideo = blurNativeVideo;
       _alignment = alignment;
       _sheetHorizontalAnchor = horizontalAnchor;
       _dragOffset = 0;
@@ -900,7 +905,8 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
                     enabled: _explicitBackgroundColor == null,
                     tint: colorScheme.surface,
                     borderRadius: borderRadius,
-                    opacity: 0.86,
+                    opacity: _blurNativeVideo ? 0.24 : 0.86,
+                    blurNativeVideo: _blurNativeVideo,
                     child: SafeArea(
                       top: isTop,
                       bottom: !isTop,

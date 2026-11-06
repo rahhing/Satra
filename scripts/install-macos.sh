@@ -1,3 +1,4 @@
+
 #!/bin/bash
 # Build and update the stable Finder/Dock application.
 set -euo pipefail

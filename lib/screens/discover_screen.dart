@@ -38,10 +38,12 @@ import '../widgets/clickable_cursor.dart';
 import '../widgets/loading_indicator_box.dart';
 import '../widgets/profile_switching_overlay.dart';
 import '../services/settings_service.dart';
+import '../services/media_list_playback_launcher.dart';
 import '../widgets/settings_builder.dart';
 import '../widgets/fitting_title_text.dart';
 import '../widgets/tv_browse_rail.dart';
 import '../widgets/tv_spotlight_scaffold.dart';
+import '../widgets/retained_tab_view.dart';
 import '../mixins/refreshable.dart';
 import '../mixins/tab_visibility_aware.dart';
 import '../i18n/strings.g.dart';
@@ -57,6 +59,8 @@ import '../utils/platform_detector.dart';
 import '../utils/tone_mapped_logo_image.dart';
 import '../theme/mono_tokens.dart';
 import 'libraries/content_state_builder.dart';
+import 'libraries/libraries_screen.dart' show LibraryTabType, LibraryTabLabel;
+import 'libraries/home_library_section.dart';
 import 'libraries/state_messages.dart';
 import 'main_screen.dart';
 
@@ -118,6 +122,50 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   final FocusNode _homeChipFocusNode = FocusNode(debugLabel: 'discover_top_home_chip');
   final Map<String, FocusNode> _libraryChipFocusNodes = {};
   final _actionBarKey = GlobalKey<FocusableActionBarState>();
+  final _homeLibrarySectionKey = GlobalKey<HomeLibrarySectionState>();
+  LibraryTabType _homeSection = LibraryTabType.recommended;
+  LibraryTabType _lastLibrarySection = LibraryTabType.browse;
+  bool _hasOpenedLibrarySection = false;
+  final _sectionFocusNodes = {
+    for (final section in LibraryTabType.values) section: FocusNode(debugLabel: 'home_section_${section.name}'),
+  };
+
+  void _selectHomeSection(LibraryTabType section) {
+    if (section == _homeSection) {
+      _focusContentFromAppBar();
+      return;
+    }
+    setState(() {
+      _homeSection = section;
+      _pendingTvBrowseRailFocus = false;
+      if (section != LibraryTabType.recommended) {
+        _lastLibrarySection = section;
+        _hasOpenedLibrarySection = true;
+      }
+    });
+  }
+
+  List<MediaLibrary> _visibleHomeLibraries(BuildContext context) {
+    final libraries = context.watch<LibrariesProvider>().libraries;
+    final hidden = context.watch<HiddenLibrariesProvider>().hiddenLibraryKeys;
+    return libraries.where((library) => !hidden.contains(library.globalKey)).toList();
+  }
+
+  void _shuffleHome() {
+    final selected = _homeSection == LibraryTabType.recommended
+        ? null
+        : _homeLibrarySectionKey.currentState?.selectedLibrary;
+    final libraries = context.read<LibrariesProvider>().libraries;
+    final hidden = context.read<HiddenLibrariesProvider>().hiddenLibraryKeys;
+    final eligible = libraries
+        .where((library) => !hidden.contains(library.globalKey) && MediaListPlaybackLauncher.canShuffleLibrary(library))
+        .toList();
+    if (eligible.isEmpty) return;
+    final library = selected != null && MediaListPlaybackLauncher.canShuffleLibrary(selected)
+        ? selected
+        : eligible[math.Random().nextInt(eligible.length)];
+    unawaited(MediaListPlaybackLauncher.shuffleLibrary(context, library));
+  }
 
   FocusNode _focusNodeForLibraryChip(String globalKey) {
     return _libraryChipFocusNodes.putIfAbsent(globalKey, () => FocusNode(debugLabel: 'discover_top_lib_$globalKey'));
@@ -225,6 +273,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   void _focusTopActions() {
     if (!(ModalRoute.of(context)?.isCurrent ?? false)) return;
+    if (_homeSection != LibraryTabType.recommended) {
+      _sectionFocusNodes[_homeSection]?.requestFocus();
+      return;
+    }
     if (_homeChipFocusNode.context != null) {
       _homeChipFocusNode.requestFocus();
       return;
@@ -258,6 +310,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   void _focusContentFromAppBar() {
+    if (_homeSection != LibraryTabType.recommended) {
+      _homeLibrarySectionKey.currentState?.focusContent();
+      return;
+    }
     if (PlatformDetector.isTV()) {
       _focusTvBrowseRailWhenReady(immediate: true);
       return;
@@ -276,6 +332,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   void _focusTvBrowseRailWhenReady({bool immediate = false, bool initial = false}) {
     if (!PlatformDetector.isTV()) return;
+    if (_homeSection != LibraryTabType.recommended) return;
     if (!_isTabVisible || !(ModalRoute.of(context)?.isCurrent ?? false)) {
       _pendingTvBrowseRailFocus = false;
       return;
@@ -494,6 +551,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _heroFocusNode.removeListener(_onHeroFocusChanged);
     _heroFocusNode.dispose();
     _homeChipFocusNode.dispose();
+    for (final node in _sectionFocusNodes.values) {
+      node.dispose();
+    }
     for (final node in _libraryChipFocusNodes.values) {
       node.dispose();
     }
@@ -607,6 +667,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   @override
   void focusActiveTabIfReady() {
+    if (_homeSection != LibraryTabType.recommended) {
+      _homeLibrarySectionKey.currentState?.focusContent();
+      return;
+    }
     if (PlatformDetector.isTV()) {
       _focusTvBrowseRailWhenReady();
       return;
@@ -650,7 +714,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   @override
-  void manualRefresh() => unawaited(_refreshFromToolbar());
+  void manualRefresh() {
+    if (_homeSection != LibraryTabType.recommended) {
+      _homeLibrarySectionKey.currentState?.refresh();
+    } else {
+      unawaited(_refreshFromToolbar());
+    }
+  }
 
   Future<void> _refreshFromToolbar() async {
     final outcome = await _discover.refreshNow();
@@ -700,103 +770,148 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     return serverIds.length > 1;
   }
 
-  Widget _buildOverlaidAppBar() {
+  Widget _buildOverlaidAppBar(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final foregroundColor = colorScheme.onSurface;
-    return ToolbarScrim(
-      child: Row(
-        children: [
-          Expanded(
-            child: SettingValueBuilder<String?>(
-              pref: SettingsService.mainServerId,
-              builder: (context, _, _) {
-                final mainServerLibraries = _currentMainServerLibraries(context, listen: true);
-                final mainScope = MainScreenFocusScope.of(context, listen: false);
-                final showTopNav =
-                    PlatformDetector.isTV() ||
-                    mainServerLibraries.isNotEmpty ||
-                    mainScope?.selectLibrary != null ||
-                    mainScope?.selectHome != null;
-                if (!showTopNav) {
-                  return Align(
-                    alignment: AlignmentDirectional.centerStart,
-                    child: Text(
-                      t.discover.title,
-                      style: Theme.of(
-                        context,
-                      ).textTheme.titleLarge?.copyWith(color: foregroundColor, fontWeight: .bold),
-                    ),
-                  );
-                }
-                return Align(
-                  alignment: AlignmentDirectional.centerStart,
-                  child: TabChipStrip(
-                    children: [
-                      FocusableTabChip(
-                        label: t.common.home,
-                        isSelected: true,
-                        focusNode: _homeChipFocusNode,
-                        onSelect: _focusContentFromAppBar,
-                        onNavigateLeft: _navigateToSidebar,
-                        onNavigateRight: mainServerLibraries.isNotEmpty
-                            ? () => _focusNodeForLibraryChip(mainServerLibraries.first.globalKey).requestFocus()
-                            : () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                        onNavigateDown: _focusContentFromAppBar,
-                        onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                        onBack: _navigateToSidebar,
-                      ),
-                      for (int i = 0; i < mainServerLibraries.length; i++) ...[
-                        const SizedBox(width: 8),
-                        FocusableTabChip(
-                          label: mainServerLibraries[i].title,
-                          isSelected: false,
-                          focusNode: _focusNodeForLibraryChip(mainServerLibraries[i].globalKey),
-                          onSelect: () => MainScreenFocusScope.of(
-                            context,
-                            listen: false,
-                          )?.selectLibrary?.call(mainServerLibraries[i].globalKey),
-                          onNavigateLeft: i > 0
-                              ? () => _focusNodeForLibraryChip(mainServerLibraries[i - 1].globalKey).requestFocus()
-                              : () => _homeChipFocusNode.requestFocus(),
-                          onNavigateRight: i < mainServerLibraries.length - 1
-                              ? () => _focusNodeForLibraryChip(mainServerLibraries[i + 1].globalKey).requestFocus()
-                              : () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                          onNavigateDown: _focusContentFromAppBar,
-                          onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                          onBack: _navigateToSidebar,
-                        ),
-                      ],
-                    ],
+    final showSections = PlatformDetector.shouldUseSideNavigation(context);
+    final libraries = _visibleHomeLibraries(context);
+    return ToolbarScrim.navigation(
+      navigation: SettingValueBuilder<String?>(
+        pref: SettingsService.mainServerId,
+        builder: (context, _, _) {
+          final mainServerLibraries = _currentMainServerLibraries(context, listen: true);
+          final mainScope = MainScreenFocusScope.of(context, listen: false);
+          final showTopNav =
+              PlatformDetector.isTV() ||
+              mainServerLibraries.isNotEmpty ||
+              mainScope?.selectLibrary != null ||
+              mainScope?.selectHome != null;
+          if (!showTopNav) {
+            return Align(
+              alignment: AlignmentDirectional.centerStart,
+              child: Text(
+                t.discover.title,
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foregroundColor, fontWeight: .bold),
+              ),
+            );
+          }
+          return Align(
+            alignment: AlignmentDirectional.centerStart,
+            child: TabChipStrip(
+              motionId: 'browse_navigation',
+              children: [
+                FocusableTabChip(
+                  label: t.common.home,
+                  isSelected: true,
+                  focusNode: _homeChipFocusNode,
+                  onSelect: () => _selectHomeSection(LibraryTabType.recommended),
+                  onNavigateLeft: _navigateToSidebar,
+                  onNavigateRight: mainServerLibraries.isNotEmpty
+                      ? () => _focusNodeForLibraryChip(mainServerLibraries.first.globalKey).requestFocus()
+                      : showSections
+                      ? () => _sectionFocusNodes[LibraryTabType.recommended]!.requestFocus()
+                      : () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                  onNavigateDown: _focusContentFromAppBar,
+                  onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                  onBack: _navigateToSidebar,
+                ),
+                for (int i = 0; i < mainServerLibraries.length; i++) ...[
+                  const SizedBox(width: 8),
+                  FocusableTabChip(
+                    label: mainServerLibraries[i].title,
+                    isSelected: false,
+                    focusNode: _focusNodeForLibraryChip(mainServerLibraries[i].globalKey),
+                    onSelect: () => MainScreenFocusScope.of(
+                      context,
+                      listen: false,
+                    )?.selectLibrary?.call(mainServerLibraries[i].globalKey),
+                    onNavigateLeft: i > 0
+                        ? () => _focusNodeForLibraryChip(mainServerLibraries[i - 1].globalKey).requestFocus()
+                        : () => _homeChipFocusNode.requestFocus(),
+                    onNavigateRight: i < mainServerLibraries.length - 1
+                        ? () => _focusNodeForLibraryChip(mainServerLibraries[i + 1].globalKey).requestFocus()
+                        : showSections
+                        ? () => _sectionFocusNodes[LibraryTabType.recommended]!.requestFocus()
+                        : () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                    onNavigateDown: _focusContentFromAppBar,
+                    onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                    onBack: _navigateToSidebar,
                   ),
-                );
-              },
+                ],
+                if (showSections) ...[
+                  Container(
+                    width: 1,
+                    height: 20,
+                    margin: const EdgeInsets.symmetric(horizontal: 10),
+                    color: foregroundColor.withValues(alpha: 0.2),
+                  ),
+                  for (final section in LibraryTabType.values) ...[
+                    if (section.index > 0) const SizedBox(width: 8),
+                    FocusableTabChip(
+                      label: section.label,
+                      isSelected: _homeSection == section,
+                      indicatorGroup: 1,
+                      focusNode: _sectionFocusNodes[section],
+                      onSelect: () => _selectHomeSection(section),
+                      onNavigateLeft: () {
+                        if (section.index > 0) {
+                          _sectionFocusNodes[LibraryTabType.values[section.index - 1]]!.requestFocus();
+                        } else if (mainServerLibraries.isNotEmpty) {
+                          _focusNodeForLibraryChip(mainServerLibraries.last.globalKey).requestFocus();
+                        } else {
+                          _homeChipFocusNode.requestFocus();
+                        }
+                      },
+                      onNavigateRight: section.index < LibraryTabType.values.length - 1
+                          ? () => _sectionFocusNodes[LibraryTabType.values[section.index + 1]]!.requestFocus()
+                          : () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                      onNavigateDown: _focusContentFromAppBar,
+                      onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                      onBack: _navigateToSidebar,
+                    ),
+                  ],
+                ],
+              ],
             ),
-          ),
-          const SizedBox(width: 12),
-          BrowseToolbarActions(
-            actionBarKey: _actionBarKey,
-            onRefresh: manualRefresh,
-            onNavigateLeft: () {
-              final libs = _currentMainServerLibraries(context, listen: false);
-              if (libs.isNotEmpty) {
-                final node = _focusNodeForLibraryChip(libs.last.globalKey);
-                if (node.context != null) {
-                  node.requestFocus();
-                  return;
-                }
-              }
-              if (_homeChipFocusNode.context != null) {
-                _homeChipFocusNode.requestFocus();
-              } else {
-                _navigateToSidebar();
-              }
-            },
-            onNavigateDown: _focusContentFromAppBar,
-            onProfileSwitchingChanged: (busy) {
-              if (mounted) setState(() => _switchingProfile = busy);
-            },
-          ),
+          );
+        },
+      ),
+      actions: BrowseToolbarActions(
+        actionBarKey: _actionBarKey,
+        onRefresh: manualRefresh,
+        extraActions: [
+          if (showSections && libraries.any(MediaListPlaybackLauncher.canShuffleLibrary))
+            FocusableAction(
+              debugLabel: 'shuffle_home',
+              icon: Symbols.shuffle_rounded,
+              iconColor: foregroundColor,
+              tooltip: t.common.shuffle,
+              onPressed: _shuffleHome,
+            ),
         ],
+        onNavigateLeft: () {
+          if (showSections) {
+            _sectionFocusNodes[LibraryTabType.genres]!.requestFocus();
+            return;
+          }
+          final libs = _currentMainServerLibraries(context, listen: false);
+          if (libs.isNotEmpty) {
+            final node = _focusNodeForLibraryChip(libs.last.globalKey);
+            if (node.context != null) {
+              node.requestFocus();
+              return;
+            }
+          }
+          if (_homeChipFocusNode.context != null) {
+            _homeChipFocusNode.requestFocus();
+          } else {
+            _navigateToSidebar();
+          }
+        },
+        onNavigateDown: _focusContentFromAppBar,
+        onProfileSwitchingChanged: (busy) {
+          if (mounted) setState(() => _switchingProfile = busy);
+        },
       ),
     );
   }
@@ -816,6 +931,39 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   Widget _buildContent(BuildContext context) {
+    if (!PlatformDetector.shouldUseSideNavigation(context)) return _buildRecommendedContent(context);
+    final libraries = _visibleHomeLibraries(context);
+    return Material(
+      color: Theme.of(context).scaffoldBackgroundColor,
+      child: Stack(
+        fit: StackFit.expand,
+        clipBehavior: Clip.none,
+        children: [
+          RetainedTabView(
+            index: _homeSection == LibraryTabType.recommended ? 0 : 1,
+            children: [
+              _buildRecommendedContent(context),
+              if (_hasOpenedLibrarySection)
+                HomeLibrarySection(
+                  key: _homeLibrarySectionKey,
+                  section: _lastLibrarySection,
+                  libraries: libraries,
+                  isActive: _homeSection != LibraryTabType.recommended,
+                  onSectionChanged: _selectHomeSection,
+                  onNavigateUp: () => _sectionFocusNodes[_homeSection]!.requestFocus(),
+                )
+              else
+                const SizedBox.shrink(),
+            ],
+          ),
+          _cachedTvToolbarOverlay(),
+          if (_switchingProfile) const ProfileSwitchingOverlay(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecommendedContent(BuildContext context) {
     final svc = SettingsService.instance;
     final showHeroSection = svc.read(SettingsService.showHeroSection);
 
@@ -939,8 +1087,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           // Overlaid app bar — excluded from default focus traversal so that
           // initial/tab-switch focus lands on content (hero/hubs), not the toolbar.
           // Toolbar buttons are still reachable via explicit UP from hero section.
-          Positioned(top: 0, left: 0, right: 0, child: ExcludeFocusTraversal(child: _buildOverlaidAppBar())),
-          if (_switchingProfile) const ProfileSwitchingOverlay(),
+          if (!PlatformDetector.shouldUseSideNavigation(context)) ...[
+            Positioned(top: 0, left: 0, right: 0, child: ExcludeFocusTraversal(child: _buildOverlaidAppBar(context))),
+            if (_switchingProfile) const ProfileSwitchingOverlay(),
+          ],
         ],
       ),
     );
@@ -984,13 +1134,13 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   // only the theme, translations and _switchingProfile; the providers and
   // clock inside it rebuild themselves.
   Widget? _tvToolbarOverlayWidget;
-  (ThemeData, Translations, bool)? _tvToolbarOverlayWidgetKey;
+  (ThemeData, Translations, bool, LibraryTabType)? _tvToolbarOverlayWidgetKey;
 
   Widget _cachedTvToolbarOverlay() {
-    final key = (Theme.of(context), t, _switchingProfile);
+    final key = (Theme.of(context), t, _switchingProfile, _homeSection);
     if (_tvToolbarOverlayWidget != null && key == _tvToolbarOverlayWidgetKey) return _tvToolbarOverlayWidget!;
     _tvToolbarOverlayWidgetKey = key;
-    return _tvToolbarOverlayWidget = TvToolbarOverlay(child: _buildOverlaidAppBar());
+    return _tvToolbarOverlayWidget = TvToolbarOverlay(child: Builder(builder: _buildOverlaidAppBar));
   }
 
   Widget _buildTvContent(BuildContext context) {
@@ -1032,8 +1182,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               bottom: 0,
               child: _cachedTvBrowseRail(browseHubs, showServerName: showServerNameOnHubs || hubsSpanMultipleServers),
             ),
-          _cachedTvToolbarOverlay(),
-          if (_switchingProfile) const ProfileSwitchingOverlay(),
         ],
       ),
     );

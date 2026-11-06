@@ -42,7 +42,7 @@ class VideoControlButton extends StatelessWidget {
   final bool? checked;
 
   /// Whether this button represents an active state (e.g., a feature is enabled).
-  /// When true, the icon color defaults to amber instead of white.
+  /// When true, the icon color uses the theme accent instead of white.
   final bool isActive;
 
   /// Optional FocusNode for D-pad/keyboard navigation.
@@ -76,7 +76,7 @@ class VideoControlButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final idleColor = color ?? (isActive ? Colors.amber : Colors.white);
+    final idleColor = color ?? (isActive ? Theme.of(context).colorScheme.primary : Colors.white);
     final label = this.label;
     final effectiveSemanticLabel = semanticLabel ?? label ?? tooltip;
 

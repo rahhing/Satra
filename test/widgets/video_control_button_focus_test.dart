@@ -5,6 +5,7 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import 'package:satra/focus/input_mode_tracker.dart';
 import 'package:satra/widgets/video_controls/video_control_button.dart';
+import 'package:satra/theme/mono_theme.dart';
 
 import '../test_helpers/theme.dart';
 
@@ -18,14 +19,15 @@ void main() {
   setUp(() => node = FocusNode(debugLabel: 'control'));
   tearDown(() => node.dispose());
 
-  Widget shell({Color? color, VoidCallback? onPressed}) => InputModeTracker(
+  Widget shell({Color? color, VoidCallback? onPressed, bool isActive = false, ThemeData? theme}) => InputModeTracker(
     child: MaterialApp(
-      theme: ThemeData(extensions: const [testMonoTokens]),
+      theme: theme ?? ThemeData(extensions: const [testMonoTokens]),
       home: Scaffold(
         body: Center(
           child: VideoControlButton(
             icon: Symbols.pause_rounded,
             color: color,
+            isActive: isActive,
             focusNode: node,
             onPressed: onPressed ?? () {},
             semanticLabel: 'Pause',
@@ -80,5 +82,18 @@ void main() {
 
     expect(node.hasPrimaryFocus, isTrue);
     expect(iconColor(tester), Colors.white, reason: 'focus chrome is a keyboard/D-pad affordance only');
+  });
+
+  testWidgets('active player controls follow theme changes and retain focus contrast', (tester) async {
+    for (final palette in [MonoPalette.oled, MonoPalette.ember, MonoPalette.paper]) {
+      await tester.pumpWidget(shell(isActive: true, theme: monoTheme(palette)));
+      node.unfocus();
+      await tester.pumpAndSettle();
+      expect(iconColor(tester), palette.accent);
+      await enterKeyboardMode(tester);
+      node.requestFocus();
+      await tester.pumpAndSettle();
+      expect(iconColor(tester), palette.onAccent);
+    }
   });
 }

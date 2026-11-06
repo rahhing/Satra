@@ -68,6 +68,7 @@ import '../widgets/vertical_bar_shell.dart';
 import '../widgets/side_navigation_rail.dart';
 import '../widgets/glass_surface.dart';
 import '../widgets/retained_tab_view.dart';
+import '../widgets/focusable_tab_chip.dart';
 import '../focus/covered_route_focus_boundary.dart';
 import '../focus/dpad_navigator.dart';
 import '../focus/key_event_utils.dart';
@@ -1183,7 +1184,9 @@ class _MainScreenState extends State<MainScreen>
       children: [
         const AuthErrorBanner(),
         Expanded(
-          child: RetainedTabView(index: _currentIndex, children: _screens),
+          child: TabChipMotionScope(
+            child: RetainedTabView(index: _currentIndex, children: _screens),
+          ),
         ),
       ],
     );

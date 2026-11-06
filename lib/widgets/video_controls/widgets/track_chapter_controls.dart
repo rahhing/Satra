@@ -171,6 +171,7 @@ class TrackChapterControls extends StatelessWidget {
                   state.onCancelAutoHide?.call();
                   OverlaySheetController.of(context)
                       .show(
+                        blurNativeVideo: true,
                         builder: (_) => VideoSettingsSheet(player: player, trackControlsState: state),
                       )
                       .whenComplete(() => state.onStartAutoHide?.call());

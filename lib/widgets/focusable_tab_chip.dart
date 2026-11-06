@@ -7,6 +7,31 @@ import '../focus/input_mode_tracker.dart';
 import '../theme/app_motion.dart';
 import 'focus_builders.dart';
 
+/// Retained browsing pages hand their current pill positions to the incoming
+/// page, so Home/library transitions continue the same movement.
+class TabChipMotionScope extends StatefulWidget {
+  const TabChipMotionScope({super.key, required this.child});
+  final Widget child;
+
+  @override
+  State<TabChipMotionScope> createState() => _TabChipMotionScopeState();
+}
+
+class _TabChipMotionScopeState extends State<TabChipMotionScope> {
+  final positions = <String, Map<int, Rect>>{};
+
+  @override
+  Widget build(BuildContext context) => _TabChipMotionHistory(positions: positions, child: widget.child);
+}
+
+class _TabChipMotionHistory extends InheritedWidget {
+  const _TabChipMotionHistory({required this.positions, required super.child});
+  final Map<String, Map<int, Rect>> positions;
+
+  @override
+  bool updateShouldNotify(_TabChipMotionHistory oldWidget) => false;
+}
+
 /// Horizontally scrollable host for a row of [FocusableTabChip]s.
 ///
 /// App-bar titles and header rows give the strip a bounded width; a plain
@@ -16,8 +41,9 @@ import 'focus_builders.dart';
 /// chip mixin, so LEFT/RIGHT reaches off-screen tabs.
 class TabChipStrip extends StatefulWidget {
   final List<Widget> children;
+  final String? motionId;
 
-  const TabChipStrip({super.key, required this.children});
+  const TabChipStrip({super.key, required this.children, this.motionId});
 
   @override
   State<TabChipStrip> createState() => _TabChipStripState();
@@ -38,14 +64,19 @@ class _TabChipStripState extends State<TabChipStrip> with TickerProviderStateMix
     _controller.duration = AppMotion.duration(context);
     _indicatorController.duration = AppMotion.duration(context);
     final active = TickerMode.valuesOf(context).enabled;
-    if (active && !_active) _controller.forward(from: 0);
+    final shared = widget.motionId != null && context.getInheritedWidgetOfExactType<_TabChipMotionHistory>() != null;
+    if (shared) {
+      _controller.value = 1;
+    } else if (active && !_active) {
+      _controller.forward(from: 0);
+    }
     _active = active;
   }
 
   @override
   void didUpdateWidget(TabChipStrip oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (_active && _labels(oldWidget) != _labels(widget)) _controller.forward(from: 0);
+    if (_active && widget.motionId == null && _labels(oldWidget) != _labels(widget)) _controller.forward(from: 0);
   }
 
   @override
@@ -69,6 +100,9 @@ class _TabChipStripState extends State<TabChipStrip> with TickerProviderStateMix
           position: Tween(begin: const Offset(0.015, 0), end: Offset.zero).animate(_progress),
           child: _TabIndicatorScope(
             child: _TabChipRow(
+              active: _active,
+              history: context.getInheritedWidgetOfExactType<_TabChipMotionHistory>()?.positions,
+              motionId: widget.motionId,
               controller: _indicatorController,
               color: Theme.of(context).colorScheme.primary,
               textDirection: Directionality.of(context),
@@ -248,6 +282,9 @@ class _TabIndicatorScope extends InheritedWidget {
 
 class _TabChipRow extends MultiChildRenderObjectWidget {
   const _TabChipRow({
+    required this.active,
+    required this.history,
+    required this.motionId,
     required this.controller,
     required this.color,
     required this.textDirection,
@@ -259,14 +296,23 @@ class _TabChipRow extends MultiChildRenderObjectWidget {
   final Color color;
   final TextDirection textDirection;
   final Map<int, int> selections;
+  final bool active;
+  final Map<String, Map<int, Rect>>? history;
+  final String? motionId;
 
   @override
   RenderObject createRenderObject(BuildContext context) =>
-      _RenderTabChipRow(controller, color, selections, textDirection);
+      _RenderTabChipRow(controller, color, selections, textDirection)
+        ..history = history
+        ..motionId = motionId
+        ..active = active;
 
   @override
   void updateRenderObject(BuildContext context, _RenderTabChipRow renderObject) {
     renderObject
+      ..history = history
+      ..motionId = motionId
+      ..active = active
       ..indicatorColor = color
       ..selectedGroups = selections
       ..textDirection = textDirection;
@@ -283,6 +329,17 @@ class _RenderTabChipRow extends RenderFlex {
   Map<int, Rect> _from = {};
   Map<int, Rect> _to = {};
   bool _laidOut = false;
+  bool _active = false;
+  bool _activationPending = false;
+  Map<String, Map<int, Rect>>? history;
+  String? motionId;
+
+  set active(bool value) {
+    if (value == _active) return;
+    _active = value;
+    _activationPending = value;
+    markNeedsLayout();
+  }
 
   set indicatorColor(Color color) {
     if (color == _color) return;
@@ -319,30 +376,43 @@ class _RenderTabChipRow extends RenderFlex {
       final data = child.parentData! as FlexParentData;
       targets[group] = (data.offset & child.size).deflate(1);
     }
-    if (mapEquals(targets, _to)) return;
+    if (!_active) {
+      _from = targets;
+      _to = targets;
+      _laidOut = true;
+      return;
+    }
+    if (mapEquals(targets, _to) && !_activationPending) return;
+    final shared = _activationPending && history != null ? history![motionId] : null;
     final progress = AppMotion.curve.transform(controller.value);
-    _from = _laidOut
-        ? {
-            for (final group in {..._from.keys, ..._to.keys}) group: Rect.lerp(_from[group], _to[group], progress)!,
-          }
-        : targets;
+    _from =
+        shared ??
+        (_laidOut
+            ? {
+                for (final group in {..._from.keys, ..._to.keys}) group: Rect.lerp(_from[group], _to[group], progress)!,
+              }
+            : targets);
     _to = targets;
-    if (_laidOut) controller.forward(from: 0);
+    if (_laidOut || shared != null) controller.forward(from: 0);
+    _activationPending = false;
     _laidOut = true;
   }
 
   @override
   void paint(PaintingContext context, Offset offset) {
     final progress = AppMotion.curve.transform(controller.value);
+    final current = <int, Rect>{};
     for (final group in {..._from.keys, ..._to.keys}) {
       final rect = Rect.lerp(_from[group], _to[group], progress);
       if (rect == null) continue;
+      current[group] = rect;
       final alpha = _from[group] == null ? progress : (_to[group] == null ? 1 - progress : 1.0);
       context.canvas.drawRRect(
         RRect.fromRectAndRadius(rect.shift(offset), const Radius.circular(20)),
         Paint()..color = _color.withValues(alpha: _color.a * alpha),
       );
     }
+    if (_active && motionId != null) history?[motionId!] = current;
     super.paint(context, offset);
   }
 }

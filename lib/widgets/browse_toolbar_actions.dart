@@ -13,6 +13,7 @@ import '../profiles/profile.dart';
 import '../profiles/profile_activation.dart';
 import '../profiles/profile_avatar.dart';
 import '../providers/companion_remote_provider.dart';
+import '../providers/libraries_provider.dart';
 import '../providers/multi_server_provider.dart';
 import '../screens/companion_remote/mobile_remote_screen.dart';
 import '../screens/profile/profile_switch_screen.dart';
@@ -23,6 +24,7 @@ import '../watch_together/watch_together.dart';
 import 'app_icon.dart';
 import 'app_menu.dart';
 import 'companion_remote/remote_session_dialog.dart';
+import 'library_management_sheet.dart';
 import 'server_activities_button.dart';
 import 'system_clock.dart';
 
@@ -35,6 +37,7 @@ class BrowseToolbarActions extends StatefulWidget {
     required this.onNavigateLeft,
     required this.onNavigateDown,
     this.extraActions = const [],
+    this.onManageLibraries,
     this.onProfileSwitchingChanged,
   });
 
@@ -43,6 +46,7 @@ class BrowseToolbarActions extends StatefulWidget {
   final VoidCallback onNavigateLeft;
   final VoidCallback onNavigateDown;
   final List<FocusableAction> extraActions;
+  final VoidCallback? onManageLibraries;
   final ValueChanged<bool>? onProfileSwitchingChanged;
 
   @override
@@ -95,6 +99,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
     final profiles = activeProvider.profiles;
 
     return FocusableAction(
+      debugLabel: 'profile_menu',
       onPressed: _switchingProfile ? null : () => _userMenuKey.currentState?.showButtonMenu(focusFirstItem: true),
       child: AppMenuButton<String>(
         key: _userMenuKey,
@@ -179,6 +184,9 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final foregroundColor = colorScheme.onSurface;
+    // Home retains this subtree while its first library load completes.
+    // Read availability here so the action updates without rebuilding rails.
+    final hasLibraries = context.select<LibrariesProvider, bool>((provider) => provider.hasLibraries);
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -208,8 +216,17 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
               onNavigateLeft: widget.onNavigateLeft,
               onNavigateDown: widget.onNavigateDown,
               actions: [
+                if (hasLibraries)
+                  FocusableAction(
+                    debugLabel: 'manage_libraries',
+                    icon: Symbols.edit_rounded,
+                    iconColor: foregroundColor,
+                    tooltip: t.libraries.manageLibraries,
+                    onPressed: widget.onManageLibraries ?? () => showLibraryManagementSheet(context),
+                  ),
                 ...widget.extraActions,
                 FocusableAction(
+                  debugLabel: 'refresh',
                   icon: Symbols.refresh_rounded,
                   iconColor: foregroundColor,
                   tooltip: t.common.refresh,
@@ -217,6 +234,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                 ),
                 // Watch Together
                 FocusableAction(
+                  debugLabel: 'watch_together',
                   onPressed: openWatchTogether,
                   child: Stack(
                     children: [
@@ -254,6 +272,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                 ),
                 // Companion Remote
                 FocusableAction(
+                  debugLabel: 'companion_remote',
                   onPressed: openCompanionRemote,
                   child: Stack(
                     children: [
@@ -292,6 +311,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                 if (PlatformDetector.isDesktop(context) &&
                     context.select<MultiServerProvider, bool>((p) => p.hasOnlinePlexServers))
                   FocusableAction(
+                    debugLabel: 'server_activities',
                     onPressed: () => _serverActivitiesButtonKey.currentState?.togglePanel(),
                     child: ServerActivitiesButton(key: _serverActivitiesButtonKey),
                   ),

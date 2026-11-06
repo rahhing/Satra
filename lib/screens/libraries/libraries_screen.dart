@@ -47,6 +47,16 @@ import 'tabs/base_library_tab.dart';
 
 enum LibraryTabType { recommended, browse, collections, playlists, genres }
 
+extension LibraryTabLabel on LibraryTabType {
+  String get label => switch (this) {
+    LibraryTabType.recommended => t.libraries.tabs.recommended,
+    LibraryTabType.browse => t.libraries.tabs.browse,
+    LibraryTabType.collections => t.libraries.tabs.collections,
+    LibraryTabType.playlists => t.libraries.tabs.playlists,
+    LibraryTabType.genres => t.libraries.tabs.genres,
+  };
+}
+
 List<LibraryTabType> visibleLibraryTabs(MediaLibrary library) {
   if (library.isShared) return [LibraryTabType.browse, LibraryTabType.playlists];
   // Genres filter the library's own type; only movie and show libraries
@@ -443,13 +453,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     }
   }
 
-  String _getTabLabel(LibraryTabType type) => switch (type) {
-    LibraryTabType.recommended => t.libraries.tabs.recommended,
-    LibraryTabType.browse => t.libraries.tabs.browse,
-    LibraryTabType.collections => t.libraries.tabs.collections,
-    LibraryTabType.genres => t.libraries.tabs.genres,
-    LibraryTabType.playlists => t.libraries.tabs.playlists,
-  };
+  String _getTabLabel(LibraryTabType type) => type.label;
 
   Widget _buildTabContent(
     LibraryTabType type, {
@@ -758,6 +762,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     // On desktop/TV with side nav, show Home + main server libraries + tabs in app bar
     if (PlatformDetector.shouldUseSideNavigation(context)) {
       return TabChipStrip(
+        motionId: 'browse_navigation',
         children: [
           if (showTopLevelNav) ...[
             FocusableTabChip(
@@ -945,8 +950,8 @@ class _LibrariesScreenState extends State<LibrariesScreen>
       return provider.getClientForServer(serverId)?.capabilities.folderGrouping ?? false;
     });
 
-    List<FocusableAction> appBarActions({bool includeRefresh = true}) => [
-      if (allLibraries.isNotEmpty)
+    List<FocusableAction> appBarActions({bool includeRefresh = true, bool includeManagement = true}) => [
+      if (includeManagement && allLibraries.isNotEmpty)
         FocusableAction(
           icon: Symbols.edit_rounded,
           tooltip: t.libraries.manageLibraries,
@@ -1035,48 +1040,39 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     }
 
     Widget buildSharedTopBar() {
-      return ToolbarScrim(
-        child: Row(
-          children: [
-            Expanded(
-              child: Align(
-                alignment: AlignmentDirectional.centerStart,
-                child: _buildAppBarTitle(
-                  visibleLibraries,
-                  selectedLibrary,
-                  groupByServer: groupByServerSetting,
-                  mainServerLibraries: mainServerLibraries,
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            BrowseToolbarActions(
-              actionBarKey: _actionBarKey,
-              onRefresh: manualRefresh,
-              extraActions: appBarActions(includeRefresh: false),
-              onNavigateLeft: () {
-                for (var i = _visibleTabs.length - 1; i >= 0; i--) {
-                  final node = getTabChipFocusNode(i);
-                  if (node.context != null) {
-                    node.requestFocus();
-                    return;
-                  }
-                }
-                if (mainServerLibraries.isNotEmpty) {
-                  final node = _focusNodeForLibraryChip(mainServerLibraries.last.globalKey);
-                  if (node.context != null) {
-                    node.requestFocus();
-                    return;
-                  }
-                }
-                _homeChipFocusNode.requestFocus();
-              },
-              onNavigateDown: _focusCurrentTabFromTabBar,
-              onProfileSwitchingChanged: (busy) {
-                if (mounted) setState(() => _switchingProfile = busy);
-              },
-            ),
-          ],
+      return ToolbarScrim.navigation(
+        navigation: _buildAppBarTitle(
+          visibleLibraries,
+          selectedLibrary,
+          groupByServer: groupByServerSetting,
+          mainServerLibraries: mainServerLibraries,
+        ),
+        actions: BrowseToolbarActions(
+          actionBarKey: _actionBarKey,
+          onRefresh: manualRefresh,
+          extraActions: appBarActions(includeRefresh: false, includeManagement: false),
+          onManageLibraries: _showLibraryManagementSheet,
+          onNavigateLeft: () {
+            for (var i = _visibleTabs.length - 1; i >= 0; i--) {
+              final node = getTabChipFocusNode(i);
+              if (node.context != null) {
+                node.requestFocus();
+                return;
+              }
+            }
+            if (mainServerLibraries.isNotEmpty) {
+              final node = _focusNodeForLibraryChip(mainServerLibraries.last.globalKey);
+              if (node.context != null) {
+                node.requestFocus();
+                return;
+              }
+            }
+            _homeChipFocusNode.requestFocus();
+          },
+          onNavigateDown: _focusCurrentTabFromTabBar,
+          onProfileSwitchingChanged: (busy) {
+            if (mounted) setState(() => _switchingProfile = busy);
+          },
         ),
       );
     }
