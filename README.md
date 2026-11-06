@@ -5,7 +5,7 @@
 
 A desktop-first client for **Plex**, **Jellyfin**, and **Emby**, built with Flutter.
 
-Satra is a redesigned fork of [Plezy](https://github.com/edde746/plezy) with navigation and visual styling inspired by [Nuvio Desktop](https://github.com/NuvioMedia/NuvioDesktop):
+Satra is a redesigned fork of [Plezy](https://github.com/edde746/plezy)
 
 - **Full-Bleed Spotlight & Browse Rail**: Uses the cinematic spotlight backdrop and horizontal hub rails as the default layout, paired with full desktop mouse wheel scrolling, click-and-drag scrolling, and cross-row hover selection.
 - **OLED Canvas & Frosted Surfaces**: True black `#000000` canvas, monochrome white ribbon branding (`assets/satra.svg`), translucent glass chrome, and artwork-driven ambient backgrounds.
