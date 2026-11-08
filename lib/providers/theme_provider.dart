@@ -19,9 +19,9 @@ typedef ThemeChoice = ({settings.ThemeMode mode, MonoPalette? palette});
 class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, WidgetsBindingObserver {
   final SupporterService _supporter;
   late final SettingsBindingOwner _settingsBinding;
-  settings.ThemeMode _storedMode = settings.ThemeMode.system;
+  settings.ThemeMode _storedMode = settings.ThemeMode.oled;
   MonoPalette? _customPalette;
-  double _storedCornerRadius = 12;
+  double _storedCornerRadius = 32;
   late ThemeChoice _choice;
   late Brightness _systemBrightness;
   bool? _windowChromeDark;
@@ -170,7 +170,7 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
       monoTheme(palette?.brightness == Brightness.dark ? palette! : MonoPalette.dark, cornerRadius: _cornerRadius);
 
   static double get _cornerRadius =>
-      settings.SettingsService.instanceOrNull?.read(settings.SettingsService.pillCornerRadius) ?? 12;
+      settings.SettingsService.instanceOrNull?.read(settings.SettingsService.pillCornerRadius) ?? 32;
 
   /// Material equivalent of [palette]: system for System (null), otherwise
   /// the palette's brightness.

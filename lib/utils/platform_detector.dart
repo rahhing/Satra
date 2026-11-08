@@ -76,7 +76,7 @@ class TvDetectionService {
   static bool? _debugAppleTVOverride;
   static bool? _debugAutomotiveOverride;
   bool _detected = false;
-  bool _forceTv = false;
+  bool _forceTv = true;
   bool _isAppleTV = false;
   bool _isAutomotive = false;
   bool _initialized = false;
@@ -86,7 +86,7 @@ class TvDetectionService {
 
   /// Get the singleton instance, initializing if needed.
   /// Pass [forceTv] to combine a user override with the system-feature check.
-  static Future<TvDetectionService> getInstance({bool forceTv = false}) =>
+  static Future<TvDetectionService> getInstance({bool forceTv = true}) =>
       _singleton.getInstance(TvDetectionService._, (instance) => instance._detect(forceTv));
 
   static const bool _tvosBuild = bool.fromEnvironment('TVOS_BUILD');
@@ -175,11 +175,11 @@ class TvDetectionService {
     _forceTv = value;
   }
 
-  /// Synchronous access after initialization (returns false if not initialized).
+  /// Synchronous access after initialization (returns true if not initialized).
   ///
   /// App code goes through the [PlatformDetector] facade ([PlatformDetector.isTV]
   /// and siblings); these raw accessors exist for the facade and tests.
-  static bool isTVSync() => _debugAppleTVOverride ?? _singleton.instance?.isTV ?? false;
+  static bool isTVSync() => _debugAppleTVOverride ?? _singleton.instance?.isTV ?? true;
 
   /// Synchronous TV-hardware check: [isTVSync] without the user's force-TV
   /// override (false before initialization).

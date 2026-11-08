@@ -196,7 +196,7 @@ void _bootstrapApp() {
       discard: (dependencies) => dependencies.appDatabase.close(),
       onCommitted: (dependencies) => _startNonessentialInitialization(dependencies.settings),
       lightTheme: monoTheme(MonoPalette.light),
-      darkTheme: monoTheme(MonoPalette.dark),
+      darkTheme: monoTheme(MonoPalette.oled),
       resolveTheme: _resolveStartupTheme,
       // Android runs the Flutter surface in transparent mode over a window
       // whose background SatraActivity already restored, so the loading frame
@@ -223,7 +223,7 @@ void _bootstrapApp() {
 /// never flashes the fallback. That fallback is the same TV-aware default.
 Future<StartupThemeResolution> _resolveStartupTheme() async {
   final settings = await SettingsService.getInstance();
-  await TvDetectionService.getInstance(forceTv: settings.read(SettingsService.forceTvMode));
+  await TvDetectionService.getInstance(forceTv: true);
   final palette = ThemeProvider.resolveStored(settings, unlocked: SupporterService.startupUnlocked(settings)).palette;
   ThemeProvider.applyWindowChromeBrightness(
     ThemeProvider.isDarkFor(palette, WidgetsBinding.instance.platformDispatcher.platformBrightness),
@@ -980,7 +980,7 @@ Future<_StartupDependencies> _initializeStartup(SettingsService settings) async 
     // three have a working sync fallback, so a detection failure is not fatal.
     await _optionalGatePhase(StartupPhase.deviceCapabilities, () async {
       await (
-        TvDetectionService.getInstance(forceTv: settings.read(SettingsService.forceTvMode)),
+        TvDetectionService.getInstance(forceTv: true),
         DevicePerformance.getInstance(override: settings.read(SettingsService.visualEffects)),
         VideoDecodeCapabilities.getInstance(),
       ).wait;

@@ -223,7 +223,7 @@ class MonoPalette {
 
 final Map<({MonoPalette palette, TargetPlatform platform, double cornerRadius}), ThemeData> _monoThemeCache = {};
 
-ThemeData monoTheme(MonoPalette palette, {double cornerRadius = 12}) {
+ThemeData monoTheme(MonoPalette palette, {double cornerRadius = 32}) {
   // ThemeData derives several defaults from defaultTargetPlatform.
   final key = (palette: palette, platform: defaultTargetPlatform, cornerRadius: cornerRadius);
   final cached = _monoThemeCache[key];
@@ -240,7 +240,7 @@ ThemeData monoTheme(MonoPalette palette, {double cornerRadius = 12}) {
 /// palette's theme alive.
 ThemeData monoThemeUncached(MonoPalette palette) => _buildMonoTheme(palette, platform: defaultTargetPlatform);
 
-ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, double cornerRadius = 12}) {
+ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, double cornerRadius = 32}) {
   final brightness = c.brightness;
   final onAccent = c.onAccent;
   final clickableCursor = WidgetStateProperty.resolveWith<MouseCursor>(

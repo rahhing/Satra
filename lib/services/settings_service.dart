@@ -67,11 +67,11 @@ enum ThemeMode {
 }
 
 /// Library density is now an int 1–5 (1 = most compact, 5 = most comfortable).
-/// Default is 3.
+/// Default is 4.
 class LibraryDensity {
   static const int min = 1;
   static const int max = 5;
-  static const int defaultValue = 3;
+  static const int defaultValue = 4;
 
   /// Returns a 0.0–1.0 factor for interpolation (0 = most compact, 1 = most comfortable).
   static double factor(int density) => (density.clamp(min, max) - min) / (max - min);
@@ -110,7 +110,7 @@ enum EpisodeAction { play, details }
 
 enum DockSide { left, right }
 
-double _normalizeCornerRadius(double value) => value.isFinite ? value.clamp(0.0, 32.0) : 12.0;
+double _normalizeCornerRadius(double value) => value.isFinite ? value.clamp(0.0, 32.0) : 32.0;
 
 /// How Specials (season 0) are placed in the episode watch order — the
 /// sequence auto-advance, offline next/prev, and "download next N" walk.
@@ -481,6 +481,16 @@ class _UseExternalPlayerPref extends Pref<bool> {
 
   @override
   Future<void> writeTo(BaseSharedPreferencesService svc, bool value) => svc.writeBool(key, value);
+}
+
+class _ForceTvModePref extends BoolPref {
+  const _ForceTvModePref() : super('force_tv_mode', defaultValue: true);
+
+  @override
+  bool readFrom(BaseSharedPreferencesService svc) => true;
+
+  @override
+  Future<void> writeTo(BaseSharedPreferencesService svc, bool value) => super.writeTo(svc, true);
 }
 
 /// Native Dolby playback: bitstreaming on Android TV and desktop, Apple's
@@ -878,11 +888,11 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showExploreTab = BoolPref('show_explore_tab', defaultValue: true);
   static const alwaysKeepSidebarOpen = BoolPref('always_keep_sidebar_open');
   static const dockSide = EnumPref<DockSide>('dock_side', values: DockSide.values, defaultValue: DockSide.left);
-  static const pillCornerRadius = DoublePref('pill_corner_radius', defaultValue: 12, transform: _normalizeCornerRadius);
+  static const pillCornerRadius = DoublePref('pill_corner_radius', defaultValue: 32, transform: _normalizeCornerRadius);
 
   /// Sidebar Libraries section expansion. Persisted so a collapsed section
   /// stays collapsed across launches instead of springing back open (#1896).
-  static const librariesSectionExpanded = BoolPref('libraries_section_expanded', defaultValue: true);
+  static const librariesSectionExpanded = BoolPref('libraries_section_expanded', defaultValue: false);
   static const showUnwatchedCount = BoolPref('show_unwatched_count', defaultValue: true);
 
   /// The corner checkmark on watched posters/thumbnails (#1998). Progress bars
@@ -895,7 +905,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static const globalShaderPreset = StringPref('global_shader_preset', defaultValue: 'none');
   static const requireProfileSelectionOnOpen = BoolPref('require_profile_selection_on_open');
   static const useExternalPlayer = _UseExternalPlayerPref();
-  static const forceTvMode = BoolPref('force_tv_mode', defaultValue: true);
+  static const forceTvMode = _ForceTvModePref();
   static const visualEffects = EnumPref<VisualEffectsSetting>(
     'visual_effects',
     values: VisualEffectsSetting.values,
@@ -975,7 +985,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static final syncOffsetScope = PlayerSettingScopePref('sync_offset_scope', [audioSyncOffset, subtitleSyncOffset]);
   static final displaySwitchDelay = IntPref('display_switch_delay', transform: (v) => v.clamp(0, 10));
 
-  static ThemeMode _tvAwareThemeModeDefault() => PlatformDetector.isTV() ? ThemeMode.oled : ThemeMode.dark;
+  static ThemeMode _tvAwareThemeModeDefault() => ThemeMode.oled;
   static const themeMode = EnumPref<ThemeMode>(
     'theme_mode',
     values: ThemeMode.values,
@@ -1008,7 +1018,7 @@ class SettingsService extends BaseSharedPreferencesService {
     defaultValue: PlaybackBufferTier.auto,
   );
   static const libraryDensity = _LibraryDensityPref();
-  static GridSpacing _tvAwareGridSpacingDefault() => PlatformDetector.isTV() ? GridSpacing.normal : GridSpacing.tight;
+  static GridSpacing _tvAwareGridSpacingDefault() => GridSpacing.spacious;
   static const gridSpacing = EnumPref<GridSpacing>(
     'grid_spacing',
     values: GridSpacing.values,

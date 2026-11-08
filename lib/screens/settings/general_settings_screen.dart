@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -42,13 +40,6 @@ class GeneralSettingsScreen extends StatelessWidget {
                 icon: Symbols.person_rounded,
                 title: t.settings.requireProfileSelectionOnOpen,
                 subtitle: t.settings.requireProfileSelectionOnOpenDescription,
-              ),
-            if (Platform.isAndroid || PlatformDetector.isDesktopOS())
-              SettingSwitchTile(
-                pref: SettingsService.forceTvMode,
-                icon: Symbols.tv_rounded,
-                title: t.settings.forceTvMode,
-                subtitle: t.settings.forceTvModeDescription,
               ),
           ],
         ),
