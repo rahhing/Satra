@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 
 import 'card_focus_scope.dart';
@@ -47,7 +48,7 @@ Widget buildFocusChrome(
             radii: borderRadii,
             color: focusColor,
           );
-    card = AnimatedContainer(duration: duration, curve: Curves.easeOutCubic, decoration: decoration, child: child);
+    card = AnimatedContainer(duration: duration, curve: AppMotion.curve, decoration: decoration, child: child);
   }
 
   // Card glow renders in an overlay above siblings so it stays

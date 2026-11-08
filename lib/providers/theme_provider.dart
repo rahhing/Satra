@@ -21,6 +21,7 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
   late final SettingsBindingOwner _settingsBinding;
   settings.ThemeMode _storedMode = settings.ThemeMode.system;
   MonoPalette? _customPalette;
+  double _storedCornerRadius = 12;
   late ThemeChoice _choice;
   late Brightness _systemBrightness;
   bool? _windowChromeDark;
@@ -37,13 +38,19 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
     _choice = _resolve();
     _supporter.addListener(_apply);
     _settingsBinding = SettingsBindingOwner(
-      prefs: [settings.SettingsService.themeMode, settings.SettingsService.customThemePalette],
+      prefs: [
+        settings.SettingsService.themeMode,
+        settings.SettingsService.customThemePalette,
+        settings.SettingsService.pillCornerRadius,
+      ],
       onRefresh: (service) {
         final previous = (_storedMode, _customPalette);
+        final previousRadius = _storedCornerRadius;
         _readStored(service);
         // A stored change that paints the same still changes what the picker
         // shows (the saved-but-locked marker, the Custom swatch).
-        _apply(pushSplash: true, forceNotify: (_storedMode, _customPalette) != previous);
+        final paletteChanged = (_storedMode, _customPalette) != previous;
+        _apply(pushSplash: paletteChanged, forceNotify: paletteChanged || _storedCornerRadius != previousRadius);
       },
     );
     unawaited(_settingsBinding.bind());
@@ -71,6 +78,7 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
   void _readStored(settings.SettingsService service) {
     _storedMode = service.read(settings.SettingsService.themeMode);
     _customPalette = service.read(settings.SettingsService.customThemePalette);
+    _storedCornerRadius = service.read(settings.SettingsService.pillCornerRadius);
   }
 
   ThemeChoice _resolve() => resolve(_storedMode, _customPalette, unlocked: _supporter.isUnlocked);
@@ -150,7 +158,7 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
   /// Static, like [darkThemeFor], so the pre-provider startup frame resolves
   /// the same theme this provider will settle on (#1833).
   static ThemeData lightThemeFor(MonoPalette? palette) =>
-      monoTheme(palette?.brightness == Brightness.light ? palette! : MonoPalette.light);
+      monoTheme(palette?.brightness == Brightness.light ? palette! : MonoPalette.light, cornerRadius: _cornerRadius);
 
   /// Dark-slot theme for [palette]: the palette itself when it is dark,
   /// otherwise Dark (the System theme's dark half).
@@ -159,7 +167,10 @@ class ThemeProvider extends ChangeNotifier with DisposableChangeNotifierMixin, W
   /// provider will settle on, instead of guessing from platform brightness
   /// and flashing when the two disagree (#1833).
   static ThemeData darkThemeFor(MonoPalette? palette) =>
-      monoTheme(palette?.brightness == Brightness.dark ? palette! : MonoPalette.dark);
+      monoTheme(palette?.brightness == Brightness.dark ? palette! : MonoPalette.dark, cornerRadius: _cornerRadius);
+
+  static double get _cornerRadius =>
+      settings.SettingsService.instanceOrNull?.read(settings.SettingsService.pillCornerRadius) ?? 12;
 
   /// Material equivalent of [palette]: system for System (null), otherwise
   /// the palette's brightness.

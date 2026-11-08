@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
@@ -162,7 +163,7 @@ class _FocusGlowOverlayState extends State<FocusGlowOverlay> {
             child: AnimatedOpacity(
               opacity: _visible ? 1.0 : 0.0,
               duration: duration,
-              curve: Curves.easeOutCubic,
+              curve: AppMotion.curve,
               onEnd: _handleFadeEnd,
               child: size == null
                   ? const SizedBox.shrink()

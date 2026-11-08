@@ -1,3 +1,4 @@
+import '../../../theme/app_motion.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -128,7 +129,7 @@ class _ScreenLockOverlayState extends State<ScreenLockOverlay> {
                     ignoring: !visible,
                     child: AnimatedOpacity(
                       opacity: visible ? 1.0 : 0.0,
-                      duration: const Duration(milliseconds: 200),
+                      duration: AppMotion.duration(context, AppMotion.fast),
                       child: Semantics(
                         container: true,
                         button: true,

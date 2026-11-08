@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
@@ -278,7 +279,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
         context,
         alignment: widget.focusScrollAlignment,
         duration: _navigationScrollDuration,
-        curve: Curves.easeOutCubic,
+        curve: AppMotion.curve,
       );
     });
   }
@@ -295,7 +296,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
       leadingPadding: _leadingPadding,
       animate: animate,
       duration: _navigationScrollDuration,
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
     );
     if (index >= 0 && index < _totalItemCount) {
       scrollKeyedChildToHorizontalCenter(
@@ -304,7 +305,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
         animate: animate,
         isCurrent: () => _focusedIndex == index && index < _totalItemCount,
         duration: _navigationScrollDuration,
-        curve: Curves.easeOutCubic,
+        curve: AppMotion.curve,
       );
     }
   }

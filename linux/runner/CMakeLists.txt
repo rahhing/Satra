@@ -7,6 +7,7 @@ add_executable(${BINARY_NAME}
   "vsync/flutter_vsync.cc"
   "mpv/mpv_player.cc"
   "mpv/mpv_plugin.cc"
+  "mpv/mpv_preview_plugin.cc"
   "mpv/plane_render_executor.cc"
   "mpv/wayland_video_surface.cc"
   "${FLUTTER_MANAGED_DIR}/generated_plugin_registrant.cc"

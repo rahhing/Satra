@@ -1,3 +1,4 @@
+import 'theme/app_motion.dart';
 import 'dart:async';
 import 'dart:io' show Directory, Platform, ProcessInfo;
 import 'dart:ui' show AppExitResponse;
@@ -852,6 +853,8 @@ class _StartupBootstrapState<T> extends State<StartupBootstrap<T>> {
       child: Builder(
         builder: (context) => InputModeTracker(
           child: MaterialApp(
+            themeAnimationCurve: AppMotion.curve,
+            themeAnimationDuration: AppMotion.systemDuration(),
             debugShowCheckedModeBanner: false,
             locale: TranslationProvider.of(context).locale.localizationsLocale,
             supportedLocales: supportedLocalizationsLocales,
@@ -1978,6 +1981,8 @@ class _AppShell extends StatelessWidget {
                 behavior: HitTestBehavior.translucent,
                 child: InputModeTracker(
                   child: MaterialApp(
+                    themeAnimationCurve: AppMotion.curve,
+                    themeAnimationDuration: AppMotion.systemDuration(),
                     title: t.app.title,
                     debugShowCheckedModeBanner: false,
                     scrollBehavior: const FluidScrollBehavior(),
@@ -2495,7 +2500,9 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
 
   Widget _buildStatusText(BuildContext context) {
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 200),
+      duration: AppMotion.duration(context, AppMotion.fast),
+      switchInCurve: AppMotion.curve,
+      switchOutCurve: AppMotion.curve,
       child: Text(
         _statusMessage,
         key: ValueKey(_statusMessage),

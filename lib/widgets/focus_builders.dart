@@ -1,3 +1,5 @@
+import '../theme/mono_tokens.dart';
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 import '../focus/focus_chrome.dart';
 import '../focus/focus_theme.dart';
@@ -32,7 +34,7 @@ class FocusBuilders {
     bool? selected,
     required EdgeInsetsGeometry padding,
     required Color backgroundColor,
-    double borderRadius = 20,
+    double? borderRadius,
     Duration? animationDuration,
     required Widget child,
   }) {
@@ -52,9 +54,14 @@ class FocusBuilders {
             onTap: onTap,
             child: AnimatedContainer(
               duration: duration,
-              curve: Curves.easeOutCubic,
+              curve: AppMotion.curve,
               padding: padding,
-              decoration: BoxDecoration(color: backgroundColor, borderRadius: BorderRadius.circular(borderRadius)),
+              decoration: BoxDecoration(
+                color: backgroundColor,
+                borderRadius: BorderRadius.circular(
+                  borderRadius ?? (Theme.of(context).extension<MonoTokens>()?.radiusSm ?? 12) * 5 / 3,
+                ),
+              ),
               child: child,
             ),
           ),
@@ -111,7 +118,7 @@ class FocusBuilders {
     final focusedWidget = AnimatedScale(
       scale: isFocused ? focusScale : 1.0,
       duration: duration,
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       child: buildFocusChrome(
         context,
         showFocus: isFocused,

@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:async';
 
 import 'package:flutter/foundation.dart';
@@ -100,7 +101,9 @@ class _SupporterSheetState extends State<SupporterSheet> {
         position.maxScrollExtent,
       );
       if ((target - position.pixels).abs() < 1) return;
-      unawaited(position.animateTo(target, duration: const Duration(milliseconds: 200), curve: Curves.easeOut));
+      unawaited(
+        position.animateTo(target, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve),
+      );
     });
   }
 
@@ -168,7 +171,9 @@ class _SupporterSheetState extends State<SupporterSheet> {
   /// they and the button do not fit on screen together.
   void _scrollToTop() {
     if (!_scrollController.hasClients) return;
-    unawaited(_scrollController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeOut));
+    unawaited(
+      _scrollController.animateTo(0, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve),
+    );
   }
 
   @override

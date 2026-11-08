@@ -451,49 +451,52 @@ class ExploreScreenState extends State<ExploreScreen>
     final active = sources.activeSource;
     final foregroundColor = Theme.of(context).colorScheme.onSurface;
 
-    return ToolbarScrim(
-      child: Row(
-        children: [
-          const Spacer(),
-          FocusableActionBar(
-            key: _actionBarKey,
-            onNavigateLeft: _navigateToSidebar,
-            onNavigateDown: _tvBrowseRailKey.currentState?.requestFocus,
-            onBack: _navigateToSidebar,
-            spacing: 4,
-            actions: [
-              if (active != null && sources.connectedSources.length > 1)
-                FocusableAction(
-                  debugLabel: 'ExploreSourceSwitcher',
-                  onPressed: () => _sourceMenuKey.currentState?.showButtonMenu(focusFirstItem: true),
-                  child: _buildSourceSwitcher(
-                    sources,
-                    active,
-                    textStyle: Theme.of(
-                      context,
-                    ).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w600),
-                    anchorAlignment: AppMenuAnchorAlignment.end,
-                    parentOwnsFocus: true,
+    return Align(
+      alignment: Alignment.topRight,
+      child: ToolbarScrim(
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FocusableActionBar(
+              key: _actionBarKey,
+              onNavigateLeft: _navigateToSidebar,
+              onNavigateDown: _tvBrowseRailKey.currentState?.requestFocus,
+              onBack: _navigateToSidebar,
+              spacing: 4,
+              actions: [
+                if (active != null && sources.connectedSources.length > 1)
+                  FocusableAction(
+                    debugLabel: 'ExploreSourceSwitcher',
+                    onPressed: () => _sourceMenuKey.currentState?.showButtonMenu(focusFirstItem: true),
+                    child: _buildSourceSwitcher(
+                      sources,
+                      active,
+                      textStyle: Theme.of(
+                        context,
+                      ).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w600),
+                      anchorAlignment: AppMenuAnchorAlignment.end,
+                      parentOwnsFocus: true,
+                    ),
                   ),
-                ),
-              if (active != null)
+                if (active != null)
+                  FocusableAction(
+                    icon: Symbols.search_rounded,
+                    iconColor: foregroundColor,
+                    tooltip: t.common.search,
+                    onPressed: () => Navigator.of(
+                      context,
+                    ).push(MaterialPageRoute<void>(builder: (_) => CatalogSearchScreen(source: active))),
+                  ),
                 FocusableAction(
-                  icon: Symbols.search_rounded,
+                  icon: Symbols.refresh_rounded,
                   iconColor: foregroundColor,
-                  tooltip: t.common.search,
-                  onPressed: () => Navigator.of(
-                    context,
-                  ).push(MaterialPageRoute<void>(builder: (_) => CatalogSearchScreen(source: active))),
+                  tooltip: t.common.refresh,
+                  onPressed: () => unawaited(_explore.load()),
                 ),
-              FocusableAction(
-                icon: Symbols.refresh_rounded,
-                iconColor: foregroundColor,
-                tooltip: t.common.refresh,
-                onPressed: () => unawaited(_explore.load()),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

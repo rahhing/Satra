@@ -1,3 +1,4 @@
+import '../../../theme/app_motion.dart';
 import 'dart:async' show Stream, unawaited;
 import '../../../media/ids.dart';
 
@@ -191,8 +192,8 @@ class ContentStripState extends State<ContentStrip> {
       Scrollable.ensureVisible(
         context,
         alignment: 0.5,
-        duration: const Duration(milliseconds: 150),
-        curve: Curves.easeOut,
+        duration: AppMotion.duration(context, AppMotion.fast),
+        curve: AppMotion.curve,
       );
     });
   }

@@ -1,3 +1,4 @@
+import '../theme/mono_tokens.dart';
 import 'package:flutter/material.dart';
 
 import 'focus_theme.dart';
@@ -58,7 +59,7 @@ class _FocusableButtonState extends State<FocusableButton> {
       focusNode: widget.focusNode,
       canRequestFocus: enabled,
       disableScale: true,
-      borderRadius: 100,
+      borderRadius: Theme.of(context).extension<MonoTokens>()?.radiusMd ?? 18,
       useBackgroundFocus: widget.useBackgroundFocus,
       descendantsAreFocusable: false,
       onFocusChange: (f) => setState(() => _isFocused = f),

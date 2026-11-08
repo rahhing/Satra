@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:async';
 import 'dart:ui';
 import '../media/ids.dart';
@@ -9,6 +10,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 import '../focus/card_focus_scope.dart';
 import 'hover_lift.dart';
+import 'media_card_artwork.dart';
 import 'artwork_atmosphere.dart';
 import '../focus/focus_theme.dart';
 import '../focus/input_mode_tracker.dart';
@@ -502,6 +504,7 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
             onSecondaryTap: showContextMenuFromTap,
             density: SettingsService.instance.read(SettingsService.libraryDensity),
             isOffline: widget.isOffline,
+            previewOnHover: widget.isInContinueWatching,
             localPosterPath: localPosterPath,
             showServerName: widget.showServerName,
             libraryName: widget.libraryName,
@@ -659,9 +662,19 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
       child: _CatalogFocusBorder(
         accentColor: _catalogAccent,
         borderRadius: _posterFocusRadius(context, item),
-        child: fullBleed
-            ? _clipPosterImage(context, item, Stack(fit: StackFit.expand, children: [image, ...overlays]))
-            : Stack(children: [_clipPosterImage(context, item, image), ...overlays]),
+        child: MediaCardArtwork(
+          borderRadius: _posterFocusRadius(context, item),
+          item: item is MediaItem ? item : null,
+          previewOnHover:
+              widget.isInContinueWatching &&
+              !widget.isOffline &&
+              item is MediaItem &&
+              (item.isMovie || item.isEpisode) &&
+              !(SettingsService.instance.read(SettingsService.hideSpoilers) && item.shouldHideSpoiler),
+          child: fullBleed
+              ? _clipPosterImage(context, item, Stack(fit: StackFit.expand, children: [image, ...overlays]))
+              : Stack(children: [_clipPosterImage(context, item, image), ...overlays]),
+        ),
       ),
     );
   }
@@ -767,6 +780,7 @@ class _MediaCardList extends StatelessWidget {
   final EpisodePosterMode? episodePosterModeOverride;
   final CardShape? cardShapeOverride;
   final bool enableDetailLinks;
+  final bool previewOnHover;
   final CatalogItem? catalogItem;
 
   const _MediaCardList({
@@ -785,6 +799,7 @@ class _MediaCardList extends StatelessWidget {
     this.cardShapeOverride,
     this.catalogItem,
     required this.enableDetailLinks,
+    this.previewOnHover = false,
   });
 
   CardShape _cardShape() {
@@ -909,26 +924,37 @@ class _MediaCardList extends StatelessWidget {
                 child: SizedBox(
                   width: _posterWidth(),
                   height: _posterHeight(),
-                  child: Stack(
-                    children: [
-                      _clipPosterImage(
-                        context,
-                        item,
-                        _buildPosterImage(
+                  child: MediaCardArtwork(
+                    borderRadius: _posterFocusRadius(context, item),
+                    item: item is MediaItem ? item as MediaItem : null,
+                    previewOnHover:
+                        previewOnHover &&
+                        !isOffline &&
+                        item is MediaItem &&
+                        ((item as MediaItem).isMovie || (item as MediaItem).isEpisode) &&
+                        !(SettingsService.instance.read(SettingsService.hideSpoilers) &&
+                            (item as MediaItem).shouldHideSpoiler),
+                    child: Stack(
+                      children: [
+                        _clipPosterImage(
                           context,
                           item,
-                          isOffline: isOffline,
-                          localPosterPath: localPosterPath,
-                          episodePosterModeOverride: episodePosterModeOverride,
-                          cardShapeOverride: cardShapeOverride,
-                          catalogItem: catalogItem,
-                          knownWidth: catalogItem == null ? null : _posterWidth(),
-                          knownHeight: catalogItem == null ? null : _posterHeight(),
+                          _buildPosterImage(
+                            context,
+                            item,
+                            isOffline: isOffline,
+                            localPosterPath: localPosterPath,
+                            episodePosterModeOverride: episodePosterModeOverride,
+                            cardShapeOverride: cardShapeOverride,
+                            catalogItem: catalogItem,
+                            knownWidth: catalogItem == null ? null : _posterWidth(),
+                            knownHeight: catalogItem == null ? null : _posterHeight(),
+                          ),
                         ),
-                      ),
-                      if (item is MediaItem && _showsWatchedIndicator(item as MediaItem))
-                        WatchedIndicator(item: item as MediaItem),
-                    ],
+                        if (item is MediaItem && _showsWatchedIndicator(item as MediaItem))
+                          WatchedIndicator(item: item as MediaItem),
+                      ],
+                    ),
                   ),
                 ),
               ),
@@ -1500,7 +1526,7 @@ class _CatalogFocusBorder extends StatelessWidget {
     if (showFocus == null) return child;
     return AnimatedContainer(
       duration: FocusTheme.getAnimationDuration(context),
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       foregroundDecoration: FocusTheme.focusDecoration(
         context,
         isFocused: showFocus,

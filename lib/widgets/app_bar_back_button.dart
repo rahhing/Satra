@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -121,8 +122,8 @@ class _AppBarBackButtonState extends State<AppBarBackButton> {
             excludeFromSemantics: true,
             onTap: _handlePressed,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              curve: Curves.easeInOut,
+              duration: AppMotion.duration(context, AppMotion.fast),
+              curve: AppMotion.curve,
               margin: const EdgeInsets.all(8),
               width: 40,
               height: 40,

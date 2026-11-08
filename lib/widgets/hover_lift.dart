@@ -2,11 +2,25 @@ import 'package:flutter/material.dart';
 
 import '../theme/app_motion.dart';
 
-/// Pointer feedback uses paint transforms so a shelf never shifts its layout.
+/// A stable subtree keeps images and inline players mounted while the pointer
+/// enters, presses, leaves, or reverses an in-flight animation.
 class HoverLift extends StatefulWidget {
   const HoverLift({super.key, required this.child});
 
   final Widget child;
+
+  static const hoverScale = 1.035;
+  static const liftFraction = 0.018;
+
+  /// Paint space required when this lift is composed with keyboard focus.
+  /// Shelves can clip their horizontal edges without trimming a lifted card.
+  static EdgeInsets paintOutsets(Size size, {double parentScale = 1}) {
+    final scale = hoverScale * parentScale;
+    final horizontal = size.width * (scale - 1) / 2;
+    final vertical = size.height * (scale - 1) / 2;
+    final lift = size.height * liftFraction * scale;
+    return EdgeInsets.fromLTRB(horizontal, vertical + lift, horizontal, (vertical - lift).clamp(0, double.infinity));
+  }
 
   @override
   State<HoverLift> createState() => _HoverLiftState();
@@ -15,47 +29,31 @@ class HoverLift extends StatefulWidget {
 class _HoverLiftState extends State<HoverLift> {
   bool _hovered = false;
   bool _pressed = false;
-  bool _engaged = false;
 
   @override
   Widget build(BuildContext context) {
-    final active = _hovered || _pressed;
-    final duration = AppMotion.duration(context, const Duration(milliseconds: 200));
-    Widget content = widget.child;
-    if ((active || _engaged) && duration != Duration.zero) {
-      content = AnimatedScale(
-        duration: duration,
-        curve: AppMotion.curve,
-        scale: _pressed ? 0.985 : (_hovered ? 1.025 : 1),
-        onEnd: () {
-          if (!mounted || _hovered || _pressed) return;
-          setState(() => _engaged = false);
-        },
-        child: AnimatedSlide(
-          duration: duration,
-          curve: AppMotion.curve,
-          offset: _hovered ? const Offset(0, -0.012) : Offset.zero,
-          child: content,
-        ),
-      );
-    }
+    final motion = AppMotion.duration(context) != Duration.zero;
     return MouseRegion(
-      onEnter: (_) => setState(() {
-        _hovered = true;
-        _engaged = true;
-      }),
+      onEnter: (_) => setState(() => _hovered = true),
       onExit: (_) => setState(() {
         _hovered = false;
         _pressed = false;
       }),
       child: Listener(
-        onPointerDown: (_) => setState(() {
-          _pressed = true;
-          _engaged = true;
-        }),
+        onPointerDown: (_) => setState(() => _pressed = true),
         onPointerUp: (_) => setState(() => _pressed = false),
         onPointerCancel: (_) => setState(() => _pressed = false),
-        child: content,
+        child: AnimatedScale(
+          duration: AppMotion.duration(context, _pressed ? AppMotion.fast : AppMotion.standard),
+          curve: AppMotion.curve,
+          scale: !motion ? 1 : (_pressed ? 0.985 : (_hovered ? HoverLift.hoverScale : 1)),
+          child: AnimatedSlide(
+            duration: AppMotion.duration(context),
+            curve: AppMotion.curve,
+            offset: motion && _hovered && !_pressed ? const Offset(0, -HoverLift.liftFraction) : Offset.zero,
+            child: widget.child,
+          ),
+        ),
       ),
     );
   }

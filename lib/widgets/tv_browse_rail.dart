@@ -1,3 +1,5 @@
+import '../theme/app_motion.dart';
+import 'hover_lift.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -453,7 +455,6 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   static const _scrollCatchUpViewportDistance = 2.5;
   // Equivalent to the former whole-rail Opacity(0.6) without keeping a
   // full-viewport saveLayer alive.
-  static const _unfocusedRailDimAlpha = 0.4;
 
   late final FocusNode _focusNode = LockedFocusRowNode(debugLabel: 'tv_browse_rail', focusedItemRect: _focusedCardRect);
   final Map<String, ScrollController> _scrollControllers = {};
@@ -491,7 +492,8 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   bool _isUserVerticalScrollActive = false;
   double? _wheelScrollTarget;
   int _wheelScrollGeneration = 0;
-  static const Duration wheelRowStepDelay = Duration(milliseconds: 250);
+  static const Duration wheelRowScrollDuration = Duration(milliseconds: 300);
+  static const Duration wheelRowStepDelay = wheelRowScrollDuration;
   Timer? _wheelRowStepCooldownTimer;
 
   /// Hub key whose leading slot took focus only because the hub had no items
@@ -907,7 +909,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     _scrollToItem();
   }
 
-  void _moveHub(int delta) {
+  void _moveHub(int delta, {Duration? scrollDuration}) {
     if (widget.hubs.isEmpty) return;
     _isUserVerticalScrollActive = false;
     _wheelScrollGeneration++;
@@ -942,20 +944,25 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     _scrollToItemAfterLayout(animate: false);
     // Section offsets are computed at build, so a laid-out list can start the
     // vertical glide in this frame instead of one frame later.
-    if (!_alignActiveHubToTop(animate: true)) _scrollActiveHubToTop();
+    if (!_alignActiveHubToTop(animate: true, duration: scrollDuration)) {
+      _scrollActiveHubToTop(duration: scrollDuration);
+    }
   }
 
   /// Scrolls the vertical list so the active hub sits at the top, using the
   /// build-time section offsets. Returns false when the list has no client yet
   /// or the offsets do not cover [_hubIndex]; callers then fall back to the
   /// section key path in [_scrollActiveHubToTop].
-  bool _alignActiveHubToTop({required bool animate}) {
+  bool _alignActiveHubToTop({required bool animate, Duration? duration}) {
     if (!_verticalController.hasClients || _hubIndex < 0 || _hubIndex >= _sectionOffsets.length) return false;
     _isUserVerticalScrollActive = false;
     final target = _sectionOffsets[_hubIndex].clamp(0.0, _sectionMaxScrollExtent).toDouble();
-    if (animate) {
+    final glideDuration = MediaQuery.disableAnimationsOf(context)
+        ? Duration.zero
+        : duration ?? _navigationScrollDuration;
+    if (animate && glideDuration > Duration.zero) {
       _startVerticalScrollAnimation(
-        () => _verticalController.animateTo(target, duration: _navigationScrollDuration, curve: Curves.easeOutCubic),
+        () => _verticalController.animateTo(target, duration: glideDuration, curve: AppMotion.curve),
       );
     } else {
       _verticalScrollGeneration++;
@@ -984,10 +991,10 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     return overlaps(_sectionOffsets[_hubIndex].clamp(0.0, _sectionMaxScrollExtent).toDouble());
   }
 
-  void _scrollActiveHubToTop({bool animate = true}) {
+  void _scrollActiveHubToTop({bool animate = true, Duration? duration}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      if (_alignActiveHubToTop(animate: animate)) return;
+      if (_alignActiveHubToTop(animate: animate, duration: duration)) return;
 
       final key = _hubSectionKeys[_hubIndex];
       final context = key?.currentContext;
@@ -998,8 +1005,8 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
           () => Scrollable.ensureVisible(
             context,
             alignment: 0,
-            duration: _navigationScrollDuration,
-            curve: Curves.easeOutCubic,
+            duration: MediaQuery.disableAnimationsOf(context) ? Duration.zero : duration ?? _navigationScrollDuration,
+            curve: AppMotion.curve,
           ),
         );
       } else {
@@ -1099,7 +1106,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
   }
 
   /// Steps the active hub row up or down by one row on mouse wheel / trackpad
-  /// scroll, enforcing a 0.25s ([wheelRowStepDelay]) cooldown between steps so
+  /// scroll, enforcing a [wheelRowStepDelay] cooldown between steps so
   /// each scroll cycles cleanly to the next row without cutting off the top of
   /// the row's header/pills.
   bool stepHubByScroll(double dy) {
@@ -1111,11 +1118,11 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
       _focusNode.requestFocus();
     }
     if (next == _hubIndex) {
-      _alignActiveHubToTop(animate: true);
+      _alignActiveHubToTop(animate: true, duration: wheelRowScrollDuration);
       return false;
     }
     _wheelRowStepCooldownTimer = Timer(wheelRowStepDelay, () {});
-    _moveHub(delta);
+    _moveHub(delta, scrollDuration: wheelRowScrollDuration);
     return true;
   }
 
@@ -1143,11 +1150,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     final generation = ++_wheelScrollGeneration;
     _wheelScrollTarget = target;
     unawaited(
-      position.animateTo(target, duration: const Duration(milliseconds: 240), curve: Curves.easeOutCubic).whenComplete(
-        () {
-          if (generation == _wheelScrollGeneration) _wheelScrollTarget = null;
-        },
-      ),
+      position.animateTo(target, duration: const Duration(milliseconds: 240), curve: AppMotion.curve).whenComplete(() {
+        if (generation == _wheelScrollGeneration) _wheelScrollTarget = null;
+      }),
     );
   }
 
@@ -1240,7 +1245,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     if (!animate || distance > viewportWidth * _scrollCatchUpViewportDistance) {
       position.jumpTo(target);
     } else {
-      unawaited(position.animateTo(target, duration: _navigationScrollDuration, curve: Curves.easeOutCubic));
+      unawaited(position.animateTo(target, duration: _navigationScrollDuration, curve: AppMotion.curve));
     }
   }
 
@@ -1482,7 +1487,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
                           end: Alignment.bottomCenter,
                           colors: [
                             theme.scaffoldBackgroundColor.withValues(alpha: 0),
-                            theme.scaffoldBackgroundColor.withValues(alpha: 0.7),
+                            theme.scaffoldBackgroundColor.withValues(alpha: 0),
                           ],
                         ),
                       ),
@@ -1495,7 +1500,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
                         TvBrowseRailLayout.railBottomPaddingForScale(scale),
                       ),
                       child: ClipRect(
-                        clipper: _RailClipper(leftOverflow: horizontalInset, rightOverflow: 0),
+                        // Media scrolls behind the shelf's leading margin,
+                        // rather than leaking into the space beside the dock.
+                        clipper: const _RailClipper(rightOverflow: 0),
                         child: ExcludeSemantics(
                           // Both axes animate during D-pad navigation. Keeping
                           // the individual headers/cards in the semantics tree
@@ -1541,7 +1548,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
                         builder: (context, railHasFocus, _) => AnimatedDimScrim(
                           dimmed: !railHasFocus,
                           color: theme.scaffoldBackgroundColor,
-                          alpha: _unfocusedRailDimAlpha,
+                          alpha: 0,
                           // The band's top edge cuts across the spotlight
                           // artwork; ramp the dim in instead.
                           fadeTop: 36 * scale,
@@ -1821,6 +1828,10 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
       totalCount: totalCount,
     );
     final rightOverflow = metrics.railEdgePadding + metrics.cardWidth + metrics.itemGap;
+    final hoverOutsets = HoverLift.paintOutsets(
+      Size(metrics.cardWidth, metrics.containerHeight),
+      parentScale: fullCardLayout ? TvBrowseRailLayout.fullCardFocusScale : FocusTheme.focusScale,
+    );
 
     return Transform.translate(
       offset: Offset(-interactionExpansion, 0),
@@ -1831,7 +1842,8 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
           clipper: _RailClipper(
             leftOverflow: leftOverflow,
             rightOverflow: rightOverflow,
-            verticalOverflow: metrics.focusExtra,
+            topOverflow: math.max(metrics.focusExtra, hoverOutsets.top + FocusTheme.focusBorderWidth),
+            bottomOverflow: math.max(metrics.focusExtra, hoverOutsets.bottom + FocusTheme.focusBorderWidth),
           ),
           child: rail,
         ),
@@ -2359,10 +2371,10 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     return AnimatedScale(
       scale: isFocused ? FocusTheme.focusScale : 1.0,
       duration: duration,
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       child: AnimatedContainer(
         duration: duration,
-        curve: Curves.easeOutCubic,
+        curve: AppMotion.curve,
         width: metrics.cardWidth,
         height: metrics.posterHeight,
         decoration: BoxDecoration(
@@ -2433,7 +2445,7 @@ class _RailBleedPositioned extends StatelessWidget {
     return TweenAnimationBuilder<double>(
       tween: Tween(end: target),
       duration: FocusTheme.getAnimationDuration(context),
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       child: child,
       builder: (context, bleedLeft, child) {
         final backgroundWidth = math.max(width + bleedLeft, MediaQuery.sizeOf(context).width);
@@ -2539,7 +2551,7 @@ class _HubArtworkDim extends Animation<double> {
     if (_duration == Duration.zero) {
       _controller.value = next;
     } else {
-      unawaited(_controller.animateTo(next, duration: _duration, curve: Curves.easeOutCubic));
+      unawaited(_controller.animateTo(next, duration: _duration, curve: AppMotion.curve));
     }
   }
 

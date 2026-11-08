@@ -1,4 +1,6 @@
 import 'dart:async';
+import '../theme/app_motion.dart';
+import '../widgets/hero_page_indicators.dart';
 import '../widgets/artwork_atmosphere.dart';
 import '../media/ids.dart';
 import 'dart:io' show Platform;
@@ -74,7 +76,6 @@ class DiscoverScreen extends StatefulWidget {
 class _DiscoverScreenState extends State<DiscoverScreen>
     with Refreshable, ManualRefreshable, FullRefreshable, TabVisibilityAware, FocusableTab, WidgetsBindingObserver {
   static const Duration _heroAutoScrollDuration = Duration(seconds: 8);
-  static const Duration _indicatorUpdateInterval = Duration(milliseconds: 200);
 
   /// Data + refresh policy live in [DiscoverProvider]; this state keeps only
   /// UI concerns (hero carousel, focus, spotlight). The proxy getters keep
@@ -94,8 +95,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   final ScrollController _scrollController = ScrollController();
   final ValueNotifier<int> _heroIndex = ValueNotifier<int>(0);
   Timer? _autoScrollTimer;
-  Timer? _indicatorTimer;
-  final ValueNotifier<double> _indicatorProgress = ValueNotifier(0.0);
   bool _isAutoScrollPaused = false;
   bool _heroFocusPausedAutoScroll = false;
   final TvSpotlightController _spotlight = TvSpotlightController();
@@ -268,7 +267,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   void _scrollToTop() {
     if (!_scrollController.hasClients) return;
-    _scrollController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    _scrollController.animateTo(0, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve);
   }
 
   void _focusTopActions() {
@@ -349,6 +348,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       }
     }
 
+    WidgetsBinding.instance.scheduleFrame();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       if (!_isTabVisible || !(ModalRoute.of(context)?.isCurrent ?? false)) {
@@ -495,7 +495,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     if (_heroFocusNode.hasFocus) {
       _heroFocusPausedAutoScroll = true;
       _autoScrollTimer?.cancel();
-      _stopIndicatorProgress();
       return;
     }
 
@@ -518,14 +517,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       onUp: _focusTopActions,
       onLeft: () {
         if (_heroIndex.value > 0) {
-          _heroController.previousPage(duration: tokens(context).slow, curve: Curves.easeInOut);
+          _heroController.previousPage(duration: AppMotion.duration(context, AppMotion.slow), curve: AppMotion.curve);
         } else {
           _navigateToSidebar();
         }
       },
       onRight: () {
         if (_heroIndex.value < _onDeck.length - 1) {
-          _heroController.nextPage(duration: tokens(context).slow, curve: Curves.easeInOut);
+          _heroController.nextPage(duration: AppMotion.duration(context, AppMotion.slow), curve: AppMotion.curve);
         }
       },
       onSelect: () {
@@ -542,9 +541,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _discover.removeListener(_onDiscoverChanged);
     WidgetsBinding.instance.removeObserver(this);
     _autoScrollTimer?.cancel();
-    _indicatorTimer?.cancel();
     _spotlight.dispose();
-    _indicatorProgress.dispose();
     _heroIndex.dispose();
     _heroController.dispose();
     _scrollController.dispose();
@@ -576,16 +573,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     } else if (state == AppLifecycleState.inactive || state == AppLifecycleState.hidden) {
       // Stop animations to prevent scroll state corruption while backgrounded
       _autoScrollTimer?.cancel();
-      _stopIndicatorProgress();
     }
   }
 
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
     if (PlatformDetector.isTV()) return;
-    if (_isAutoScrollPaused) return;
+    if (_isAutoScrollPaused || !_isTabVisible || WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations) return;
 
-    _startIndicatorProgress();
     _autoScrollTimer = Timer.periodic(_heroAutoScrollDuration, (timer) {
       if (_onDeck.isEmpty || !_heroController.hasClients || _isAutoScrollPaused) {
         return;
@@ -595,37 +590,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       if (_heroIndex.value >= _onDeck.length) _heroIndex.value = 0;
 
       final nextPage = (_heroIndex.value + 1) % _onDeck.length;
-      _heroController.animateToPage(nextPage, duration: const Duration(milliseconds: 500), curve: Curves.easeInOut);
-      // Wait for page transition to complete before resetting progress
-      Future.delayed(const Duration(milliseconds: 500), () {
-        if (mounted && !_isAutoScrollPaused) {
-          _startIndicatorProgress();
-        }
-      });
+      unawaited(
+        _heroController.animateToPage(
+          nextPage,
+          duration: AppMotion.duration(context, AppMotion.slow),
+          curve: AppMotion.curve,
+        ),
+      );
     });
-  }
-
-  void _startIndicatorProgress() {
-    if (!mounted) return;
-    _indicatorTimer?.cancel();
-    _indicatorProgress.value = 0.0;
-    final totalSteps = _heroAutoScrollDuration.inMilliseconds ~/ _indicatorUpdateInterval.inMilliseconds;
-    int step = 0;
-    _indicatorTimer = Timer.periodic(_indicatorUpdateInterval, (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      step++;
-      _indicatorProgress.value = (step / totalSteps).clamp(0.0, 1.0);
-      if (step >= totalSteps) {
-        timer.cancel();
-      }
-    });
-  }
-
-  void _stopIndicatorProgress() {
-    _indicatorTimer?.cancel();
   }
 
   void _resetAutoScrollTimer() {
@@ -638,7 +610,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       _isAutoScrollPaused = true;
     });
     _autoScrollTimer?.cancel();
-    _stopIndicatorProgress();
   }
 
   void _resumeAutoScroll() {
@@ -653,7 +624,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     _isTabVisible = false;
     _pendingTvBrowseRailFocus = false;
     _autoScrollTimer?.cancel();
-    _stopIndicatorProgress();
   }
 
   @override
@@ -676,41 +646,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       return;
     }
     _focusTopBoundary();
-  }
-
-  // Helper method to calculate visible dot range (max 5 dots)
-  ({int start, int end}) _getVisibleDotRange() {
-    final totalDots = _onDeck.length;
-    if (totalDots <= 5) {
-      return (start: 0, end: totalDots - 1);
-    }
-
-    // Center the active dot when possible
-    final center = _heroIndex.value;
-    final int start = (center - 2).clamp(0, totalDots - 5);
-    final int end = start + 4; // 5 dots total (0-4 inclusive)
-
-    return (start: start, end: end);
-  }
-
-  // Helper method to determine dot size based on position
-  double _getDotSize(int dotIndex, int start, int end) {
-    final totalDots = _onDeck.length;
-
-    // If we have 5 or fewer dots, all are full size (8px)
-    if (totalDots <= 5) {
-      return 8.0;
-    }
-
-    // First and last visible dots are smaller if there are more items beyond them
-    final isFirstVisible = dotIndex == start && start > 0;
-    final isLastVisible = dotIndex == end && end < totalDots - 1;
-
-    if (isFirstVisible || isLastVisible) {
-      return 5.0; // Smaller edge dots
-    }
-
-    return 8.0; // Normal size
   }
 
   @override
@@ -1231,100 +1166,33 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                   return _buildHeroItem(_onDeck[index], heroHeight);
                 },
               ),
-              // Page indicators with animated progress and pause/play button.
-              // Hidden on TV only (issue #600: pointer-only control unreachable
-              // via d-pad) — never gated on transient input mode, which back-key
-              // events, BT keyboards, and gamepads can flip on phones/desktop.
-              if (!isTv)
+              if (!isTv && _onDeck.length > 1)
                 Positioned(
-                  bottom: 16,
-                  left: -26,
-                  right: 0,
-                  // Centered on the same safe width as the hero item above it.
+                  bottom: 18,
+                  right: 24,
+                  left: 24,
                   child: SafeArea(
                     top: false,
                     bottom: false,
-                    child: Row(
-                      mainAxisAlignment: .center,
-                      children: [
-                        // Pause/Play button
-                        ClickableCursor(
-                          child: GestureDetector(
-                            onTap: () {
-                              if (_isAutoScrollPaused) {
-                                _resumeAutoScroll();
-                              } else {
-                                _pauseAutoScroll();
-                              }
-                            },
-                            child: AppIcon(
-                              _isAutoScrollPaused ? Symbols.play_arrow_rounded : Symbols.pause_rounded,
-                              fill: 1,
-                              color: Theme.of(context).colorScheme.onSurface,
-                              size: 18,
-                              semanticLabel: _isAutoScrollPaused
-                                  ? t.accessibility.autoScrollPlay
-                                  : t.accessibility.autoScrollPause,
-                            ),
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: ValueListenableBuilder<int>(
+                        valueListenable: _heroIndex,
+                        builder: (context, index, _) => HeroPageIndicators(
+                          itemCount: _onDeck.length,
+                          currentIndex: index,
+                          paused: _isAutoScrollPaused,
+                          pauseLabel: _isAutoScrollPaused
+                              ? t.accessibility.autoScrollPlay
+                              : t.accessibility.autoScrollPause,
+                          onTogglePaused: _isAutoScrollPaused ? _resumeAutoScroll : _pauseAutoScroll,
+                          onSelected: (page) => _heroController.animateToPage(
+                            page,
+                            duration: AppMotion.duration(context, AppMotion.slow),
+                            curve: AppMotion.curve,
                           ),
                         ),
-                        const SizedBox(width: 8),
-                        ValueListenableBuilder<int>(
-                          valueListenable: _heroIndex,
-                          builder: (context, heroIndex, _) {
-                            final range = _getVisibleDotRange();
-                            return Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: List.generate(range.end - range.start + 1, (i) {
-                                final index = range.start + i;
-                                final isActive = heroIndex == index;
-                                final dotSize = _getDotSize(index, range.start, range.end);
-
-                                return isActive
-                                    ? ValueListenableBuilder<double>(
-                                        valueListenable: _indicatorProgress,
-                                        builder: (context, progress, child) {
-                                          final maxWidth = dotSize * 3;
-                                          final fillWidth = dotSize + ((maxWidth - dotSize) * progress);
-                                          final onSurface = Theme.of(context).colorScheme.onSurface;
-                                          return Container(
-                                            margin: const EdgeInsets.symmetric(horizontal: 4),
-                                            width: maxWidth,
-                                            height: dotSize,
-                                            decoration: BoxDecoration(
-                                              color: onSurface.withValues(alpha: 0.4),
-                                              borderRadius: BorderRadius.circular(dotSize / 2),
-                                            ),
-                                            child: Align(
-                                              alignment: .centerLeft,
-                                              child: Container(
-                                                width: fillWidth,
-                                                height: dotSize,
-                                                decoration: BoxDecoration(
-                                                  color: onSurface,
-                                                  borderRadius: BorderRadius.circular(dotSize / 2),
-                                                ),
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      )
-                                    : AnimatedContainer(
-                                        duration: tokens(context).slow,
-                                        curve: Curves.easeInOut,
-                                        margin: const EdgeInsets.symmetric(horizontal: 4),
-                                        width: dotSize,
-                                        height: dotSize,
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4),
-                                          borderRadius: BorderRadius.circular(dotSize / 2),
-                                        ),
-                                      );
-                              }),
-                            );
-                          },
-                        ),
-                      ],
+                      ),
                     ),
                   ),
                 ),
@@ -1355,8 +1223,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               },
               child: TweenAnimationBuilder<double>(
                 tween: Tween(begin: 0.0, end: 1.0),
-                duration: const Duration(milliseconds: 800),
-                curve: Curves.easeOut,
+                duration: AppMotion.duration(context, AppMotion.slow),
+                curve: AppMotion.curve,
                 builder: (context, value, child) {
                   return Transform.scale(
                     scale: 1.0 + (0.1 * (1 - value)),
@@ -1656,8 +1524,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               },
               borderRadius: BorderRadius.all(Radius.circular(isTv ? 32 : 24)),
               child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                curve: Curves.easeOutCubic,
+                duration: AppMotion.duration(context, AppMotion.fast),
+                curve: AppMotion.curve,
                 padding: .symmetric(horizontal: isTv ? 34 : 24, vertical: isTv ? 16 : 12),
                 decoration: BoxDecoration(
                   color: backgroundColor,

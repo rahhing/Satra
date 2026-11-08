@@ -1,3 +1,4 @@
+import '../../../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 
 import '../../../focus/card_focus_scope.dart';
@@ -47,7 +48,7 @@ class PlayerFocusDisc extends StatelessWidget {
     final scheme = Theme.of(context).colorScheme;
     return AnimatedContainer(
       duration: FocusTheme.getAnimationDuration(context),
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       decoration: BoxDecoration(
         shape: borderRadius == null ? BoxShape.circle : BoxShape.rectangle,
         borderRadius: borderRadius,

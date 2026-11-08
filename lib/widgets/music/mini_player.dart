@@ -1,3 +1,4 @@
+import '../../theme/app_motion.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -242,8 +243,8 @@ class _MusicMiniPlayerOverlayState extends State<MusicMiniPlayerOverlay> {
         return Stack(
           children: [
             AnimatedPositionedDirectional(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
+              duration: AppMotion.duration(context, AppMotion.fast),
+              curve: AppMotion.curve,
               start: 12 + start,
               end: 12 + safeEnd,
               bottom: bottom,

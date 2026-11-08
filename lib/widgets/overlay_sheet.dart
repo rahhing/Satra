@@ -338,14 +338,14 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
 
     _slideCurve = CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       reverseCurve: Curves.easeInCubic,
     );
 
     _barrierAnimation = Tween<double>(
       begin: 0,
       end: 0.5,
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: _animationController, curve: AppMotion.curve));
   }
 
   @override
@@ -921,7 +921,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
                       child: AnimatedSize(
                         key: ValueKey(_sheetSession),
                         duration: AppMotion.duration(context),
-                        curve: Curves.easeOutCubic,
+                        curve: AppMotion.curve,
                         alignment: isTop ? Alignment.topCenter : Alignment.bottomCenter,
                         child: ConstrainedBox(constraints: effectiveConstraints, child: sheetContent),
                       ),

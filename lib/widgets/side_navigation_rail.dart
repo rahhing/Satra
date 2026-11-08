@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/physics.dart';
 import 'package:provider/provider.dart';
 
 import '../focus/dpad_navigator.dart';
@@ -19,7 +20,6 @@ import '../navigation/navigation_tabs.dart';
 import '../providers/catalog_sources_provider.dart';
 import '../providers/hidden_libraries_provider.dart';
 import '../providers/libraries_provider.dart';
-import '../services/device_performance.dart';
 import '../services/music/music_playback_service.dart';
 import '../services/settings_service.dart';
 import '../utils/music_navigation.dart';
@@ -33,9 +33,72 @@ import '../services/fullscreen_state_manager.dart';
 import '../theme/mono_tokens.dart';
 import '../theme/app_motion.dart';
 import 'glass_surface.dart';
-import 'brand_mark.dart';
 import '../widgets/backend_badge.dart';
 import '../i18n/strings.g.dart';
+
+// One timeline drives the dock's geometry. Children keep their elements when
+// crossing either endpoint, so reversing a hover never replaces their layout.
+class _DockExpansion extends InheritedWidget {
+  const _DockExpansion({required this.animation, required super.child});
+  final Animation<double> animation;
+
+  static Animation<double>? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<_DockExpansion>()?.animation;
+
+  @override
+  bool updateShouldNotify(_DockExpansion oldWidget) => animation != oldWidget.animation;
+}
+
+class _RailMorph extends StatelessWidget {
+  const _RailMorph({required this.expanded, required this.builder, this.child});
+  final bool expanded;
+  final _RailTransitionBuilder builder;
+  final Widget? child;
+
+  @override
+  Widget build(BuildContext context) {
+    final animation = _DockExpansion.of(context);
+    if (animation != null) {
+      return AnimatedBuilder(
+        animation: animation,
+        child: child,
+        builder: (context, child) => builder(context, animation.value, child),
+      );
+    }
+    return TweenAnimationBuilder<double>(
+      tween: Tween(end: expanded ? 1 : 0),
+      duration: AppMotion.duration(context, SideNavigationRailState.expandDuration),
+      curve: SideNavigationRailState.expandCurve,
+      builder: builder,
+      child: child,
+    );
+  }
+}
+
+typedef _RailTransitionBuilder = Widget Function(BuildContext context, double progress, Widget? child);
+
+class _RailPadding extends StatelessWidget {
+  const _RailPadding({required this.padding, required this.duration, required this.curve, required this.child});
+  final EdgeInsets padding;
+  final Duration duration;
+  final Curve curve;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    if (_DockExpansion.of(context) == null) {
+      return AnimatedPadding(padding: padding, duration: duration, curve: curve, child: child);
+    }
+    return _RailMorph(
+      expanded: false,
+      child: child,
+      builder: (context, progress, child) => Padding(
+        padding: padding.copyWith(left: lerpDouble(4, 18, progress), right: lerpDouble(4, 18, progress)),
+        child: child,
+      ),
+    );
+  }
+}
 
 enum _LibraryNavSection { visible, hidden }
 
@@ -66,7 +129,11 @@ KeyEventResult _handleRailItemKey(KeyEvent event, {required VoidCallback onSelec
     onSelect();
     return KeyEventResult.handled;
   }
-  if (event.logicalKey == LogicalKeyboardKey.arrowRight && onNavigateRight != null) {
+  final contentKey =
+      !PlatformDetector.isTVDevice() && SettingsService.instanceOrNull?.read(SettingsService.dockSide) == DockSide.right
+      ? LogicalKeyboardKey.arrowLeft
+      : LogicalKeyboardKey.arrowRight;
+  if (event.logicalKey == contentKey && onNavigateRight != null) {
     onNavigateRight();
     return KeyEventResult.handled;
   }
@@ -161,7 +228,7 @@ class NavigationRailItem extends StatelessWidget {
     this.autofocus = false,
     this.iconSize = 22,
     this.horizontalPadding = 17,
-    this.expandedContentWidth = SideNavigationRailState.expandedWidth - 24,
+    this.expandedContentWidth = SideNavigationRailState.expandedWidth - 36,
     this.expandedHeight = 48,
     this.suppressSelectedBackground = false,
     this.focusAlpha = 0.12,
@@ -172,7 +239,8 @@ class NavigationRailItem extends StatelessWidget {
   Color? _indicatorColorForLayout(MonoTokens t, {required bool focused, required bool collapsedLayout}) {
     // The collapsed TV rail is a transparent overlay strip; a persistent
     // active pill over artwork is noise there, so it shows focus only.
-    final showSelected = isSelected && !suppressSelectedBackground && !(collapsedLayout && PlatformDetector.isTV());
+    final showSelected =
+        isSelected && !suppressSelectedBackground && !(collapsedLayout && PlatformDetector.isTVDevice());
     if (focused) return t.accent.withValues(alpha: showSelected ? 0.23 : 0.16);
     if (showSelected) return t.accent.withValues(alpha: 0.12);
     return null;
@@ -214,7 +282,7 @@ class NavigationRailItem extends StatelessWidget {
             alignment: .center,
             decoration: BoxDecoration(
               color: _indicatorColor(t, focused: focused, expansion: 0),
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(t.radiusSm * 7 / 6),
             ),
             child: _leadingIcon(t),
           ),
@@ -275,18 +343,18 @@ class NavigationRailItem extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: horizontalPadding, vertical: fixedHeight ? 0 : 8),
       decoration: BoxDecoration(
         color: _indicatorColor(t, focused: focused, expansion: 1),
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(t.radiusSm * 7 / 6),
       ),
       child: _buildExpandedContent(context, t, labelOpacity: 1, showLeading: true),
     );
   }
 
-  /// At the endpoints only the active layout exists in the tree. Mid-morph a
-  /// single icon moves with the pill geometry while label and indicator color
-  /// alpha provide the crossfade without subtree opacity layers.
+  /// Keep the same icon, label and indicator mounted throughout the morph.
   Widget _buildMorphingLayouts(BuildContext context, MonoTokens t, {required bool focused, required double expansion}) {
-    if (expansion <= 0) return _buildCollapsedLayout(context, t, focused: focused);
-    if (expansion >= 1) {
+    if (_DockExpansion.of(context) == null && expansion <= 0) {
+      return _buildCollapsedLayout(context, t, focused: focused);
+    }
+    if (_DockExpansion.of(context) == null && expansion >= 1) {
       return SizedBox(
         width: expandedContentWidth,
         height: expandedHeight,
@@ -302,45 +370,49 @@ class NavigationRailItem extends StatelessWidget {
     final iconLeft = lerpDouble((collapsedWidth - iconSize) / 2, horizontalPadding, expansion);
     final iconTop = lerpDouble((collapsedHeight - iconSize) / 2, (expandedHeight - iconSize) / 2, expansion);
 
-    return SizedBox(
-      width: lerpDouble(collapsedWidth, expandedContentWidth, expansion),
-      height: lerpDouble(collapsedHeight, expandedHeight, expansion),
-      child: Stack(
-        children: [
-          Positioned(
-            left: indicatorLeft,
-            top: indicatorTop,
-            child: Container(
-              width: lerpDouble(collapsedPillWidth, expandedContentWidth, expansion),
-              height: lerpDouble(collapsedIndicatorHeight, expandedHeight, expansion),
-              decoration: BoxDecoration(
-                color: _indicatorColor(t, focused: focused, expansion: expansion),
-                borderRadius: BorderRadius.circular(14),
+    return Semantics(
+      label: collapsedLabel,
+      excludeSemantics: true,
+      child: SizedBox(
+        width: lerpDouble(collapsedWidth, expandedContentWidth, expansion),
+        height: lerpDouble(collapsedHeight, expandedHeight, expansion),
+        child: Stack(
+          children: [
+            Positioned(
+              left: indicatorLeft,
+              top: indicatorTop,
+              child: Container(
+                width: lerpDouble(collapsedPillWidth, expandedContentWidth, expansion),
+                height: lerpDouble(collapsedIndicatorHeight, expandedHeight, expansion),
+                decoration: BoxDecoration(
+                  color: _indicatorColor(t, focused: focused, expansion: expansion),
+                  borderRadius: BorderRadius.circular(t.radiusSm * 7 / 6),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: 0,
-            top: 0,
-            child: SizedBox(
-              width: expandedContentWidth,
-              height: expandedHeight,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
-                child: _buildExpandedContent(context, t, labelOpacity: expansion, showLeading: false),
+            Positioned(
+              left: 0,
+              top: 0,
+              child: SizedBox(
+                width: expandedContentWidth,
+                height: expandedHeight,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                  child: _buildExpandedContent(context, t, labelOpacity: expansion, showLeading: false),
+                ),
               ),
             ),
-          ),
-          Positioned(
-            left: iconLeft,
-            top: iconTop,
-            child: SizedBox(
-              width: iconSize,
-              height: iconSize,
-              child: Center(child: _leadingIcon(t)),
+            Positioned(
+              left: iconLeft,
+              top: iconTop,
+              child: SizedBox(
+                width: iconSize,
+                height: iconSize,
+                child: Center(child: _leadingIcon(t)),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -358,10 +430,8 @@ class NavigationRailItem extends StatelessWidget {
                 width: expandedContentWidth,
                 child: _buildExpandedLayout(context, t, focused: focused, fixedHeight: false),
               )
-            : TweenAnimationBuilder<double>(
-                tween: Tween(end: isCollapsed ? 0.0 : 1.0),
-                duration: AppMotion.duration(context, SideNavigationRailState.expandDuration),
-                curve: SideNavigationRailState.expandCurve,
+            : _RailMorph(
+                expanded: !isCollapsed,
                 builder: (context, expansion, _) =>
                     _buildMorphingLayouts(context, t, focused: focused, expansion: expansion),
               );
@@ -374,7 +444,7 @@ class NavigationRailItem extends StatelessWidget {
             child: InkWell(
               canRequestFocus: false,
               onTap: onTap,
-              borderRadius: BorderRadius.circular(MonoTokens.radiusFull),
+              borderRadius: BorderRadius.circular(t.radiusSm * 5 / 3),
               child: UnconstrainedBox(
                 alignment: .centerLeft,
                 constrainedAxis: Axis.vertical,
@@ -430,7 +500,8 @@ class SideNavigationRail extends StatefulWidget {
   State<SideNavigationRail> createState() => SideNavigationRailState();
 }
 
-class SideNavigationRailState extends State<SideNavigationRail> with MountedSetStateMixin {
+class SideNavigationRailState extends State<SideNavigationRail>
+    with SingleTickerProviderStateMixin, MountedSetStateMixin {
   /// Libraries section expansion, held in settings rather than widget state so
   /// it survives relaunch, remount and layout switches (#1896). The rail's
   /// [ListenableBuilder] below listens to the pref, so the toggle just writes.
@@ -440,31 +511,27 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   bool _isTouchExpanded = false;
   bool _lastReportedFloatingPanel = false;
   Timer? _collapseTimer;
+  late final AnimationController _expansion;
+  double? _expansionTarget;
   static const double collapsedWidth = 80.0;
   static const double tvCollapsedWidth = 48.0;
   static const double expandedWidth = 220.0;
-  static const double _horizontalPadding = 12.0;
+  static const double _horizontalPadding = 18.0;
   static const double _collapsedHorizontalPadding = 4.0;
   static const double _itemGap = 4.0;
-  static const Duration _collapseDelay = Duration(milliseconds: 150);
+  static const Duration _collapseDelay = Duration(milliseconds: 100);
 
   /// Trailing corner radius of the floating (hover/touch) overlay panel; the
   /// docked open rail keeps the regular radiusLg card rounding.
   static const double overlayCornerRadius = 32.0;
 
-  /// Collapse/expand morph timing, shared by the rail width, every item's
-  /// layout morph, and the shell's content translate + bleed counter
-  /// animations (MainScreen and SideNavigationBleedBuilder) so they all
-  /// track tick for tick.
-  /// Reduced-tier devices resolve this to zero; keep every consumer on this
-  /// getter so the shell and rail continue to move in lockstep.
-  static Duration get expandDuration =>
-      WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations
-      ? Duration.zero
-      : DevicePerformance.reducedDuration(const Duration(milliseconds: 320));
-  static const Curve expandCurve = Curves.easeOutCubic;
+  /// TV rail and shell translation timing. The desktop dock overlays the
+  /// content and uses its own shared spring, without moving the page.
+  static Duration get expandDuration => AppMotion.systemDuration();
+  static const Curve expandCurve = AppMotion.curve;
 
-  static double collapsedWidthForContext(BuildContext _) => PlatformDetector.isTV() ? tvCollapsedWidth : collapsedWidth;
+  static double collapsedWidthForContext(BuildContext _) =>
+      PlatformDetector.isTVDevice() ? tvCollapsedWidth : collapsedWidth;
 
   /// Edge padding around the item column; collapsed rails center their items
   /// (72px in the 80px desktop strip, 40px in the 48px TV strip).
@@ -513,11 +580,13 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   void initState() {
     super.initState();
     _focusTracker = FocusMemoryTracker(debugLabelPrefix: 'nav');
+    _expansion = AnimationController(vsync: this, value: _shouldExpand ? 1 : 0);
   }
 
   @override
   void dispose() {
     _collapseTimer?.cancel();
+    _expansion.dispose();
     _focusTracker.dispose();
     super.dispose();
   }
@@ -538,6 +607,34 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
     if (oldWidget.alwaysExpanded != widget.alwaysExpanded) {
       _scheduleFloatingPanelNotification();
     }
+    _animateExpansion();
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _animateExpansion();
+  }
+
+  void _animateExpansion() {
+    final target = _shouldExpand ? 1.0 : 0.0;
+    if (PlatformDetector.isTVDevice() || AppMotion.duration(context, expandDuration) == Duration.zero) {
+      _expansion.value = target;
+      return;
+    }
+    if (_expansionTarget == target && _expansion.isAnimating) return;
+    if (_expansion.value == target && !_expansion.isAnimating) return;
+    _expansionTarget = target;
+    // Preserve speed on reversal instead of restarting an ease-out tween.
+    _expansion.animateWith(
+      SpringSimulation(
+        const SpringDescription(mass: 1, stiffness: 1100, damping: 67),
+        _expansion.value,
+        target,
+        _expansion.velocity,
+        snapToEnd: true,
+      ),
+    );
   }
 
   /// didUpdateWidget runs during build, where notifying the parent would
@@ -550,6 +647,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   }
 
   void _notifyFloatingPanelIfNeeded() {
+    _animateExpansion();
     final floating = _isFloatingPanel;
     if (_lastReportedFloatingPanel == floating) return;
     _lastReportedFloatingPanel = floating;
@@ -808,6 +906,12 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   KeyEventResult _handleVerticalNavigation(FocusNode _, KeyEvent event, List<String> focusOrder) {
     if (event is! KeyDownEvent) return KeyEventResult.ignored;
 
+    if (!PlatformDetector.isTVDevice() &&
+        SettingsService.instance.read(SettingsService.dockSide) == DockSide.right &&
+        event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+      widget.onNavigateToContent?.call();
+      return KeyEventResult.handled;
+    }
     final isDown = event.logicalKey == LogicalKeyboardKey.arrowDown;
     final isUp = event.logicalKey == LogicalKeyboardKey.arrowUp;
     if (!isDown && !isUp) return KeyEventResult.ignored;
@@ -850,7 +954,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   /// Calculate top padding for macOS traffic lights and TV overlaid top bar
   double _getTopPadding(BuildContext context) {
     final safeTop = MediaQuery.paddingOf(context).top;
-    double basePadding = safeTop + (PlatformDetector.isTV() ? 76 : 16);
+    double basePadding = safeTop + (PlatformDetector.isTVDevice() ? 76 : 16);
 
     // On macOS, add extra padding for traffic lights (when not fullscreen)
     if (Platform.isMacOS) {
@@ -867,6 +971,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
   @override
   Widget build(BuildContext context) {
     final t = tokens(context);
+    final isDock = !PlatformDetector.isTVDevice();
     final librariesProvider = context.watch<LibrariesProvider>();
     final hiddenLibrariesProvider = context.watch<HiddenLibrariesProvider>();
     final hiddenKeys = hiddenLibrariesProvider.hiddenLibraryKeys;
@@ -896,7 +1001,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
     // way back into the now-playing screen there; desktop already has the
     // mini-player for that.
     final musicService = context.watch<MusicPlaybackService?>();
-    final nowPlayingTrack = widget.isOfflineMode || !PlatformDetector.isTV() ? null : musicService?.currentTrack;
+    final nowPlayingTrack = widget.isOfflineMode || !PlatformDetector.isTVDevice() ? null : musicService?.currentTrack;
 
     // Listen to fullscreen + the groupLibrariesByServer / showExploreTab
     // settings so the rail rebuilds when they are toggled in Appearance, and to
@@ -946,7 +1051,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
           isCollapsed: isCollapsed,
         );
         _debugAssertUniqueFocusOrder(focusOrder);
-        return TapRegion(
+        final rail = TapRegion(
           onTapOutside: (_) {
             if (_isTouchExpanded) {
               setState(() => _isTouchExpanded = false);
@@ -960,58 +1065,64 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
             child: GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: isCollapsed ? _expandForTouch : null,
-              child: AnimatedContainer(
-                duration: expandDuration,
-                curve: expandCurve,
-                width: isCollapsed ? effectiveCollapsedWidth : expandedWidth,
-                clipBehavior: Clip.hardEdge,
-                decoration: const BoxDecoration(),
+              child: _RailMorph(
+                expanded: !isCollapsed,
+                builder: (context, progress, child) => Container(
+                  key: const ValueKey('navigation_dock'),
+                  width: lerpDouble(effectiveCollapsedWidth, expandedWidth, progress),
+                  clipBehavior: Clip.hardEdge,
+                  decoration: const BoxDecoration(),
+                  child: child,
+                ),
                 child: Stack(
                   children: [
                     // Animate the pane itself. Opacity/saveLayer around a
                     // backdrop filter hides its input until the fade ends.
                     Positioned.fill(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(6, PlatformDetector.isTV() ? 68 : 8, 6, 8),
+                        padding: EdgeInsets.fromLTRB(6, isDock ? 0 : 68, 6, isDock ? 0 : 8),
                         child: TweenAnimationBuilder<double>(
                           key: const ValueKey('sidebar_glass'),
-                          tween: Tween(end: PlatformDetector.isTV() && !_isFloatingPanel ? 0.0 : 1.0),
+                          tween: Tween(end: PlatformDetector.isTVDevice() && !_isFloatingPanel ? 0.0 : 1.0),
                           duration: expandDuration,
                           curve: expandCurve,
-                          builder: (context, visibility, _) => GlassSurface(
-                            enabled: visibility > 0,
-                            tint: t.surface,
-                            sigma: 28 * visibility,
-                            opacity: (_isFloatingPanel ? 0.42 : 0.28) * visibility,
-                            borderRadius: const BorderRadius.all(Radius.circular(24)),
-                            child: const SizedBox.expand(),
-                          ),
+                          builder: (context, visibility, _) {
+                            Widget surface(double progress) => GlassSurface(
+                              enabled: visibility > 0,
+                              tint: t.surface,
+                              sigma: isDock ? 28 : 28 * visibility,
+                              opacity: lerpDouble(0.28, 0.42, progress)! * visibility,
+                              borderRadius: BorderRadius.circular(t.radiusLg.clamp(0, 36)),
+                              child: const SizedBox.expand(),
+                            );
+                            return isDock
+                                ? _RailMorph(expanded: !isCollapsed, builder: (_, progress, _) => surface(progress))
+                                : surface(_isFloatingPanel ? 1 : 0);
+                          },
                         ),
                       ),
                     ),
                     IgnorePointer(
-                      ignoring: isCollapsed,
+                      ignoring: isCollapsed && !isDock,
                       child: Focus(
                         canRequestFocus: false,
                         skipTraversal: true,
                         onKeyEvent: (node, event) => _handleVerticalNavigation(node, event, focusOrder),
                         child: Column(
+                          mainAxisSize: isDock ? MainAxisSize.min : MainAxisSize.max,
                           children: [
-                            SizedBox(height: _getTopPadding(context)),
-                            Expanded(
-                              child: AnimatedPadding(
+                            SizedBox(height: isDock ? (t.radiusLg * 0.45).clamp(10, 16) : _getTopPadding(context)),
+                            Flexible(
+                              fit: isDock ? FlexFit.loose : FlexFit.tight,
+                              child: _RailPadding(
                                 padding: .symmetric(horizontal: horizontalPadding),
                                 duration: expandDuration,
                                 curve: expandCurve,
                                 child: ListView(
+                                  shrinkWrap: isDock,
                                   padding: EdgeInsets.zero,
                                   clipBehavior: Clip.hardEdge,
                                   children: [
-                                    if (!PlatformDetector.isTV())
-                                      const Padding(
-                                        padding: EdgeInsets.only(top: 4, bottom: 20),
-                                        child: Center(child: BrandMark(size: 28)),
-                                      ),
                                     if (widget.isOfflineMode && widget.onReconnect != null) ...[
                                       _buildReconnectItem(isCollapsed: isCollapsed),
                                       const SizedBox(height: _itemGap),
@@ -1079,7 +1190,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                                 ),
                               ),
                             ),
-                            AnimatedPadding(
+                            _RailPadding(
                               padding: EdgeInsets.symmetric(horizontal: horizontalPadding),
                               duration: expandDuration,
                               curve: expandCurve,
@@ -1113,13 +1224,18 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                                     focusNode: _focusTracker.get(_kSettings),
                                     isCollapsed: isCollapsed,
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: isDock ? (t.radiusLg * 0.45).clamp(10, 16) : 8),
                                 ],
                               ),
                             ),
                             if (_showFullscreenToggle)
-                              AnimatedPadding(
-                                padding: .fromLTRB(horizontalPadding, 0, horizontalPadding, 12),
+                              _RailPadding(
+                                padding: .fromLTRB(
+                                  horizontalPadding,
+                                  0,
+                                  horizontalPadding,
+                                  isDock ? (t.radiusLg * 0.45).clamp(12, 16) : 12,
+                                ),
                                 duration: expandDuration,
                                 curve: expandCurve,
                                 child: _buildFullscreenItem(isCollapsed: isCollapsed),
@@ -1134,6 +1250,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
             ),
           ),
         );
+        return isDock ? _DockExpansion(animation: _expansion, child: rail) : rail;
       },
     );
   }
@@ -1326,12 +1443,25 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
         ),
 
         TweenAnimationBuilder<double>(
-          tween: Tween(end: (_librariesExpanded && !isCollapsed) ? 1.0 : 0.0),
+          tween: Tween(end: (_librariesExpanded && (!PlatformDetector.isTVDevice() || !isCollapsed)) ? 1.0 : 0.0),
           duration: expandDuration,
           curve: expandCurve,
           builder: (context, value, child) {
-            return ClipRect(
-              child: Align(alignment: .topCenter, heightFactor: value, child: child),
+            return _RailMorph(
+              expanded: !isCollapsed,
+              child: child,
+              builder: (context, expansion, child) => ClipRect(
+                child: Align(
+                  alignment: .topCenter,
+                  heightFactor: value * (PlatformDetector.isTVDevice() ? 1 : expansion),
+                  child: UnconstrainedBox(
+                    constrainedAxis: Axis.vertical,
+                    alignment: Alignment.topLeft,
+                    clipBehavior: Clip.hardEdge,
+                    child: SizedBox(width: expandedWidth - 36, child: child),
+                  ),
+                ),
+              ),
             );
           },
           child: ExcludeFocus(
@@ -1461,7 +1591,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
     required dynamic t,
   }) {
     final focusNode = _focusTracker.get(focusKey);
-    final radius = BorderRadius.circular(MonoTokens.radiusFull);
+    final radius = BorderRadius.circular(t.radiusSm * 5 / 3);
     // Sub-section header at full rail width; the smaller type alone carries
     // the hierarchy, matching M3E expanded-rail sections.
     return ListenableBuilder(
@@ -1489,7 +1619,7 @@ class SideNavigationRailState extends State<SideNavigationRail> with MountedSetS
                 constrainedAxis: Axis.vertical,
                 clipBehavior: Clip.hardEdge,
                 child: SizedBox(
-                  width: expandedWidth - 24,
+                  width: expandedWidth - 36,
                   child: Padding(
                     padding: .symmetric(vertical: verticalPadding, horizontal: 17),
                     child: Row(

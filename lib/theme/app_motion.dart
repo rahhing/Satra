@@ -4,9 +4,17 @@ import '../services/device_performance.dart';
 
 /// Shared motion for the browsing UI, including the OS reduce-motion setting.
 abstract final class AppMotion {
-  static const curve = Curves.easeOutCubic;
+  // A quick response that gently settles, without overshooting artwork/text.
+  static const curve = Cubic(0.22, 1, 0.36, 1);
+  static const fast = Duration(milliseconds: 180);
   static const standard = Duration(milliseconds: 280);
-  static const slow = Duration(milliseconds: 420);
+  static const slow = Duration(milliseconds: 480);
+
+  /// For roots above MediaQuery, such as MaterialApp's theme animation.
+  static Duration systemDuration([Duration value = standard]) =>
+      WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations
+      ? Duration.zero
+      : DevicePerformance.reducedDuration(value);
 
   static Duration duration(BuildContext context, [Duration value = standard]) =>
       MediaQuery.disableAnimationsOf(context) ? Duration.zero : DevicePerformance.reducedDuration(value);

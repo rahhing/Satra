@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:async';
 import 'dart:math' as math;
 
@@ -96,7 +97,7 @@ Future<T?> showAppMenu<T>(
       focusFirstItem: focusFirstItem,
     ),
     transitionBuilder: (dialogContext, animation, _, child) {
-      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
+      final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
       final alignment = _transitionAlignment(dialogContext, position: position, anchorRect: anchorRect);
 
       return FadeTransition(
@@ -148,7 +149,7 @@ Future<T?> showAnchoredPanel<T>(
       builder: builder,
     ),
     transitionBuilder: (dialogContext, animation, _, child) {
-      final curved = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic);
+      final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
       return FadeTransition(
         opacity: curved,
         child: AnimatedBuilder(
@@ -584,7 +585,7 @@ class _AppMenuItemTileState<T> extends State<AppMenuItemTile<T>> with FocusableT
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
                 child: AnimatedContainer(
-                  duration: tokens(context).fast,
+                  duration: AppMotion.duration(context, AppMotion.fast),
                   decoration: BoxDecoration(
                     color: background,
                     borderRadius: BorderRadius.circular(tokens(context).radiusSm),

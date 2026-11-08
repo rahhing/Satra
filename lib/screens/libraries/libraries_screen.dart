@@ -95,6 +95,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   final _playlistsTabKey = GlobalKey();
 
   String? _selectedLibraryGlobalKey;
+  int _libraryLoadGeneration = 0;
 
   /// Flag to prevent onTabChanged from focusing when we're programmatically changing tabs
   bool _isRestoringTab = false;
@@ -531,6 +532,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     final selectedLibrary = allLibraries.where((lib) => lib.globalKey == libraryGlobalKey).firstOrNull;
     if (selectedLibrary == null) return;
 
+    final generation = ++_libraryLoadGeneration;
     final isLibraryChange = _selectedLibraryGlobalKey != libraryGlobalKey;
 
     // Update visible tabs and state in the same synchronous block so no
@@ -539,7 +541,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
 
     _updateState(() {
       _selectedLibraryGlobalKey = libraryGlobalKey;
-      _loadedTabs.clear();
+      if (isLibraryChange) _loadedTabs.clear();
     });
     widget.onLibrarySelected?.call(libraryGlobalKey);
 
@@ -549,16 +551,16 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     // jumpTo to catch via the browse-tab callback).
     if (isLibraryChange) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted) return;
+        if (!mounted || generation != _libraryLoadGeneration) return;
         _resetOuterScroll();
       });
     }
 
     // Save selected library key and restore saved tab (async — safe after state is consistent)
     final storage = await StorageService.getInstance();
-    if (!mounted || _selectedLibraryGlobalKey != libraryGlobalKey) return;
+    if (!mounted || generation != _libraryLoadGeneration || _selectedLibraryGlobalKey != libraryGlobalKey) return;
     await storage.saveSelectedLibraryKey(libraryGlobalKey);
-    if (!mounted || _selectedLibraryGlobalKey != libraryGlobalKey) return;
+    if (!mounted || generation != _libraryLoadGeneration || _selectedLibraryGlobalKey != libraryGlobalKey) return;
 
     // When clicking/switching a library with defaultToRecommended: true, always pick Recommended.
     // Otherwise restore saved tab by name (e.g. cold start), or fallback to Recommended / first tab.
@@ -588,7 +590,10 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     // However, on first load the tab might finish loading before the tab index
     // is restored. Check if the current tab has already loaded and focus if so.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted && _selectedLibraryGlobalKey == libraryGlobalKey && _loadedTabs.contains(tabController.index)) {
+      if (mounted &&
+          generation == _libraryLoadGeneration &&
+          _selectedLibraryGlobalKey == libraryGlobalKey &&
+          _loadedTabs.contains(tabController.index)) {
         _focusCurrentTab();
       }
     });

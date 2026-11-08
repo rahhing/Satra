@@ -1,8 +1,9 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import '../theme/mono_tokens.dart';
 import '../utils/platform_detector.dart';
+import 'scroll_hover_guard.dart';
 
 /// A wrapper widget that adds hover-activated navigation arrows to horizontal scrolling content.
 /// The arrows only appear on desktop/web platforms and hide at scroll boundaries.
@@ -32,6 +33,7 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
   bool _isHovering = false;
   bool _canScrollLeft = false;
   bool _canScrollRight = false;
+  Widget? _content;
 
   @override
   void initState() {
@@ -48,6 +50,7 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
   @override
   void didUpdateWidget(covariant HorizontalScrollWithArrows oldWidget) {
     super.didUpdateWidget(oldWidget);
+    _content = null;
     if (oldWidget.controller == widget.controller) return;
 
     if (_listensForScrollState) {
@@ -62,6 +65,12 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
       _scrollController.addListener(_updateScrollState);
       WidgetsBinding.instance.addPostFrameCallback((_) => _updateScrollState());
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _content = null;
   }
 
   @override
@@ -103,7 +112,11 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
     final position = _scrollController.position;
     final delta = direction * position.viewportDimension * widget.scrollAmount;
     final targetScroll = (position.pixels + delta).clamp(0.0, position.maxScrollExtent);
-    _scrollController.animateTo(targetScroll, duration: tokens(context).slow, curve: Curves.easeInOut);
+    _scrollController.animateTo(
+      targetScroll,
+      duration: AppMotion.duration(context, AppMotion.slow),
+      curve: AppMotion.curve,
+    );
   }
 
   void _scrollLeft() => _animateScroll(-1);
@@ -124,8 +137,8 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
       child: Center(
         child: AnimatedOpacity(
           opacity: (_isHovering && canScroll) ? 1.0 : 0.0,
-          duration: const Duration(milliseconds: 200),
-          curve: Curves.easeInOut,
+          duration: AppMotion.duration(context, AppMotion.fast),
+          curve: AppMotion.curve,
           child: IgnorePointer(
             ignoring: !(_isHovering && canScroll),
             child: _NavigationArrow(icon: icon, onPressed: onPressed),
@@ -137,7 +150,9 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
 
   @override
   Widget build(BuildContext context) {
-    final child = widget.builder(_scrollController);
+    // Chrome state changes must not reconstruct the scroll view or its card
+    // delegate. Refresh this cached widget only for parent/dependency changes.
+    final child = _content ??= widget.builder(_scrollController);
 
     // Hover arrows need a mouse; isDesktop(context) is also true on TV where
     // the MouseRegion + scroll-notification machinery is dead weight per row.
@@ -154,8 +169,9 @@ class _HorizontalScrollWithArrowsState extends State<HorizontalScrollWithArrows>
           return false;
         },
         child: Stack(
+          clipBehavior: Clip.none,
           children: [
-            child,
+            ScrollHoverGuard(child: child),
             _buildArrowButton(
               position: 8,
               icon: Symbols.chevron_left_rounded,

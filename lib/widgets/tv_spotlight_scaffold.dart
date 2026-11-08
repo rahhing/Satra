@@ -16,6 +16,8 @@ import '../utils/formatters.dart';
 import 'tv_browse_rail.dart';
 import 'settings_builder.dart';
 import 'tv_spotlight_background.dart';
+import 'backdrop_page_controls.dart';
+import 'cycling_media_backdrop.dart';
 
 class TvSpotlightController extends ValueNotifier<MediaItem?> {
   TvSpotlightController({Duration settleDelay = const Duration(milliseconds: 150)})
@@ -126,62 +128,67 @@ class TvSpotlightScaffold extends StatelessWidget {
     final spotlightBottom = desiredSpotlightBottom > maxSpotlightBottom ? maxSpotlightBottom : desiredSpotlightBottom;
     final spotlightLeft = (24 * scale).clamp(18.0, 40.0).toDouble();
 
-    return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
-      child: SizedBox.expand(
-        child: Stack(
-          fit: StackFit.expand,
-          clipBehavior: Clip.none,
-          children: [
-            Builder(
-              builder: (context) {
-                final foregroundLeft = MainScreenFocusScope.foregroundLeftOf(context);
-                return SideNavigationBleedBuilder(
-                  targetBleed: foregroundLeft,
-                  child: GestureDetector(
-                    supportedDevices: const {PointerDeviceKind.trackpad},
-                    onVerticalDragStart: (details) => _findDescendantBrowseRail(context)?.startTrackpadScroll(details),
-                    onVerticalDragUpdate: (details) =>
-                        _findDescendantBrowseRail(context)?.updateTrackpadScroll(details),
-                    onVerticalDragEnd: (details) => _findDescendantBrowseRail(context)?.endTrackpadScroll(details),
-                    onVerticalDragCancel: () => _findDescendantBrowseRail(context)?.cancelTrackpadScroll(),
-                    child: Listener(
-                      behavior: HitTestBehavior.translucent,
-                      onPointerSignal: (signal) {
-                        if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
-                          GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
-                            if (event is PointerScrollEvent) {
-                              _findDescendantBrowseRail(context)?.stepHubByScroll(event.scrollDelta.dy);
-                            }
-                          });
-                        }
-                      },
-                      child: RepaintBoundary(
-                        child: ValueListenableBuilder<MediaItem?>(
-                          valueListenable: spotlightListenable,
-                          builder: (context, _, _) {
-                            final spotlight = resolveSpotlight();
-                            return _CatalogSpotlightBackground(
-                              item: spotlight,
-                              client: resolveClient(spotlight),
-                              hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
-                              contentTop: spotlightTop,
-                              contentBottom: spotlightBottom,
-                              contentLeft: spotlightLeft + foregroundLeft,
-                              targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
-                            );
-                          },
+    return BackdropPageControls(
+      controlsBottom: spotlightBottom + 16,
+      builder: (context, rotation) => Material(
+        color: Theme.of(context).scaffoldBackgroundColor,
+        child: SizedBox.expand(
+          child: Stack(
+            fit: StackFit.expand,
+            clipBehavior: Clip.none,
+            children: [
+              Builder(
+                builder: (context) {
+                  final foregroundLeft = MainScreenFocusScope.foregroundLeftOf(context);
+                  return SideNavigationBleedBuilder(
+                    targetBleed: foregroundLeft,
+                    child: GestureDetector(
+                      supportedDevices: const {PointerDeviceKind.trackpad},
+                      onVerticalDragStart: (details) =>
+                          _findDescendantBrowseRail(context)?.startTrackpadScroll(details),
+                      onVerticalDragUpdate: (details) =>
+                          _findDescendantBrowseRail(context)?.updateTrackpadScroll(details),
+                      onVerticalDragEnd: (details) => _findDescendantBrowseRail(context)?.endTrackpadScroll(details),
+                      onVerticalDragCancel: () => _findDescendantBrowseRail(context)?.cancelTrackpadScroll(),
+                      child: Listener(
+                        behavior: HitTestBehavior.translucent,
+                        onPointerSignal: (signal) {
+                          if (signal is PointerScrollEvent && signal.scrollDelta.dy != 0) {
+                            GestureBinding.instance.pointerSignalResolver.register(signal, (event) {
+                              if (event is PointerScrollEvent) {
+                                _findDescendantBrowseRail(context)?.stepHubByScroll(event.scrollDelta.dy);
+                              }
+                            });
+                          }
+                        },
+                        child: RepaintBoundary(
+                          child: ValueListenableBuilder<MediaItem?>(
+                            valueListenable: spotlightListenable,
+                            builder: (context, _, _) {
+                              final spotlight = resolveSpotlight();
+                              return _CatalogSpotlightBackground(
+                                item: spotlight,
+                                backdropController: rotation,
+                                client: resolveClient(spotlight),
+                                hideSpoilers: hideSpoilers ?? settings.read(SettingsService.hideSpoilers),
+                                contentTop: spotlightTop,
+                                contentBottom: spotlightBottom,
+                                contentLeft: spotlightLeft + foregroundLeft,
+                                targetWidthPx: (size.width * MediaQuery.devicePixelRatioOf(context)).ceil(),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  builder: (context, animatedBleed, child) =>
-                      Positioned(top: 0, bottom: 0, left: -animatedBleed, width: fullBleedWidth, child: child!),
-                );
-              },
-            ),
-            foreground,
-          ],
+                    builder: (context, animatedBleed, child) =>
+                        Positioned(top: 0, bottom: 0, left: -animatedBleed, width: fullBleedWidth, child: child!),
+                  );
+                },
+              ),
+              foreground,
+            ],
+          ),
         ),
       ),
     );
@@ -218,6 +225,7 @@ class _CatalogSpotlightBackground extends StatefulWidget {
     required this.contentBottom,
     required this.contentLeft,
     required this.targetWidthPx,
+    this.backdropController,
   });
 
   final MediaItem? item;
@@ -227,6 +235,7 @@ class _CatalogSpotlightBackground extends StatefulWidget {
   final double contentBottom;
   final double contentLeft;
   final int targetWidthPx;
+  final BackdropRotationController? backdropController;
 
   @override
   State<_CatalogSpotlightBackground> createState() => _CatalogSpotlightBackgroundState();
@@ -268,9 +277,12 @@ class _CatalogSpotlightBackgroundState extends State<_CatalogSpotlightBackground
     }
 
     final bannerUrl = catalogItem.bannerUrl;
-    final backdrop = bannerUrl != null && bannerUrl.isNotEmpty
-        ? bannerUrl
-        : catalogItem.backdropFor(widget.targetWidthPx);
+    final sizedBackdrop = catalogItem.backdropFor(widget.targetWidthPx);
+    // Plex banners are often short title strips, not scenic background art.
+    // Prefer the full-size backdrop and its width variants for Explore.
+    final backdrop = catalogItem.source == CatalogSourceId.plex
+        ? sizedBackdrop ?? bannerUrl
+        : (bannerUrl != null && bannerUrl.isNotEmpty ? bannerUrl : sizedBackdrop);
     final logoUrl = catalogItem.logoUrl;
     _renderItem = item.copyWith(
       artPath: backdrop ?? item.artPath,
@@ -313,6 +325,7 @@ class _CatalogSpotlightBackgroundState extends State<_CatalogSpotlightBackground
     final theme = Theme.of(context);
     final accentColor = _accentColor;
     final background = TvSpotlightBackground(
+      backdropController: widget.backdropController,
       item: _renderItem,
       client: widget.client,
       hideSpoilers: widget.hideSpoilers,
@@ -332,13 +345,9 @@ class _CatalogSpotlightBackgroundState extends State<_CatalogSpotlightBackground
   }
 }
 
-/// Pins a toolbar to the top of the viewport across the full bleed width,
-/// sliding with the sidebar so it stays put while the content box translates.
-///
-/// Excluded from default focus traversal so that initial/tab-switch focus
-/// lands on content (hero/rails) rather than the toolbar; its buttons stay
-/// reachable via explicit UP from the content. Reads the offset aspect from
-/// its own element, so a sidebar flip rebuilds only this overlay.
+/// Keeps toolbar controls inside the foreground's hit-test bounds. Artwork
+/// may bleed behind the dock, but interactive children must not paint outside
+/// their page: Flutter cannot hit-test that overflow.
 class TvToolbarOverlay extends StatelessWidget {
   const TvToolbarOverlay({super.key, required this.child});
 
@@ -346,12 +355,6 @@ class TvToolbarOverlay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final fullBleedWidth = MainScreenFocusScope.fullBleedWidthOf(context);
-    return SideNavigationBleedBuilder(
-      targetBleed: MainScreenFocusScope.sideNavigationBleedOf(context),
-      child: ExcludeFocusTraversal(child: child),
-      builder: (context, animatedBleed, child) =>
-          Positioned(top: 0, left: -animatedBleed, width: fullBleedWidth, child: child!),
-    );
+    return Positioned(top: 0, left: 0, right: 0, child: ExcludeFocusTraversal(child: child));
   }
 }

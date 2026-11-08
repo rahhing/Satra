@@ -1,4 +1,5 @@
 #include "flutter_vsync.h"
+#include "drag_motion.h"
 
 #include <gdk/gdkwayland.h>
 #include <wayland-client.h>
@@ -48,6 +49,7 @@ struct VsyncState {
   unsigned trace_frames = 0;
   unsigned trace_draws = 0;
   bool draw_trace_connected = false;
+  std::atomic<uint64_t> presented_generation{0};
   FlutterCompositor compositor = {};
 };
 
@@ -181,11 +183,12 @@ bool request_surface_frame(const State& state, GtkWidget* view) {
   if (!GDK_IS_WAYLAND_DISPLAY(display) || !gtk_widget_get_mapped(view)) return false;
   auto* surface = gdk_wayland_window_get_wl_surface(gdk_window_get_toplevel(gtk_widget_get_window(view)));
   if (surface == nullptr) return false;
+  if (state->surface_callback != nullptr) return true;
   state->surface_callback = wl_surface_frame(surface);
   state->surface_callback_data = new State(state);
   wl_callback_add_listener(state->surface_callback, &frame_listener, state->surface_callback_data);
-  // A frame request is double-buffered surface state: commit it so the
-  // compositor can answer even while GTK's own clock is at its fallback.
+  // The empty commit submits only the frame callback. Do not serialize
+  // engine VSync requests behind GTK's slower fallback paint clock.
   wl_surface_commit(surface);
   wl_display_flush(gdk_wayland_display_get_wl_display(display));
   return true;
@@ -220,11 +223,21 @@ gboolean dispatch_vsync(gpointer data) {
   return G_SOURCE_REMOVE;
 }
 
+struct QueuedPresentation {
+  State state;
+  uint64_t generation;
+};
+
+void delete_queued_presentation(gpointer data) { delete static_cast<QueuedPresentation*>(data); }
+
 gboolean flush_presented_frame(gpointer data) {
-  auto state = *static_cast<State*>(data);
-  if (state->stopped) return G_SOURCE_REMOVE;
+  auto* queued = static_cast<QueuedPresentation*>(data);
+  const State& state = queued->state;
+  if (state->stopped || state->presented_generation.load() != queued->generation) return G_SOURCE_REMOVE;
   g_autoptr(GObject) widget = static_cast<GObject*>(g_weak_ref_get(&state->widget));
   if (widget != nullptr && gtk_widget_get_mapped(GTK_WIDGET(widget))) {
+    // A visible unfocused window still needs display-paced presentation.
+    // Window activation is not a reliable indication of screenshot capture.
     GdkWindow* window = gtk_widget_get_window(GTK_WIDGET(widget));
     G_GNUC_BEGIN_IGNORE_DEPRECATIONS
     gdk_window_process_updates(window, TRUE);
@@ -236,12 +249,12 @@ gboolean flush_presented_frame(gpointer data) {
 bool present_view(const FlutterPresentViewInfo* info) {
   auto state = get_state(info->user_data);
   const auto result = state->compositor.present_view_callback(info);
-  if (!state->stopped) {
-    // Flutter's original callback queued redraw_cb at DEFAULT_IDLE. Follow it
-    // at that same priority, then flush its damage instead of waiting for
-    // GTK's unrelated 60 Hz fallback clock to paint the newly rastered frame.
+  if (state != nullptr && !state->stopped) {
+    const uint64_t generation = ++state->presented_generation;
     GSource* source = g_idle_source_new();
-    g_source_set_callback(source, flush_presented_frame, new State(state), delete_state);
+    g_source_set_priority(source, G_PRIORITY_DEFAULT_IDLE);
+    g_source_set_callback(
+        source, flush_presented_frame, new QueuedPresentation{state, generation}, delete_queued_presentation);
     g_source_attach(source, state->context);
     g_source_unref(source);
   }
@@ -313,6 +326,7 @@ FlutterEngineResult shutdown(FlutterEngine engine) {
 }  // namespace
 
 void satra_install_flutter_vsync(FlView* view) {
+  satra_input::configure_drag_input(GTK_WIDGET(view), nullptr);
   FlEngine* engine = fl_view_get_engine(view);
   if (get_state(engine) != nullptr) return;
   GTypeQuery type;
@@ -332,6 +346,17 @@ void satra_install_flutter_vsync(FlView* view) {
   // again without driving a synthetic clock while it is hidden.
   g_signal_connect_data(
       view, "map", G_CALLBACK(+[](GtkWidget*, gpointer data) { dispatch_vsync(data); }), new State(state),
+      +[](gpointer data, GClosure*) { delete_state(data); }, G_CONNECT_DEFAULT);
+  g_signal_connect_data(
+      view, "unmap", G_CALLBACK(+[](GtkWidget*, gpointer data) {
+        auto state = *static_cast<State*>(data);
+        if (state->surface_callback != nullptr) {
+          wl_callback_destroy(state->surface_callback);
+          state->surface_callback = nullptr;
+          delete_state(state->surface_callback_data);
+          state->surface_callback_data = nullptr;
+        }
+      }), new State(state),
       +[](gpointer data, GClosure*) { delete_state(data); }, G_CONNECT_DEFAULT);
   api->Initialize = initialize;
   api->Shutdown = shutdown;

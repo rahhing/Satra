@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 
 import 'focus_theme.dart';
@@ -58,7 +59,7 @@ class CardFocusBorder extends StatelessWidget {
 
     return AnimatedContainer(
       duration: FocusTheme.getAnimationDuration(context),
-      curve: Curves.easeOutCubic,
+      curve: AppMotion.curve,
       foregroundDecoration: FocusTheme.focusDecoration(
         context,
         isFocused: showFocus,

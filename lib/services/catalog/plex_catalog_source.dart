@@ -241,6 +241,8 @@ class PlexCatalogSource with CatalogWatchlistMachinery implements CatalogSource,
     String? coverPoster;
     String? coverArt;
     String? background;
+    var backgroundWidth = 0;
+    final backdropVariants = <int, String>{};
     String? clearLogo;
     String? clearLogoWide;
     String? imageBanner;
@@ -254,7 +256,16 @@ class PlexCatalogSource with CatalogWatchlistMachinery implements CatalogSource,
         case 'coverArt':
           coverArt ??= url;
         case 'background':
-          background ??= url;
+          final width = flexibleInt(image['width']);
+          if (width != null && width > 0) {
+            backdropVariants[width] = url;
+            if (width > backgroundWidth) {
+              background = url;
+              backgroundWidth = width;
+            }
+          } else {
+            background ??= url;
+          }
         case 'clearLogo':
           clearLogo ??= url;
         case 'clearLogoWide':
@@ -286,6 +297,7 @@ class PlexCatalogSource with CatalogWatchlistMachinery implements CatalogSource,
       ids: ids,
       posterUrl: _nonEmptyString(metadata['thumb']) ?? coverPoster ?? coverArt,
       backdropUrl: _nonEmptyString(metadata['art']) ?? background,
+      backdropVariants: backdropVariants.isEmpty ? null : backdropVariants,
       logoUrl: clearLogoWide ?? clearLogo,
       bannerUrl: _nonEmptyString(metadata['banner']) ?? imageBanner,
       ratings: ratings,

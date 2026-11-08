@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/rendering.dart';
@@ -255,7 +256,7 @@ class _FocusableWrapperState extends State<FocusableWrapper> with SingleTickerPr
   AnimationController _ensureAnimationController() {
     final existing = _animationController;
     if (existing != null) return existing;
-    final controller = AnimationController(vsync: this, duration: const Duration(milliseconds: 150));
+    final controller = AnimationController(vsync: this, duration: FocusTheme.getAnimationDuration(context));
     _animationController = controller;
     _scaleAnimation = _createScaleAnimation(controller);
     return controller;
@@ -265,7 +266,7 @@ class _FocusableWrapperState extends State<FocusableWrapper> with SingleTickerPr
     return Tween<double>(
       begin: 1.0,
       end: widget.focusScale,
-    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOutCubic));
+    ).animate(CurvedAnimation(parent: controller, curve: AppMotion.curve));
   }
 
   @override
@@ -405,7 +406,7 @@ class _FocusableWrapperState extends State<FocusableWrapper> with SingleTickerPr
       // scrollable on every move and the header bounces (#2916).
       if ((targetOffset - currentOffset).abs() < 0.5) return;
 
-      position.animateTo(targetOffset, duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
+      position.animateTo(targetOffset, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve);
     });
   }
 

@@ -1,9 +1,9 @@
 import 'dart:ui';
+import 'media_card_artwork.dart';
 
 import 'package:flutter/material.dart';
 import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
-import '../focus/focus_theme.dart';
 import '../focus/focusable_wrapper.dart';
 import '../mixins/context_menu_tap_mixin.dart';
 import '../models/download_models.dart';
@@ -150,7 +150,7 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
             child: InkWell(
               key: Key(episode.id),
               mouseCursor: SystemMouseCursors.click,
-              borderRadius: BorderRadius.circular(FocusTheme.defaultBorderRadius),
+              borderRadius: BorderRadius.circular(tokens(context).radiusSm),
               onTap: widget.onTap,
               canRequestFocus: false,
               onTapDown: storeTapPosition,
@@ -161,7 +161,7 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
               child: Container(
                 decoration: BoxDecoration(
                   color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(FocusTheme.defaultBorderRadius),
+                  borderRadius: BorderRadius.circular(tokens(context).radiusSm),
                 ),
                 padding: const EdgeInsets.symmetric(vertical: 4),
                 child: Row(
@@ -169,55 +169,31 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
                   children: [
                     SizedBox(
                       width: 144,
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.all(Radius.circular(6)),
-                            child: AspectRatio(
-                              aspectRatio: 16 / 9,
-                              child: shouldBlur
-                                  ? ClipRect(
-                                      child: ImageFiltered(
-                                        imageFilter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
-                                        child: _buildEpisodeThumbnail(episode),
-                                      ),
-                                    )
-                                  : _buildEpisodeThumbnail(episode),
-                            ),
-                          ),
-
-                          Positioned.fill(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(6)),
-                                gradient: LinearGradient(
-                                  begin: Alignment.topCenter,
-                                  end: Alignment.bottomCenter,
-                                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.2)],
-                                ),
-                              ),
-                              child: Center(
-                                child: Container(
-                                  padding: const EdgeInsets.all(6),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withValues(alpha: 0.6),
-                                    shape: BoxShape.circle,
-                                  ),
-                                  child: const AppIcon(
-                                    Symbols.play_arrow_rounded,
-                                    fill: 1,
-                                    color: Colors.white,
-                                    size: 20,
-                                  ),
-                                ),
+                      child: MediaCardArtwork(
+                        borderRadius: tokens(context).radiusSm,
+                        item: episode,
+                        child: Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(tokens(context).radiusSm),
+                              child: AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: shouldBlur
+                                    ? ClipRect(
+                                        child: ImageFiltered(
+                                          imageFilter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                                          child: _buildEpisodeThumbnail(episode),
+                                        ),
+                                      )
+                                    : _buildEpisodeThumbnail(episode),
                               ),
                             ),
-                          ),
 
-                          Positioned.fill(
-                            child: WatchedIndicator(item: episode, size: WatchedIndicatorSize.compact),
-                          ),
-                        ],
+                            Positioned.fill(
+                              child: WatchedIndicator(item: episode, size: WatchedIndicatorSize.compact),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 

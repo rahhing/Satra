@@ -37,7 +37,8 @@ class ToolbarScrim extends StatelessWidget {
       child: GlassSurface(
         borderRadius: const BorderRadius.all(Radius.circular(22)),
         sigma: 20,
-        opacity: 0.24,
+        opacity: 0.48,
+        tint: Theme.of(context).brightness == Brightness.dark ? const Color(0xFF0A0C10) : null,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
           child: ConstrainedBox(

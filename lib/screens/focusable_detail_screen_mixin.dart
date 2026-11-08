@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 import '../focus/focusable_action_bar.dart';
 import '../focus/input_mode_tracker.dart';
@@ -52,7 +53,7 @@ mixin FocusableDetailScreenMixin<T extends StatefulWidget> on State<T>, GridFocu
     });
     actionBarKey.currentState?.requestFocusOnFirst();
     // Scroll to top to show the app bar
-    scrollController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+    scrollController.animateTo(0, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve);
   }
 
   /// Handle BACK key from content - navigate to app bar and set flag to prevent PopScope exit

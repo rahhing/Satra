@@ -8,6 +8,7 @@ import '../media/media_item.dart';
 import '../media/media_item_types.dart';
 import '../media/media_server_client.dart';
 import '../services/device_performance.dart';
+import '../theme/app_motion.dart';
 import '../utils/content_utils.dart';
 import '../utils/formatters.dart';
 import '../utils/layout_constants.dart';
@@ -15,12 +16,13 @@ import '../utils/media_image_helper.dart';
 import '../services/settings_service.dart';
 import '../utils/tone_mapped_logo_image.dart';
 import 'cycling_media_backdrop.dart';
+import 'spotlight_artwork.dart';
+import 'spotlight_shading.dart';
 import 'fitting_title_text.dart';
 import 'fitted_metadata_line.dart';
 import 'settings_builder.dart';
 import 'media_rating_badge.dart';
 import 'optimized_media_image.dart' show ClearLogoImage, blurArtwork;
-import 'rasterized_gradient.dart';
 
 class TvSpotlightBackground extends StatelessWidget {
   final MediaItem? item;
@@ -33,6 +35,7 @@ class TvSpotlightBackground extends StatelessWidget {
   final bool showInfo;
   final String? Function(String? artworkPath)? localArtworkPathResolver;
   final bool allowNetwork;
+  final BackdropRotationController? backdropController;
 
   /// Optional caller-owned fact appended to the existing metadata line.
   final Widget? metadataTrailing;
@@ -49,6 +52,7 @@ class TvSpotlightBackground extends StatelessWidget {
     this.showInfo = true,
     this.localArtworkPathResolver,
     this.allowNetwork = true,
+    this.backdropController,
     this.metadataTrailing,
   });
 
@@ -59,9 +63,8 @@ class TvSpotlightBackground extends StatelessWidget {
     final media = item;
     final bgColor = Theme.of(context).scaffoldBackgroundColor;
 
-    // The gradients never differ between spotlight items, so only the artwork
-    // cross-fades by image paint alpha. Keeping the gradients outside the
-    // rotating layer avoids full-screen saveLayers on low-end TVs.
+    // Keep artwork at its original brightness above the browsing shelves.
+    // Local shading below supports cards and the dock without a black fill.
     final size = MediaQuery.sizeOf(context);
     final containerAspect = size.width / size.height;
     final fallbackPaths = media == null
@@ -70,8 +73,11 @@ class TvSpotlightBackground extends StatelessWidget {
     return SettingValueBuilder<bool>(
       pref: SettingsService.tvCornerSpotlightBackdrop,
       builder: (context, cornerBackdrop, _) {
-        final backdropSize = cornerBackdrop ? Size(size.width * 0.68, size.height * 0.72) : size;
+        final shelfStart = ((size.height - contentBottom) / size.height + 0.06).clamp(0.45, 0.76);
+        final dockBand = ((contentLeft ?? 24) * 0.75 / size.width).clamp(0.025, 0.12);
         final backdrop = CyclingMediaBackdrop(
+          controller: backdropController,
+          frameBuilder: (context, artwork) => SpotlightArtwork(artwork: artwork, size: size, corner: cornerBackdrop),
           mediaKey: media?.globalKey,
           imagePaths: media?.heroRotationPaths(containerAspectRatio: containerAspect) ?? const [],
           fallbackImagePaths: fallbackPaths,
@@ -88,23 +94,15 @@ class TvSpotlightBackground extends StatelessWidget {
         return Stack(
           fit: StackFit.expand,
           children: [
-            RepaintBoundary(
-              child: cornerBackdrop ? _buildCornerBackdrop(backdropSize, backdrop) : blurArtwork(backdrop),
-            ),
-            _buildHorizontalScrim(bgColor),
-            RasterizedGradient(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                // Hard stop at the clear point so neither ramp blends toward
-                // the other's color while fading out.
-                colors: [
-                  Colors.black.withValues(alpha: 0.45),
-                  Colors.black.withValues(alpha: 0),
-                  bgColor.withValues(alpha: 0),
-                  bgColor.withValues(alpha: 0.96),
-                ],
-                stops: const [0.0, 0.38, 0.38, 1.0],
+            RepaintBoundary(child: backdrop),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: SpotlightShading(
+                  key: const ValueKey('spotlight_shelf_shading'),
+                  size: size,
+                  shelfStart: shelfStart,
+                  dockBand: dockBand,
+                ),
               ),
             ),
             if (media != null && showInfo)
@@ -117,9 +115,9 @@ class TvSpotlightBackground extends StatelessWidget {
                 // saveLayers are bounded to the text region, not the screen.
                 child: RepaintBoundary(
                   child: AnimatedSwitcher(
-                    duration: DevicePerformance.reducedDuration(const Duration(milliseconds: 280)),
-                    switchInCurve: Curves.easeOutCubic,
-                    switchOutCurve: Curves.easeOutCubic,
+                    duration: Duration.zero,
+                    switchInCurve: AppMotion.curve,
+                    switchOutCurve: AppMotion.curve,
                     // Expand instead of the default loose centered Stack so the
                     // info keeps filling the region and bottom-left aligning.
                     layoutBuilder: (currentChild, previousChildren) =>
@@ -128,8 +126,13 @@ class TvSpotlightBackground extends StatelessWidget {
                       key: ValueKey(media.globalKey),
                       child: LayoutBuilder(
                         builder: (context, constraints) {
-                          if (!constraints.hasBoundedHeight || constraints.maxHeight <= 0 || constraints.maxWidth <= 0) {
-                            return Align(alignment: .bottomLeft, child: _buildInfo(context, media, constraints.maxWidth));
+                          if (!constraints.hasBoundedHeight ||
+                              constraints.maxHeight <= 0 ||
+                              constraints.maxWidth <= 0) {
+                            return Align(
+                              alignment: .bottomLeft,
+                              child: _buildInfo(context, media, constraints.maxWidth),
+                            );
                           }
 
                           return Align(
@@ -152,45 +155,6 @@ class TvSpotlightBackground extends StatelessWidget {
           ],
         );
       },
-    );
-  }
-
-  /// Corner spotlight: artwork pinned to the top-right corner, left and
-  /// bottom edges feathered into the scaffold background so the info block
-  /// sits on a calm surface instead of the image.
-  Widget _buildCornerBackdrop(Size backdropSize, Widget backdrop) {
-    return Align(
-      alignment: Alignment.topRight,
-      child: SizedBox(
-        width: backdropSize.width,
-        height: backdropSize.height,
-        child: ShaderMask(
-          shaderCallback: (rect) =>
-              const LinearGradient(colors: [Colors.transparent, Colors.white], stops: [0.0, 0.35]).createShader(rect),
-          blendMode: BlendMode.dstIn,
-          child: ShaderMask(
-            shaderCallback: (rect) => const LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [Colors.white, Colors.white, Colors.transparent],
-              stops: [0.0, 0.55, 1.0],
-            ).createShader(rect),
-            blendMode: BlendMode.dstIn,
-            child: backdrop,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHorizontalScrim(Color bgColor) {
-    return RasterizedGradient(
-      gradient: LinearGradient(
-        begin: Alignment.centerLeft,
-        end: Alignment.centerRight,
-        colors: [bgColor.withValues(alpha: 0.86), bgColor.withValues(alpha: 0.32), bgColor.withValues(alpha: 0)],
-        stops: const [0.0, 0.56, 1.0],
-      ),
     );
   }
 

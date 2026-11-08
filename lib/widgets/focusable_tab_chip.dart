@@ -5,6 +5,7 @@ import 'package:flutter/rendering.dart';
 import '../focus/focusable_chip_mixin.dart';
 import '../focus/input_mode_tracker.dart';
 import '../theme/app_motion.dart';
+import '../theme/mono_tokens.dart';
 import 'focus_builders.dart';
 
 /// Retained browsing pages hand their current pill positions to the incoming
@@ -105,6 +106,7 @@ class _TabChipStripState extends State<TabChipStrip> with TickerProviderStateMix
               motionId: widget.motionId,
               controller: _indicatorController,
               color: Theme.of(context).colorScheme.primary,
+              cornerRadius: (Theme.of(context).extension<MonoTokens>()?.radiusSm ?? 12) * 5 / 3,
               textDirection: Directionality.of(context),
               selections: {
                 for (var i = 0; i < widget.children.length; i++)
@@ -247,7 +249,9 @@ class _FocusableTabChipState extends State<FocusableTabChip> with FocusableChipS
       padding: hasImage ? const EdgeInsets.all(8) : const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       backgroundColor: backgroundColor,
       animationDuration: duration,
-      borderRadius: hasImage ? 12 : 20,
+      borderRadius: hasImage
+          ? (Theme.of(context).extension<MonoTokens>()?.radiusSm ?? 12)
+          : (Theme.of(context).extension<MonoTokens>()?.radiusSm ?? 12) * 5 / 3,
       child: hasImage
           ? Column(
               mainAxisSize: .min,
@@ -263,7 +267,11 @@ class _FocusableTabChipState extends State<FocusableTabChip> with FocusableChipS
       duration: duration,
       curve: AppMotion.curve,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(hasImage ? 12 : 20),
+        borderRadius: BorderRadius.circular(
+          hasImage
+              ? (Theme.of(context).extension<MonoTokens>()?.radiusSm ?? 12)
+              : (Theme.of(context).extension<MonoTokens>()?.radiusSm ?? 12) * 5 / 3,
+        ),
         border: Border.all(color: showFocus ? colorScheme.primary : Colors.transparent),
       ),
       child: chip,
@@ -289,6 +297,7 @@ class _TabChipRow extends MultiChildRenderObjectWidget {
     required this.color,
     required this.textDirection,
     required this.selections,
+    required this.cornerRadius,
     required super.children,
   });
 
@@ -296,6 +305,7 @@ class _TabChipRow extends MultiChildRenderObjectWidget {
   final Color color;
   final TextDirection textDirection;
   final Map<int, int> selections;
+  final double cornerRadius;
   final bool active;
   final Map<String, Map<int, Rect>>? history;
   final String? motionId;
@@ -305,7 +315,8 @@ class _TabChipRow extends MultiChildRenderObjectWidget {
       _RenderTabChipRow(controller, color, selections, textDirection)
         ..history = history
         ..motionId = motionId
-        ..active = active;
+        ..active = active
+        ..cornerRadius = cornerRadius;
 
   @override
   void updateRenderObject(BuildContext context, _RenderTabChipRow renderObject) {
@@ -313,6 +324,7 @@ class _TabChipRow extends MultiChildRenderObjectWidget {
       ..history = history
       ..motionId = motionId
       ..active = active
+      ..cornerRadius = cornerRadius
       ..indicatorColor = color
       ..selectedGroups = selections
       ..textDirection = textDirection;
@@ -325,6 +337,13 @@ class _RenderTabChipRow extends RenderFlex {
 
   final AnimationController controller;
   Color _color;
+  double _cornerRadius = 20;
+  set cornerRadius(double value) {
+    if (_cornerRadius == value) return;
+    _cornerRadius = value;
+    markNeedsPaint();
+  }
+
   Map<int, int> _selections;
   Map<int, Rect> _from = {};
   Map<int, Rect> _to = {};
@@ -408,7 +427,7 @@ class _RenderTabChipRow extends RenderFlex {
       current[group] = rect;
       final alpha = _from[group] == null ? progress : (_to[group] == null ? 1 - progress : 1.0);
       context.canvas.drawRRect(
-        RRect.fromRectAndRadius(rect.shift(offset), const Radius.circular(20)),
+        RRect.fromRectAndRadius(rect.shift(offset), Radius.circular(_cornerRadius)),
         Paint()..color = _color.withValues(alpha: _color.a * alpha),
       );
     }

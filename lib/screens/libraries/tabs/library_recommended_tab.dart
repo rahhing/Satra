@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../services/backdrop_cache.dart';
+import '../../../services/settings_service.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../focus/hub_vertical_navigation.dart';
@@ -16,7 +17,6 @@ import '../../../media/media_server_client.dart';
 import '../../../mixins/deletion_aware.dart';
 import '../../../mixins/item_updatable.dart';
 import '../../../mixins/watch_state_aware.dart';
-import '../../../services/settings_service.dart';
 import '../../../utils/deletion_notifier.dart';
 import '../../../utils/hub_icons.dart';
 import '../../../utils/media_event_keys.dart';
@@ -75,13 +75,22 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
   @override
   Widget build(BuildContext context) {
     final content = super.build(context);
+    if (!PlatformDetector.isTV()) return content;
+    final tvHubs = items.where((hub) => hub.items.isNotEmpty).toList();
     final cached = _backdrops?.selectionFor(widget.library.globalKey);
-    if (!PlatformDetector.isTV() || !isLoading || cached == null) return content;
+    // Keep this scene mounted through the very first hub request, including
+    // libraries with no cached selection. Its decoded backdrop retains the
+    // outgoing artwork until the next library's image is ready to blend in.
     return TvSpotlightScaffold(
-      hubs: const [],
+      hubs: tvHubs,
       spotlightListenable: _spotlight,
-      resolveSpotlight: () => cached,
-      resolveClient: (_) => context.tryGetMediaClientForServer(serverIdOrNull(widget.library.serverId)),
+      resolveSpotlight: () {
+        final item = _spotlight.resolve(tvHubs) ?? cached;
+        if (item != null) _backdrops?.rememberSelection(widget.library.globalKey, item);
+        return item;
+      },
+      resolveClient: (spotlight) =>
+          context.tryGetMediaClientForServer(serverIdOrNull(spotlight?.serverId ?? widget.library.serverId)),
       foreground: content,
     );
   }
@@ -309,7 +318,7 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
     if (PlatformDetector.isTV()) {
       return SettingsBuilder(
         prefs: const [SettingsService.hideSpoilers, SettingsService.libraryDensity, SettingsService.episodePosterMode],
-        builder: (context) => _buildTvContent(items),
+        builder: (context) => _buildTvForeground(items),
       );
     }
 
@@ -354,41 +363,34 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
     );
   }
 
-  Widget _buildTvContent(List<MediaHub> items) {
+  Widget _buildTvForeground(List<MediaHub> items) {
     final tvHubs = items.where((hub) => hub.items.isNotEmpty).toList();
-    return TvSpotlightScaffold(
-      hubs: tvHubs,
-      spotlightListenable: _spotlight,
-      resolveSpotlight: () {
-        final item = _spotlight.resolve(tvHubs);
-        if (item != null) _backdrops?.rememberSelection(widget.library.globalKey, item);
-        return item;
-      },
-      resolveClient: (spotlight) =>
-          context.tryGetMediaClientForServer(serverIdOrNull(spotlight?.serverId ?? widget.library.serverId)),
-      foreground: tvHubs.isEmpty
-          ? const SizedBox.shrink()
-          : Positioned(
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: TvBrowseRail(
-                key: _tvBrowseRailKey,
-                hubs: tvHubs,
-                focusMemory: _hubFocusMemory,
-                iconForHub: (hub, _) => hubIconFor(hub),
-                onFocusedItemChanged: _setSpotlightItem,
-                onRefresh: updateItem,
-                onRemoveFromContinueWatching: _refreshContinueWatching,
-                isContinueWatchingHub: _isContinueWatchingHub,
-                usesContinueWatchingAction: _usesContinueWatchingAction,
-                onNavigateUp: widget.onNavigateToChrome ?? widget.onBack,
-                onNavigateToSidebar: _navigateToSidebar,
-                onBack: widget.onBack,
-                tallPosterScale: TvBrowseRailLayout.compactTallPosterScale,
-                widePosterScale: TvBrowseRailLayout.compactEpisodeThumbnailScale,
-              ),
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        if (tvHubs.isNotEmpty)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: TvBrowseRail(
+              key: _tvBrowseRailKey,
+              hubs: tvHubs,
+              focusMemory: _hubFocusMemory,
+              iconForHub: (hub, _) => hubIconFor(hub),
+              onFocusedItemChanged: _setSpotlightItem,
+              onRefresh: updateItem,
+              onRemoveFromContinueWatching: _refreshContinueWatching,
+              isContinueWatchingHub: _isContinueWatchingHub,
+              usesContinueWatchingAction: _usesContinueWatchingAction,
+              onNavigateUp: widget.onNavigateToChrome ?? widget.onBack,
+              onNavigateToSidebar: _navigateToSidebar,
+              onBack: widget.onBack,
+              tallPosterScale: TvBrowseRailLayout.compactTallPosterScale,
+              widePosterScale: TvBrowseRailLayout.compactEpisodeThumbnailScale,
             ),
+          ),
+      ],
     );
   }
 

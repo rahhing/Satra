@@ -18,9 +18,14 @@ there is no global fastest-monitor setting or hardcoded high-refresh timer.
 
 GTK can retain a 60 Hz fallback even while Flutter produces faster frames.
 After the original compositor callback queues its redraw, the adapter flushes
-that damage on the GTK thread. This preserves Flutter's compositor, textures,
-input, resizing and the separate mpv video plane while presenting completed UI
-frames without waiting for another 60 Hz GTK cycle.
+that damage on the GTK thread. Completed frames share one pending flush, with
+a generation counter re-arming presentation if another raster frame completes
+during the paint. VSync requests run independently of those flushes, and visible
+windows keep display-paced painting whether focused or not. Serializing VSync
+behind GTK painting or using activation as a capture flag can throttle normal
+navigation to GTK's 60 Hz fallback. Unmapping cancels the old surface callback
+so it cannot stall a remapped view. Flutter's compositor, textures, input,
+resizing and the separate mpv video plane remain intact.
 
 The GTK wrapper hides its proc-table accessor. `pinned_engine_layout.h` mirrors
 the layout from engine revision `5d531788691ec3404cac0cee66ead4007b177363`.
@@ -42,12 +47,18 @@ With Flutter 3.47.1 and Ninja on PATH:
 python3 scripts/perf/linux_frame_pacing.py --stock
 python3 scripts/perf/linux_frame_pacing.py
 python3 scripts/perf/linux_frame_pacing.py --idle
+python3 scripts/perf/linux_frame_pacing.py --idle --capture
+python3 scripts/perf/linux_frame_pacing.py --navigation
+python3 scripts/perf/linux_frame_pacing.py --navigation --legacy-composition
 ```
 
 Each run creates a temporary native project, runs a small animated Flutter
 scene in profile mode for 17 seconds, reports engine frame timings, and closes
 normally. It never replaces Satra's build or uses the user's profile. The idle
-variant pauses its animation from seconds 4–11. Move the probe window to another
+variant pauses its animation from seconds 4–11. The capture variant repeatedly
+reads the GPU-rendered scene back, including during the pause, and checks each
+captured frame for an intact square and opaque background. It exercises engine
+readback, not the desktop's screenshot overlay. Move the probe window to another
 display during a run to check the monitor-change diagnostics and frame cadence.
 
 `SATRA_TRACE_VSYNC=1` also enables callback/draw counts in Satra itself. FPS is
@@ -64,3 +75,9 @@ FPS on the 240 Hz output (median 4,163 µs) and 164.6 FPS on the second output
 reported zero Flutter frames, followed by normal high-refresh rendering after
 resume. Both probes closed normally. The release app also builds successfully;
 the unknown-engine guard rejects an unrecognized binary.
+
+The navigation fixture uses the production backdrop compositor and cached
+readability shading alongside frosted chrome and scrolling image rows. It
+reports UI/raster p95 times as well as frame intervals. `--legacy-composition`
+compares the former double-blur crossfade. These are isolated synthetic scenes,
+not a measurement of an authenticated server's library or network latency.

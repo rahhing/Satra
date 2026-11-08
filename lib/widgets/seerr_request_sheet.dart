@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -567,8 +568,8 @@ class _SeerrRequestSheetState extends State<SeerrRequestSheet> {
       Scrollable.ensureVisible(
         buttonContext,
         alignment: 0.9,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
+        duration: AppMotion.duration(context, AppMotion.fast),
+        curve: AppMotion.curve,
       ),
     );
   }

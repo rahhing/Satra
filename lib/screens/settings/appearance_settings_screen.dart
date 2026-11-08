@@ -61,6 +61,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
             _viewModeSelector(),
             _densitySelector(),
             _gridSpacingSelector(),
+            _cornerRadiusSelector(),
             _episodePosterModeSelector(),
             SettingSwitchTile(
               pref: SettingsService.showEpisodeNumberOnCards,
@@ -141,6 +142,8 @@ class AppearanceSettingsScreen extends StatelessWidget {
         SettingsGroup(
           title: t.settings.navigation,
           children: [
+            if (PlatformDetector.shouldUseSideNavigation(context) && !PlatformDetector.isTVDevice())
+              _dockSideSelector(),
             if (hasExplore)
               SettingSwitchTile(
                 pref: SettingsService.showExploreTab,
@@ -308,6 +311,59 @@ class AppearanceSettingsScreen extends StatelessWidget {
       ButtonSegment(value: ViewMode.grid, label: Text(t.settings.gridView)),
       ButtonSegment(value: ViewMode.list, label: Text(t.settings.listView)),
     ],
+  );
+
+  Widget _dockSideSelector() => SettingValueBuilder<DockSide>(
+    pref: SettingsService.dockSide,
+    builder: (context, side, _) => ListTile(
+      leading: const AppIcon(Symbols.dock_to_left_rounded),
+      title: const Text('Dock position'),
+      trailing: DropdownButton<DockSide>(
+        key: const ValueKey('dock_position'),
+        value: side,
+        underline: const SizedBox.shrink(),
+        borderRadius: BorderRadius.circular(12),
+        items: const [
+          DropdownMenuItem(value: DockSide.left, child: Text('Left')),
+          DropdownMenuItem(value: DockSide.right, child: Text('Right')),
+        ],
+        onChanged: (value) {
+          if (value != null) SettingsService.instance.write(SettingsService.dockSide, value);
+        },
+      ),
+    ),
+  );
+
+  Widget _cornerRadiusSelector() => SettingValueBuilder<double>(
+    pref: SettingsService.pillCornerRadius,
+    builder: (context, radius, _) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const AppIcon(Symbols.rounded_corner_rounded),
+              const SizedBox(width: 16),
+              Text('Corner rounding', style: settingsOptionTitleStyle(context)),
+              const Spacer(),
+              Text('${radius.round()}'),
+            ],
+          ),
+          const SizedBox(height: 8),
+          const Text('Shape cards, Continue Watching, the dock, and navigation pills.'),
+          FocusableSlider(
+            key: const ValueKey('pill_corner_radius'),
+            value: radius,
+            min: 0,
+            max: 32,
+            divisions: 32,
+            onChanged: (value) => SettingsService.instance.write(SettingsService.pillCornerRadius, value),
+          ),
+          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [Text('Square'), Text('Rounded')]),
+        ],
+      ),
+    ),
   );
 
   Widget _gridSpacingSelector() => SettingSegmentedTile<GridSpacing>(

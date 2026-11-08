@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 
 import '../focus/focusable_wrapper.dart';
@@ -57,7 +58,7 @@ class _MediaDetailsSheetState extends State<MediaDetailsSheet> {
       position.maxScrollExtent,
     );
     if (target == position.pixels) return;
-    _scrollController.animateTo(target, duration: const Duration(milliseconds: 150), curve: Curves.easeOut);
+    _scrollController.animateTo(target, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve);
   }
 
   /// Year (or episode label and air date), certification, runtime, and every

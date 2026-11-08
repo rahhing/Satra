@@ -8,6 +8,7 @@
 
 #include "flutter/generated_plugin_registrant.h"
 #include "mpv/mpv_plugin.h"
+#include "mpv/mpv_preview_plugin.h"
 #include "vsync/flutter_vsync.h"
 
 // On Wayland the mpv video plane is a wl_subsurface stacked *below* this
@@ -113,6 +114,12 @@ static void my_application_activate(GApplication* application) {
   FlPluginRegistrar* audio_registrar =
       fl_plugin_registry_get_registrar_for_plugin(FL_PLUGIN_REGISTRY(self->flutter_view), "MpvAudioPlugin");
   mpv_audio_plugin_register_with_registrar(audio_registrar);
+
+  // Register the software-rendered pixel-buffer MPV preview plugin for muted
+  // card hover previews (no GL/EGL context or Wayland subsurface usage).
+  FlPluginRegistrar* preview_registrar =
+      fl_plugin_registry_get_registrar_for_plugin(FL_PLUGIN_REGISTRY(self->flutter_view), "MpvPreviewPlugin");
+  mpv_preview_plugin_register_with_registrar(preview_registrar);
 
   gtk_widget_show(GTK_WIDGET(window));
   gtk_widget_grab_focus(GTK_WIDGET(self->flutter_view));

@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:ui' as ui;
 
 import 'package:flutter/widgets.dart';
@@ -54,7 +55,7 @@ class AnimatedDimScrim extends StatelessWidget {
       child: TweenAnimationBuilder<double>(
         tween: Tween(end: dimmed ? alpha : 0.0),
         duration: FocusTheme.getAnimationDuration(context),
-        curve: Curves.easeOutCubic,
+        curve: AppMotion.curve,
         builder: (context, value, _) {
           if (value == 0) return const SizedBox.shrink();
           if (fadeTop == 0 && fadeBottom == 0) {

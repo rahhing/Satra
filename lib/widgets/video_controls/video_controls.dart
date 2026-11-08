@@ -1,3 +1,4 @@
+import '../../theme/app_motion.dart';
 import 'dart:async' show StreamSubscription, Timer, unawaited;
 import 'dart:io' show Platform;
 
@@ -1277,7 +1278,7 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                               canRequestFocus: _showControls,
                               child: AnimatedOpacity(
                                 opacity: _controlsOpaque ? 1.0 : 0.0,
-                                duration: const Duration(milliseconds: 200),
+                                duration: AppMotion.duration(context, AppMotion.fast),
                                 onEnd: () {
                                   if (!_showControls) {
                                     widget.chromeController.markControlsHidden();
@@ -1396,7 +1397,7 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                       child: IgnorePointer(
                         child: AnimatedOpacity(
                           opacity: _doubleTapFeedbackOpacity,
-                          duration: tokens(context).slow,
+                          duration: AppMotion.duration(context, AppMotion.slow),
                           child: RepaintBoundary(
                             child: DoubleTapFeedback(
                               isForward: _lastDoubleTapWasForward,
@@ -1426,7 +1427,7 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                               pulse: toast.pulse,
                             ),
                             PlayerToastKind.notice => AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 150),
+                              duration: AppMotion.duration(context, AppMotion.fast),
                               child: PlayerToastIndicator(
                                 key: ValueKey('${toast.icon.codePoint}:${toast.text}'),
                                 icon: toast.icon,
@@ -1450,7 +1451,7 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                             }
                             return AnimatedOpacity(
                               opacity: indicator.visible ? 1.0 : 0.0,
-                              duration: const Duration(milliseconds: 160),
+                              duration: AppMotion.duration(context, AppMotion.fast),
                               child: RepaintBoundary(
                                 child: MobileEdgeAdjustmentIndicator(
                                   key: ValueKey(side),
@@ -1466,8 +1467,8 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                   // Skip intro/credits button (auto-dismisses after 7s, then only shows with controls)
                   if (_isSkipMarkerButtonVisible)
                     AnimatedPositioned(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
+                      duration: AppMotion.duration(context, AppMotion.fast),
+                      curve: AppMotion.curve,
                       right: 24,
                       bottom: () {
                         if (!_showControls) return 24.0;
@@ -1478,14 +1479,14 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                       }(),
                       child: AnimatedOpacity(
                         opacity: 1.0,
-                        duration: tokens(context).slow,
+                        duration: AppMotion.duration(context, AppMotion.slow),
                         child: _buildSkipMarkerButton(),
                       ),
                     ),
                   if (_showPerformanceOverlay)
                     AnimatedPositioned(
-                      duration: const Duration(milliseconds: 200),
-                      curve: Curves.easeInOut,
+                      duration: AppMotion.duration(context, AppMotion.fast),
+                      curve: AppMotion.curve,
                       top: _showControls ? (isMobile ? 100.0 : 60.0) : 16.0,
                       left: 16,
                       right: 16,
@@ -1498,7 +1499,7 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                         alignment: Alignment.topLeft,
                         child: AnimatedOpacity(
                           opacity: performanceOverlayVisible ? 1.0 : 0.0,
-                          duration: const Duration(milliseconds: 200),
+                          duration: AppMotion.duration(context, AppMotion.fast),
                           child: IgnorePointer(
                             child: PlayerPerformanceOverlay(
                               player: widget.player,

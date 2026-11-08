@@ -1,3 +1,4 @@
+import '../../theme/app_motion.dart';
 import 'package:flutter/material.dart';
 import '../../media/ids.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -387,8 +388,8 @@ class _SwipeRevealDeleteActionState extends State<_SwipeRevealDeleteAction> {
             onHorizontalDragUpdate: _handleDragUpdate,
             onHorizontalDragEnd: _handleDragEnd,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 160),
-              curve: Curves.easeOutCubic,
+              duration: AppMotion.duration(context, AppMotion.fast),
+              curve: AppMotion.curve,
               transform: Matrix4.translationValues(-_dragExtent, 0, 0),
               child: DecoratedBox(
                 decoration: BoxDecoration(color: theme.scaffoldBackgroundColor),

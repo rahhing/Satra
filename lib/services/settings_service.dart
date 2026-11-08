@@ -108,6 +108,10 @@ enum ContinueWatchingAction { play, details }
 
 enum EpisodeAction { play, details }
 
+enum DockSide { left, right }
+
+double _normalizeCornerRadius(double value) => value.isFinite ? value.clamp(0.0, 32.0) : 12.0;
+
 /// How Specials (season 0) are placed in the episode watch order — the
 /// sequence auto-advance, offline next/prev, and "download next N" walk.
 enum SpecialsOrdering {
@@ -873,6 +877,8 @@ class SettingsService extends BaseSharedPreferencesService {
   /// keep working while the tab is hidden.
   static const showExploreTab = BoolPref('show_explore_tab', defaultValue: true);
   static const alwaysKeepSidebarOpen = BoolPref('always_keep_sidebar_open');
+  static const dockSide = EnumPref<DockSide>('dock_side', values: DockSide.values, defaultValue: DockSide.left);
+  static const pillCornerRadius = DoublePref('pill_corner_radius', defaultValue: 12, transform: _normalizeCornerRadius);
 
   /// Sidebar Libraries section expansion. Persisted so a collapsed section
   /// stays collapsed across launches instead of springing back open (#1896).
@@ -1010,7 +1016,7 @@ class SettingsService extends BaseSharedPreferencesService {
   );
   static const automotiveUiScale = _AutomotiveUiScalePref();
   static const desktopUiScale = DoublePref('desktop_ui_scale', transform: DesktopUiScale.normalize);
-  static const tvCornerSpotlightBackdrop = BoolPref('tv_corner_spotlight_backdrop');
+  static const tvCornerSpotlightBackdrop = BoolPref('tv_corner_spotlight_backdrop', defaultValue: true);
   static const episodePosterMode = _EpisodePosterModePref();
   static const continueWatchingAction = EnumPref<ContinueWatchingAction>(
     'continue_watching_action',
@@ -1528,6 +1534,8 @@ class SettingsService extends BaseSharedPreferencesService {
     startupSection,
     showExploreTab,
     alwaysKeepSidebarOpen,
+    dockSide,
+    pillCornerRadius,
     librariesSectionExpanded,
     showUnwatchedCount,
     showWatchedIndicators,

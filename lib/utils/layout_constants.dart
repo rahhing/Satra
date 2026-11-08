@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'platform_detector.dart';
+import '../theme/app_motion.dart';
 
 /// Layout and sizing constants used throughout the application
 /// Screen width breakpoints for responsive design
@@ -28,8 +29,8 @@ class ScreenBreakpoints {
 
 /// Animation and notification durations.
 class AppDurations {
-  static const Duration animMedium = Duration(milliseconds: 300);
-  static const Duration animSlow = Duration(milliseconds: 500);
+  static const Duration animMedium = AppMotion.standard;
+  static const Duration animSlow = AppMotion.slow;
   static const Duration snackBarDefault = Duration(seconds: 3);
   static const Duration snackBarLong = Duration(seconds: 4);
 }

@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:async';
 import '../widgets/artwork_atmosphere.dart';
 import 'dart:math' as math;
@@ -347,7 +348,7 @@ PageRoute<bool> mediaDetailRoute({
     pageBuilder: (_, _, _) => page,
     transitionsBuilder: (_, animation, _, child) {
       return FadeTransition(
-        opacity: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic),
+        opacity: CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic),
         child: child,
       );
     },
@@ -1131,7 +1132,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
             key: tvDetailRevealGateKey,
             opacity: revealed ? 1 : 0,
             duration: const Duration(milliseconds: 160),
-            curve: Curves.easeOutCubic,
+            curve: AppMotion.curve,
             child: child,
           ),
         ),
@@ -1489,8 +1490,8 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
           child: GestureDetector(
             onTap: activate,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 150),
-              curve: Curves.easeOutCubic,
+              duration: AppMotion.duration(context, AppMotion.fast),
+              curve: AppMotion.curve,
               padding: _HeroChips.padding,
               decoration: BoxDecoration(color: bgColor, borderRadius: _HeroChips.radius),
               child: _HeroChips.content(
@@ -2381,7 +2382,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       _overviewFocusNode.requestFocus();
       _scrollSectionIntoView(_overviewSectionKey);
     } else {
-      _scrollController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+      _scrollController.animateTo(0, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve);
       _playButtonFocusNode.requestFocus();
     }
   }
@@ -2970,7 +2971,11 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                     _overviewFocusNode.requestFocus();
                     _scrollSectionIntoView(_overviewSectionKey);
                   } else {
-                    _scrollController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeOut);
+                    _scrollController.animateTo(
+                      0,
+                      duration: AppMotion.duration(context, AppMotion.fast),
+                      curve: AppMotion.curve,
+                    );
                     _playButtonFocusNode.requestFocus();
                   }
                 }
@@ -3598,8 +3603,8 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                                   onNavigateUp: () {
                                     _scrollController.animateTo(
                                       0,
-                                      duration: const Duration(milliseconds: 200),
-                                      curve: Curves.easeOut,
+                                      duration: AppMotion.duration(context, AppMotion.fast),
+                                      curve: AppMotion.curve,
                                     );
                                     _playButtonFocusNode.requestFocus();
                                   },
@@ -3735,7 +3740,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                       ignoring: offset < 50,
                       child: AnimatedOpacity(
                         opacity: (offset / 100).clamp(0.0, 1.0),
-                        duration: const Duration(milliseconds: 150),
+                        duration: AppMotion.duration(context, AppMotion.fast),
                         child: child!,
                       ),
                     ),

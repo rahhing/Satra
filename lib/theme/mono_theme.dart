@@ -221,15 +221,16 @@ class MonoPalette {
   int get hashCode => Object.hash(bg, surface, outline, text, textMuted, accent);
 }
 
-final Map<({MonoPalette palette, TargetPlatform platform}), ThemeData> _monoThemeCache = {};
+final Map<({MonoPalette palette, TargetPlatform platform, double cornerRadius}), ThemeData> _monoThemeCache = {};
 
-ThemeData monoTheme(MonoPalette palette) {
+ThemeData monoTheme(MonoPalette palette, {double cornerRadius = 12}) {
   // ThemeData derives several defaults from defaultTargetPlatform.
-  final key = (palette: palette, platform: defaultTargetPlatform);
+  final key = (palette: palette, platform: defaultTargetPlatform, cornerRadius: cornerRadius);
   final cached = _monoThemeCache[key];
   if (cached != null) return cached;
 
-  final theme = _buildMonoTheme(palette, platform: key.platform);
+  final theme = _buildMonoTheme(palette, platform: key.platform, cornerRadius: cornerRadius);
+  if (_monoThemeCache.length >= 80) _monoThemeCache.clear();
   _monoThemeCache[key] = theme;
   return theme;
 }
@@ -239,7 +240,7 @@ ThemeData monoTheme(MonoPalette palette) {
 /// palette's theme alive.
 ThemeData monoThemeUncached(MonoPalette palette) => _buildMonoTheme(palette, platform: defaultTargetPlatform);
 
-ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
+ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, double cornerRadius = 12}) {
   final brightness = c.brightness;
   final onAccent = c.onAccent;
   final clickableCursor = WidgetStateProperty.resolveWith<MouseCursor>(
@@ -259,7 +260,7 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       (states) => states.contains(WidgetState.disabled) ? c.text.withValues(alpha: 0.38) : onAccent,
     ),
     animationDuration: AppMotion.standard,
-    shape: const WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(16)))),
+    shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(cornerRadius * 4 / 3))),
   );
 
   final base = ThemeData(
@@ -404,7 +405,7 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
       surfaceTintColor: Colors.transparent,
       elevation: 0,
       indicatorColor: c.accent.withValues(alpha: 0.12),
-      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(cornerRadius * 7 / 6)),
       labelTextStyle: WidgetStateProperty.resolveWith(
         (states) => TextStyle(
           color: states.contains(WidgetState.selected) ? c.accent : c.textMuted,
@@ -420,7 +421,7 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
     navigationRailTheme: NavigationRailThemeData(
       backgroundColor: Colors.transparent,
       indicatorColor: c.accent.withValues(alpha: 0.12),
-      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+      indicatorShape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(cornerRadius * 7 / 6)),
       selectedIconTheme: IconThemeData(color: c.accent),
       unselectedIconTheme: IconThemeData(color: c.textMuted),
       selectedLabelTextStyle: TextStyle(color: c.accent, fontSize: 11, fontWeight: .w600),
@@ -450,13 +451,13 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform}) {
   return base.copyWith(
     extensions: [
       MonoTokens(
-        radiusSm: 12,
-        radiusMd: 18,
-        radiusLg: 24,
-        radiusXs: 5,
+        radiusSm: cornerRadius,
+        radiusMd: cornerRadius * 1.5,
+        radiusLg: cornerRadius * 2,
+        radiusXs: cornerRadius * 5 / 12,
         groupGap: 2,
         space: 12,
-        fast: const Duration(milliseconds: 180),
+        fast: AppMotion.fast,
         normal: AppMotion.standard,
         slow: AppMotion.slow,
         expressive: AppMotion.slow,

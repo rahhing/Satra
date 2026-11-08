@@ -1,3 +1,4 @@
+import '../widgets/cycling_media_backdrop.dart';
 import 'dart:async';
 import '../media/ids.dart';
 import '../media/media_server_client.dart';
@@ -14,9 +15,10 @@ import 'package:flutter/services.dart'
     show HardwareKeyboard, KeyDownEvent, KeyRepeatEvent, KeyUpEvent, LogicalKeyboardKey;
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
-import 'package:window_manager/window_manager.dart';
+import 'package:window_manager/window_manager.dart' hide DockSide;
 import '../i18n/strings.g.dart';
 import '../services/app_exit_service.dart';
+import '../services/hover_preview_controller.dart';
 import '../services/tvos_system_navigation_service.dart';
 import '../services/update_service.dart';
 import '../utils/app_logger.dart';
@@ -227,9 +229,10 @@ class ContentRefreshResumeGate {
   required double viewportWidth,
   required double currentSideNavigationWidth,
   required double reservedSideNavigationWidth,
+  bool dockOnRight = false,
 }) {
   return (
-    left: currentSideNavigationWidth,
+    left: dockOnRight ? 0 : currentSideNavigationWidth,
     width: (viewportWidth - reservedSideNavigationWidth).clamp(0.0, double.infinity).toDouble(),
   );
 }
@@ -389,6 +392,7 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen>
     with RouteAware, WindowListener, WidgetsBindingObserver, MountedSetStateMixin {
   NavigationTabId _currentTab = NavigationTabId.discover;
+  int _navigationGeneration = 0;
   String? _selectedLibraryGlobalKey;
   Future<void>? _desktopExitFuture;
 
@@ -1184,8 +1188,10 @@ class _MainScreenState extends State<MainScreen>
       children: [
         const AuthErrorBanner(),
         Expanded(
-          child: TabChipMotionScope(
-            child: RetainedTabView(index: _currentIndex, children: _screens),
+          child: BackdropTransitionScope(
+            child: TabChipMotionScope(
+              child: RetainedTabView(index: _currentIndex, children: _screens),
+            ),
           ),
         ),
       ],
@@ -1752,6 +1758,7 @@ class _MainScreenState extends State<MainScreen>
     // Guard: ignore if tab isn't available in current mode
     if (!_getVisibleTabs(_isOffline).any((t) => t.id == tab)) return;
 
+    final generation = ++_navigationGeneration;
     final previousTab = _currentTab;
     final wasMounted = _mountedTabs.contains(tab);
     setState(() {
@@ -1796,22 +1803,19 @@ class _MainScreenState extends State<MainScreen>
       }
     }
 
-    if (wasMounted) {
+    // Let the retained page become visible before focus and refresh work.
+    // Only the latest navigation can act after the frame has been committed.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || generation != _navigationGeneration || _currentTab != tab) return;
       notifySelectedScreen();
-    } else {
-      // A promoted slot does not have a State until this setState has built.
-      // Imperative visibility/focus work must wait rather than silently miss.
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (!mounted || _currentTab != tab) return;
-        notifySelectedScreen();
-      });
-    }
+    });
 
     // Focus search input after rebuild so IndexedStack has made it visible.
     // Skipped for a companion-remote search (focusSearchInput: false), whose
     // submit runs the search and focuses results without opening the keyboard.
     if (tab == NavigationTabId.search && focusSearchInput) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || generation != _navigationGeneration || _currentTab != tab) return;
         _onScreen<SearchInputFocusable>(NavigationTabId.search, (screen) => screen.focusSearchInput());
       });
     }
@@ -1823,10 +1827,16 @@ class _MainScreenState extends State<MainScreen>
 
     _selectedLibraryGlobalKey = libraryGlobalKey;
     _selectTab(NavigationTabId.libraries);
+    final generation = _navigationGeneration;
     // A first visit promotes LibrariesScreen in _selectTab. Wait for its State
     // before applying the requested library and focus; neither action may drop.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
+      if (!mounted ||
+          generation != _navigationGeneration ||
+          _currentTab != NavigationTabId.libraries ||
+          _selectedLibraryGlobalKey != libraryGlobalKey) {
+        return;
+      }
       _onScreen<LibraryLoadable>(
         NavigationTabId.libraries,
         (screen) => screen.loadLibraryByKey(libraryGlobalKey, defaultToRecommended: true),
@@ -2039,10 +2049,15 @@ class _MainScreenState extends State<MainScreen>
 
   Widget _buildContent(BuildContext context, bool useSideNav) {
     if (useSideNav) {
-      return SettingValueBuilder<bool>(
-        pref: SettingsService.alwaysKeepSidebarOpen,
-        builder: (context, alwaysExpanded, _) {
-          final targetContentOffset = _sideNavigationWidth(context, alwaysExpanded: alwaysExpanded);
+      return SettingsBuilder(
+        prefs: const [SettingsService.alwaysKeepSidebarOpen, SettingsService.dockSide],
+        builder: (context) {
+          final alwaysExpanded = SettingsService.instance.read(SettingsService.alwaysKeepSidebarOpen);
+          final isDock = !PlatformDetector.isTVDevice();
+          final dockOnRight = isDock && SettingsService.instance.read(SettingsService.dockSide) == DockSide.right;
+          final targetContentOffset = isDock && !alwaysExpanded
+              ? SideNavigationRailState.collapsedWidthForContext(context)
+              : _sideNavigationWidth(context, alwaysExpanded: alwaysExpanded);
           final reservedContentOffset = alwaysExpanded
               ? SideNavigationRailState.expandedWidth
               : SideNavigationRailState.collapsedWidthForContext(context);
@@ -2081,12 +2096,14 @@ class _MainScreenState extends State<MainScreen>
                     viewportWidth: viewportWidth,
                     currentSideNavigationWidth: targetContentOffset,
                     reservedSideNavigationWidth: reservedContentOffset,
+                    dockOnRight: dockOnRight,
                   );
+                  final contentLeft = contentLayout.left;
                   return MainScreenFocusScope(
                     focusSidebar: _focusSidebar,
-                    sideNavigationWidth: targetContentOffset,
+                    sideNavigationWidth: dockOnRight ? 0 : targetContentOffset,
                     reservedSideNavigationWidth: reservedContentOffset,
-                    foregroundLeft: contentLayout.left,
+                    foregroundLeft: contentLeft,
                     foregroundWidth: contentLayout.width,
                     viewportWidth: viewportWidth,
                     selectLibrary: _selectLibrary,
@@ -2100,7 +2117,7 @@ class _MainScreenState extends State<MainScreen>
                           Positioned(
                             top: 0,
                             bottom: 0,
-                            left: contentLayout.left,
+                            left: contentLeft,
                             width: contentLayout.width,
                             child: TweenAnimationBuilder<double>(
                               duration: SideNavigationRailState.expandDuration,
@@ -2110,14 +2127,25 @@ class _MainScreenState extends State<MainScreen>
                                 node: _contentFocusScope,
                                 // No autofocus - we control focus programmatically to prevent
                                 // autofocus from stealing focus back after setState() rebuilds
-                                child: _buildTickerAwareStack(),
+                                child: NotificationListener<ScrollNotification>(
+                                  onNotification: (notification) {
+                                    if (notification is ScrollStartNotification) {
+                                      unawaited(HoverPreviewController.instance.stop());
+                                    }
+                                    return false;
+                                  },
+                                  child: _buildTickerAwareStack(),
+                                ),
                               ),
                               // Duration/curve must stay in sync with
                               // SideNavigationBleedBuilder and the rail's width
                               // animation so all three track tick for tick.
                               builder: (context, contentLeftPadding, contentChild) {
                                 return Transform.translate(
-                                  offset: Offset(contentLeftPadding - targetContentOffset, 0),
+                                  offset: Offset(
+                                    (contentLeftPadding - targetContentOffset) * (dockOnRight ? -1 : 1),
+                                    0,
+                                  ),
                                   child: contentChild!,
                                 );
                               },
@@ -2129,7 +2157,7 @@ class _MainScreenState extends State<MainScreen>
                           Positioned.fill(
                             child: IgnorePointer(
                               child: AnimatedOpacity(
-                                opacity: _isSidebarFloatingPanel ? 1.0 : 0.0,
+                                opacity: !isDock && _isSidebarFloatingPanel ? 1.0 : 0.0,
                                 duration: SideNavigationRailState.expandDuration,
                                 curve: SideNavigationRailState.expandCurve,
                                 child: const ColoredBox(color: Color(0x66000000)),
@@ -2139,32 +2167,45 @@ class _MainScreenState extends State<MainScreen>
                           Positioned(
                             top: 0,
                             bottom: 0,
-                            left: 0,
-                            child: FocusScope(
-                              node: _sidebarFocusScope,
-                              child: SideNavigationRail(
-                                key: _sideNavKey,
-                                selectedTab: _currentTab,
-                                selectedLibraryKey: _selectedLibraryGlobalKey,
-                                isOfflineMode: _isOffline,
-                                isSidebarFocused: _isSidebarFocused,
-                                alwaysExpanded: alwaysExpanded,
-                                isReconnecting: _isReconnecting,
-                                onDestinationSelected: (tab) {
-                                  final restorePreviousFocus = tab == _currentTab;
-                                  _selectTab(tab);
-                                  _focusContent(restorePreviousFocus: restorePreviousFocus);
-                                },
-                                onLibrarySelected: (key) {
-                                  _selectLibrary(key);
-                                  _focusContent(restorePreviousFocus: false);
-                                },
-                                onNavigateToContent: _focusContent,
-                                onFloatingPanelChanged: (floating) {
-                                  if (_isSidebarFloatingPanel == floating) return;
-                                  setState(() => _isSidebarFloatingPanel = floating);
-                                },
-                                onReconnect: _triggerReconnect,
+                            left: dockOnRight ? null : 0,
+                            right: dockOnRight ? 0 : null,
+                            child: Align(
+                              widthFactor: 1,
+                              alignment: dockOnRight ? Alignment.centerRight : Alignment.centerLeft,
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(vertical: isDock ? 12 : 0),
+                                child: FocusScope(
+                                  node: _sidebarFocusScope,
+                                  onFocusChange: (focused) {
+                                    if (isDock && focused && !_isSidebarFocused) {
+                                      setState(() => _isSidebarFocused = true);
+                                    }
+                                  },
+                                  child: SideNavigationRail(
+                                    key: _sideNavKey,
+                                    selectedTab: _currentTab,
+                                    selectedLibraryKey: _selectedLibraryGlobalKey,
+                                    isOfflineMode: _isOffline,
+                                    isSidebarFocused: _isSidebarFocused,
+                                    alwaysExpanded: alwaysExpanded,
+                                    isReconnecting: _isReconnecting,
+                                    onDestinationSelected: (tab) {
+                                      final restorePreviousFocus = tab == _currentTab;
+                                      _selectTab(tab);
+                                      _focusContent(restorePreviousFocus: restorePreviousFocus);
+                                    },
+                                    onLibrarySelected: (key) {
+                                      _selectLibrary(key);
+                                      _focusContent(restorePreviousFocus: false);
+                                    },
+                                    onNavigateToContent: _focusContent,
+                                    onFloatingPanelChanged: (floating) {
+                                      if (_isSidebarFloatingPanel == floating) return;
+                                      setState(() => _isSidebarFloatingPanel = floating);
+                                    },
+                                    onReconnect: _triggerReconnect,
+                                  ),
+                                ),
                               ),
                             ),
                           ),

@@ -1,3 +1,4 @@
+import '../../theme/app_motion.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -158,7 +159,9 @@ class _QueueListState extends State<QueueList> {
       final anchor = _rowOffset(fromIndex, gap).clamp(0.0, position.maxScrollExtent);
       if ((anchor - position.pixels).abs() > (TrackRow.height + gap) * 1.5) return;
       final target = _rowOffset(currentIndex, gap).clamp(0.0, position.maxScrollExtent);
-      unawaited(controller.animateTo(target, duration: const Duration(milliseconds: 250), curve: Curves.easeOut));
+      unawaited(
+        controller.animateTo(target, duration: AppMotion.duration(context, AppMotion.standard), curve: AppMotion.curve),
+      );
     });
   }
 

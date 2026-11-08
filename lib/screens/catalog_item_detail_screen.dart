@@ -1,3 +1,4 @@
+import '../theme/app_motion.dart';
 import 'dart:async';
 
 import 'package:collection/collection.dart';
@@ -453,8 +454,8 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
       Scrollable.ensureVisible(
         focusContext,
         alignment: alignment,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
+        duration: AppMotion.duration(context, AppMotion.fast),
+        curve: AppMotion.curve,
       ),
     );
   }
@@ -512,8 +513,8 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
       Scrollable.ensureVisible(
         sectionContext,
         alignment: 0.3,
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
+        duration: AppMotion.duration(context, AppMotion.fast),
+        curve: AppMotion.curve,
       ),
     );
   }
@@ -521,7 +522,9 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
   void _requestActionBarFocus() {
     _actionBarKey.currentState?.requestFocusOnFirst();
     if (!_scrollController.hasClients) return;
-    unawaited(_scrollController.animateTo(0, duration: const Duration(milliseconds: 200), curve: Curves.easeOut));
+    unawaited(
+      _scrollController.animateTo(0, duration: AppMotion.duration(context, AppMotion.fast), curve: AppMotion.curve),
+    );
   }
 
   void _requestRelationFocus(int index) {
