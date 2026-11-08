@@ -161,7 +161,7 @@ gboolean OnMainThreadSessionNotify(gpointer data) {
 
   if (!session->stop_requested.load(std::memory_order_acquire)) {
     if (session->texture != nullptr && session->registrar != nullptr &&
-        session->buffer->has_frame) {
+        session->buffer->has_frame.load(std::memory_order_acquire)) {
       fl_texture_registrar_mark_texture_frame_available(session->registrar,
                                                        FL_TEXTURE(session->texture));
     }
@@ -376,7 +376,7 @@ void RunPreviewWorker(std::shared_ptr<PreviewSession> session,
             std::lock_guard<std::mutex> lock(session->buffer->mutex);
             std::swap(render_buf, session->buffer->staged);
             session->buffer->dirty = true;
-            session->buffer->has_frame = true;
+            session->buffer->has_frame.store(true, std::memory_order_release);
           }
           if (frames_after_restart >= 2) {
             session->ready_to_reveal.store(true, std::memory_order_release);
