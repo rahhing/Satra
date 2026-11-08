@@ -53,12 +53,14 @@ static gboolean satra_preview_texture_copy_pixels(FlPixelBufferTexture* texture,
                                                   const uint8_t** out_buffer,
                                                   uint32_t* width,
                                                   uint32_t* height,
-                                                  GError** /*error*/) {
+                                                  GError** error) {
   SatraPreviewTexture* self = SATRA_PREVIEW_TEXTURE(texture);
-  if (!self->buffer) return FALSE;
+  if (!self->buffer) {
+    g_set_error(error, g_quark_from_static_string("satra-preview"), 1, "Preview buffer unavailable");
+    return FALSE;
+  }
   {
     std::lock_guard<std::mutex> lock(self->buffer->mutex);
-    if (!self->buffer->has_frame) return FALSE;
     if (self->buffer->dirty) {
       std::swap(self->buffer->front, self->buffer->staged);
       self->buffer->dirty = false;

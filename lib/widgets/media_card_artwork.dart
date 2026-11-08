@@ -172,9 +172,9 @@ class _MediaCardArtworkState extends State<MediaCardArtwork> with WidgetsBinding
                       ? null
                       : ValueListenableBuilder<bool>(
                           valueListenable: session.ready,
-                          builder: (context, _, _) {
+                          builder: (context, loaded, _) {
                             final textureId = session.textureId;
-                            if (textureId == null) return const SizedBox.shrink();
+                            if (!loaded || textureId == null) return const SizedBox.shrink();
                             return ClipRRect(
                               borderRadius: radius,
                               child: FittedBox(
