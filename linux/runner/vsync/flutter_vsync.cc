@@ -35,10 +35,10 @@ struct VsyncState {
   GMainContext* context;
   GThread* gtk_thread = g_thread_self();
   FlutterEngineProcTable api;
-  gpointer task_runner = nullptr;
   FlutterTaskRunnerDescription platform_task_runner = {};
   FlutterCustomTaskRunners custom_task_runners = {};
   FlutterTaskRunnerPostTaskCallback post_task_callback = nullptr;
+  bool in_vsync = false;
   bool in_run_task = false;
   std::deque<FlutterTask> immediate_tasks;
   FlutterEngine engine = nullptr;  // GTK thread only.
@@ -64,6 +64,8 @@ struct VsyncState {
 using State = std::shared_ptr<VsyncState>;
 std::mutex engines_mutex;
 std::unordered_map<FlutterEngine, State> engines;
+
+FlutterEngineResult run_task(FlutterEngine engine, const FlutterTask* task);
 
 State get_state(void* engine) {
   auto* state = static_cast<State*>(g_object_get_data(G_OBJECT(engine), kStateKey));
@@ -127,15 +129,17 @@ gboolean on_tick(GtkWidget* widget, GdkFrameClock* clock, gpointer data) {
   const auto engine_now = state->api.GetCurrentTime();
   const auto start_ns = static_cast<uint64_t>(static_cast<int64_t>(engine_now) + (start_us - monotonic_us) * 1000);
   const auto target_ns = start_ns + static_cast<uint64_t>((target_us - start_us) * 1000);
+  state->in_vsync = true;
   for (const auto baton : batons) {
     if (state->api.OnVsync(state->engine, baton, start_ns, target_ns) != kSuccess) {
       g_warning("Satra VSync: engine rejected a frame callback");
     }
   }
-  if (state->task_runner != nullptr) {
-    if (GSource* source = g_main_context_find_source_by_user_data(state->context, state->task_runner)) {
-      g_source_set_ready_time(source, 0);
-    }
+  state->in_vsync = false;
+  while (!state->immediate_tasks.empty() && !state->stopped) {
+    const FlutterTask next = state->immediate_tasks.front();
+    state->immediate_tasks.pop_front();
+    run_task(state->engine, &next);
   }
 
   if (state->trace && !batons.empty()) {
@@ -296,17 +300,12 @@ void post_task(FlutterTask task, uint64_t target_time_nanos, void* user_data) {
   auto state = get_state(user_data);
   if (state == nullptr) return;
   const auto now_ns = state->api.GetCurrentTime();
-  if (g_thread_self() == state->gtk_thread && state->in_run_task && target_time_nanos <= now_ns &&
+  if (g_thread_self() == state->gtk_thread && (state->in_run_task || state->in_vsync) && target_time_nanos <= now_ns &&
       state->immediate_tasks.size() < 8) {
     state->immediate_tasks.push_back(task);
     return;
   }
   state->post_task_callback(task, target_time_nanos, user_data);
-  if (target_time_nanos <= now_ns && state->task_runner != nullptr && (!state->in_run_task || g_thread_self() != state->gtk_thread)) {
-    if (GSource* source = g_main_context_find_source_by_user_data(state->context, state->task_runner)) {
-      g_source_set_ready_time(source, 0);
-    }
-  }
 }
 
 FlutterEngineResult run_task(FlutterEngine engine, const FlutterTask* task) {
@@ -411,7 +410,6 @@ void satra_install_flutter_vsync(FlView* view) {
     g_error("Satra VSync: incompatible Flutter embedder API");
   }
   auto state = std::make_shared<VsyncState>(GTK_WIDGET(view), *api);
-  state->task_runner = reinterpret_cast<const SatraPinnedEngineLayout*>(engine)->task_runner;
   g_object_set_data_full(G_OBJECT(engine), kStateKey, new State(state), delete_state);
   // A minimized view may retain an outstanding request. Resume it when mapped
   // again without driving a synthetic clock while it is hidden.

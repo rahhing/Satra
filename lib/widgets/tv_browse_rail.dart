@@ -5,6 +5,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ScrollCacheExtent;
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -1914,7 +1915,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
         controller: scrollController,
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
-        cacheExtent: 5000,
+        scrollCacheExtent: ScrollCacheExtent.pixels(5000),
         // The row anchors at its first media item. The leading options card
         // occupies the negative-offset region before the anchor, so at rest it
         // sits off-screen and never pushes the hub's content right; focusing
