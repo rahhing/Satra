@@ -8,6 +8,7 @@
 #include <atomic>
 #include <cmath>
 #include <cstddef>
+#include <deque>
 #include <memory>
 #include <mutex>
 #include <unordered_map>
@@ -32,7 +33,14 @@ struct VsyncState {
 
   GWeakRef widget;
   GMainContext* context;
+  GThread* gtk_thread = g_thread_self();
   FlutterEngineProcTable api;
+  gpointer task_runner = nullptr;
+  FlutterTaskRunnerDescription platform_task_runner = {};
+  FlutterCustomTaskRunners custom_task_runners = {};
+  FlutterTaskRunnerPostTaskCallback post_task_callback = nullptr;
+  bool in_run_task = false;
+  std::deque<FlutterTask> immediate_tasks;
   FlutterEngine engine = nullptr;  // GTK thread only.
   std::atomic<bool> stopped{false};
   std::mutex mutex;
@@ -108,7 +116,7 @@ gboolean on_tick(GtkWidget* widget, GdkFrameClock* clock, gpointer data) {
   if (!compositor_tick && std::abs(clock_interval_us - interval_us) < interval_us / 8 &&
       presentation_us > monotonic_us && presentation_us <= monotonic_us + 2 * interval_us) {
     target_us = presentation_us;
-    start_us = target_us - interval_us;
+    start_us = std::min(target_us - interval_us, monotonic_us);
   }
   if (target_us <= monotonic_us) {
     start_us = monotonic_us;
@@ -122,6 +130,11 @@ gboolean on_tick(GtkWidget* widget, GdkFrameClock* clock, gpointer data) {
   for (const auto baton : batons) {
     if (state->api.OnVsync(state->engine, baton, start_ns, target_ns) != kSuccess) {
       g_warning("Satra VSync: engine rejected a frame callback");
+    }
+  }
+  if (state->task_runner != nullptr) {
+    if (GSource* source = g_main_context_find_source_by_user_data(state->context, state->task_runner)) {
+      g_source_set_ready_time(source, 0);
     }
   }
 
@@ -273,10 +286,56 @@ void request_vsync(void* user_data, intptr_t baton) {
   // The engine can ask from its UI thread. Always marshal to GTK, even when
   // its main context is momentarily unowned (g_main_context_invoke may inline).
   GSource* source = g_idle_source_new();
-  g_source_set_priority(source, G_PRIORITY_HIGH);
+  g_source_set_priority(source, G_PRIORITY_DEFAULT);
   g_source_set_callback(source, dispatch_vsync, new State(state), delete_state);
   g_source_attach(source, state->context);
   g_source_unref(source);
+}
+
+void post_task(FlutterTask task, uint64_t target_time_nanos, void* user_data) {
+  auto state = get_state(user_data);
+  if (state == nullptr) return;
+  const auto now_ns = state->api.GetCurrentTime();
+  if (g_thread_self() == state->gtk_thread && state->in_run_task && target_time_nanos <= now_ns &&
+      state->immediate_tasks.size() < 8) {
+    state->immediate_tasks.push_back(task);
+    return;
+  }
+  state->post_task_callback(task, target_time_nanos, user_data);
+  if (target_time_nanos <= now_ns && state->task_runner != nullptr && (!state->in_run_task || g_thread_self() != state->gtk_thread)) {
+    if (GSource* source = g_main_context_find_source_by_user_data(state->context, state->task_runner)) {
+      g_source_set_ready_time(source, 0);
+    }
+  }
+}
+
+FlutterEngineResult run_task(FlutterEngine engine, const FlutterTask* task) {
+  State state;
+  {
+    std::lock_guard<std::mutex> lock(engines_mutex);
+    auto it = engines.find(engine);
+    if (it == engines.end()) return kInvalidArguments;
+    state = it->second;
+  }
+  const bool was_in_run_task = state->in_run_task;
+  state->in_run_task = true;
+  const auto res = state->api.RunTask(engine, task);
+  if (!was_in_run_task) {
+    int drained = 0;
+    while (!state->immediate_tasks.empty() && !state->stopped && drained < 8) {
+      const FlutterTask next = state->immediate_tasks.front();
+      state->immediate_tasks.pop_front();
+      state->api.RunTask(engine, &next);
+      ++drained;
+    }
+    while (!state->immediate_tasks.empty()) {
+      const FlutterTask rem = state->immediate_tasks.front();
+      state->immediate_tasks.pop_front();
+      state->post_task_callback(rem, 0, reinterpret_cast<void*>( state->platform_task_runner.user_data));
+    }
+    state->in_run_task = false;
+  }
+  return res;
 }
 
 FlutterEngineResult initialize(
@@ -289,6 +348,17 @@ FlutterEngineResult initialize(
   auto compositor = state->compositor;
   compositor.present_view_callback = present_view;
   patched.compositor = &compositor;
+  if (args->custom_task_runners != nullptr && args->custom_task_runners->platform_task_runner != nullptr) {
+    state->platform_task_runner = *args->custom_task_runners->platform_task_runner;
+    state->post_task_callback = state->platform_task_runner.post_task_callback;
+    state->platform_task_runner.post_task_callback = post_task;
+    state->custom_task_runners = *args->custom_task_runners;
+    state->custom_task_runners.platform_task_runner = &state->platform_task_runner;
+    if (state->custom_task_runners.ui_task_runner == args->custom_task_runners->platform_task_runner) {
+      state->custom_task_runners.ui_task_runner = &state->platform_task_runner;
+    }
+    patched.custom_task_runners = &state->custom_task_runners;
+  }
   const auto result = state->api.Initialize(version, config, &patched, user_data, engine_out);
   if (result == kSuccess) {
     state->engine = *engine_out;
@@ -341,6 +411,7 @@ void satra_install_flutter_vsync(FlView* view) {
     g_error("Satra VSync: incompatible Flutter embedder API");
   }
   auto state = std::make_shared<VsyncState>(GTK_WIDGET(view), *api);
+  state->task_runner = reinterpret_cast<const SatraPinnedEngineLayout*>(engine)->task_runner;
   g_object_set_data_full(G_OBJECT(engine), kStateKey, new State(state), delete_state);
   // A minimized view may retain an outstanding request. Resume it when mapped
   // again without driving a synthetic clock while it is hidden.
@@ -359,5 +430,6 @@ void satra_install_flutter_vsync(FlView* view) {
       }), new State(state),
       +[](gpointer data, GClosure*) { delete_state(data); }, G_CONNECT_DEFAULT);
   api->Initialize = initialize;
+  api->RunTask = run_task;
   api->Shutdown = shutdown;
 }

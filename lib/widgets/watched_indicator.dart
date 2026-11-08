@@ -89,14 +89,17 @@ class WatchedIndicator extends StatelessWidget {
       bottomLeft: Radius.circular(size.barRadius),
       bottomRight: Radius.circular(size.barRadius),
     );
+    final checkInset = size == WatchedIndicatorSize.standard
+        ? (tokens(context).radiusSm * 0.28).clamp(size.checkInset, 10.0)
+        : size.checkInset;
 
     return Stack(
       children: [
         // Watched checkmark
         if (showWatched && item.isWatched && !hasActiveProgress)
           Positioned(
-            top: size.checkInset,
-            right: size.checkInset,
+            top: checkInset,
+            right: checkInset,
             child: Container(
               padding: EdgeInsets.all(size.checkPadding),
               decoration: BoxDecoration(
@@ -114,8 +117,8 @@ class WatchedIndicator extends StatelessWidget {
             unwatched != null &&
             unwatched > 0)
           Positioned(
-            top: size.checkInset,
-            right: size.checkInset,
+            top: checkInset,
+            right: checkInset,
             child: UnwatchedCountBadge(count: unwatched, size: size.badgeSize, fontSize: size.badgeFontSize),
           ),
         // Progress bar for partially watched content (episodes/movies)

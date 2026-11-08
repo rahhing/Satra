@@ -687,7 +687,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                           // each). TV keeps the default: d-pad animateTo benefits from
                           // the prefetch and TV rows inflate via the focus path anyway.
                           scrollCacheExtent: (isTv || PlatformDetector.isDesktopOS())
-                              ? null
+                              ? const ScrollCacheExtent.pixels(5000)
                               : const ScrollCacheExtent.pixels(0),
                           padding: widget.inset
                               ? EdgeInsets.symmetric(vertical: isTv ? 6 : 2)
@@ -751,6 +751,22 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                               // indices instead of the whole realized row.
                               salt: isItemFocused,
                               keyboardMode: isKeyboardMode,
+                              isOnScreen: () {
+                                final itemLeft = index * _itemExtent;
+                                final itemRight = itemLeft + _itemExtent;
+                                final scrollOffset = (_scrollController.hasClients &&
+                                        _scrollController.positions.length == 1 &&
+                                        _scrollController.position.hasPixels)
+                                    ? _scrollController.position.pixels
+                                    : 0.0;
+                                final viewport = (_scrollController.hasClients &&
+                                        _scrollController.positions.length == 1 &&
+                                        _scrollController.position.hasViewportDimension)
+                                    ? _scrollController.position.viewportDimension
+                                    : constraints.maxWidth;
+                                return itemRight > scrollOffset - _itemExtent &&
+                                    itemLeft < scrollOffset + viewport + _itemExtent;
+                              },
                               skeleton: () => Padding(
                                 padding: cardPadding,
                                 child: SizedBox(width: cardWidth, child: const SkeletonMediaCard()),

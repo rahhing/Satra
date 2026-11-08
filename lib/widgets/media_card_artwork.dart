@@ -139,10 +139,14 @@ class _MediaCardArtworkState extends State<MediaCardArtwork> with WidgetsBinding
     final effects = AppMotion.effectsEnabled(context);
     final session = _session;
     return MouseRegion(
-      onEnter: (_) => _enter(),
+      onEnter: (event) {
+        if (event.buttons == 0) _enter();
+      },
       onExit: (_) => _exit(),
       child: Listener(
-        onPointerDown: (_) => setState(_stop),
+        onPointerDown: (_) {
+          if (_session != null || _hoverDelay != null) setState(_stop);
+        },
         child: AnimatedContainer(
           duration: AppMotion.duration(context),
           curve: AppMotion.curve,

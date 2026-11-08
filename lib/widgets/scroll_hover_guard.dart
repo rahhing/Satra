@@ -85,7 +85,20 @@ class _RenderHoverHitFilter extends RenderProxyBox {
   @override
   bool hitTest(BoxHitTestResult result, {required Offset position}) {
     if (!suppressed) return super.hitTest(result, position: position);
-    return size.contains(position) && (child?.hitTest(_WithoutHoverHits(result), position: position) ?? false);
+    if (!size.contains(position)) return false;
+    // SliverHitTestResult.wrap and BoxHitTestResult.wrap inside CustomScrollView
+    // and ListView construct new HitTestResult wrappers sharing result.path,
+    // which would bypass a subclassed add() override. Strip any hover
+    // annotations added within this subtree directly from the shared path.
+    final path = result.path as List<HitTestEntry>;
+    final before = path.length;
+    final hit = child?.hitTest(_WithoutHoverHits(result), position: position) ?? false;
+    for (var i = path.length - 1; i >= before; i--) {
+      if (path[i].target is MouseTrackerAnnotation) {
+        path.removeAt(i);
+      }
+    }
+    return hit;
   }
 }
 

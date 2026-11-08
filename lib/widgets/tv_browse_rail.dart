@@ -991,6 +991,26 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     return overlaps(_sectionOffsets[_hubIndex].clamp(0.0, _sectionMaxScrollExtent).toDouble());
   }
 
+  bool _isHubCardNeeded(
+    MediaHub hub,
+    int childIndex, {
+    required TvBrowseRailLayoutMetrics metrics,
+    required double itemExtent,
+    required double railViewportWidth,
+    required double leftOverflow,
+    required double rightOverflow,
+  }) {
+    final cardLeft = metrics.railEdgePadding + childIndex * itemExtent;
+    final cardRight = cardLeft + metrics.cardWidth;
+    final controller = _scrollControllers[_hubKey(hub)];
+    final scrollOffset = (controller != null && controller.positions.length == 1 && controller.position.hasPixels)
+        ? controller.position.pixels
+        : 0.0;
+    final visibleLeft = scrollOffset - leftOverflow - itemExtent;
+    final visibleRight = scrollOffset + railViewportWidth + rightOverflow + itemExtent;
+    return cardRight > visibleLeft && cardLeft < visibleRight;
+  }
+
   void _scrollActiveHubToTop({bool animate = true, Duration? duration}) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
@@ -1817,6 +1837,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     );
     _metricsByHub[_hubKey(hub)] = metrics;
 
+    final rightOverflow = metrics.railEdgePadding + metrics.cardWidth + metrics.itemGap;
     final rail = _buildHubRailList(
       hub: hub,
       hubIndex: hubIndex,
@@ -1826,8 +1847,10 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
       fullCardLayout: fullCardLayout,
       scrollController: scrollController,
       totalCount: totalCount,
+      railViewportWidth: railViewportWidth,
+      leftOverflow: leftOverflow,
+      rightOverflow: rightOverflow,
     );
-    final rightOverflow = metrics.railEdgePadding + metrics.cardWidth + metrics.itemGap;
     final hoverOutsets = HoverLift.paintOutsets(
       Size(metrics.cardWidth, metrics.containerHeight),
       parentScale: fullCardLayout ? TvBrowseRailLayout.fullCardFocusScale : FocusTheme.focusScale,
@@ -1860,8 +1883,12 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     required bool fullCardLayout,
     required ScrollController scrollController,
     required int totalCount,
+    required double railViewportWidth,
+    required double leftOverflow,
+    required double rightOverflow,
   }) {
     final leadingCount = _leadingCountFor(hub);
+    final itemExtent = TvBrowseRailLayout.itemExtentForIndex(index: 0, metrics: metrics);
     final cardMemo = _cardMemos.putIfAbsent(_hubKey(hub), SliverChildMemo<MediaItem>.new);
     // Everything a cached media card bakes in besides its item. Callers may
     // rebuild hub objects on every build (Detail does), so the hub enters by
@@ -1887,6 +1914,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
         controller: scrollController,
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
+        cacheExtent: 5000,
         // The row anchors at its first media item. The leading options card
         // occupies the negative-offset region before the anchor, so at rest it
         // sits off-screen and never pushes the hub's content right; focusing
@@ -1913,7 +1941,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
             padding: .fromLTRB(metrics.railEdgePadding, 2 * scale, metrics.railEdgePadding, 18 * scale),
             sliver: SliverFixedExtentList(
               // A fixed extent keeps all sliver offset and child-index math O(1).
-              itemExtent: TvBrowseRailLayout.itemExtentForIndex(index: 0, metrics: metrics),
+              itemExtent: itemExtent,
               delegate: SliverChildBuilderDelegate(
                 addAutomaticKeepAlives: false,
                 addSemanticIndexes: false,
@@ -1955,12 +1983,21 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
                     item,
                     epoch: (cardEpoch, Theme.of(context)),
                     // Rows realized in the vertical list's cache extent (below
-                    // the screen, at rest and after the current glide) inflate
-                    // one card per frame instead of the whole row in the frame
-                    // the row enters it — the one dropped frame per vertical
-                    // move on low-end TV boxes.
+                    // the screen, at rest and after the current glide) and
+                    // off-screen cards in the horizontal cacheExtent inflate
+                    // one card per frame instead of spiking mid-scroll.
                     build: () => BudgetedCard(
-                      urgent: () => _isHubRowNeeded(hubIndex),
+                      urgent: () =>
+                          _isHubRowNeeded(hubIndex) &&
+                          _isHubCardNeeded(
+                            hub,
+                            childIndex,
+                            metrics: metrics,
+                            itemExtent: itemExtent,
+                            railViewportWidth: railViewportWidth,
+                            leftOverflow: leftOverflow,
+                            rightOverflow: rightOverflow,
+                          ),
                       builder: (context) => _buildRailCard(
                         context,
                         hub: hub,
@@ -2050,7 +2087,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
     return Padding(
       padding: .only(right: metrics.itemGap),
       child: MouseRegion(
-        onEnter: (_) => _setHoveredItem(_liveHub(hub, hubIndex), hubIndex, itemIndex),
+        onEnter: (event) {
+          if (event.buttons == 0) _setHoveredItem(_liveHub(hub, hubIndex), hubIndex, itemIndex);
+        },
         child: Align(alignment: .topLeft, child: focusableCard),
       ),
     );

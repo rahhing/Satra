@@ -34,7 +34,9 @@ class _HoverLiftState extends State<HoverLift> {
   Widget build(BuildContext context) {
     final motion = AppMotion.duration(context) != Duration.zero;
     return MouseRegion(
-      onEnter: (_) => setState(() => _hovered = true),
+      onEnter: (event) {
+        if (event.buttons == 0) setState(() => _hovered = true);
+      },
       onExit: (_) => setState(() {
         _hovered = false;
         _pressed = false;

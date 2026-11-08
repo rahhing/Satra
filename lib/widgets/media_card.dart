@@ -525,7 +525,12 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
       excludeSemantics: !preserveDetailSemantics,
       child: ArtworkAtmosphereScope.maybeOf(context) == null
           ? cardWidget
-          : MouseRegion(onEnter: (_) => ArtworkAtmosphereScope.select(context, item), child: cardWidget),
+          : MouseRegion(
+              onEnter: (event) {
+                if (event.buttons == 0) ArtworkAtmosphereScope.select(context, item);
+              },
+              child: cardWidget,
+            ),
     );
 
     // Catalog stand-ins (Explore tab) have no server-backed actions — every
@@ -654,16 +659,17 @@ class MediaCardState extends State<MediaCard> with ContextMenuTapMixin<MediaCard
       knownHeight: knownHeight,
       artworkDim: widget.artworkDim,
     );
+    final posterRadius = _posterFocusRadius(context, item);
     final overlays = <Widget>[
       if (item is MediaItem && _showsWatchedIndicator(item)) WatchedIndicator(item: item),
-      if (badgeLabels.isNotEmpty) _CatalogBadges(labels: badgeLabels),
+      if (badgeLabels.isNotEmpty) _CatalogBadges(labels: badgeLabels, borderRadius: posterRadius),
     ];
     return ExcludeSemantics(
       child: _CatalogFocusBorder(
         accentColor: _catalogAccent,
-        borderRadius: _posterFocusRadius(context, item),
+        borderRadius: posterRadius,
         child: MediaCardArtwork(
-          borderRadius: _posterFocusRadius(context, item),
+          borderRadius: posterRadius,
           item: item is MediaItem ? item : null,
           previewOnHover:
               widget.isInContinueWatching &&
@@ -1474,33 +1480,56 @@ List<String> _buildCatalogBadgeLabels(CatalogItem? item, DateTime? now) {
 
 class _CatalogBadges extends StatelessWidget {
   final List<String> labels;
+  final double borderRadius;
 
-  const _CatalogBadges({required this.labels});
+  const _CatalogBadges({required this.labels, this.borderRadius = 12});
 
   @override
   Widget build(BuildContext context) {
+    // Keep capsule badges concentric with the poster's rounded corner arc so
+    // the top pill never collides with or gets clipped by large pill radii.
+    final inset = (borderRadius * 0.34).clamp(7.0, 12.0);
     return Positioned(
       key: const Key('catalog-badges'),
-      top: 6,
-      left: 6,
-      right: 6,
+      top: inset,
+      left: inset,
+      right: inset,
       child: Column(
+        mainAxisSize: .min,
         crossAxisAlignment: .start,
         children: [
           for (var index = 0; index < labels.length; index++) ...[
-            if (index > 0) const SizedBox(height: 3),
+            if (index > 0) const SizedBox(height: 4),
             DecoratedBox(
               decoration: BoxDecoration(
-                color: Colors.black.withValues(alpha: 0.76),
-                borderRadius: BorderRadius.circular(4),
+                color: const Color(0xCC0D0E12),
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(
+                  color: Colors.white.withValues(alpha: 0.16),
+                  width: 0.65,
+                  strokeAlign: BorderSide.strokeAlignInside,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.28),
+                    blurRadius: 6,
+                    offset: const Offset(0, 1.5),
+                  ),
+                ],
               ),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Text(
                   labels[index],
                   maxLines: 1,
                   overflow: .ellipsis,
-                  style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: .w700, height: 1),
+                  style: TextStyle(
+                    color: Colors.white.withValues(alpha: 0.96),
+                    fontSize: 9.5,
+                    fontWeight: .w600,
+                    letterSpacing: 0.15,
+                    height: 1.05,
+                  ),
                 ),
               ),
             ),
