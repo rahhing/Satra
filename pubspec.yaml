@@ -161,6 +161,7 @@ flutter:
   assets:
     - assets/satra.svg
     - assets/fonts/OFL.txt
+    - assets/fonts/PlusJakartaSans-OFL.txt
     - assets/licenses/SpatialAudioBridge.txt
     - assets/satra.png
     - assets/satra_adaptive_foreground.svg
@@ -188,6 +189,9 @@ flutter:
   # Registered as UI font families so the Linux build, whose fontconfig may
   # lack CJK fonts, can fall back to the bundled subtitle fonts (mono_theme).
   fonts:
+    - family: Plus Jakarta Sans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans.ttf
     - family: Inter
       fonts:
         - asset: assets/fonts/Inter.ttf

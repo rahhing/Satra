@@ -313,25 +313,14 @@ class AppearanceSettingsScreen extends StatelessWidget {
     ],
   );
 
-  Widget _dockSideSelector() => SettingValueBuilder<DockSide>(
+  Widget _dockSideSelector() => SettingSegmentedTile<DockSide>(
     pref: SettingsService.dockSide,
-    builder: (context, side, _) => ListTile(
-      leading: const AppIcon(Symbols.dock_to_left_rounded),
-      title: const Text('Dock position'),
-      trailing: DropdownButton<DockSide>(
-        key: const ValueKey('dock_position'),
-        value: side,
-        underline: const SizedBox.shrink(),
-        borderRadius: BorderRadius.circular(12),
-        items: const [
-          DropdownMenuItem(value: DockSide.left, child: Text('Left')),
-          DropdownMenuItem(value: DockSide.right, child: Text('Right')),
-        ],
-        onChanged: (value) {
-          if (value != null) SettingsService.instance.write(SettingsService.dockSide, value);
-        },
-      ),
-    ),
+    icon: Symbols.dock_to_left_rounded,
+    title: 'Dock position',
+    segments: const [
+      ButtonSegment(value: DockSide.left, label: Text('Left')),
+      ButtonSegment(value: DockSide.right, label: Text('Right')),
+    ],
   );
 
   Widget _cornerRadiusSelector() => SettingValueBuilder<double>(

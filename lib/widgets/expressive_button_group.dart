@@ -109,17 +109,7 @@ class _ExpressiveButtonGroupState<T> extends State<ExpressiveButtonGroup<T>> {
   }
 
   BorderRadius _radiiFor(int i, bool selected, bool pressed, MonoTokens t) {
-    if (selected) {
-      return BorderRadius.circular(pressed ? t.radiusLg : t.radiusSm * 5 / 3);
-    }
-    // The row-end corners stay fully rounded even while pressed so the group
-    // keeps its pill silhouette.
-    final inner = Radius.circular(pressed ? t.radiusXs : t.radiusSm);
-    final outer = Radius.circular(t.radiusSm * 5 / 3);
-    return BorderRadius.horizontal(
-      left: i == 0 ? outer : inner,
-      right: i == widget.segments.length - 1 ? outer : inner,
-    );
+    return BorderRadius.circular(12);
   }
 
   Color _fillFor(bool selected, bool focused, bool hovered, ColorScheme cs, MonoTokens t) {

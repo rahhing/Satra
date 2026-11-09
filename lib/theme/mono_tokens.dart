@@ -8,9 +8,13 @@ MonoTokens tokens(BuildContext context) => Theme.of(context).extension<MonoToken
 /// items. Pair with `MonoTokens.groupGap` spacing for the hairline gaps.
 BorderRadius groupItemRadii(BuildContext context, int index, int count) {
   final t = tokens(context);
+  // Group rows can be much shorter than cards. Keep their corners from
+  // consuming the row when the global rounding setting is high.
+  final outer = t.radiusLg.clamp(0.0, 20.0);
+  final inner = t.radiusXs.clamp(0.0, 6.0);
   return BorderRadius.vertical(
-    top: Radius.circular(index == 0 ? t.radiusLg : t.radiusXs),
-    bottom: Radius.circular(index == count - 1 ? t.radiusLg : t.radiusXs),
+    top: Radius.circular(index == 0 ? outer : inner),
+    bottom: Radius.circular(index == count - 1 ? outer : inner),
   );
 }
 

@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../screens/settings/settings_screen.dart';
 import '../utils/platform_detector.dart';
 import '../utils/video_player_navigation.dart';
+import '../widgets/utility_panel_route.dart';
 
 /// Route name of a pushed [SettingsScreen] — lets the settings keyboard
 /// shortcut recognize settings already in the stack instead of stacking a
@@ -13,7 +14,10 @@ const String kSettingsRouteName = '/settings';
 
 /// The route every settings push site uses, so a pushed settings screen is
 /// identifiable by [kSettingsRouteName].
-MaterialPageRoute<void> buildSettingsRoute() {
+Route<void> buildSettingsRoute() {
+  if (PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()) {
+    return utilityPanelRoute(name: kSettingsRouteName, child: const SettingsScreen());
+  }
   return MaterialPageRoute<void>(
     settings: const RouteSettings(name: kSettingsRouteName),
     builder: (_) => const SettingsScreen(),

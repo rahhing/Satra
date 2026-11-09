@@ -47,6 +47,7 @@ import '../../widgets/overlay_sheet.dart';
 import '../../widgets/setting_tile.dart';
 import '../../widgets/settings_builder.dart';
 import '../../widgets/settings_section.dart';
+import '../../widgets/utility_panel_route.dart';
 import '../../widgets/system_bottom_inset.dart';
 import '../../profiles/active_profile_provider.dart';
 import '../../profiles/profile.dart';
@@ -196,6 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
   }
 
   Widget _buildContent(BuildContext sheetContext, {required bool hasLibraries}) {
+    final inPanel = UtilityPanelScope.isPresent(sheetContext);
     return Scaffold(
       body: Focus(
         onKeyEvent: _handleKeyEvent,
@@ -204,58 +206,75 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
         child: SafeArea(
           top: false,
           bottom: false,
-          child: CustomScrollView(
-            primary: false,
-            slivers: [
-              ExcludeFocus(child: CustomAppBar(title: Text(t.settings.title), pinned: true)),
-              SliverList(
-                delegate: SliverChildListDelegate([
-                  const SizedBox(height: 8),
-                  SettingsGroup(
-                    children: [
-                      if (supporterBuildMode == SupporterMode.iap)
-                        SupporterSettingsTile(focusNode: _focusTracker.get(_kSupporter))
-                      else if (DonationService.isEnabled)
-                        _buildDonateTile(),
-                      _buildGeneralTile(),
-                      _buildAppearanceTile(),
-                      _buildPlaybackTile(),
-                      if (hasLibraries) _buildManageLibrariesTile(sheetContext),
-                      _buildServicesTile(),
-                    ],
+          child: Column(
+            children: [
+              if (inPanel)
+                SizedBox(
+                  height: kToolbarHeight,
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: Text(t.settings.title, style: Theme.of(sheetContext).appBarTheme.titleTextStyle),
+                    ),
                   ),
+                ),
+              Expanded(
+                child: CustomScrollView(
+                  primary: false,
+                  slivers: [
+                    if (!inPanel) ExcludeFocus(child: CustomAppBar(title: Text(t.settings.title), pinned: true)),
+                    SliverList(
+                      delegate: SliverChildListDelegate([
+                        const SizedBox(height: 8),
+                        SettingsGroup(
+                          children: [
+                            if (supporterBuildMode == SupporterMode.iap)
+                              SupporterSettingsTile(focusNode: _focusTracker.get(_kSupporter))
+                            else if (DonationService.isEnabled)
+                              _buildDonateTile(),
+                            _buildGeneralTile(),
+                            _buildAppearanceTile(),
+                            _buildPlaybackTile(),
+                            if (hasLibraries) _buildManageLibrariesTile(sheetContext),
+                            _buildServicesTile(),
+                          ],
+                        ),
 
-                  _buildConnectionsSection(sheetContext),
+                        _buildConnectionsSection(sheetContext),
 
-                  if (!PlatformDetector.isAppleTV()) _buildDownloadsSection(),
+                        if (!PlatformDetector.isAppleTV()) _buildDownloadsSection(),
 
-                  if (_keyboardShortcutsSupported || PlatformDetector.shouldActAsRemoteHost(sheetContext))
-                    _buildControlsSection(sheetContext),
+                        if (_keyboardShortcutsSupported || PlatformDetector.shouldActAsRemoteHost(sheetContext))
+                          _buildControlsSection(sheetContext),
 
-                  _buildAdvancedSection(),
+                        _buildAdvancedSection(),
 
-                  if (UpdateService.isUpdateCheckAvailable) ...[_buildUpdateSection()],
+                        if (UpdateService.isUpdateCheckAvailable) ...[_buildUpdateSection()],
 
-                  // Hidden on Android TV / tvOS (no document picker); desktop in
-                  // force-TV mode keeps it — FilePickerService works there.
-                  if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS()) _buildBackupSection(),
+                        // Hidden on Android TV / tvOS (no document picker); desktop in
+                        // force-TV mode keeps it — FilePickerService works there.
+                        if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS()) _buildBackupSection(),
 
-                  const SizedBox(height: 24),
-                  SettingsGroup(
-                    children: [
-                      SettingNavigationTile(
-                        focusNode: _focusTracker.get(_kAbout),
-                        icon: Symbols.info_rounded,
-                        title: t.settings.about,
-                        subtitle: t.settings.aboutDescription,
-                        destinationBuilder: (context) => const AboutScreen(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                ]),
+                        const SizedBox(height: 24),
+                        SettingsGroup(
+                          children: [
+                            SettingNavigationTile(
+                              focusNode: _focusTracker.get(_kAbout),
+                              icon: Symbols.info_rounded,
+                              title: t.settings.about,
+                              subtitle: t.settings.aboutDescription,
+                              destinationBuilder: (context) => const AboutScreen(),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 24),
+                      ]),
+                    ),
+                    const SliverSystemBottomInset(),
+                  ],
+                ),
               ),
-              const SliverSystemBottomInset(),
             ],
           ),
         ),

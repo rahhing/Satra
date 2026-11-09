@@ -37,7 +37,9 @@ import 'libraries/state_messages.dart';
 import 'main_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  const SearchScreen({super.key, this.spotlight = false});
+
+  final bool spotlight;
 
   @override
   State<SearchScreen> createState() => _SearchScreenState();
@@ -546,7 +548,7 @@ class _SearchScreenState extends State<SearchScreen>
         child: CustomScrollView(
           primary: false,
           slivers: [
-            DesktopSliverAppBar(title: Text(t.common.search), floating: true),
+            if (!widget.spotlight) DesktopSliverAppBar(title: Text(t.common.search), floating: true),
             SliverToBoxAdapter(
               child: SearchInputField(
                 controller: searchController,

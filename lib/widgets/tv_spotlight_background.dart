@@ -131,7 +131,7 @@ class TvSpotlightBackground extends StatelessWidget {
                               constraints.maxWidth <= 0) {
                             return Align(
                               alignment: .bottomLeft,
-                              child: _buildInfo(context, media, constraints.maxWidth),
+                              child: _buildInfo(context, media, constraints.maxWidth, cornerBackdrop),
                             );
                           }
 
@@ -142,7 +142,7 @@ class TvSpotlightBackground extends StatelessWidget {
                               alignment: .bottomLeft,
                               child: SizedBox(
                                 width: constraints.maxWidth,
-                                child: _buildInfo(context, media, constraints.maxWidth),
+                                child: _buildInfo(context, media, constraints.maxWidth, cornerBackdrop),
                               ),
                             ),
                           );
@@ -158,7 +158,7 @@ class TvSpotlightBackground extends StatelessWidget {
     );
   }
 
-  Widget _buildInfo(BuildContext context, MediaItem media, double width) {
+  Widget _buildInfo(BuildContext context, MediaItem media, double width, bool cornerBackdrop) {
     final scale = _scale(context);
     final colorScheme = Theme.of(context).colorScheme;
     final shouldHideSpoiler = hideSpoilers && media.shouldHideSpoiler;
@@ -169,7 +169,7 @@ class TvSpotlightBackground extends StatelessWidget {
       crossAxisAlignment: .start,
       mainAxisSize: .min,
       children: [
-        _buildLogoOrTitle(context, media, title, width),
+        _buildLogoOrTitle(context, media, title, width, cornerBackdrop),
         SizedBox(height: _sectionGap(scale)),
         _buildMetadataLine(context, media),
         if (summary != null && summary.isNotEmpty) ...[
@@ -204,7 +204,13 @@ class TvSpotlightBackground extends StatelessWidget {
   /// The logo is contained within its slot; the title fallback gets
   /// [ClearLogoImage.fallbackWidthFor] of the info block's [availableWidth]
   /// at the slot's height (#1796).
-  Widget _buildLogoOrTitle(BuildContext context, MediaItem media, String title, double availableWidth) {
+  Widget _buildLogoOrTitle(
+    BuildContext context,
+    MediaItem media,
+    String title,
+    double availableWidth,
+    bool cornerBackdrop,
+  ) {
     final theme = Theme.of(context);
     // The spotlight scrim washes artwork toward the scaffold background, so
     // light themes recolor light-toned logos to stay visible.
@@ -214,8 +220,8 @@ class TvSpotlightBackground extends StatelessWidget {
     );
     final scale = _scale(context);
     final logoPath = media.clearLogoPath;
-    final logoWidth = math.min(_logoWidth(scale), availableWidth);
-    final logoHeight = _logoHeight(scale);
+    final logoWidth = math.min(_logoWidth(scale) * (cornerBackdrop ? 1.35 : 1), availableWidth);
+    final logoHeight = _logoHeight(scale) * (cornerBackdrop ? 1.35 : 1);
     final width = ClearLogoImage.fallbackWidthFor(logoWidth: logoWidth, available: availableWidth);
     if (logoPath == null || logoPath.isEmpty) {
       return SizedBox(width: width, height: logoHeight, child: _buildTitle(context, title));

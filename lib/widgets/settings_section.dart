@@ -3,6 +3,7 @@ import '../theme/mono_tokens.dart';
 import '../utils/platform_detector.dart';
 import 'app_icon.dart';
 import 'expressive_button_group.dart';
+import 'utility_panel_route.dart';
 
 /// Standard settings-option title style, for group children that are not a
 /// [ListTile] (segmented controls, sliders) and so don't inherit its
@@ -64,30 +65,59 @@ class SettingsGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = tokens(context);
+    final inPanel = UtilityPanelScope.isPresent(context);
     return Column(
       crossAxisAlignment: .start,
       children: [
         if (title != null) SettingsSectionHeader(title!),
         Padding(
           padding: margin,
-          child: ListTileTheme.merge(
-            visualDensity: PlatformDetector.isAutomotive() ? VisualDensity.standard : const VisualDensity(vertical: -3),
-            child: Column(
-              children: [
-                for (var i = 0; i < children.length; i++) ...[
-                  if (i > 0) SizedBox(height: t.groupGap),
-                  Material(
-                    color: t.surface,
-                    clipBehavior: Clip.antiAlias,
-                    shape: RoundedRectangleBorder(borderRadius: groupItemRadii(context, i, children.length)),
-                    child: children[i],
+          child: inPanel
+              ? _panelGroup(context)
+              : ListTileTheme.merge(
+                  visualDensity: PlatformDetector.isAutomotive()
+                      ? VisualDensity.standard
+                      : const VisualDensity(vertical: -3),
+                  child: Column(
+                    children: [
+                      for (var i = 0; i < children.length; i++) ...[
+                        if (i > 0) SizedBox(height: t.groupGap),
+                        Material(
+                          color: t.surface,
+                          clipBehavior: Clip.antiAlias,
+                          shape: RoundedRectangleBorder(borderRadius: groupItemRadii(context, i, children.length)),
+                          child: children[i],
+                        ),
+                      ],
+                    ],
                   ),
-                ],
-              ],
-            ),
-          ),
+                ),
         ),
       ],
+    );
+  }
+
+  Widget _panelGroup(BuildContext context) {
+    final foreground = Theme.of(context).colorScheme.onSurface;
+    return Material(
+      color: foreground.withValues(alpha: 0.055),
+      borderRadius: BorderRadius.circular(14),
+      clipBehavior: Clip.antiAlias,
+      child: ListTileTheme.merge(
+        visualDensity: const VisualDensity(vertical: -2),
+        child: Column(
+          children: [
+            for (var i = 0; i < children.length; i++) ...[
+              if (i > 0)
+                Padding(
+                  padding: const EdgeInsets.only(left: 52),
+                  child: Divider(height: 1, thickness: 1, color: foreground.withValues(alpha: 0.08)),
+                ),
+              Material(color: Colors.transparent, child: children[i]),
+            ],
+          ],
+        ),
+      ),
     );
   }
 }

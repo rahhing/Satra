@@ -3,6 +3,7 @@ import '../focus/input_mode_tracker.dart';
 import '../focus/key_event_utils.dart';
 import 'desktop_app_bar.dart';
 import 'system_bottom_inset.dart';
+import 'utility_panel_route.dart';
 
 /// A scaffold widget that wraps Focus + Scaffold + CustomScrollView
 /// with consistent keyboard navigation handling and app bar styling.
@@ -96,6 +97,7 @@ class _FocusedScrollScaffoldState extends State<FocusedScrollScaffold> {
       WidgetsBinding.instance.addPostFrameCallback((_) => _requestInitialFocus());
     }
 
+    final fixedPanelHeader = widget.pinned && UtilityPanelScope.isPresent(context);
     return Focus(
       canRequestFocus: false,
       onKeyEvent: (_, event) {
@@ -115,28 +117,47 @@ class _FocusedScrollScaffoldState extends State<FocusedScrollScaffold> {
           body: SafeArea(
             top: false,
             bottom: false,
-            child: CustomScrollView(
-              slivers: [
-                if (!widget.focusableAppBarActions || !_appBarFocusEnabled)
+            child: Column(
+              children: [
+                if (fixedPanelHeader)
                   ExcludeFocus(
-                    child: CustomAppBar(
+                    excluding: !widget.focusableAppBarActions || !_appBarFocusEnabled,
+                    child: AppBar(
                       title: widget.title,
-                      pinned: widget.pinned,
                       actions: widget.actions,
                       automaticallyImplyLeading: widget.automaticallyImplyLeading,
+                      leading: widget.onBackPressed == null ? null : BackButton(onPressed: widget.onBackPressed),
+                      backgroundColor: Colors.transparent,
+                      elevation: 0,
+                      scrolledUnderElevation: 0,
                     ),
-                  )
-                else
-                  CustomAppBar(
-                    title: widget.title,
-                    pinned: widget.pinned,
-                    actions: widget.actions,
-                    automaticallyImplyLeading: widget.automaticallyImplyLeading,
                   ),
-                ...widget.slivers,
-                // Keeps the last row scrollable clear of the Android
-                // navigation bar / iOS home indicator; zero-height elsewhere.
-                const SliverSystemBottomInset(),
+                Expanded(
+                  child: CustomScrollView(
+                    slivers: [
+                      if (!fixedPanelHeader && (!widget.focusableAppBarActions || !_appBarFocusEnabled))
+                        ExcludeFocus(
+                          child: CustomAppBar(
+                            title: widget.title,
+                            pinned: widget.pinned,
+                            actions: widget.actions,
+                            automaticallyImplyLeading: widget.automaticallyImplyLeading,
+                          ),
+                        )
+                      else if (!fixedPanelHeader)
+                        CustomAppBar(
+                          title: widget.title,
+                          pinned: widget.pinned,
+                          actions: widget.actions,
+                          automaticallyImplyLeading: widget.automaticallyImplyLeading,
+                        ),
+                      ...widget.slivers,
+                      // Keeps the last row scrollable clear of the Android
+                      // navigation bar / iOS home indicator; zero-height elsewhere.
+                      const SliverSystemBottomInset(),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),

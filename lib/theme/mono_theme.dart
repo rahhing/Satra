@@ -3,7 +3,6 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
-import 'gapped_track_shape.dart';
 import 'mono_tokens.dart';
 import 'app_motion.dart';
 
@@ -260,13 +259,13 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, doub
       (states) => states.contains(WidgetState.disabled) ? c.text.withValues(alpha: 0.38) : onAccent,
     ),
     animationDuration: AppMotion.standard,
-    shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(cornerRadius * 4 / 3))),
+    shape: WidgetStatePropertyAll(RoundedRectangleBorder(borderRadius: BorderRadius.circular(14))),
   );
 
   final base = ThemeData(
     platform: platform,
     useMaterial3: true,
-    fontFamily: 'Inter',
+    fontFamily: 'Plus Jakarta Sans',
     brightness: brightness,
     pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
@@ -330,10 +329,16 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, doub
       scrolledUnderElevation: 0,
       centerTitle: false,
       foregroundColor: c.text,
-      titleTextStyle: TextStyle(color: c.text, fontSize: 20, fontWeight: .w700, letterSpacing: -0.6),
+      titleTextStyle: TextStyle(
+        fontFamily: 'Plus Jakarta Sans',
+        color: c.text,
+        fontSize: 20,
+        fontWeight: .w700,
+        letterSpacing: -0.6,
+      ),
     ),
     textTheme: Typography.englishLike2021
-        .apply(fontFamily: 'Inter', bodyColor: c.text, displayColor: c.text)
+        .apply(fontFamily: 'Plus Jakarta Sans', bodyColor: c.text, displayColor: c.text)
         .copyWith(
           displayLarge: const TextStyle(fontWeight: .w700, letterSpacing: -1.5),
           displaySmall: TextStyle(color: c.text, fontSize: 40, fontWeight: .w700, letterSpacing: -1.2),
@@ -378,19 +383,33 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, doub
     textButtonTheme: TextButtonThemeData(style: ButtonStyle(mouseCursor: clickableCursor)),
     outlinedButtonTheme: OutlinedButtonThemeData(style: ButtonStyle(mouseCursor: clickableCursor)),
     iconButtonTheme: IconButtonThemeData(style: ButtonStyle(mouseCursor: clickableCursor)),
+    switchTheme: SwitchThemeData(
+      mouseCursor: clickableCursor,
+      // A transparent icon keeps both thumb sizes equal in Material's switch.
+      thumbIcon: const WidgetStatePropertyAll(Icon(Icons.circle, color: Colors.transparent, size: 1)),
+      thumbColor: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
+        final color = selected ? onAccent : c.text;
+        return color.withValues(alpha: states.contains(WidgetState.disabled) ? 0.38 : 1);
+      }),
+      trackColor: WidgetStateProperty.resolveWith((states) {
+        final selected = states.contains(WidgetState.selected);
+        if (selected) return c.accent.withValues(alpha: states.contains(WidgetState.disabled) ? 0.28 : 1);
+        return c.text.withValues(alpha: states.contains(WidgetState.disabled) ? 0.08 : 0.22);
+      }),
+      trackOutlineColor: WidgetStatePropertyAll(Colors.transparent),
+      trackOutlineWidth: const WidgetStatePropertyAll(0),
+      overlayColor: WidgetStatePropertyAll(c.text.withValues(alpha: 0.10)),
+    ),
     sliderTheme: SliderThemeData(
       // The mono scheme maps surfaceContainerHighest (the M3 default inactive
       // track) to the same color as surface cards, which makes the inactive
       // track invisible inside grouped-list items.
       inactiveTrackColor: c.text.withValues(alpha: 0.12),
-      trackHeight: 16,
-      trackGap: 6,
-      thumbSize: const WidgetStatePropertyAll(Size(4, 20)),
-      thumbShape: const HandleThumbShape(),
-      trackShape: const GappedTrackShape(),
+      trackHeight: 4,
+      thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 8),
+      overlayShape: const RoundSliderOverlayShape(overlayRadius: 16),
       tickMarkShape: const RoundSliderTickMarkShape(tickMarkRadius: 2),
-      // ignore: deprecated_member_use — opting into the 2024 slider appearance until the default flips
-      year2023: false,
     ),
     dividerTheme: DividerThemeData(space: 0, thickness: 1, color: c.outline),
     listTileTheme: ListTileThemeData(

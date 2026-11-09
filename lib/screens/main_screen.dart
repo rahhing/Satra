@@ -69,6 +69,7 @@ import '../widgets/mobile_navigation_rail.dart';
 import '../widgets/vertical_bar_shell.dart';
 import '../widgets/side_navigation_rail.dart';
 import '../widgets/glass_surface.dart';
+import '../widgets/utility_panel_route.dart';
 import '../widgets/retained_tab_view.dart';
 import '../widgets/focusable_tab_chip.dart';
 import '../focus/covered_route_focus_boundary.dart';
@@ -459,6 +460,8 @@ class _MainScreenState extends State<MainScreen>
   /// consumer discards the concrete `State<X>` type and pattern-matches on a
   /// capability mixin (Refreshable, FocusableTab, …) instead.
   final Map<NavigationTabId, GlobalKey> _screenKeys = {for (final id in NavigationTabId.values) id: GlobalKey()};
+  final GlobalKey _utilitySearchKey = GlobalKey();
+  bool _utilityPanelOpen = false;
   final GlobalKey<SideNavigationRailState> _sideNavKey = GlobalKey();
 
   /// Measures the mobile navigation area (bottom bar or landscape rail) for
@@ -1646,7 +1649,7 @@ class _MainScreenState extends State<MainScreen>
     if (_isOffline) return KeyEventResult.handled;
 
     _selectTab(NavigationTabId.search);
-    if (_isSidebarFocused) _focusContent();
+    if (_isSidebarFocused && !(PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice())) _focusContent();
     // Schedule focus after the frame so the search screen is visible in the IndexedStack
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _onScreen<SearchInputFocusable>(NavigationTabId.search, (screen) => screen.focusSearchInput());
@@ -1758,6 +1761,28 @@ class _MainScreenState extends State<MainScreen>
     // Guard: ignore if tab isn't available in current mode
     if (!_getVisibleTabs(_isOffline).any((t) => t.id == tab)) return;
 
+    if (PlatformDetector.isDesktopOS() &&
+        !PlatformDetector.isTVDevice() &&
+        (tab == NavigationTabId.search || tab == NavigationTabId.downloads || tab == NavigationTabId.settings)) {
+      if (_utilityPanelOpen) return;
+      _utilityPanelOpen = true;
+      final Widget panel = switch (tab) {
+        NavigationTabId.search => SearchScreen(key: _utilitySearchKey, spotlight: true),
+        NavigationTabId.downloads => const DownloadsScreen(),
+        _ => const SettingsScreen(),
+      };
+      Navigator.of(context)
+          .push(
+            utilityPanelRoute(
+              child: panel,
+              search: tab == NavigationTabId.search,
+              name: tab == NavigationTabId.settings ? kSettingsRouteName : null,
+            ),
+          )
+          .whenComplete(() => _utilityPanelOpen = false);
+      return;
+    }
+
     final generation = ++_navigationGeneration;
     final previousTab = _currentTab;
     final wasMounted = _mountedTabs.contains(tab);
@@ -1848,7 +1873,9 @@ class _MainScreenState extends State<MainScreen>
   void _openSettings() {
     if (PlatformDetector.shouldUseSideNavigation(context)) {
       _selectTab(NavigationTabId.settings);
-      _focusContent(restorePreviousFocus: false);
+      if (!(PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice())) {
+        _focusContent(restorePreviousFocus: false);
+      }
       return;
     }
 
@@ -1932,6 +1959,12 @@ class _MainScreenState extends State<MainScreen>
   /// capability [T]. Passive broadcasts deliberately tolerate an unvisited
   /// tab; imperative actions select it first and defer until after its build.
   void _onScreen<T>(NavigationTabId tab, void Function(T state) fn) {
+    if (tab == NavigationTabId.search) {
+      if (_utilitySearchKey.currentState case final T state) {
+        fn(state);
+        return;
+      }
+    }
     if (_screenKeys[tab]?.currentState case final T state) fn(state);
   }
 
