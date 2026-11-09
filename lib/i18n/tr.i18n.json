@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Kendi aktarıcınızı ayarlamadığınız sürece herkese açık Open Watch Party aktarıcıları kullanılır",
     "watchTogetherRelayHint": "https://ornek-aktarici.com",
     "watchTogetherRelayInvalid": "Geçerli bir HTTP veya HTTPS aktarıcı adresi girin.",
-    "crashReporting": "Çökme Bildirimi",
-    "crashReportingDescription": "Uygulamanın geliştirilmesine yardımcı olmak için çökme raporları gönder",
+
+
     "debugLogging": "Hata Ayıklama Günlüğü",
     "debugLoggingDescription": "Sorun giderme için ayrıntılı günlük kaydını etkinleştir",
     "viewLogs": "Günlükleri Görüntüle",
@@ -970,9 +970,8 @@
     "serverBusyBody": "Sunucu bu dosyayı yayınlamayı sürekli reddetti (HTTP 503). Sunucu yeniden başlatılıyor veya meşgul olabilir ya da dosyanın bulunduğu depolama birimi çevrim dışı olabilir. Kısa süre sonra tekrar deneyin — sorun devam ederse sunucu sahibinden sunucuyu ve dosyanın bulunduğu depolama birimini kontrol etmesini isteyin.",
     "playbackNotAllowedTitle": "Oynatmaya izin verilmiyor",
     "playbackNotAllowedBody": "Sunucu bu ögeyi yayınlamayı reddetti (HTTP 403). Hesabınızın bunu oynatma izni olmayabilir veya sunucu oynatmaya yalnızca kendi yerel ağında izin veriyor olabilir.",
-    "logsUploaded": "Günlükler yüklendi",
-    "logsUploadFailed": "Günlükler yüklenemedi",
-    "logId": "Günlük Kimliği (ID)",
+
+
     "burnedSubtitlesUseMenu": "Altyazılar bu akışın görüntüsüne gömülü. Bunları altyazı menüsünden değiştirin.",
     "noVideoUrl": "Kullanılabilir video URL'si yok",
     "playbackNoMediaSources": "Sunucu oynatılabilir medya kaynağı döndürmedi",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Günlükleri Temizle",
-    "copyLogs": "Günlükleri Kopyala",
-    "uploadLogs": "Günlükleri Yükle"
+    "copyLogs": "Günlükleri Kopyala"
+
   },
   "startup": {
     "failedTitle": "Satra başlatılamadı",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Ayrıntıları gizle",
     "copyDetails": "Ayrıntıları kopyala",
     "detailsCopied": "Ayrıntılar panoya kopyalandı",
-    "uploadDetails": "Ayrıntıları yükle",
+
     "repairStorage": "Depolama Alanını Onar",
     "repairTitle": "Kayıtlı veriler onarılsın mı?",
     "repairBodyCommon": "Satra'nin ayar dosyası hasarlı ve okunamıyor. Onarım, her ayarı varsayılanına sıfırlar.",

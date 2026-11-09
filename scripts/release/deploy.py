@@ -20,7 +20,7 @@ Phases (in order):
     changelog   generate per-channel release notes via the claude CLI
     bump        bump pubspec version, commit, push
     farm_start  trigger .github/workflows/build.yml for a tagged draft release
-    play        build AAB, upload symbols, publish to Google Play production
+    play        build AAB, publish to Google Play production
     amazon      build APK, upload via the App Submission API, commit the edit
     ios         flutter build ipa, upload the signed IPA to App Store Connect
     tvos        xcodebuild archive/export, upload the signed IPA to App Store Connect
@@ -896,7 +896,7 @@ def _play_pending_edit(ctx: Context, edits, package: str) -> str | None:
 def phase_play(ctx: Context) -> None:
     package = ctx.env["SUPPLY_PACKAGE_NAME"]
     aab = ROOT / "build/app/outputs/bundle/release/app-release.aab"
-    if dry_guard(ctx, f"build AAB, upload symbols, publish {package} to Play production"):
+    if dry_guard(ctx, f"build AAB, publish {package} to Play production"):
         return
 
     from googleapiclient.http import MediaFileUpload  # noqa: PLC0415
@@ -910,19 +910,15 @@ def phase_play(ctx: Context) -> None:
         commit = short_sha()
         run([
             "flutter", "build", "appbundle",
-            "--dart-define=ENABLE_SENTRY=true",
+
             f"--dart-define=GIT_COMMIT={commit}",
-            "--dart-define=SENTRY_ENVIRONMENT=play-store",
-            "--dart-define=SENTRY_DIST=play-store",
+
+
             "--dart-define=SUPPORTER_MODE=iap",
             "--obfuscate",
             "--split-debug-info=debug-info/android-aab",
             "--extra-gen-snapshot-options=--save-obfuscation-map=debug-info/android-aab/obfuscation.map.json",
         ])
-        run(
-            [str(SCRIPTS_DIR / "upload-symbols.sh"), "android-aab"],
-            env={"SENTRY_DIST": "play-store"},
-        )
         if not aab.is_file():
             raise DeployError(f"play: AAB not found at {aab}")
 
@@ -1082,20 +1078,16 @@ def phase_amazon(ctx: Context) -> None:
     run(
         [
             "flutter", "build", "apk", "--release",
-            "--dart-define=ENABLE_SENTRY=true",
+
             f"--dart-define=GIT_COMMIT={commit}",
-            "--dart-define=SENTRY_ENVIRONMENT=amazon",
-            "--dart-define=SENTRY_DIST=amazon",
+
+
             "--dart-define=SUPPORTER_MODE=unlocked",
             "--obfuscate",
             "--split-debug-info=debug-info/android-apk",
             "--extra-gen-snapshot-options=--save-obfuscation-map=debug-info/android-apk/obfuscation.map.json",
         ],
         env={"AMAZON": "1"},
-    )
-    run(
-        [str(SCRIPTS_DIR / "upload-symbols.sh"), "android-apk"],
-        env={"SENTRY_DIST": "amazon"},
     )
     if not apk.is_file():
         raise DeployError(f"amazon: APK not found at {apk}")
@@ -1225,7 +1217,7 @@ def _upload_ipa(ctx: Context, ipa: Path, platform: str) -> None:
 
 
 def phase_ios(ctx: Context) -> None:
-    if dry_guard(ctx, "flutter build ipa, upload symbols, upload IPA to ASC"):
+    if dry_guard(ctx, "flutter build ipa, upload IPA to ASC"):
         return
     if _asc_has_uploaded_build(ctx, "IOS"):
         log(f"ios: App Store Connect already has build {ctx.build_number}; skipping upload")
@@ -1233,17 +1225,13 @@ def phase_ios(ctx: Context) -> None:
     commit = short_sha()
     run([
         "flutter", "build", "ipa",
-        "--dart-define=ENABLE_SENTRY=true",
+
         f"--dart-define=GIT_COMMIT={commit}",
-        "--dart-define=SENTRY_ENVIRONMENT=app-store",
-        "--dart-define=SENTRY_DIST=app-store",
+
+
         "--dart-define=SUPPORTER_MODE=iap",
         "--split-debug-info=debug-info/ios",
     ])
-    run(
-        [str(SCRIPTS_DIR / "upload-symbols.sh"), "ios"],
-        env={"SENTRY_DIST": "app-store", "BUGS_APPLE_ARCHIVE": "build/ios/archive/Satra.xcarchive"},
-    )
     _upload_ipa(ctx, ROOT / "build/ios/ipa/Satra.ipa", "ios")
 
 

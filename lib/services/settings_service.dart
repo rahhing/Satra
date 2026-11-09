@@ -646,7 +646,6 @@ class SettingsService extends BaseSharedPreferencesService {
   static const String defaultCreditsPattern = PlaybackExtras.defaultCreditsPattern;
 
   static const enableDebugLogging = BoolPref('enable_debug_logging', onWrite: setLoggerLevel);
-  static const crashReporting = BoolPref('crash_reporting', defaultValue: true);
   static const enableHardwareDecoding = BoolPref('enable_hardware_decoding', defaultValue: true);
   static const enableHDR = BoolPref('enable_hdr', defaultValue: true);
   // Linux native video plane only. Defaults to the compositor: photographed on a
@@ -1665,7 +1664,6 @@ class SettingsService extends BaseSharedPreferencesService {
           pref != keyboardHotkeys &&
           pref != globalShaderPreset)
         pref,
-    crashReporting,
     mpvConfigText,
     watchPartyRelayUrl,
     rememberedBrightnessLevel,

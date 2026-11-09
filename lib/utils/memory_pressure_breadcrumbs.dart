@@ -1,11 +1,9 @@
-import 'dart:async';
 import 'dart:io';
 import 'dart:math' as math;
 
 import 'package:clock/clock.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 import '../services/playback_coordinator.dart';
 import 'app_logger.dart';
@@ -71,11 +69,6 @@ mixin MemoryPressureBreadcrumbs on PaintingBinding {
     if (_suppressedMemoryPressureSignals > 0) data['suppressed'] = _suppressedMemoryPressureSignals;
     _suppressedMemoryPressureSignals = 0;
 
-    unawaited(
-      Sentry.addBreadcrumb(
-        Breadcrumb(message: 'Memory pressure', category: 'memory.pressure', level: SentryLevel.warning, data: data),
-      ),
-    );
     appLogger.i('Memory pressure: ${data.entries.map((e) => '${e.key}=${e.value}').join(' ')}');
   }
 

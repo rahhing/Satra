@@ -8,7 +8,7 @@ import 'package:http/http.dart';
 /// can catch with one filter and match exhaustively when they care which
 /// failure mode it is.
 ///
-/// [message] is English for stable logs and Sentry grouping. [display] is the
+/// [message] is English for stable logs. [display] is the
 /// localized user-facing text when this failure is rendered in the UI.
 sealed class MediaServerException implements Exception {
   final String message;

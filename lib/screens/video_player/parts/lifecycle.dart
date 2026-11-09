@@ -22,25 +22,6 @@ extension _VideoPlayerLifecycleMethods on VideoPlayerScreenState {
   void _recordLifecycleState(String state, {String? action}) {
     final isTv = PlatformDetector.isTV();
     final pipActive = PipService().isPipActive.value;
-    final breadcrumbData = <String, dynamic>{
-      'state': state,
-      'isTv': isTv,
-      'autoPipEnabled': _autoPipEnabled,
-      'pipActive': pipActive,
-      'pipTransitionInFlight': _androidAutoPipTransitionInFlight,
-      'hiddenForBackground': _hiddenForBackground,
-      'playerSuspendedForTvBackground': _tvSuspend.suspended,
-      'mediaControlsSuspendedForTvBackground': _mediaControls.suspendedForTvBackground,
-      'backend': _playerBackendLabel,
-    };
-    if (action != null) {
-      breadcrumbData['action'] = action;
-    }
-
-    Sentry.addBreadcrumb(
-      Breadcrumb(message: 'Player lifecycle $state', category: 'player.lifecycle', data: breadcrumbData),
-    );
-
     appLogger.d(
       'Player lifecycle: state=$state'
       '${action != null ? ' action=$action' : ''}'

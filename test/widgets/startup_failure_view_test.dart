@@ -97,7 +97,6 @@ void main() {
     expect(find.byKey(startupFailureRepairKey), findsNothing);
     // The diagnostic actions stay, because a stuck user still needs them out.
     expect(find.byKey(startupFailureCopyKey), findsOneWidget);
-    expect(find.byKey(startupFailureUploadKey), findsOneWidget);
     expect(find.text(t.startup.restartRequiredBody), findsOneWidget);
   });
 

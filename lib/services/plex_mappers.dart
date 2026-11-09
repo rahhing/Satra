@@ -15,7 +15,6 @@ import 'package:json_annotation/json_annotation.dart';
 import '../media/chapter_marker_classifier.dart';
 import '../media/artist_discography.dart';
 import '../media/ids.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import '../i18n/strings.g.dart';
 
 import '../media/media_backend.dart';
@@ -750,24 +749,7 @@ class PlexMetadataDto {
     this.flattenSeasons,
   });
 
-  factory PlexMetadataDto.fromJson(Map<String, dynamic> json) {
-    try {
-      return _$PlexMetadataDtoFromJson(json);
-    } on TypeError catch (e, st) {
-      Sentry.captureException(
-        e,
-        stackTrace: st,
-        withScope: (scope) {
-          scope.setContexts('plex_mapper', {
-            'backend': 'plex',
-            'dto': 'PlexMetadataDto',
-            'topLevelFieldCount': json.length,
-          });
-        },
-      );
-      rethrow;
-    }
-  }
+  factory PlexMetadataDto.fromJson(Map<String, dynamic> json) => _$PlexMetadataDtoFromJson(json);
 
   factory PlexMetadataDto.fromJsonWithImages(Map<String, dynamic> json) {
     String? clearLogoUrl;

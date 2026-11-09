@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Servidores de retransmissão públicos do Open Watch Party, a menos que você defina o seu",
     "watchTogetherRelayHint": "https://minha-retransmissao.exemplo.com.br",
     "watchTogetherRelayInvalid": "Insira uma URL base de retransmissão HTTP ou HTTPS válida.",
-    "crashReporting": "Relatório de Erros",
-    "crashReportingDescription": "Enviar relatórios de erros para ajudar a melhorar o app",
+
+
     "debugLogging": "Log de Depuração",
     "debugLoggingDescription": "Ativar log detalhado para solução de problemas",
     "viewLogs": "Ver Logs",
@@ -970,9 +970,8 @@
     "serverBusyBody": "O servidor continuou se recusando a transmitir este arquivo (HTTP 503). Ele pode estar reiniciando ou ocupado, ou o armazenamento do arquivo pode estar offline. Tente novamente em instantes — se isso continuar acontecendo, peça ao proprietário do servidor para verificar o servidor e o armazenamento do arquivo.",
     "playbackNotAllowedTitle": "Reprodução não permitida",
     "playbackNotAllowedBody": "O servidor se recusou a transmitir este item (HTTP 403). Sua conta pode não ter permissão para reproduzi-lo, ou o servidor pode permitir a reprodução apenas na própria rede local.",
-    "logsUploaded": "Logs enviados",
-    "logsUploadFailed": "Falha ao enviar logs",
-    "logId": "ID do log",
+
+
     "burnedSubtitlesUseMenu": "As legendas estão incorporadas a esta transmissão. Altere-as no menu de legendas.",
     "noVideoUrl": "Nenhuma URL de vídeo disponível",
     "playbackNoMediaSources": "O servidor não retornou nenhuma fonte de mídia reproduzível",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Limpar Logs",
-    "copyLogs": "Copiar Logs",
-    "uploadLogs": "Enviar Logs"
+    "copyLogs": "Copiar Logs"
+
   },
   "startup": {
     "failedTitle": "O Satra não conseguiu iniciar",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Ocultar detalhes",
     "copyDetails": "Copiar detalhes",
     "detailsCopied": "Detalhes copiados para a área de transferência",
-    "uploadDetails": "Enviar detalhes",
+
     "repairStorage": "Reparar armazenamento",
     "repairTitle": "Reparar dados armazenados?",
     "repairBodyCommon": "O arquivo de configurações do Satra está danificado e não pode ser lido. Reparar redefine todas as configurações para o padrão.",

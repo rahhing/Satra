@@ -55,6 +55,21 @@ void main() {
     expect(expanded.left + expanded.width, viewportWidth);
   });
 
+  test('an open dock leaves space on the opposite edge on either side', () {
+    for (final onRight in [false, true]) {
+      final layout = mainScreenSideNavigationContentLayout(
+        viewportWidth: 1280,
+        currentSideNavigationWidth: 220,
+        reservedSideNavigationWidth: 220,
+        dockOnRight: onRight,
+        oppositeInset: 24,
+      );
+      expect(layout.width, 1036);
+      expect(layout.left, onRight ? 24 : 220);
+      expect(1280 - layout.left - layout.width, onRight ? 220 : 24);
+    }
+  });
+
   test('tvOS Menu pass-through only enables at root with sidebar focus', () {
     bool shouldPass({
       bool isAppleTV = true,

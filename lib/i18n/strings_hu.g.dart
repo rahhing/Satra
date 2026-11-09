@@ -401,8 +401,6 @@ class _Translations$settings$hu extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Nyilvános Open Watch Party-relék, hacsak nem adsz meg sajátot';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => 'Adj meg egy érvényes HTTP- vagy HTTPS-alapú relészerver-URL-t.';
-	@override String get crashReporting => 'Összeomlási jelentések';
-	@override String get crashReportingDescription => 'Összeomlási jelentések küldése az alkalmazás fejlesztésének elősegítéséhez';
 	@override String get debugLogging => 'Hibakeresési naplózás';
 	@override String get debugLoggingDescription => 'Részletes naplózás engedélyezése a hibaelhárításhoz';
 	@override String get viewLogs => 'Naplók megtekintése';
@@ -1086,9 +1084,6 @@ class _Translations$messages$hu extends Translations$messages$en {
 	@override String get serverBusyBody => 'A szerver ismételten megtagadta ennek a fájlnak a streamelését (HTTP 503). Lehet, hogy újraindul, túlterhelt, vagy a fájl tárhelye nem érhető el. Próbáld újra egy kis idő múlva – ha a probléma továbbra is fennáll, kérd meg a szerver tulajdonosát, hogy ellenőrizze a szervert és a fájl tárhelyét.';
 	@override String get playbackNotAllowedTitle => 'A lejátszás nem engedélyezett';
 	@override String get playbackNotAllowedBody => 'A szerver megtagadta ennek az elemnek a streamelését (HTTP 403). Lehet, hogy a fiókodnak nincs engedélye a lejátszására, vagy a szerver csak a helyi hálózatán engedélyezi a lejátszást.';
-	@override String get logsUploaded => 'Naplók feltöltve';
-	@override String get logsUploadFailed => 'Nem sikerült a naplók feltöltése';
-	@override String get logId => 'Naplóazonosító';
 	@override String get burnedSubtitlesUseMenu => 'A feliratok bele vannak égetve ebbe a streambe. A feliratmenüben módosíthatod őket.';
 	@override String get noVideoUrl => 'Nem érhető el videó-URL';
 	@override String get playbackNoMediaSources => 'A szerver nem adott vissza lejátszható médiaforrást';
@@ -1477,7 +1472,6 @@ class _Translations$logs$hu extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Naplók törlése';
 	@override String get copyLogs => 'Naplók másolása';
-	@override String get uploadLogs => 'Naplók feltöltése';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$hu extends Translations$startup$en {
 	@override String get hideDetails => 'Részletek elrejtése';
 	@override String get copyDetails => 'Részletek másolása';
 	@override String get detailsCopied => 'A részletek a vágólapra kerültek';
-	@override String get uploadDetails => 'Részletek feltöltése';
 	@override String get repairStorage => 'Tárhely javítása';
 	@override String get repairTitle => 'Javítsuk a tárolt adatokat?';
 	@override String get repairBodyCommon => 'A Satra beállításfájlja sérült, és nem olvasható. A javítás minden beállítást visszaállít az alapértelmezettre.';
@@ -3683,8 +3676,6 @@ extension on TranslationsHu {
 			'settings.watchTogetherRelayDescription' => 'Nyilvános Open Watch Party-relék, hacsak nem adsz meg sajátot',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => 'Adj meg egy érvényes HTTP- vagy HTTPS-alapú relészerver-URL-t.',
-			'settings.crashReporting' => 'Összeomlási jelentések',
-			'settings.crashReportingDescription' => 'Összeomlási jelentések küldése az alkalmazás fejlesztésének elősegítéséhez',
 			'settings.debugLogging' => 'Hibakeresési naplózás',
 			'settings.debugLoggingDescription' => 'Részletes naplózás engedélyezése a hibaelhárításhoz',
 			'settings.viewLogs' => 'Naplók megtekintése',
@@ -3909,10 +3900,10 @@ extension on TranslationsHu {
 			'themeEditor.slots.text' => 'Szöveg',
 			'themeEditor.slots.textMuted' => 'Másodlagos szöveg',
 			'themeEditor.slots.accent' => 'Kiemelőszín',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Átlátszatlanság',
 			'themeEditor.hexHint' => '#RRGGBB vagy #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Más témákból',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} – ${color}',
 			'themeEditor.contrast.textOnBg' => 'Szöveg a háttéren',
@@ -4301,9 +4292,6 @@ extension on TranslationsHu {
 			'messages.serverBusyBody' => 'A szerver ismételten megtagadta ennek a fájlnak a streamelését (HTTP 503). Lehet, hogy újraindul, túlterhelt, vagy a fájl tárhelye nem érhető el. Próbáld újra egy kis idő múlva – ha a probléma továbbra is fennáll, kérd meg a szerver tulajdonosát, hogy ellenőrizze a szervert és a fájl tárhelyét.',
 			'messages.playbackNotAllowedTitle' => 'A lejátszás nem engedélyezett',
 			'messages.playbackNotAllowedBody' => 'A szerver megtagadta ennek az elemnek a streamelését (HTTP 403). Lehet, hogy a fiókodnak nincs engedélye a lejátszására, vagy a szerver csak a helyi hálózatán engedélyezi a lejátszást.',
-			'messages.logsUploaded' => 'Naplók feltöltve',
-			'messages.logsUploadFailed' => 'Nem sikerült a naplók feltöltése',
-			'messages.logId' => 'Naplóazonosító',
 			'messages.burnedSubtitlesUseMenu' => 'A feliratok bele vannak égetve ebbe a streambe. A feliratmenüben módosíthatod őket.',
 			'messages.noVideoUrl' => 'Nem érhető el videó-URL',
 			'messages.playbackNoMediaSources' => 'A szerver nem adott vissza lejátszható médiaforrást',
@@ -4423,13 +4411,13 @@ extension on TranslationsHu {
 			'profiles.tokenIdentityMismatch' => 'A Plex-profil tokenje nem a várt szerverhez tartozik',
 			'connections.sectionTitle' => 'Kapcsolatok',
 			'connections.addConnection' => 'Kapcsolat hozzáadása',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Jelentkezz be Plexszel, vagy csatlakoztass egy Jellyfin- vagy Emby-szervert',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Hozzáadás a következőhöz (${displayName}): Plex, Jellyfin, Emby vagy más profilkapcsolat',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'A(z) ${name} munkamenete lejárt',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} szerver munkamenete lejárt',
 			'connections.accessDeniedOne' => ({required Object name}) => 'A(z) ${name} megtagadta a hozzáférést ettől a fióktól',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} szerver megtagadta a hozzáférést ettől a fióktól',
 			'connections.signInAgain' => 'Bejelentkezés újra',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'A(z) ${product} kapcsolat szerkesztése',
@@ -4667,7 +4655,6 @@ extension on TranslationsHu {
 			'hubDetail.noItemsFound' => 'Nem találhatók elemek',
 			'logs.clearLogs' => 'Naplók törlése',
 			'logs.copyLogs' => 'Naplók másolása',
-			'logs.uploadLogs' => 'Naplók feltöltése',
 			'startup.failedTitle' => 'A Satra nem tudott elindulni',
 			'startup.failedBody' => 'Valami hiba történt az indítás során. Az alábbi részletek mutatják, mi hibázott.',
 			'startup.failedBodyRepairable' => 'A Satra mentett beállításfájlja sérült, és újra kell építeni, mielőtt a Satra elindulhatna. Az újrapróbálkozás nem segít – válassza a Tárhely javítása lehetőséget.',
@@ -4676,7 +4663,6 @@ extension on TranslationsHu {
 			'startup.hideDetails' => 'Részletek elrejtése',
 			'startup.copyDetails' => 'Részletek másolása',
 			'startup.detailsCopied' => 'A részletek a vágólapra kerültek',
-			'startup.uploadDetails' => 'Részletek feltöltése',
 			'startup.repairStorage' => 'Tárhely javítása',
 			'startup.repairTitle' => 'Javítsuk a tárolt adatokat?',
 			'startup.repairBodyCommon' => 'A Satra beállításfájlja sérült, és nem olvasható. A javítás minden beállítást visszaállít az alapértelmezettre.',
@@ -4937,8 +4923,6 @@ extension on TranslationsHu {
 			'liveTv.recordSettings.skipInLibrary' => 'A könyvtárban már meglévő epizódok kihagyása',
 			'liveTv.recordSettings.keepUpTo' => 'Megtartandó epizódok',
 			'liveTv.recordSettings.keepUpToHint' => 'A 0 minden epizódot megtart',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => '${minutes} perc múlva kezdődik',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day}, ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => 'A(z) ${product} érvénytelen Élő TV-lejátszási adatokat adott vissza',
@@ -4946,6 +4930,8 @@ extension on TranslationsHu {
 			'liveTv.failedToBuildStreamUrl' => 'Nem sikerült összeállítani a stream URL-címét',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Nem sikerült elindítani a csatornát: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Nem sikerült csatornát váltani: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Gyűjtemények',
 			'collections.collection' => 'Gyűjtemény',
 			'collections.empty' => 'A gyűjtemény üres',
@@ -5451,8 +5437,6 @@ extension on TranslationsHu {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Szoftveres',
 			'performanceOverlay.decoderHardware' => 'Hardveres',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Aktív',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} sikertelen)',
 			'externalPlayer.title' => 'Külső lejátszó',
@@ -5460,6 +5444,8 @@ extension on TranslationsHu {
 			'externalPlayer.useExternalPlayerDescription' => 'Videók megnyitása egy másik alkalmazásban',
 			'externalPlayer.selectPlayer' => 'Lejátszó kiválasztása',
 			'externalPlayer.customPlayers' => 'Egyéni lejátszók',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Rendszer alapértelmezése',
 			'externalPlayer.addCustomPlayer' => 'Egyéni lejátszó hozzáadása',
 			'externalPlayer.playerName' => 'Lejátszó neve',

@@ -401,8 +401,6 @@ class _Translations$settings$uz extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Oʻz relengizni belgilamasangiz, ommaviy Open Watch Party relelari ishlatiladi';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => 'Toʻgʻri HTTP yoki HTTPS rele manzilini kiriting.';
-	@override String get crashReporting => 'Xatoliklar haqida hisobot';
-	@override String get crashReportingDescription => 'Ilovani takomillashtirishga yordam berish uchun xatoliklar hisobotini yuboring';
 	@override String get debugLogging => 'Nosozliklarni aniqlash jurnali';
 	@override String get debugLoggingDescription => 'Muammolarni hal qilish uchun batafsil jurnal yuritishni yoqing';
 	@override String get viewLogs => 'Jurnallarni koʻrish';
@@ -1086,9 +1084,6 @@ class _Translations$messages$uz extends Translations$messages$en {
 	@override String get serverBusyBody => 'Server bu faylni uzatishni qayta-qayta rad etdi (HTTP 503). U qayta ishga tushayotgan yoki band boʻlishi, yoxud fayl saqlanadigan xotira oflayn boʻlishi mumkin. Birozdan keyin qaytadan urinib koʻring. Muammo davom etsa, server egasidan server va fayl xotirasini tekshirishni soʻrang.';
 	@override String get playbackNotAllowedTitle => 'Ijro etishga ruxsat berilmagan';
 	@override String get playbackNotAllowedBody => 'Server bu elementni uzatishni rad etdi (HTTP 403). Hisobingizda uni ijro etishga ruxsat boʻlmasligi yoki server ijroga faqat oʻzining mahalliy tarmogʻida ruxsat berishi mumkin.';
-	@override String get logsUploaded => 'Jurnallar yuklandi';
-	@override String get logsUploadFailed => 'Jurnallarni yuklab boʻlmadi';
-	@override String get logId => 'Jurnal ID-si';
 	@override String get burnedSubtitlesUseMenu => 'Subtitrlar bu oqim tasviriga singdirilgan. Ularni subtitr menyusidan oʻzgartiring.';
 	@override String get noVideoUrl => 'Video URL mavjud emas';
 	@override String get playbackNoMediaSources => 'Server ijro etiladigan media manbalarini qaytarmadi';
@@ -1477,7 +1472,6 @@ class _Translations$logs$uz extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Jurnallarni tozalash';
 	@override String get copyLogs => 'Jurnallarni nusxalash';
-	@override String get uploadLogs => 'Jurnallarni yuklash';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$uz extends Translations$startup$en {
 	@override String get hideDetails => 'Tafsilotlarni yashirish';
 	@override String get copyDetails => 'Tafsilotlarni nusxalash';
 	@override String get detailsCopied => 'Tafsilotlar buferga nusxalandi';
-	@override String get uploadDetails => 'Tafsilotlarni yuklash';
 	@override String get repairStorage => 'Saqlashni tiklash';
 	@override String get repairTitle => 'Saqlangan maʼlumotlar tikilsinmi?';
 	@override String get repairBodyCommon => 'Satraning sozlamalar fayli shikastlangan va uni oʻqib boʻlmaydi. Tiklash barcha sozlamalarni standart holatiga qaytaradi.';
@@ -3683,8 +3676,6 @@ extension on TranslationsUz {
 			'settings.watchTogetherRelayDescription' => 'Oʻz relengizni belgilamasangiz, ommaviy Open Watch Party relelari ishlatiladi',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => 'Toʻgʻri HTTP yoki HTTPS rele manzilini kiriting.',
-			'settings.crashReporting' => 'Xatoliklar haqida hisobot',
-			'settings.crashReportingDescription' => 'Ilovani takomillashtirishga yordam berish uchun xatoliklar hisobotini yuboring',
 			'settings.debugLogging' => 'Nosozliklarni aniqlash jurnali',
 			'settings.debugLoggingDescription' => 'Muammolarni hal qilish uchun batafsil jurnal yuritishni yoqing',
 			'settings.viewLogs' => 'Jurnallarni koʻrish',
@@ -3909,10 +3900,10 @@ extension on TranslationsUz {
 			'themeEditor.slots.text' => 'Matn',
 			'themeEditor.slots.textMuted' => 'Ikkilamchi matn',
 			'themeEditor.slots.accent' => 'Urgʻu rangi',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Noshaffoflik',
 			'themeEditor.hexHint' => '#RRGGBB yoki #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Boshqa mavzulardan',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} — ${color}',
 			'themeEditor.contrast.textOnBg' => 'Fondagi matn',
@@ -4301,9 +4292,6 @@ extension on TranslationsUz {
 			'messages.serverBusyBody' => 'Server bu faylni uzatishni qayta-qayta rad etdi (HTTP 503). U qayta ishga tushayotgan yoki band boʻlishi, yoxud fayl saqlanadigan xotira oflayn boʻlishi mumkin. Birozdan keyin qaytadan urinib koʻring. Muammo davom etsa, server egasidan server va fayl xotirasini tekshirishni soʻrang.',
 			'messages.playbackNotAllowedTitle' => 'Ijro etishga ruxsat berilmagan',
 			'messages.playbackNotAllowedBody' => 'Server bu elementni uzatishni rad etdi (HTTP 403). Hisobingizda uni ijro etishga ruxsat boʻlmasligi yoki server ijroga faqat oʻzining mahalliy tarmogʻida ruxsat berishi mumkin.',
-			'messages.logsUploaded' => 'Jurnallar yuklandi',
-			'messages.logsUploadFailed' => 'Jurnallarni yuklab boʻlmadi',
-			'messages.logId' => 'Jurnal ID-si',
 			'messages.burnedSubtitlesUseMenu' => 'Subtitrlar bu oqim tasviriga singdirilgan. Ularni subtitr menyusidan oʻzgartiring.',
 			'messages.noVideoUrl' => 'Video URL mavjud emas',
 			'messages.playbackNoMediaSources' => 'Server ijro etiladigan media manbalarini qaytarmadi',
@@ -4423,13 +4411,13 @@ extension on TranslationsUz {
 			'profiles.tokenIdentityMismatch' => 'Plex profil tokeni kutilmagan serverga tegishli boʻlib chiqdi',
 			'connections.sectionTitle' => 'Ulanishlar',
 			'connections.addConnection' => 'Ulanish qoʻshish',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Plex orqali kiring yoki Jellyfin yoki Emby serveriga ulaning',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName} profiliga qoʻshish: Plex, Jellyfin, Emby yoki boshqa ulanish',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} uchun seans vaqti tugadi',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} server uchun seans vaqti tugadi',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} ushbu hisobga kirishni rad etdi',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} ta server ushbu hisobga kirishni rad etdi',
 			'connections.signInAgain' => 'Qaytadan kirish',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '${product} ulanishini tahrirlash',
@@ -4667,7 +4655,6 @@ extension on TranslationsUz {
 			'hubDetail.noItemsFound' => 'Elementlar topilmadi',
 			'logs.clearLogs' => 'Jurnallarni tozalash',
 			'logs.copyLogs' => 'Jurnallarni nusxalash',
-			'logs.uploadLogs' => 'Jurnallarni yuklash',
 			'startup.failedTitle' => 'Satra ishga tusha olmadi',
 			'startup.failedBody' => 'Ishga tushirish paytida nimadir xato ketdi. Quyidagi tafsilotlar aynan nima muvaffaqiyatsiz boʻlganini koʻrsatadi.',
 			'startup.failedBodyRepairable' => 'Satraning saqlangan sozlamalar fayli shikastlangan va Satra ishga tushishidan oldin uni qayta tiklash kerak. Qayta urinish yordam bermaydi — Saqlashni tiklashni tanlang.',
@@ -4676,7 +4663,6 @@ extension on TranslationsUz {
 			'startup.hideDetails' => 'Tafsilotlarni yashirish',
 			'startup.copyDetails' => 'Tafsilotlarni nusxalash',
 			'startup.detailsCopied' => 'Tafsilotlar buferga nusxalandi',
-			'startup.uploadDetails' => 'Tafsilotlarni yuklash',
 			'startup.repairStorage' => 'Saqlashni tiklash',
 			'startup.repairTitle' => 'Saqlangan maʼlumotlar tikilsinmi?',
 			'startup.repairBodyCommon' => 'Satraning sozlamalar fayli shikastlangan va uni oʻqib boʻlmaydi. Tiklash barcha sozlamalarni standart holatiga qaytaradi.',
@@ -4937,8 +4923,6 @@ extension on TranslationsUz {
 			'liveTv.recordSettings.skipInLibrary' => 'Kutubxonada mavjud epizodlarni oʻtkazib yuborish',
 			'liveTv.recordSettings.keepUpTo' => 'Saqlanadigan epizodlar',
 			'liveTv.recordSettings.keepUpToHint' => '0 barcha epizodlarni saqlaydi',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => '${minutes} daqiqadan keyin boshlanadi',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day}, soat ${time} da',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} Jonli TV ijrosi uchun notoʻgʻri maʼlumot qaytardi',
@@ -4946,6 +4930,8 @@ extension on TranslationsUz {
 			'liveTv.failedToBuildStreamUrl' => 'Oqim URL-ini tuzib boʻlmadi',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kanalni ishga tushirib boʻlmadi: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kanalni almashtirib boʻlmadi: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Toʻplamlar',
 			'collections.collection' => 'Toʻplam',
 			'collections.empty' => 'Toʻplam boʻsh',
@@ -5451,8 +5437,6 @@ extension on TranslationsUz {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Dasturiy',
 			'performanceOverlay.decoderHardware' => 'Apparat',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Faol',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} ta muvaffaqiyatsiz)',
 			'externalPlayer.title' => 'Tashqi pleyer',
@@ -5460,6 +5444,8 @@ extension on TranslationsUz {
 			'externalPlayer.useExternalPlayerDescription' => 'Videolarni boshqa ilovada ochish',
 			'externalPlayer.selectPlayer' => 'Pleyerni tanlash',
 			'externalPlayer.customPlayers' => 'Maxsus pleyerlar',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Tizim standarti',
 			'externalPlayer.addCustomPlayer' => 'Maxsus pleyer qoʻshish',
 			'externalPlayer.playerName' => 'Pleyer nomi',

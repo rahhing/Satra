@@ -401,8 +401,6 @@ class _Translations$settings$az extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Öz relenizi təyin etməsəniz, ictimai Open Watch Party releləri istifadə olunur';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => 'Düzgün HTTP və ya HTTPS rele ünvanı daxil edin.';
-	@override String get crashReporting => 'Xəta hesabatı';
-	@override String get crashReportingDescription => 'Tətbiqi təkmilləşdirməyə kömək etmək üçün xəta hesabatları göndərin';
 	@override String get debugLogging => 'Xəta saxlama jurnalı';
 	@override String get debugLoggingDescription => 'Problemləri həll etmək üçün ətraflı jurnal qeydiyyatını aktivləşdirin';
 	@override String get viewLogs => 'Jurnallara bax';
@@ -1086,9 +1084,6 @@ class _Translations$messages$az extends Translations$messages$en {
 	@override String get serverBusyBody => 'Server bu faylı yayımlamaqdan dəfələrlə imtina etdi (HTTP 503). Server yenidən başladılır və ya məşğul ola bilər, yaxud faylın yerləşdiyi yaddaş oflayn ola bilər. Bir az sonra təzədən cəhd edin — problem davam edərsə, server sahibindən serveri və faylın yerləşdiyi yaddaşı yoxlamasını istəyin.';
 	@override String get playbackNotAllowedTitle => 'Oynatmaya icazə verilmir';
 	@override String get playbackNotAllowedBody => 'Server bu elementi yayımlamaqdan imtina etdi (HTTP 403). Hesabınızın onu oynatmaq icazəsi olmaya bilər, yaxud server oynatmaya yalnız öz yerli şəbəkəsində icazə verə bilər.';
-	@override String get logsUploaded => 'Jurnallar yükləndi';
-	@override String get logsUploadFailed => 'Jurnallar yüklənə bilmədi';
-	@override String get logId => 'Jurnal ID-si';
 	@override String get burnedSubtitlesUseMenu => 'Altyazılar bu yayıma həkk edilib. Onları altyazı menyusundan dəyişin.';
 	@override String get noVideoUrl => 'Video URL-i mövcud deyil';
 	@override String get playbackNoMediaSources => 'Server oynadıla bilən media mənbəyi qaytarmadı';
@@ -1477,7 +1472,6 @@ class _Translations$logs$az extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Jurnalları təmizlə';
 	@override String get copyLogs => 'Jurnalları kopyala';
-	@override String get uploadLogs => 'Jurnalları yüklə';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$az extends Translations$startup$en {
 	@override String get hideDetails => 'Təfərrüatları gizlət';
 	@override String get copyDetails => 'Təfərrüatları kopyala';
 	@override String get detailsCopied => 'Təfərrüatlar buferə kopyalandı';
-	@override String get uploadDetails => 'Təfərrüatları yüklə';
 	@override String get repairStorage => 'Yaddaşı təmir et';
 	@override String get repairTitle => 'Saxlanmış məlumatlar təmir edilsin?';
 	@override String get repairBodyCommon => 'Satra-nin tənzimləmə faylı zədələnib və oxuna bilmir. Təmir bütün tənzimləmələri defolt vəziyyətinə sıfırlayır.';
@@ -3683,8 +3676,6 @@ extension on TranslationsAz {
 			'settings.watchTogetherRelayDescription' => 'Öz relenizi təyin etməsəniz, ictimai Open Watch Party releləri istifadə olunur',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => 'Düzgün HTTP və ya HTTPS rele ünvanı daxil edin.',
-			'settings.crashReporting' => 'Xəta hesabatı',
-			'settings.crashReportingDescription' => 'Tətbiqi təkmilləşdirməyə kömək etmək üçün xəta hesabatları göndərin',
 			'settings.debugLogging' => 'Xəta saxlama jurnalı',
 			'settings.debugLoggingDescription' => 'Problemləri həll etmək üçün ətraflı jurnal qeydiyyatını aktivləşdirin',
 			'settings.viewLogs' => 'Jurnallara bax',
@@ -3909,10 +3900,10 @@ extension on TranslationsAz {
 			'themeEditor.slots.text' => 'Mətn',
 			'themeEditor.slots.textMuted' => 'Köməkçi mətn',
 			'themeEditor.slots.accent' => 'Vurğu',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Şəffaflıq',
 			'themeEditor.hexHint' => '#RRGGBB və ya #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Digər mövzulardan',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme}: ${color}',
 			'themeEditor.contrast.textOnBg' => 'Arxa fonda mətn',
@@ -4301,9 +4292,6 @@ extension on TranslationsAz {
 			'messages.serverBusyBody' => 'Server bu faylı yayımlamaqdan dəfələrlə imtina etdi (HTTP 503). Server yenidən başladılır və ya məşğul ola bilər, yaxud faylın yerləşdiyi yaddaş oflayn ola bilər. Bir az sonra təzədən cəhd edin — problem davam edərsə, server sahibindən serveri və faylın yerləşdiyi yaddaşı yoxlamasını istəyin.',
 			'messages.playbackNotAllowedTitle' => 'Oynatmaya icazə verilmir',
 			'messages.playbackNotAllowedBody' => 'Server bu elementi yayımlamaqdan imtina etdi (HTTP 403). Hesabınızın onu oynatmaq icazəsi olmaya bilər, yaxud server oynatmaya yalnız öz yerli şəbəkəsində icazə verə bilər.',
-			'messages.logsUploaded' => 'Jurnallar yükləndi',
-			'messages.logsUploadFailed' => 'Jurnallar yüklənə bilmədi',
-			'messages.logId' => 'Jurnal ID-si',
 			'messages.burnedSubtitlesUseMenu' => 'Altyazılar bu yayıma həkk edilib. Onları altyazı menyusundan dəyişin.',
 			'messages.noVideoUrl' => 'Video URL-i mövcud deyil',
 			'messages.playbackNoMediaSources' => 'Server oynadıla bilən media mənbəyi qaytarmadı',
@@ -4423,13 +4411,13 @@ extension on TranslationsAz {
 			'profiles.tokenIdentityMismatch' => 'Plex profil tokeni gözlənilməyən serveri müəyyən etdi',
 			'connections.sectionTitle' => 'Qoşulmalar',
 			'connections.addConnection' => 'Qoşulma əlavə et',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Plex ilə daxil olun və ya Jellyfin yaxud Emby serverinə qoşulun',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName} profilinə əlavə et: Plex, Jellyfin, Emby və ya başqa profil qoşulması',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} üçün seansın vaxtı bitdi',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} server üçün seansın vaxtı bitdi',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} bu hesaba girişi rədd etdi',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} server bu hesaba girişi rədd etdi',
 			'connections.signInAgain' => 'Yenidən daxil ol',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '${product} qoşulmasını düzəliş et',
@@ -4667,7 +4655,6 @@ extension on TranslationsAz {
 			'hubDetail.noItemsFound' => 'Element tapılmadı',
 			'logs.clearLogs' => 'Jurnalları təmizlə',
 			'logs.copyLogs' => 'Jurnalları kopyala',
-			'logs.uploadLogs' => 'Jurnalları yüklə',
 			'startup.failedTitle' => 'Satra başlaya bilmədi',
 			'startup.failedBody' => 'Başlatma zamanı nəsə səhv getdi. Aşağıdakı təfərrüatlar nəyin uğursuz olduğunu göstərir.',
 			'startup.failedBodyRepairable' => 'Satra-nin saxlanmış tənzimləmə faylı zədələnib və Satra başlamazdan əvvəl yenidən qurulmalıdır. Təzədən cəhd etmək kömək etməyəcək — Yaddaşı təmir et seçin.',
@@ -4676,7 +4663,6 @@ extension on TranslationsAz {
 			'startup.hideDetails' => 'Təfərrüatları gizlət',
 			'startup.copyDetails' => 'Təfərrüatları kopyala',
 			'startup.detailsCopied' => 'Təfərrüatlar buferə kopyalandı',
-			'startup.uploadDetails' => 'Təfərrüatları yüklə',
 			'startup.repairStorage' => 'Yaddaşı təmir et',
 			'startup.repairTitle' => 'Saxlanmış məlumatlar təmir edilsin?',
 			'startup.repairBodyCommon' => 'Satra-nin tənzimləmə faylı zədələnib və oxuna bilmir. Təmir bütün tənzimləmələri defolt vəziyyətinə sıfırlayır.',
@@ -4937,8 +4923,6 @@ extension on TranslationsAz {
 			'liveTv.recordSettings.skipInLibrary' => 'Kitabxanada artıq olan epizodları ötür',
 			'liveTv.recordSettings.keepUpTo' => 'Saxlanılacaq epizodlar',
 			'liveTv.recordSettings.keepUpToHint' => '0 bütün epizodları saxlayır',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => '${minutes} dəq sonra başlayır',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day}, saat ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} etibarsız Canlı TV oynatma məlumatı qaytardı',
@@ -4946,6 +4930,8 @@ extension on TranslationsAz {
 			'liveTv.failedToBuildStreamUrl' => 'Yayım URL-i yaratmaq olmadı',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kanal başladıla bilmədi: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kanal dəyişdirilə bilmədi: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Kolleksiyalar',
 			'collections.collection' => 'Kolleksiya',
 			'collections.empty' => 'Kolleksiya boşdur',
@@ -5451,8 +5437,6 @@ extension on TranslationsAz {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Proqram təminatı',
 			'performanceOverlay.decoderHardware' => 'Aparat təminatı',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Aktiv',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} uğursuz)',
 			'externalPlayer.title' => 'Xarici oynadıcı',
@@ -5460,6 +5444,8 @@ extension on TranslationsAz {
 			'externalPlayer.useExternalPlayerDescription' => 'Videoları başqa tətbiqdə açın',
 			'externalPlayer.selectPlayer' => 'Oynadıcı seç',
 			'externalPlayer.customPlayers' => 'Xüsusi oynadıcılar',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Sistem defoltu',
 			'externalPlayer.addCustomPlayer' => 'Xüsusi oynadıcı əlavə et',
 			'externalPlayer.playerName' => 'Oynadıcı adı',

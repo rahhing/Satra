@@ -13,7 +13,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/services.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:provider/provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 import 'connection/connection.dart';
 import 'connection/connection_bootstrap.dart';
 import 'connection/connection_registry.dart';
@@ -52,8 +52,6 @@ import 'utils/desktop_ui_scale.dart';
 import 'utils/pointer_scroll_axis.dart';
 import 'services/apple_tv_remote_touch_service.dart';
 import 'services/discord_rpc_service.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as p;
 import 'services/image_cache_service.dart';
 import 'services/app_icon/app_icon_service.dart';
 import 'services/gamepad_service.dart';
@@ -103,7 +101,6 @@ import 'focus/input_mode_tracker.dart';
 import 'focus/key_event_utils.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'utils/navigation_transitions.dart';
-import 'utils/log_redaction_manager.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'utils/android_exit_diagnostics.dart';
 import 'utils/storage_failure.dart';
@@ -115,11 +112,7 @@ import 'utils/dialogs.dart';
 import 'widgets/dialog_action_button.dart';
 import 'widgets/startup_failure_view.dart';
 
-const bool _enableSentry = bool.fromEnvironment('ENABLE_SENTRY', defaultValue: false);
-const String _sentryDsn = 'https://6a1a6ef8c72140099b2798973c1bfb2f@bugs.plezy.app/1';
 const String gitCommit = String.fromEnvironment('GIT_COMMIT');
-const String _sentryEnvironment = String.fromEnvironment('SENTRY_ENVIRONMENT');
-const String _sentryDist = String.fromEnvironment('SENTRY_DIST');
 
 // Workaround for Flutter bug #177992: iPadOS 26.1+ misinterprets fake touch events
 // at (0,0) as barrier taps, causing modals to dismiss immediately.
@@ -257,7 +250,7 @@ const Duration _optionalPhaseTimeout = Duration(seconds: 10);
 
 /// Runs a startup step that the app can survive without.
 ///
-/// Window chrome, locale selection, crash reporting and the artwork cache are
+/// Window chrome, locale selection and the artwork cache are
 /// all degradable; before #1732 any one of them could veto the whole boot —
 /// by throwing, or by never completing.
 Future<void> _optionalGatePhase(
@@ -282,75 +275,7 @@ Future<_StartupDependencies> _initializeApplication() async {
   final settings = await _gatePhase(StartupPhase.preferences, SettingsService.getInstance);
   setLoggerLevel(settings.read(SettingsService.enableDebugLogging));
 
-  if (_enableSentry) {
-    // Crash reporting is observability: it must never veto the launch it
-    // exists to report on. `Sentry.init` runs its integrations eagerly, so an
-    // integration throwing used to fail the gate before any Satra code ran.
-    //
-    // Deliberately no `appRunner`. On every non-web platform `Sentry.init`
-    // reduces it to `await appRunner()` after the integrations — error capture
-    // comes from `OnErrorIntegration`/`PlatformDispatcher.onError`, installed
-    // during init either way. Passing the startup work in would make a startup
-    // failure indistinguishable from a Sentry failure, and this guard would
-    // then run the whole gate — migrations, native recovery, database open —
-    // a second time.
-    await _optionalGatePhase(StartupPhase.crashReporting, () async {
-      final nativeDatabasePath = await _sentryNativeDatabasePath();
-      await SentryFlutter.init((options) {
-        options.dsn = _sentryDsn;
-        options.release = _sentryRelease();
-        if (nativeDatabasePath != null) options.nativeDatabasePath = nativeDatabasePath;
-        if (_sentryEnvironment.isNotEmpty) options.environment = _sentryEnvironment;
-        if (_sentryDist.isNotEmpty) options.dist = _sentryDist;
-        options.tracesSampleRate = 0;
-        options.attachStacktrace = true;
-        options.enableAutoSessionTracking = false;
-        options.recordHttpBreadcrumbs = false;
-        options.captureNativeFailedRequests = false;
-        options.enableAppHangTracking = !kDebugMode;
-        options.appHangTimeoutInterval = const Duration(seconds: 3);
-        options.beforeSend = _beforeSend;
-        options.beforeBreadcrumb = _beforeBreadcrumb;
-      });
-      // Only reached when init really completed; the phase above swallows a
-      // failure or a timeout and would otherwise leave a no-op hub that
-      // accepts events and drops them.
-      _crashReporterReady = true;
-    });
-  }
-
-  // Registered rather than awaited: sending must not sit on the critical path,
-  // but it must finish before the success path consumes the record off disk.
-  // Runs even without Sentry so a build that can never report still resolves
-  // the record instead of carrying it forever.
-  StartupDiagnosticsStore.holdForFlush(flushPendingStartupFailure());
-
-  AndroidExitDiagnostics.markTelemetryReady();
   return _initializeStartup(settings);
-}
-
-/// Release identifier for Sentry.
-///
-/// `PackageInfo.fromPlatform()` reads the executable's Win32 version resource
-/// and throws `WindowsException`/`ArgumentError` when that read fails (UNC
-/// launch, antivirus interception). Official builds always define
-/// `GIT_COMMIT`, so resolve that first and only pay the platform read — inside
-/// a guard — when there is no commit to use.
-String _sentryRelease() {
-  if (gitCommit.length >= 7) return 'satra@${gitCommit.substring(0, 7)}';
-  if (gitCommit.isNotEmpty) return 'satra@$gitCommit';
-  return 'satra@unknown';
-}
-
-Future<String?> _sentryNativeDatabasePath() async {
-  if (kIsWeb || !(Platform.isWindows || Platform.isLinux)) return null;
-  try {
-    final directory = await getApplicationSupportDirectory();
-    return p.join(directory.path, 'sentry-native');
-  } catch (error, stackTrace) {
-    appLogger.d('Sentry native database location unavailable', error: error, stackTrace: stackTrace);
-    return null;
-  }
 }
 
 const startupBootstrapProgressKey = Key('startup-bootstrap-progress');
@@ -364,7 +289,7 @@ String _diagnosticsVersion = gitCommit.isEmpty ? 'unknown' : gitCommit.substring
 /// `PackageInfo.fromPlatform()` reads the executable's Win32 version resource
 /// and throws `WindowsException`/`ArgumentError` when that read fails (a UNC
 /// launch, antivirus interception). It used to run inside the startup gate for
-/// a value only Sentry consumed; here a failure just leaves the commit label.
+/// the version label; here a failure just leaves the commit label.
 Future<void> _primeDiagnosticsVersion() async {
   try {
     final info = await PackageInfo.fromPlatform();
@@ -399,98 +324,6 @@ StartupFailureRecord describeStartupFailure(Object error, StackTrace stackTrace)
   platform: _diagnosticsPlatform(),
   repairable: _isRepairable(error),
 );
-
-/// Whether `SentryFlutter.init` actually completed this launch.
-///
-/// The crash-reporting phase is best-effort, so init can fail or time out and
-/// leave a no-op hub behind. A no-op hub accepts `captureMessage` and returns
-/// an empty id *without throwing*, so "the send did not throw" is not evidence
-/// that anything was sent.
-var _crashReporterReady = false;
-
-/// Sends a persisted startup failure to the crash reporter, once.
-///
-/// Reporting cannot happen where the failure is caught. The gate opens
-/// preferences — the likeliest thing to fail, and the whole reason #1732 has
-/// no telemetry — before crash reporting exists, so a capture there goes to a
-/// no-op hub and is silently dropped. Initialising the reporter first is not
-/// an option either: `_beforeSend` reads the crash-reporting opt-out from
-/// settings, which are not loaded yet, so early events would bypass a user's
-/// choice.
-///
-/// So every failure is persisted first and flushed here, immediately after
-/// the reporter comes up with settings loaded. In practice that is the user's
-/// own retry, seconds later, in the same process.
-///
-/// The record is only marked reported on proof of delivery — a non-empty
-/// Sentry id — or when the user has opted out, which is a deliberate
-/// suppression rather than a failure to retry. Anything else leaves it
-/// pending for the next launch.
-@visibleForTesting
-Future<void> flushPendingStartupFailure({
-  Future<SentryId> Function(StartupFailureRecord record)? send,
-  bool? reporterReady,
-  bool? crashReportingEnabled,
-  bool? reportingCompiledIn,
-}) async {
-  final record = await StartupDiagnosticsStore.peekPersisted();
-  if (record == null || record.reported) return;
-
-  final optedIn = crashReportingEnabled ?? SettingsService.instanceOrNull?.read(SettingsService.crashReporting) ?? true;
-  final canEverReport = reportingCompiledIn ?? _enableSentry;
-  if (!optedIn || !canEverReport) {
-    // Deliberate suppression, not a delivery failure. Marking it reported is
-    // what lets `consumePrevious` eventually drop the file; without this a
-    // fork build with no DSN, or an opted-out user, would carry the record
-    // forever.
-    appLogger.d(
-      optedIn
-          ? 'Startup failure not reported: crash reporting is not available in this build'
-          : 'Startup failure not reported: crash reporting is disabled',
-    );
-    await StartupDiagnosticsStore.markReported(record);
-    return;
-  }
-
-  if (!(reporterReady ?? _crashReporterReady)) {
-    // Kept on disk deliberately: `consumePrevious` retains an unreported
-    // record so the next launch can try again.
-    appLogger.d('Startup failure kept for the next launch: crash reporting is not initialised');
-    return;
-  }
-
-  try {
-    final id = await (send ?? _captureStartupFailure)(record);
-    if (id == const SentryId.empty()) {
-      // A no-op hub, a disabled client, or an event dropped in `beforeSend`.
-      appLogger.d('Startup failure was not accepted by the crash reporter; keeping it for the next launch');
-      return;
-    }
-    await StartupDiagnosticsStore.markReported(record);
-  } catch (error, stackTrace) {
-    // Leave it unreported so the next launch tries again.
-    appLogger.d('Could not report the startup failure', error: error, stackTrace: stackTrace);
-  }
-}
-
-Future<SentryId> _captureStartupFailure(StartupFailureRecord record) {
-  // The original error object is long gone by now; the record is the
-  // allowlisted, already-redacted rendering of it.
-  return Sentry.captureMessage(
-    'Startup failed: ${record.headline}',
-    level: SentryLevel.fatal,
-    withScope: (scope) {
-      scope.setTag('startup.phase', record.phaseId);
-      scope.setContexts('startup', {
-        'phase': record.phaseId,
-        'errorType': record.errorType,
-        'repairable': record.repairable,
-        'when': record.timestamp.toUtc().toIso8601String(),
-        'stackTrace': ?record.stackTrace,
-      });
-    },
-  );
-}
 
 /// Default [StartupBootstrap.repair]: states the cost, runs the repair that
 /// matches the failure, then reports what was kept and what was lost.
@@ -1077,9 +910,7 @@ void _startNonessentialInitialization(SettingsService settings) {
     bestEffort('External player detection', KnownPlayers.getForCurrentPlatform);
   }
 
-  if (settings.read(SettingsService.crashReporting)) {
-    unawaited(AndroidExitDiagnostics.logPreviousExit());
-  }
+  unawaited(AndroidExitDiagnostics.logPreviousExit());
 
   // The startup-gate application can precede the engine's first metrics
   // report, which reads as a 1.0 display budget; re-derive it now that the
@@ -1095,7 +926,6 @@ Future<void> _logEnvironmentDiagnostics() async {
   if (Platform.isAndroid) {
     final rendererName = await const MethodChannel('com.satra/theme').invokeMethod<String>('getRenderer');
     renderer = ' [$rendererName]';
-    await Future.sync(() => Sentry.configureScope((scope) => scope.setTag('renderer', rendererName ?? 'unknown')));
   }
   appLogger.i(
     'Satra v${packageInfo.version}+${packageInfo.buildNumber}$commitSuffix$renderer'
@@ -1108,114 +938,17 @@ Future<void> _logEnvironmentDiagnostics() async {
   }
 }
 
-Breadcrumb? _beforeBreadcrumb(Breadcrumb? breadcrumb, Hint _) {
-  if (breadcrumb == null) return null;
-
-  final message = breadcrumb.message;
-  final data = breadcrumb.data;
-  if (message == null && (data == null || data.isEmpty)) return breadcrumb;
-
-  if (message != null) breadcrumb.message = LogRedactionManager.redact(message);
-  if (data != null) breadcrumb.data = data.map((k, v) => MapEntry(k, v is String ? LogRedactionManager.redact(v) : v));
-  return breadcrumb;
-}
-
-FutureOr<SentryEvent?> _beforeSend(SentryEvent event, Hint _) {
-  // Drop event if user opted out of crash reporting.
-  final instance = SettingsService.instanceOrNull;
-  if (instance != null && !instance.read(SettingsService.crashReporting)) return null;
-
-  // Drop unactionable errors
-  final exceptions = event.exceptions;
-  if (exceptions != null) {
-    bool shouldDrop(SentryException e) {
-      final v = e.value;
-      final lowerValue = v?.toLowerCase();
-      // Windows file-lock errors from cache manager cleanup
-      if (e.type == 'FileSystemException' && v != null && v.contains('plexImageCache') && v.contains('errno = 32')) {
-        return true;
-      }
-      if (e.type == 'FileSystemException' &&
-          lowerValue != null &&
-          lowerValue.contains('cached_network_image_ce') &&
-          (lowerValue.contains('lock failed') || lowerValue.contains('writefrom failed'))) {
-        return true;
-      }
-      // Linux without DBus/NetworkManager
-      if (e.type == 'DBusServiceUnknownException' || (v != null && v.contains('system_bus_socket'))) {
-        return true;
-      }
-      // Device out of disk space
-      if (isStorageFullMessage(v)) return true;
-      // Native HTTP errors from CFNetwork (server errors, not actionable)
-      if (e.type == 'HTTPClientError') return true;
-      // Benign EventChannel teardown race: the engine replies this when a
-      // 'cancel' lands after the stream is already gone, and the framework
-      // reports it via FlutterError — nothing was ever wrong user-side.
-      if (e.type == 'PlatformException' && v != null && v.contains('No active stream to cancel')) return true;
-      // Discord RPC errors when Discord is not running
-      if (e.type == 'DiscordStateException') return true;
-      return false;
-    }
-
-    if (exceptions.any(shouldDrop)) return null;
-
-    // Scrub Plex tokens and server URLs from exception messages
-    for (final e in exceptions) {
-      final value = e.value;
-      if (value != null) {
-        e.value = LogRedactionManager.redact(value);
-      }
-    }
-  }
-
-  // Enrich TimeoutException with operation name + duration as tags/fingerprint.
-  // value format: "TimeoutException after 0:00:05.000000: <operation> timed out"
-  if (exceptions != null) {
-    final timeoutException = exceptions.where((e) => e.type == 'TimeoutException').firstOrNull;
-    if (timeoutException != null) {
-      final value = timeoutException.value ?? '';
-      final colonIdx = value.indexOf(': ');
-      final message = colonIdx >= 0 ? value.substring(colonIdx + 2) : value;
-      final operation = message.endsWith(' timed out')
-          ? message.substring(0, message.length - ' timed out'.length)
-          : null;
-      final durationMatch = RegExp(r'after (\d+:\d{2}:\d{2}\.\d+)').firstMatch(value);
-
-      final tags = event.tags ??= {};
-      if (operation != null) tags['timeout.operation'] = operation;
-      if (durationMatch != null) tags['timeout.duration'] = durationMatch.group(1)!;
-      event.fingerprint = ['TimeoutException', ?operation];
-    }
-  }
-
-  // Scrub breadcrumb messages and data
-  final breadcrumbs = event.breadcrumbs;
-  if (breadcrumbs != null) {
-    for (final b in breadcrumbs) {
-      final message = b.message;
-      final data = b.data;
-      if (message != null) b.message = LogRedactionManager.redact(message);
-      if (data != null) b.data = data.map((k, v) => MapEntry(k, v is String ? LogRedactionManager.redact(v) : v));
-    }
-  }
-
-  return event;
-}
-
 /// Registers notices for code Satra ships outside its pub packages.
 ///
-/// Runs in [main], before `SentryFlutter.init`, and must stay ahead of every
-/// [LicenseRegistry.licenses] reader. Sentry's event enricher walks the
-/// registry for the first captured event, and the registry iterates its live
-/// collector list across each collector's await: a collector added while that
-/// walk is suspended throws `ConcurrentModificationError` on the next step and
-/// the event never finishes enriching. The collectors are lazy, so registering
-/// them here loads nothing until a reader runs.
+/// Registers collectors before anything reads the license registry.
+/// The collectors are lazy and load their content only when needed.
 void _registerAppLicenses() {
   _registerShaderLicenses();
   LicenseRegistry.addLicense(() async* {
     yield LicenseEntryWithLineBreaks(const ['Inter'], await rootBundle.loadString('assets/fonts/OFL.txt'));
+    yield LicenseEntryWithLineBreaks(const [
+      'Plus Jakarta Sans',
+    ], await rootBundle.loadString('assets/fonts/PlusJakartaSans-OFL.txt'));
   });
   // iOS covers iPhone, iPad, and Apple TV; mpv-build links SpatialAudioBridge
   // into libmpv there and not on macOS.
@@ -2280,12 +2013,7 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
     // below. It never skips connecting: `none` means "no internet-capable
     // adapter", and a loopback or LAN-without-WAN server is still reachable
     // (#2505).
-    unawaited(Sentry.addBreadcrumb(Breadcrumb(message: 'Checking network connectivity', category: 'setup')));
     final hasNetwork = !(await ConnectivityProbe.check()).contains(ConnectivityResult.none);
-
-    unawaited(
-      Sentry.addBreadcrumb(Breadcrumb(message: 'Network check done: hasNetwork=$hasNetwork', category: 'setup')),
-    );
 
     _setStatus(t.common.loadingServers);
 
@@ -2302,10 +2030,8 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
     } catch (e, st) {
       // Defence-in-depth: a DB-open failure here used to propagate
       // uncaught and strand the splash forever (#1022). Route to auth so
-      // the user is never trapped, and surface to Sentry so an unknown
-      // regression doesn't go silent.
+      // the user is never trapped; keep the failure in the local log.
       appLogger.e('Setup: failed to load connections; returning to auth', error: e, stackTrace: st);
-      unawaited(Sentry.captureException(e, stackTrace: st));
       if (mounted) {
         unawaited(Navigator.pushReplacement(context, fadeRoute(const AuthScreen())));
       }
@@ -2335,16 +2061,6 @@ class _SetupScreenState extends State<SetupScreen> with MountedSetStateMixin {
       });
     }
 
-    final plexCount = allConnections.whereType<PlexAccountConnection>().fold<int>(0, (n, c) => n + c.servers.length);
-    final mediaBrowserCount = allConnections.whereType<JellyfinConnection>().length;
-    unawaited(
-      Sentry.addBreadcrumb(
-        Breadcrumb(
-          message: 'Handing off to MainScreen with $plexCount Plex + $mediaBrowserCount MediaBrowser server(s)',
-          category: 'setup',
-        ),
-      ),
-    );
     _setStatus(t.common.connectingToServers);
 
     // Snapshot Provider refs before further awaits.

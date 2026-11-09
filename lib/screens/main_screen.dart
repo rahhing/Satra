@@ -231,10 +231,11 @@ class ContentRefreshResumeGate {
   required double currentSideNavigationWidth,
   required double reservedSideNavigationWidth,
   bool dockOnRight = false,
+  double oppositeInset = 0,
 }) {
   return (
-    left: dockOnRight ? 0 : currentSideNavigationWidth,
-    width: (viewportWidth - reservedSideNavigationWidth).clamp(0.0, double.infinity).toDouble(),
+    left: dockOnRight ? oppositeInset : currentSideNavigationWidth,
+    width: (viewportWidth - reservedSideNavigationWidth - oppositeInset).clamp(0.0, double.infinity).toDouble(),
   );
 }
 
@@ -2088,11 +2089,12 @@ class _MainScreenState extends State<MainScreen>
           final alwaysExpanded = SettingsService.instance.read(SettingsService.alwaysKeepSidebarOpen);
           final isDock = !PlatformDetector.isTVDevice();
           final dockOnRight = isDock && SettingsService.instance.read(SettingsService.dockSide) == DockSide.right;
+          final dockEdgeInset = isDock && alwaysExpanded ? 12.0 : 0.0;
           final targetContentOffset = isDock && !alwaysExpanded
               ? SideNavigationRailState.collapsedWidthForContext(context)
-              : _sideNavigationWidth(context, alwaysExpanded: alwaysExpanded);
+              : _sideNavigationWidth(context, alwaysExpanded: alwaysExpanded) + dockEdgeInset;
           final reservedContentOffset = alwaysExpanded
-              ? SideNavigationRailState.expandedWidth
+              ? SideNavigationRailState.expandedWidth + dockEdgeInset
               : SideNavigationRailState.collapsedWidthForContext(context);
 
           return OverlaySheetHost(
@@ -2130,6 +2132,7 @@ class _MainScreenState extends State<MainScreen>
                     currentSideNavigationWidth: targetContentOffset,
                     reservedSideNavigationWidth: reservedContentOffset,
                     dockOnRight: dockOnRight,
+                    oppositeInset: isDock && alwaysExpanded ? 24 : 0,
                   );
                   final contentLeft = contentLayout.left;
                   return MainScreenFocusScope(
@@ -2200,8 +2203,8 @@ class _MainScreenState extends State<MainScreen>
                           Positioned(
                             top: 0,
                             bottom: 0,
-                            left: dockOnRight ? null : 0,
-                            right: dockOnRight ? 0 : null,
+                            left: dockOnRight ? null : dockEdgeInset,
+                            right: dockOnRight ? dockEdgeInset : null,
                             child: Align(
                               widthFactor: 1,
                               alignment: dockOnRight ? Alignment.centerRight : Alignment.centerLeft,

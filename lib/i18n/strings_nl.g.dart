@@ -401,8 +401,6 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Openbare Open Watch Party-relays, tenzij je een eigen relay instelt';
 	@override String get watchTogetherRelayHint => 'https://mijn-relay.voorbeeld.nl';
 	@override String get watchTogetherRelayInvalid => 'Voer een geldige HTTP- of HTTPS-basis-URL voor de relay in.';
-	@override String get crashReporting => 'Crashrapportage';
-	@override String get crashReportingDescription => 'Crashrapporten verzenden om de app te verbeteren';
 	@override String get debugLogging => 'Debuglogboek';
 	@override String get debugLoggingDescription => 'Schakel gedetailleerde logboekregistratie in om problemen op te lossen';
 	@override String get viewLogs => 'Logbestanden bekijken';
@@ -1086,9 +1084,6 @@ class _Translations$messages$nl extends Translations$messages$en {
 	@override String get serverBusyBody => 'De server bleef weigeren dit bestand te streamen (HTTP 503). Mogelijk wordt de server opnieuw opgestart, is deze bezet of is de opslag van het bestand offline. Probeer het over een moment opnieuw — als dit blijft gebeuren, vraag dan de servereigenaar om de server en de opslag van het bestand te controleren.';
 	@override String get playbackNotAllowedTitle => 'Afspelen niet toegestaan';
 	@override String get playbackNotAllowedBody => 'De server weigerde dit item te streamen (HTTP 403). Je account heeft mogelijk geen toestemming om het af te spelen, of de server staat afspelen alleen toe op het eigen lokale netwerk.';
-	@override String get logsUploaded => 'Logbestanden geüpload';
-	@override String get logsUploadFailed => 'Uploaden van logbestanden mislukt';
-	@override String get logId => 'Logboek-ID';
 	@override String get burnedSubtitlesUseMenu => 'De ondertitels zijn in deze stream ingebrand. Wijzig ze via het ondertitelmenu.';
 	@override String get noVideoUrl => 'Geen video-URL beschikbaar';
 	@override String get playbackNoMediaSources => 'De server heeft geen afspeelbare mediabronnen geretourneerd';
@@ -1477,7 +1472,6 @@ class _Translations$logs$nl extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Logbestanden wissen';
 	@override String get copyLogs => 'Logbestanden kopiëren';
-	@override String get uploadLogs => 'Logbestanden uploaden';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$nl extends Translations$startup$en {
 	@override String get hideDetails => 'Details verbergen';
 	@override String get copyDetails => 'Details kopiëren';
 	@override String get detailsCopied => 'Details naar het klembord gekopieerd';
-	@override String get uploadDetails => 'Details uploaden';
 	@override String get repairStorage => 'Opslag repareren';
 	@override String get repairTitle => 'Opgeslagen gegevens repareren?';
 	@override String get repairBodyCommon => 'Het instellingenbestand van Satra is beschadigd en kan niet worden gelezen. Door te repareren worden alle instellingen teruggezet naar hun standaardwaarde.';
@@ -3683,8 +3676,6 @@ extension on TranslationsNl {
 			'settings.watchTogetherRelayDescription' => 'Openbare Open Watch Party-relays, tenzij je een eigen relay instelt',
 			'settings.watchTogetherRelayHint' => 'https://mijn-relay.voorbeeld.nl',
 			'settings.watchTogetherRelayInvalid' => 'Voer een geldige HTTP- of HTTPS-basis-URL voor de relay in.',
-			'settings.crashReporting' => 'Crashrapportage',
-			'settings.crashReportingDescription' => 'Crashrapporten verzenden om de app te verbeteren',
 			'settings.debugLogging' => 'Debuglogboek',
 			'settings.debugLoggingDescription' => 'Schakel gedetailleerde logboekregistratie in om problemen op te lossen',
 			'settings.viewLogs' => 'Logbestanden bekijken',
@@ -3909,10 +3900,10 @@ extension on TranslationsNl {
 			'themeEditor.slots.text' => 'Tekst',
 			'themeEditor.slots.textMuted' => 'Secundaire tekst',
 			'themeEditor.slots.accent' => 'Accent',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Dekking',
 			'themeEditor.hexHint' => '#RRGGBB of #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Uit andere thema\'s',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} van ${theme}',
 			'themeEditor.contrast.textOnBg' => 'Tekst op achtergrond',
@@ -4301,9 +4292,6 @@ extension on TranslationsNl {
 			'messages.serverBusyBody' => 'De server bleef weigeren dit bestand te streamen (HTTP 503). Mogelijk wordt de server opnieuw opgestart, is deze bezet of is de opslag van het bestand offline. Probeer het over een moment opnieuw — als dit blijft gebeuren, vraag dan de servereigenaar om de server en de opslag van het bestand te controleren.',
 			'messages.playbackNotAllowedTitle' => 'Afspelen niet toegestaan',
 			'messages.playbackNotAllowedBody' => 'De server weigerde dit item te streamen (HTTP 403). Je account heeft mogelijk geen toestemming om het af te spelen, of de server staat afspelen alleen toe op het eigen lokale netwerk.',
-			'messages.logsUploaded' => 'Logbestanden geüpload',
-			'messages.logsUploadFailed' => 'Uploaden van logbestanden mislukt',
-			'messages.logId' => 'Logboek-ID',
 			'messages.burnedSubtitlesUseMenu' => 'De ondertitels zijn in deze stream ingebrand. Wijzig ze via het ondertitelmenu.',
 			'messages.noVideoUrl' => 'Geen video-URL beschikbaar',
 			'messages.playbackNoMediaSources' => 'De server heeft geen afspeelbare mediabronnen geretourneerd',
@@ -4423,13 +4411,13 @@ extension on TranslationsNl {
 			'profiles.tokenIdentityMismatch' => 'Het token van het Plex-profiel bleek bij een onverwachte server te horen',
 			'connections.sectionTitle' => 'Verbindingen',
 			'connections.addConnection' => 'Verbinding toevoegen',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Meld je aan met Plex of verbind een Jellyfin- of Emby-server',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Toevoegen aan ${displayName}: Plex, Jellyfin, Emby of een andere profielverbinding',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessie verlopen voor ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessie verlopen voor ${count} servers',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} weigerde toegang voor dit account',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servers weigerden toegang voor dit account',
 			'connections.signInAgain' => 'Opnieuw aanmelden',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '${product}-verbinding bewerken',
@@ -4667,7 +4655,6 @@ extension on TranslationsNl {
 			'hubDetail.noItemsFound' => 'Geen items gevonden',
 			'logs.clearLogs' => 'Logbestanden wissen',
 			'logs.copyLogs' => 'Logbestanden kopiëren',
-			'logs.uploadLogs' => 'Logbestanden uploaden',
 			'startup.failedTitle' => 'Satra kon niet starten',
 			'startup.failedBody' => 'Er is iets misgegaan tijdens het opstarten. De onderstaande details laten zien wat er misging.',
 			'startup.failedBodyRepairable' => 'Het opgeslagen instellingenbestand van Satra is beschadigd en moet opnieuw worden opgebouwd voordat Satra kan starten. Opnieuw proberen helpt niet — kies \'Opslag repareren\'.',
@@ -4676,7 +4663,6 @@ extension on TranslationsNl {
 			'startup.hideDetails' => 'Details verbergen',
 			'startup.copyDetails' => 'Details kopiëren',
 			'startup.detailsCopied' => 'Details naar het klembord gekopieerd',
-			'startup.uploadDetails' => 'Details uploaden',
 			'startup.repairStorage' => 'Opslag repareren',
 			'startup.repairTitle' => 'Opgeslagen gegevens repareren?',
 			'startup.repairBodyCommon' => 'Het instellingenbestand van Satra is beschadigd en kan niet worden gelezen. Door te repareren worden alle instellingen teruggezet naar hun standaardwaarde.',
@@ -4937,8 +4923,6 @@ extension on TranslationsNl {
 			'liveTv.recordSettings.skipInLibrary' => 'Afleveringen overslaan die al in de bibliotheek staan',
 			'liveTv.recordSettings.keepUpTo' => 'Te bewaren afleveringen',
 			'liveTv.recordSettings.keepUpToHint' => '0 bewaart alle afleveringen',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Begint over ${minutes} min',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} om ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} heeft ongeldige afspeelgegevens voor Live-tv geretourneerd',
@@ -4946,6 +4930,8 @@ extension on TranslationsNl {
 			'liveTv.failedToBuildStreamUrl' => 'Kon de stream-URL niet samenstellen',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kon het kanaal niet starten: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kon niet van kanaal wisselen: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Collecties',
 			'collections.collection' => 'Collectie',
 			'collections.empty' => 'Collectie is leeg',
@@ -5451,8 +5437,6 @@ extension on TranslationsNl {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Software',
 			'performanceOverlay.decoderHardware' => 'Hardware',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Actief',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} mislukt)',
 			'externalPlayer.title' => 'Externe speler',
@@ -5460,6 +5444,8 @@ extension on TranslationsNl {
 			'externalPlayer.useExternalPlayerDescription' => 'Open video\'s in een andere app',
 			'externalPlayer.selectPlayer' => 'Speler selecteren',
 			'externalPlayer.customPlayers' => 'Aangepaste spelers',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Systeemstandaard',
 			'externalPlayer.addCustomPlayer' => 'Aangepaste speler toevoegen',
 			'externalPlayer.playerName' => 'Spelernaam',

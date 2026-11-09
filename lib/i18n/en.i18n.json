@@ -310,8 +310,8 @@
     "watchTogetherRelayDescription": "Public Open Watch Party relays unless you set your own",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Enter a valid HTTP or HTTPS relay base URL.",
-    "crashReporting": "Crash Reporting",
-    "crashReportingDescription": "Send crash reports to help improve the app",
+
+
     "debugLogging": "Debug Logging",
     "debugLoggingDescription": "Enable detailed logging for troubleshooting",
     "viewLogs": "View Logs",
@@ -972,9 +972,8 @@
     "serverBusyBody": "The server kept refusing to stream this file (HTTP 503). It may be restarting, busy, or the file's storage may be offline. Try again in a moment — if it keeps happening, ask the server owner to check the server and the file's storage.",
     "playbackNotAllowedTitle": "Playback not allowed",
     "playbackNotAllowedBody": "The server refused to stream this item (HTTP 403). Your account may not have permission to play it, or the server may only allow playback on its local network.",
-    "logsUploaded": "Logs uploaded",
-    "logsUploadFailed": "Failed to upload logs",
-    "logId": "Log ID",
+
+
     "burnedSubtitlesUseMenu": "Subtitles are burned into this stream. Change them from the subtitle menu.",
     "noVideoUrl": "No video URL available",
     "playbackNoMediaSources": "The server returned no playable media sources",
@@ -1392,8 +1391,8 @@
   },
   "logs": {
     "clearLogs": "Clear Logs",
-    "copyLogs": "Copy Logs",
-    "uploadLogs": "Upload Logs"
+    "copyLogs": "Copy Logs"
+
   },
   "startup": {
     "failedTitle": "Satra could not start",
@@ -1404,7 +1403,7 @@
     "hideDetails": "Hide details",
     "copyDetails": "Copy details",
     "detailsCopied": "Details copied to clipboard",
-    "uploadDetails": "Upload details",
+
     "repairStorage": "Repair storage",
     "repairTitle": "Repair stored data?",
     "repairBodyCommon": "Satra's settings file is damaged and cannot be read. Repairing resets every setting to its default.",

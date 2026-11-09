@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 
 import 'app_logger.dart';
 import 'device_channel.dart';
@@ -53,13 +51,6 @@ abstract final class AndroidExitDiagnostics {
     'other',
   };
 
-  /// Exits that are failures wherever the process was. Every other reason is
-  /// reported only when the viewer could see or hear the app die.
-  static const _failureReasons = {'crash', 'native_crash', 'anr', 'initialization_failure', 'excessive_resource_usage'};
-
-  /// Android's `IMPORTANCE_PERCEPTIBLE` (picture-in-picture, background
-  /// playback). Lower values are more important; foreground is 100.
-  static const _importancePerceptible = 230;
   static const _allowedAbis = {'arm64-v8a', 'armeabi-v7a', 'x86_64', 'x86', 'unknown'};
   static const _allowedCodecContexts = {
     'audio:aac',
@@ -92,21 +83,8 @@ abstract final class AndroidExitDiagnostics {
   static final _descriptionPattern = RegExp(r'^[A-Za-z0-9 _.:,()\[\]#<>/=-]{1,120}$');
   static const _maxMemoryKb = 64 * 1024 * 1024;
   static final _startupWatch = Stopwatch()..start();
-  static final List<({String phase, int elapsedMs})> _pendingBreadcrumbs = [];
-  static var _telemetryReady = false;
   static var _nativeOnCreateRecorded = false;
   static var _lastElapsedMs = 0;
-
-  /// Flushes phase breadcrumbs recorded before Sentry's app runner started.
-  static void markTelemetryReady() {
-    if (_telemetryReady) return;
-    _telemetryReady = true;
-    final pending = List.of(_pendingBreadcrumbs);
-    _pendingBreadcrumbs.clear();
-    for (final mark in pending) {
-      _sendBreadcrumb(mark.phase, mark.elapsedMs);
-    }
-  }
 
   /// Persists and records one fixed, privacy-safe startup phase.
   static void markStartupPhase(AndroidStartupPhase phase) {
@@ -133,27 +111,6 @@ abstract final class AndroidExitDiagnostics {
     } catch (_) {
       // Local logging is best-effort.
     }
-    if (_telemetryReady) {
-      _sendBreadcrumb(phase, elapsedMs);
-    } else {
-      _pendingBreadcrumbs.add((phase: phase, elapsedMs: elapsedMs));
-    }
-  }
-
-  static void _sendBreadcrumb(String phase, int elapsedMs) {
-    try {
-      unawaited(
-        Sentry.addBreadcrumb(
-          Breadcrumb(
-            message: 'Startup phase $phase',
-            category: 'startup.phase',
-            data: {'phase': phase, 'elapsedMs': elapsedMs},
-          ),
-        ).catchError((_) {}),
-      );
-    } catch (_) {
-      // Breadcrumb emission is best-effort.
-    }
   }
 
   static Future<void> _persistStartupPhase(String phase) async {
@@ -173,8 +130,7 @@ abstract final class AndroidExitDiagnostics {
     }
   }
 
-  /// Records a native-sanitized previous-exit report in local logs, and in
-  /// Sentry when [sentryMessageFor] selects it.
+  /// Records a native-sanitized previous-exit report in local logs.
   ///
   /// Native persistence makes this one-shot across launches. Every failure is
   /// intentionally contained because historical diagnostics must not affect
@@ -203,31 +159,9 @@ abstract final class AndroidExitDiagnostics {
         'normalization=${report['normalizationEnabled'] ?? 'omitted'} '
         'uiState=${report['uiState'] ?? 'omitted'}',
       );
-      final message = sentryMessageFor(report);
-      if (message == null) return;
-      await Sentry.captureMessage(
-        message,
-        level: SentryLevel.warning,
-        withScope: (scope) => scope.setContexts('android_previous_exit', report),
-      );
     } catch (_) {
       // Historical diagnostics are best-effort and must never escape startup.
     }
-  }
-
-  /// The Sentry message for an exit worth an event, or null for a routine one.
-  ///
-  /// Android kills cached processes all the time - for memory, for idling, or
-  /// because the user cleared recents - so a background exit is only news when
-  /// it is a failure. The reason is part of the message so that each reason
-  /// groups into its own issue.
-  @visibleForTesting
-  static String? sentryMessageFor(Map<String, Object?> report) {
-    final reason = report['reason'];
-    final importance = report['importance'];
-    if (reason is! String || importance is! int) return null;
-    if (!_failureReasons.contains(reason) && importance > _importancePerceptible) return null;
-    return 'Previous Android application exit: $reason';
   }
 
   static Map<String, Object?>? _validate(Map<String, Object?>? raw) {

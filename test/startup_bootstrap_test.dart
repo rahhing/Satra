@@ -464,7 +464,6 @@ void main() {
     // Copy and Upload stay live — the whole point of the failure screen is
     // that a stuck user can still get the diagnostic out.
     expect(find.byKey(startupFailureCopyKey), findsOneWidget);
-    expect(find.byKey(startupFailureUploadKey), findsOneWidget);
   });
 
   testWidgets('repair receives a context below the bootstrap MaterialApp that can show its dialogs', (tester) async {
@@ -531,10 +530,7 @@ void main() {
     await tester.pumpAndSettle();
   });
 
-  testWidgets('persists the failure so it can be reported once the reporter is up', (tester) async {
-    // Not reported inline: the earliest gate phases run before crash
-    // reporting exists, so an inline capture would reach a no-op hub and be
-    // discarded. The record is held for `flushPendingStartupFailure` (#1732).
+  testWidgets('persists the failure for local diagnostics', (tester) async {
     StartupDiagnosticsStore.resetForTesting();
     addTearDown(StartupDiagnosticsStore.resetForTesting);
 
@@ -547,7 +543,6 @@ void main() {
     await tester.pump();
 
     expect(StartupDiagnosticsStore.pending?.phase, StartupPhase.storage);
-    expect(StartupDiagnosticsStore.pending?.reported, isFalse);
   });
 
   testWidgets('retry clears the failed generation and can commit a later success', (tester) async {

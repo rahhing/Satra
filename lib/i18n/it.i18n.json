@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Relay pubblici di Open Watch Party, se non ne imposti uno tuo",
     "watchTogetherRelayHint": "https://mio-relay.esempio.it",
     "watchTogetherRelayInvalid": "Inserisci un URL di base HTTP o HTTPS valido per il relay.",
-    "crashReporting": "Segnalazione degli arresti anomali",
-    "crashReportingDescription": "Invia segnalazioni sugli arresti anomali per contribuire a migliorare l'app",
+
+
     "debugLogging": "Registrazione di debug",
     "debugLoggingDescription": "Abilita una registrazione dettagliata per la risoluzione dei problemi",
     "viewLogs": "Visualizza i log",
@@ -970,9 +970,8 @@
     "serverBusyBody": "Il server ha continuato a rifiutare la riproduzione in streaming di questo file (HTTP 503). Potrebbe essere in fase di riavvio, occupato oppure l'unità in cui si trova il file potrebbe essere offline. Riprova tra qualche istante. Se il problema persiste, chiedi al proprietario del server di controllare il server e l'unità di archiviazione del file.",
     "playbackNotAllowedTitle": "Riproduzione non consentita",
     "playbackNotAllowedBody": "Il server ha rifiutato lo streaming di questo elemento (HTTP 403). Il tuo account potrebbe non avere l'autorizzazione per riprodurlo, oppure il server potrebbe consentire la riproduzione solo sulla sua rete locale.",
-    "logsUploaded": "Log caricati",
-    "logsUploadFailed": "Impossibile caricare i log",
-    "logId": "ID log",
+
+
     "burnedSubtitlesUseMenu": "I sottotitoli sono incorporati in questo stream. Cambiali dal menu dei sottotitoli.",
     "noVideoUrl": "Nessun URL video disponibile",
     "playbackNoMediaSources": "Il server non ha restituito sorgenti multimediali riproducibili",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Cancella log",
-    "copyLogs": "Copia log",
-    "uploadLogs": "Carica log"
+    "copyLogs": "Copia log"
+
   },
   "startup": {
     "failedTitle": "Satra non ha potuto avviarsi",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Nascondi dettagli",
     "copyDetails": "Copia dettagli",
     "detailsCopied": "Dettagli copiati negli appunti",
-    "uploadDetails": "Carica dettagli",
+
     "repairStorage": "Ripara storage",
     "repairTitle": "Riparare i dati archiviati?",
     "repairBodyCommon": "Il file delle impostazioni di Satra è danneggiato e non può essere letto. La riparazione ripristina ogni impostazione al suo valore predefinito.",

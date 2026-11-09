@@ -401,8 +401,6 @@ class _Translations$settings$bg extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Публичните релейни сървъри на Open Watch Party, освен ако не зададете свой';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => 'Въведете валиден основен HTTP или HTTPS URL адрес на релейния сървър.';
-	@override String get crashReporting => 'Докладване на сривове';
-	@override String get crashReportingDescription => 'Изпращай доклади за сривове, за да помогнеш за подобряване на приложението';
 	@override String get debugLogging => 'Логове за отстраняване на грешки';
 	@override String get debugLoggingDescription => 'Включи подробни логове за диагностика';
 	@override String get viewLogs => 'Виж логовете';
@@ -1086,9 +1084,6 @@ class _Translations$messages$bg extends Translations$messages$en {
 	@override String get serverBusyBody => 'Сървърът многократно отказа да предава този файл поточно (HTTP 503). Възможно е да се рестартира, да е зает или хранилището на файла да е офлайн. Опитайте отново след малко — ако проблемът продължи, помолете собственика на сървъра да провери сървъра и хранилището на файла.';
 	@override String get playbackNotAllowedTitle => 'Възпроизвеждането не е разрешено';
 	@override String get playbackNotAllowedBody => 'Сървърът отказа да предава този елемент поточно (HTTP 403). Възможно е профилът ви да няма разрешение да го възпроизвежда или сървърът да позволява възпроизвеждане само в локалната си мрежа.';
-	@override String get logsUploaded => 'Логовете са качени';
-	@override String get logsUploadFailed => 'Неуспешно качване на логовете';
-	@override String get logId => 'ID на лога';
 	@override String get burnedSubtitlesUseMenu => 'Субтитрите са вградени в този поток. Променете ги от менюто за субтитри.';
 	@override String get noVideoUrl => 'Няма наличен URL за видеото';
 	@override String get playbackNoMediaSources => 'Сървърът не върна медийни източници, годни за възпроизвеждане';
@@ -1477,7 +1472,6 @@ class _Translations$logs$bg extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Изчисти логовете';
 	@override String get copyLogs => 'Копирай логовете';
-	@override String get uploadLogs => 'Качи логовете';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$bg extends Translations$startup$en {
 	@override String get hideDetails => 'Скрий детайлите';
 	@override String get copyDetails => 'Копирай детайлите';
 	@override String get detailsCopied => 'Детайлите са копирани в клипборда';
-	@override String get uploadDetails => 'Качи детайлите';
 	@override String get repairStorage => 'Ремонт на хранилището';
 	@override String get repairTitle => 'Да ремонтирам ли съхранените данни?';
 	@override String get repairBodyCommon => 'Файлът с настройки на Satra е повреден и не може да бъде прочетен. Ремонтът връща всяка настройка към стойността ѝ по подразбиране.';
@@ -3683,8 +3676,6 @@ extension on TranslationsBg {
 			'settings.watchTogetherRelayDescription' => 'Публичните релейни сървъри на Open Watch Party, освен ако не зададете свой',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => 'Въведете валиден основен HTTP или HTTPS URL адрес на релейния сървър.',
-			'settings.crashReporting' => 'Докладване на сривове',
-			'settings.crashReportingDescription' => 'Изпращай доклади за сривове, за да помогнеш за подобряване на приложението',
 			'settings.debugLogging' => 'Логове за отстраняване на грешки',
 			'settings.debugLoggingDescription' => 'Включи подробни логове за диагностика',
 			'settings.viewLogs' => 'Виж логовете',
@@ -3909,10 +3900,10 @@ extension on TranslationsBg {
 			'themeEditor.slots.text' => 'Текст',
 			'themeEditor.slots.textMuted' => 'Вторичен текст',
 			'themeEditor.slots.accent' => 'Акцент',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Непрозрачност',
 			'themeEditor.hexHint' => '#RRGGBB или #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'От други теми',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Текст върху фона',
@@ -4301,9 +4292,6 @@ extension on TranslationsBg {
 			'messages.serverBusyBody' => 'Сървърът многократно отказа да предава този файл поточно (HTTP 503). Възможно е да се рестартира, да е зает или хранилището на файла да е офлайн. Опитайте отново след малко — ако проблемът продължи, помолете собственика на сървъра да провери сървъра и хранилището на файла.',
 			'messages.playbackNotAllowedTitle' => 'Възпроизвеждането не е разрешено',
 			'messages.playbackNotAllowedBody' => 'Сървърът отказа да предава този елемент поточно (HTTP 403). Възможно е профилът ви да няма разрешение да го възпроизвежда или сървърът да позволява възпроизвеждане само в локалната си мрежа.',
-			'messages.logsUploaded' => 'Логовете са качени',
-			'messages.logsUploadFailed' => 'Неуспешно качване на логовете',
-			'messages.logId' => 'ID на лога',
 			'messages.burnedSubtitlesUseMenu' => 'Субтитрите са вградени в този поток. Променете ги от менюто за субтитри.',
 			'messages.noVideoUrl' => 'Няма наличен URL за видеото',
 			'messages.playbackNoMediaSources' => 'Сървърът не върна медийни източници, годни за възпроизвеждане',
@@ -4423,13 +4411,13 @@ extension on TranslationsBg {
 			'profiles.tokenIdentityMismatch' => 'Токенът на профила в Plex съответства на неочакван сървър',
 			'connections.sectionTitle' => 'Връзки',
 			'connections.addConnection' => 'Добави връзка',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Влезте с Plex или свържете Jellyfin или Emby сървър',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Добави към ${displayName}: Plex, Jellyfin, Emby или връзка от друг профил',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Сесията за ${name} е изтекла',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Сесиите за ${count} сървъра са изтекли',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} отказа достъп за този профил',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} сървъра отказаха достъп за този профил',
 			'connections.signInAgain' => 'Влез отново',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Редактирай връзката с ${product}',
@@ -4667,7 +4655,6 @@ extension on TranslationsBg {
 			'hubDetail.noItemsFound' => 'Няма намерени елементи',
 			'logs.clearLogs' => 'Изчисти логовете',
 			'logs.copyLogs' => 'Копирай логовете',
-			'logs.uploadLogs' => 'Качи логовете',
 			'startup.failedTitle' => 'Satra не можа да стартира',
 			'startup.failedBody' => 'Нещо се обърка по време на стартирането. Детайлите по-долу показват какво е причинило грешката.',
 			'startup.failedBodyRepairable' => 'Запазеният файл с настройки на Satra е повреден и трябва да бъде възстановен, преди Satra да стартира. Повторните опити няма да помогнат — изберете „Ремонт на хранилището“.',
@@ -4676,7 +4663,6 @@ extension on TranslationsBg {
 			'startup.hideDetails' => 'Скрий детайлите',
 			'startup.copyDetails' => 'Копирай детайлите',
 			'startup.detailsCopied' => 'Детайлите са копирани в клипборда',
-			'startup.uploadDetails' => 'Качи детайлите',
 			'startup.repairStorage' => 'Ремонт на хранилището',
 			'startup.repairTitle' => 'Да ремонтирам ли съхранените данни?',
 			'startup.repairBodyCommon' => 'Файлът с настройки на Satra е повреден и не може да бъде прочетен. Ремонтът връща всяка настройка към стойността ѝ по подразбиране.',
@@ -4937,8 +4923,6 @@ extension on TranslationsBg {
 			'liveTv.recordSettings.skipInLibrary' => 'Пропускане на епизоди, които вече са в библиотеката',
 			'liveTv.recordSettings.keepUpTo' => 'Епизоди за запазване',
 			'liveTv.recordSettings.keepUpToHint' => '0 запазва всички епизоди',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Започва след ${minutes} мин',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} в ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} върна невалидни данни за възпроизвеждане на телевизия на живо',
@@ -4946,6 +4930,8 @@ extension on TranslationsBg {
 			'liveTv.failedToBuildStreamUrl' => 'URL за потока не можа да бъде създаден',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Каналът не можа да бъде стартиран: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Каналът не можа да бъде сменен: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Колекции',
 			'collections.collection' => 'Колекция',
 			'collections.empty' => 'Колекцията е празна',
@@ -5451,8 +5437,6 @@ extension on TranslationsBg {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Софтуерен',
 			'performanceOverlay.decoderHardware' => 'Хардуерен',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Активно',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (неуспешни: ${failures})',
 			'externalPlayer.title' => 'Външен плеър',
@@ -5460,6 +5444,8 @@ extension on TranslationsBg {
 			'externalPlayer.useExternalPlayerDescription' => 'Отваряй видеата в друго приложение',
 			'externalPlayer.selectPlayer' => 'Избери плейър',
 			'externalPlayer.customPlayers' => 'Потребителски плейъри',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Системен по подразбиране',
 			'externalPlayer.addCustomPlayer' => 'Добави потребителски плейър',
 			'externalPlayer.playerName' => 'Име на плейъра',

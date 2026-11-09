@@ -111,7 +111,6 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
   static const _kVideoPlayerControls = 'video_player_controls';
   static const _kVideoPlayerNavigation = 'video_player_navigation';
   static const _kCompanionRemoteServer = 'companion_remote_server';
-  static const _kCrashReporting = 'crash_reporting';
   static const _kDebugLogging = 'debug_logging';
   static const _kAutoHidePerformanceOverlay = 'auto_hide_performance_overlay';
   static const _kViewLogs = 'view_logs';
@@ -430,10 +429,11 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
       icon: Symbols.group_rounded,
       title: t.profiles.sectionTitle,
       subtitle: subtitle,
-      onTap: () => Navigator.of(
-        context,
-        rootNavigator: true,
-      ).push(MaterialPageRoute(builder: (_) => const ProfileSwitchScreen())),
+      onTap: () => Navigator.of(context, rootNavigator: true).push(
+        PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()
+            ? utilityPanelRoute(child: const ProfileSwitchScreen())
+            : MaterialPageRoute(builder: (_) => const ProfileSwitchScreen()),
+      ),
     );
   }
 
@@ -577,13 +577,6 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           onTap: () => _showRelayUrlDialog(),
         ),
         SettingSwitchTile(
-          focusNode: _focusTracker.get(_kCrashReporting),
-          pref: settings.SettingsService.crashReporting,
-          icon: Symbols.monitoring_rounded,
-          title: t.settings.crashReporting,
-          subtitle: t.settings.crashReportingDescription,
-        ),
-        SettingSwitchTile(
           focusNode: _focusTracker.get(_kDebugLogging),
           pref: settings.SettingsService.enableDebugLogging,
           icon: Symbols.bug_report_rounded,
@@ -618,15 +611,6 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
           subtitle: t.settings.resetSettingsDescription,
           onTap: () => _showResetSettingsDialog(),
         ),
-        if (kDebugMode)
-          SettingNavigationTile(
-            icon: Symbols.error_rounded,
-            title: 'Test Sentry',
-            subtitle: 'Send a test error',
-            onTap: () {
-              throw Exception("Example exception");
-            },
-          ),
         if (kDebugMode)
           SettingNavigationTile(
             icon: Symbols.timer_rounded,

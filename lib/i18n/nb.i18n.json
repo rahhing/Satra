@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Offentlige Open Watch Party-reléservere, med mindre du angir din egen",
     "watchTogetherRelayHint": "https://min-relay.eksempel.no",
     "watchTogetherRelayInvalid": "Angi en gyldig HTTP- eller HTTPS-adresse til reléserveren.",
-    "crashReporting": "Krasjrapportering",
-    "crashReportingDescription": "Send krasjrapporter for å hjelpe med å forbedre appen",
+
+
     "debugLogging": "Feilsøkingslogging",
     "debugLoggingDescription": "Aktiver detaljert logging for feilsøking",
     "viewLogs": "Vis logger",
@@ -970,9 +970,8 @@
     "serverBusyBody": "Serveren fortsatte å nekte å strømme denne filen (HTTP 503). Den kan være i ferd med å starte på nytt eller være opptatt, eller lagringsstedet til filen kan være frakoblet. Prøv igjen om litt – hvis det fortsetter å skje, kan du be eieren av serveren om å kontrollere serveren og lagringsstedet til filen.",
     "playbackNotAllowedTitle": "Avspilling er ikke tillatt",
     "playbackNotAllowedBody": "Serveren nektet å strømme dette elementet (HTTP 403). Kontoen din har kanskje ikke tillatelse til å spille det av, eller serveren tillater kanskje bare avspilling på sitt lokale nettverk.",
-    "logsUploaded": "Logger lastet opp",
-    "logsUploadFailed": "Kunne ikke laste opp logger",
-    "logId": "Logg-ID",
+
+
     "burnedSubtitlesUseMenu": "Undertekstene er brent inn i denne strømmen. Endre dem fra undertekstmenyen.",
     "noVideoUrl": "Ingen video-URL er tilgjengelig",
     "playbackNoMediaSources": "Serveren returnerte ingen avspillbare mediekilder",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Tøm logger",
-    "copyLogs": "Kopier logger",
-    "uploadLogs": "Last opp logger"
+    "copyLogs": "Kopier logger"
+
   },
   "startup": {
     "failedTitle": "Satra kunne ikke starte",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Skjul detaljer",
     "copyDetails": "Kopier detaljer",
     "detailsCopied": "Detaljer kopiert til utklippstavlen",
-    "uploadDetails": "Last opp detaljer",
+
     "repairStorage": "Reparer lagring",
     "repairTitle": "Reparere lagrede data?",
     "repairBodyCommon": "Satra's innstillingsfil er skadet og kan ikke leses. Reparasjon tilbakestiller alle innstillinger til standard.",

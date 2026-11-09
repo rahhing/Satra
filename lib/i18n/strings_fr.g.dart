@@ -401,8 +401,6 @@ class _Translations$settings$fr extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Relais publics Open Watch Party, sauf si vous définissez le vôtre';
 	@override String get watchTogetherRelayHint => 'https://mon-relais.exemple.fr';
 	@override String get watchTogetherRelayInvalid => 'Saisissez une URL de base HTTP ou HTTPS valide pour le relais.';
-	@override String get crashReporting => 'Rapports de plantage';
-	@override String get crashReportingDescription => 'Envoyer des rapports de plantage pour améliorer l\'application';
 	@override String get debugLogging => 'Journalisation de débogage';
 	@override String get debugLoggingDescription => 'Activer la journalisation détaillée pour le dépannage';
 	@override String get viewLogs => 'Voir les journaux';
@@ -1086,9 +1084,6 @@ class _Translations$messages$fr extends Translations$messages$en {
 	@override String get serverBusyBody => 'Le serveur a refusé à plusieurs reprises de diffuser ce fichier (HTTP 503). Il est peut-être en cours de redémarrage ou occupé, ou le stockage du fichier est peut-être hors ligne. Réessayez dans un instant. Si le problème persiste, demandez au propriétaire du serveur de vérifier le serveur et le stockage du fichier.';
 	@override String get playbackNotAllowedTitle => 'Lecture non autorisée';
 	@override String get playbackNotAllowedBody => 'Le serveur a refusé de diffuser cet élément (HTTP 403). Votre compte n\'a peut-être pas l\'autorisation de le lire, ou le serveur n\'autorise peut-être la lecture que sur son réseau local.';
-	@override String get logsUploaded => 'Journaux envoyés';
-	@override String get logsUploadFailed => 'Échec de l’envoi des journaux';
-	@override String get logId => 'Identifiant du journal';
 	@override String get burnedSubtitlesUseMenu => 'Les sous-titres sont incrustés à l’image de ce flux. Modifiez-les depuis le menu des sous-titres.';
 	@override String get noVideoUrl => 'Aucune URL vidéo disponible';
 	@override String get playbackNoMediaSources => 'Le serveur n’a renvoyé aucune source multimédia lisible';
@@ -1477,7 +1472,6 @@ class _Translations$logs$fr extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Effacer les journaux';
 	@override String get copyLogs => 'Copier les journaux';
-	@override String get uploadLogs => 'Envoyer les journaux';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$fr extends Translations$startup$en {
 	@override String get hideDetails => 'Masquer les détails';
 	@override String get copyDetails => 'Copier les détails';
 	@override String get detailsCopied => 'Détails copiés dans le presse-papiers';
-	@override String get uploadDetails => 'Téléverser les détails';
 	@override String get repairStorage => 'Réparer le stockage';
 	@override String get repairTitle => 'Réparer les données stockées ?';
 	@override String get repairBodyCommon => 'Le fichier de paramètres de Satra est endommagé et illisible. La réparation rétablit tous les paramètres par défaut.';
@@ -3683,8 +3676,6 @@ extension on TranslationsFr {
 			'settings.watchTogetherRelayDescription' => 'Relais publics Open Watch Party, sauf si vous définissez le vôtre',
 			'settings.watchTogetherRelayHint' => 'https://mon-relais.exemple.fr',
 			'settings.watchTogetherRelayInvalid' => 'Saisissez une URL de base HTTP ou HTTPS valide pour le relais.',
-			'settings.crashReporting' => 'Rapports de plantage',
-			'settings.crashReportingDescription' => 'Envoyer des rapports de plantage pour améliorer l\'application',
 			'settings.debugLogging' => 'Journalisation de débogage',
 			'settings.debugLoggingDescription' => 'Activer la journalisation détaillée pour le dépannage',
 			'settings.viewLogs' => 'Voir les journaux',
@@ -3909,10 +3900,10 @@ extension on TranslationsFr {
 			'themeEditor.slots.text' => 'Texte',
 			'themeEditor.slots.textMuted' => 'Texte secondaire',
 			'themeEditor.slots.accent' => 'Accent',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Opacité',
 			'themeEditor.hexHint' => '#RRGGBB ou #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Dans les autres thèmes',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} du thème ${theme}',
 			'themeEditor.contrast.textOnBg' => 'Texte sur l’arrière-plan',
@@ -4301,9 +4292,6 @@ extension on TranslationsFr {
 			'messages.serverBusyBody' => 'Le serveur a refusé à plusieurs reprises de diffuser ce fichier (HTTP 503). Il est peut-être en cours de redémarrage ou occupé, ou le stockage du fichier est peut-être hors ligne. Réessayez dans un instant. Si le problème persiste, demandez au propriétaire du serveur de vérifier le serveur et le stockage du fichier.',
 			'messages.playbackNotAllowedTitle' => 'Lecture non autorisée',
 			'messages.playbackNotAllowedBody' => 'Le serveur a refusé de diffuser cet élément (HTTP 403). Votre compte n\'a peut-être pas l\'autorisation de le lire, ou le serveur n\'autorise peut-être la lecture que sur son réseau local.',
-			'messages.logsUploaded' => 'Journaux envoyés',
-			'messages.logsUploadFailed' => 'Échec de l’envoi des journaux',
-			'messages.logId' => 'Identifiant du journal',
 			'messages.burnedSubtitlesUseMenu' => 'Les sous-titres sont incrustés à l’image de ce flux. Modifiez-les depuis le menu des sous-titres.',
 			'messages.noVideoUrl' => 'Aucune URL vidéo disponible',
 			'messages.playbackNoMediaSources' => 'Le serveur n’a renvoyé aucune source multimédia lisible',
@@ -4423,13 +4411,13 @@ extension on TranslationsFr {
 			'profiles.tokenIdentityMismatch' => 'Le jeton du profil Plex correspond à un serveur inattendu',
 			'connections.sectionTitle' => 'Connexions',
 			'connections.addConnection' => 'Ajouter une connexion',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Connectez-vous avec Plex ou connectez un serveur Jellyfin ou Emby',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Ajouter à ${displayName} : Plex, Jellyfin, Emby ou une autre connexion de profil',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Session expirée pour ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Session expirée pour ${count} serveurs',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} a refusé l\'accès à ce compte',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} serveurs ont refusé l\'accès à ce compte',
 			'connections.signInAgain' => 'Se reconnecter',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Modifier la connexion ${product}',
@@ -4667,7 +4655,6 @@ extension on TranslationsFr {
 			'hubDetail.noItemsFound' => 'Aucun élément trouvé',
 			'logs.clearLogs' => 'Effacer les journaux',
 			'logs.copyLogs' => 'Copier les journaux',
-			'logs.uploadLogs' => 'Envoyer les journaux',
 			'startup.failedTitle' => 'Satra n\'a pas pu démarrer',
 			'startup.failedBody' => 'Une erreur s\'est produite au démarrage. Les détails ci-dessous identifient la cause.',
 			'startup.failedBodyRepairable' => 'Le fichier de paramètres enregistré de Satra est endommagé et doit être reconstruit avant que Satra ne puisse démarrer. Réessayer ne servira à rien — choisissez Réparer le stockage.',
@@ -4676,7 +4663,6 @@ extension on TranslationsFr {
 			'startup.hideDetails' => 'Masquer les détails',
 			'startup.copyDetails' => 'Copier les détails',
 			'startup.detailsCopied' => 'Détails copiés dans le presse-papiers',
-			'startup.uploadDetails' => 'Téléverser les détails',
 			'startup.repairStorage' => 'Réparer le stockage',
 			'startup.repairTitle' => 'Réparer les données stockées ?',
 			'startup.repairBodyCommon' => 'Le fichier de paramètres de Satra est endommagé et illisible. La réparation rétablit tous les paramètres par défaut.',
@@ -4937,8 +4923,6 @@ extension on TranslationsFr {
 			'liveTv.recordSettings.skipInLibrary' => 'Ignorer les épisodes déjà présents dans la bibliothèque',
 			'liveTv.recordSettings.keepUpTo' => 'Épisodes à conserver',
 			'liveTv.recordSettings.keepUpToHint' => '0 conserve tous les épisodes',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Commence dans ${minutes} min',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} à ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} a renvoyé des données de lecture de TV en direct non valides',
@@ -4946,6 +4930,8 @@ extension on TranslationsFr {
 			'liveTv.failedToBuildStreamUrl' => 'Impossible de générer l’URL du flux',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Impossible de démarrer la chaîne : ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Impossible de changer de chaîne : ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Collections',
 			'collections.collection' => 'Collection',
 			'collections.empty' => 'La collection est vide',
@@ -5451,8 +5437,6 @@ extension on TranslationsFr {
 			'performanceOverlay.decoderExynosHw' => 'Matériel Exynos',
 			'performanceOverlay.decoderSoftware' => 'Logiciel',
 			'performanceOverlay.decoderHardware' => 'Matériel',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Actif',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} échecs)',
 			'externalPlayer.title' => 'Lecteur externe',
@@ -5460,6 +5444,8 @@ extension on TranslationsFr {
 			'externalPlayer.useExternalPlayerDescription' => 'Ouvrir les vidéos dans une autre application',
 			'externalPlayer.selectPlayer' => 'Sélectionner le lecteur',
 			'externalPlayer.customPlayers' => 'Lecteurs personnalisés',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Par défaut du système',
 			'externalPlayer.addCustomPlayer' => 'Ajouter un lecteur personnalisé',
 			'externalPlayer.playerName' => 'Nom du lecteur',

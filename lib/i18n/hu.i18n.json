@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Nyilvános Open Watch Party-relék, hacsak nem adsz meg sajátot",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Adj meg egy érvényes HTTP- vagy HTTPS-alapú relészerver-URL-t.",
-    "crashReporting": "Összeomlási jelentések",
-    "crashReportingDescription": "Összeomlási jelentések küldése az alkalmazás fejlesztésének elősegítéséhez",
+
+
     "debugLogging": "Hibakeresési naplózás",
     "debugLoggingDescription": "Részletes naplózás engedélyezése a hibaelhárításhoz",
     "viewLogs": "Naplók megtekintése",
@@ -970,9 +970,8 @@
     "serverBusyBody": "A szerver ismételten megtagadta ennek a fájlnak a streamelését (HTTP 503). Lehet, hogy újraindul, túlterhelt, vagy a fájl tárhelye nem érhető el. Próbáld újra egy kis idő múlva – ha a probléma továbbra is fennáll, kérd meg a szerver tulajdonosát, hogy ellenőrizze a szervert és a fájl tárhelyét.",
     "playbackNotAllowedTitle": "A lejátszás nem engedélyezett",
     "playbackNotAllowedBody": "A szerver megtagadta ennek az elemnek a streamelését (HTTP 403). Lehet, hogy a fiókodnak nincs engedélye a lejátszására, vagy a szerver csak a helyi hálózatán engedélyezi a lejátszást.",
-    "logsUploaded": "Naplók feltöltve",
-    "logsUploadFailed": "Nem sikerült a naplók feltöltése",
-    "logId": "Naplóazonosító",
+
+
     "burnedSubtitlesUseMenu": "A feliratok bele vannak égetve ebbe a streambe. A feliratmenüben módosíthatod őket.",
     "noVideoUrl": "Nem érhető el videó-URL",
     "playbackNoMediaSources": "A szerver nem adott vissza lejátszható médiaforrást",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Naplók törlése",
-    "copyLogs": "Naplók másolása",
-    "uploadLogs": "Naplók feltöltése"
+    "copyLogs": "Naplók másolása"
+
   },
   "startup": {
     "failedTitle": "A Satra nem tudott elindulni",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Részletek elrejtése",
     "copyDetails": "Részletek másolása",
     "detailsCopied": "A részletek a vágólapra kerültek",
-    "uploadDetails": "Részletek feltöltése",
+
     "repairStorage": "Tárhely javítása",
     "repairTitle": "Javítsuk a tárolt adatokat?",
     "repairBodyCommon": "A Satra beállításfájlja sérült, és nem olvasható. A javítás minden beállítást visszaállít az alapértelmezettre.",

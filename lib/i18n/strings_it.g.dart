@@ -401,8 +401,6 @@ class _Translations$settings$it extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Relay pubblici di Open Watch Party, se non ne imposti uno tuo';
 	@override String get watchTogetherRelayHint => 'https://mio-relay.esempio.it';
 	@override String get watchTogetherRelayInvalid => 'Inserisci un URL di base HTTP o HTTPS valido per il relay.';
-	@override String get crashReporting => 'Segnalazione degli arresti anomali';
-	@override String get crashReportingDescription => 'Invia segnalazioni sugli arresti anomali per contribuire a migliorare l\'app';
 	@override String get debugLogging => 'Registrazione di debug';
 	@override String get debugLoggingDescription => 'Abilita una registrazione dettagliata per la risoluzione dei problemi';
 	@override String get viewLogs => 'Visualizza i log';
@@ -1086,9 +1084,6 @@ class _Translations$messages$it extends Translations$messages$en {
 	@override String get serverBusyBody => 'Il server ha continuato a rifiutare la riproduzione in streaming di questo file (HTTP 503). Potrebbe essere in fase di riavvio, occupato oppure l\'unità in cui si trova il file potrebbe essere offline. Riprova tra qualche istante. Se il problema persiste, chiedi al proprietario del server di controllare il server e l\'unità di archiviazione del file.';
 	@override String get playbackNotAllowedTitle => 'Riproduzione non consentita';
 	@override String get playbackNotAllowedBody => 'Il server ha rifiutato lo streaming di questo elemento (HTTP 403). Il tuo account potrebbe non avere l\'autorizzazione per riprodurlo, oppure il server potrebbe consentire la riproduzione solo sulla sua rete locale.';
-	@override String get logsUploaded => 'Log caricati';
-	@override String get logsUploadFailed => 'Impossibile caricare i log';
-	@override String get logId => 'ID log';
 	@override String get burnedSubtitlesUseMenu => 'I sottotitoli sono incorporati in questo stream. Cambiali dal menu dei sottotitoli.';
 	@override String get noVideoUrl => 'Nessun URL video disponibile';
 	@override String get playbackNoMediaSources => 'Il server non ha restituito sorgenti multimediali riproducibili';
@@ -1477,7 +1472,6 @@ class _Translations$logs$it extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Cancella log';
 	@override String get copyLogs => 'Copia log';
-	@override String get uploadLogs => 'Carica log';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$it extends Translations$startup$en {
 	@override String get hideDetails => 'Nascondi dettagli';
 	@override String get copyDetails => 'Copia dettagli';
 	@override String get detailsCopied => 'Dettagli copiati negli appunti';
-	@override String get uploadDetails => 'Carica dettagli';
 	@override String get repairStorage => 'Ripara storage';
 	@override String get repairTitle => 'Riparare i dati archiviati?';
 	@override String get repairBodyCommon => 'Il file delle impostazioni di Satra è danneggiato e non può essere letto. La riparazione ripristina ogni impostazione al suo valore predefinito.';
@@ -3683,8 +3676,6 @@ extension on TranslationsIt {
 			'settings.watchTogetherRelayDescription' => 'Relay pubblici di Open Watch Party, se non ne imposti uno tuo',
 			'settings.watchTogetherRelayHint' => 'https://mio-relay.esempio.it',
 			'settings.watchTogetherRelayInvalid' => 'Inserisci un URL di base HTTP o HTTPS valido per il relay.',
-			'settings.crashReporting' => 'Segnalazione degli arresti anomali',
-			'settings.crashReportingDescription' => 'Invia segnalazioni sugli arresti anomali per contribuire a migliorare l\'app',
 			'settings.debugLogging' => 'Registrazione di debug',
 			'settings.debugLoggingDescription' => 'Abilita una registrazione dettagliata per la risoluzione dei problemi',
 			'settings.viewLogs' => 'Visualizza i log',
@@ -3909,10 +3900,10 @@ extension on TranslationsIt {
 			'themeEditor.slots.text' => 'Testo',
 			'themeEditor.slots.textMuted' => 'Testo secondario',
 			'themeEditor.slots.accent' => 'Accento',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Opacità',
 			'themeEditor.hexHint' => '#RRGGBB o #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Da altri temi',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} ${theme}',
 			'themeEditor.contrast.textOnBg' => 'Testo sullo sfondo',
@@ -4301,9 +4292,6 @@ extension on TranslationsIt {
 			'messages.serverBusyBody' => 'Il server ha continuato a rifiutare la riproduzione in streaming di questo file (HTTP 503). Potrebbe essere in fase di riavvio, occupato oppure l\'unità in cui si trova il file potrebbe essere offline. Riprova tra qualche istante. Se il problema persiste, chiedi al proprietario del server di controllare il server e l\'unità di archiviazione del file.',
 			'messages.playbackNotAllowedTitle' => 'Riproduzione non consentita',
 			'messages.playbackNotAllowedBody' => 'Il server ha rifiutato lo streaming di questo elemento (HTTP 403). Il tuo account potrebbe non avere l\'autorizzazione per riprodurlo, oppure il server potrebbe consentire la riproduzione solo sulla sua rete locale.',
-			'messages.logsUploaded' => 'Log caricati',
-			'messages.logsUploadFailed' => 'Impossibile caricare i log',
-			'messages.logId' => 'ID log',
 			'messages.burnedSubtitlesUseMenu' => 'I sottotitoli sono incorporati in questo stream. Cambiali dal menu dei sottotitoli.',
 			'messages.noVideoUrl' => 'Nessun URL video disponibile',
 			'messages.playbackNoMediaSources' => 'Il server non ha restituito sorgenti multimediali riproducibili',
@@ -4423,13 +4411,13 @@ extension on TranslationsIt {
 			'profiles.tokenIdentityMismatch' => 'Il token del profilo Plex è stato associato a un server imprevisto',
 			'connections.sectionTitle' => 'Connessioni',
 			'connections.addConnection' => 'Aggiungi connessione',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Accedi con Plex o collega un server Jellyfin o Emby',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Aggiungi a ${displayName}: Plex, Jellyfin, Emby o la connessione di un altro profilo',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessione scaduta per ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessione scaduta per ${count} server',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} ha negato l\'accesso a questo account',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} server hanno negato l\'accesso a questo account',
 			'connections.signInAgain' => 'Accedi di nuovo',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Modifica connessione ${product}',
@@ -4667,7 +4655,6 @@ extension on TranslationsIt {
 			'hubDetail.noItemsFound' => 'Nessun elemento trovato',
 			'logs.clearLogs' => 'Cancella log',
 			'logs.copyLogs' => 'Copia log',
-			'logs.uploadLogs' => 'Carica log',
 			'startup.failedTitle' => 'Satra non ha potuto avviarsi',
 			'startup.failedBody' => 'Si è verificato un errore durante l\'avvio. I dettagli seguenti indicano cosa non ha funzionato.',
 			'startup.failedBodyRepairable' => 'Il file delle impostazioni salvate di Satra è danneggiato e deve essere ricostruito prima che Satra possa avviarsi. Riprovare non servirà: scegli Ripara storage.',
@@ -4676,7 +4663,6 @@ extension on TranslationsIt {
 			'startup.hideDetails' => 'Nascondi dettagli',
 			'startup.copyDetails' => 'Copia dettagli',
 			'startup.detailsCopied' => 'Dettagli copiati negli appunti',
-			'startup.uploadDetails' => 'Carica dettagli',
 			'startup.repairStorage' => 'Ripara storage',
 			'startup.repairTitle' => 'Riparare i dati archiviati?',
 			'startup.repairBodyCommon' => 'Il file delle impostazioni di Satra è danneggiato e non può essere letto. La riparazione ripristina ogni impostazione al suo valore predefinito.',
@@ -4937,8 +4923,6 @@ extension on TranslationsIt {
 			'liveTv.recordSettings.skipInLibrary' => 'Salta gli episodi già presenti nella libreria',
 			'liveTv.recordSettings.keepUpTo' => 'Episodi da conservare',
 			'liveTv.recordSettings.keepUpToHint' => '0 conserva tutti gli episodi',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Inizia tra ${minutes} min',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} alle ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} ha restituito dati di riproduzione della TV in diretta non validi',
@@ -4946,6 +4930,8 @@ extension on TranslationsIt {
 			'liveTv.failedToBuildStreamUrl' => 'Impossibile creare l\'URL dello stream',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Impossibile avviare il canale: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Impossibile cambiare canale: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Raccolte',
 			'collections.collection' => 'Raccolta',
 			'collections.empty' => 'La raccolta è vuota',
@@ -5451,8 +5437,6 @@ extension on TranslationsIt {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Software',
 			'performanceOverlay.decoderHardware' => 'Hardware',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Attivo',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} errori)',
 			'externalPlayer.title' => 'Lettore esterno',
@@ -5460,6 +5444,8 @@ extension on TranslationsIt {
 			'externalPlayer.useExternalPlayerDescription' => 'Apri i video in un\'altra app',
 			'externalPlayer.selectPlayer' => 'Seleziona il lettore',
 			'externalPlayer.customPlayers' => 'Lettori personalizzati',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Predefinito di sistema',
 			'externalPlayer.addCustomPlayer' => 'Aggiungi lettore personalizzato',
 			'externalPlayer.playerName' => 'Nome del lettore',

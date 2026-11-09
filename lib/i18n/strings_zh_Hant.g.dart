@@ -402,8 +402,6 @@ class _Translations$settings$zh_Hant extends Translations$settings$zh {
 	@override String get watchTogetherRelayDescription => '除非您自行設定，否則使用公開的 Open Watch Party 中繼伺服器';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => '請輸入有效的 HTTP 或 HTTPS 中繼伺服器根網址。';
-	@override String get crashReporting => '當機報告';
-	@override String get crashReportingDescription => '傳送當機報告以協助改善應用程式';
 	@override String get debugLogging => '偵錯日誌';
 	@override String get debugLoggingDescription => '啟用詳細日誌記錄以便進行疑難排解';
 	@override String get viewLogs => '查看日誌';
@@ -1083,9 +1081,6 @@ class _Translations$messages$zh_Hant extends Translations$messages$zh {
 	@override String get serverBusyBody => '伺服器持續拒絕串流此檔案（HTTP 503）。伺服器可能正在重新啟動、忙碌中，或檔案所在的儲存裝置可能已離線。請稍後再試；若問題持續發生，請要求伺服器擁有者檢查伺服器及檔案所在的儲存裝置。';
 	@override String get playbackNotAllowedTitle => '不允許播放';
 	@override String get playbackNotAllowedBody => '伺服器拒絕串流此項目（HTTP 403）。此帳戶可能沒有播放權限，或伺服器可能只允許在其區域網路內播放。';
-	@override String get logsUploaded => '日誌已上傳';
-	@override String get logsUploadFailed => '上傳日誌失敗';
-	@override String get logId => '日誌 ID';
 	@override String get burnedSubtitlesUseMenu => '字幕已燒錄至此串流中。請從字幕選單變更字幕。';
 	@override String get noVideoUrl => '沒有可用的視訊 URL';
 	@override String get playbackNoMediaSources => '伺服器未傳回可播放的媒體來源';
@@ -1473,7 +1468,6 @@ class _Translations$logs$zh_Hant extends Translations$logs$zh {
 	// Translations
 	@override String get clearLogs => '清除日誌';
 	@override String get copyLogs => '複製日誌';
-	@override String get uploadLogs => '上傳日誌';
 }
 
 // Path: startup
@@ -1491,7 +1485,6 @@ class _Translations$startup$zh_Hant extends Translations$startup$zh {
 	@override String get hideDetails => '隱藏詳細資料';
 	@override String get copyDetails => '複製詳細資料';
 	@override String get detailsCopied => '詳細資料已複製到剪貼簿';
-	@override String get uploadDetails => '上傳詳細資料';
 	@override String get repairStorage => '修復儲存空間';
 	@override String get repairTitle => '修復已儲存的資料？';
 	@override String get repairBodyCommon => 'Satra 的設定檔已損壞且無法讀取。修復會將所有設定重設為預設值。';
@@ -3672,8 +3665,6 @@ extension on TranslationsZhHant {
 			'settings.watchTogetherRelayDescription' => '除非您自行設定，否則使用公開的 Open Watch Party 中繼伺服器',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => '請輸入有效的 HTTP 或 HTTPS 中繼伺服器根網址。',
-			'settings.crashReporting' => '當機報告',
-			'settings.crashReportingDescription' => '傳送當機報告以協助改善應用程式',
 			'settings.debugLogging' => '偵錯日誌',
 			'settings.debugLoggingDescription' => '啟用詳細日誌記錄以便進行疑難排解',
 			'settings.viewLogs' => '查看日誌',
@@ -3898,10 +3889,10 @@ extension on TranslationsZhHant {
 			'themeEditor.slots.text' => '文字',
 			'themeEditor.slots.textMuted' => '次要文字',
 			'themeEditor.slots.accent' => '強調色',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => '不透明度',
 			'themeEditor.hexHint' => '#RRGGBB 或 #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => '來自其他主題',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} ${color}',
 			'themeEditor.contrast.textOnBg' => '背景上的文字',
@@ -4290,9 +4281,6 @@ extension on TranslationsZhHant {
 			'messages.serverBusyBody' => '伺服器持續拒絕串流此檔案（HTTP 503）。伺服器可能正在重新啟動、忙碌中，或檔案所在的儲存裝置可能已離線。請稍後再試；若問題持續發生，請要求伺服器擁有者檢查伺服器及檔案所在的儲存裝置。',
 			'messages.playbackNotAllowedTitle' => '不允許播放',
 			'messages.playbackNotAllowedBody' => '伺服器拒絕串流此項目（HTTP 403）。此帳戶可能沒有播放權限，或伺服器可能只允許在其區域網路內播放。',
-			'messages.logsUploaded' => '日誌已上傳',
-			'messages.logsUploadFailed' => '上傳日誌失敗',
-			'messages.logId' => '日誌 ID',
 			'messages.burnedSubtitlesUseMenu' => '字幕已燒錄至此串流中。請從字幕選單變更字幕。',
 			'messages.noVideoUrl' => '沒有可用的視訊 URL',
 			'messages.playbackNoMediaSources' => '伺服器未傳回可播放的媒體來源',
@@ -4412,13 +4400,13 @@ extension on TranslationsZhHant {
 			'profiles.tokenIdentityMismatch' => 'Plex 使用者設定檔權杖解析到非預期的伺服器',
 			'connections.sectionTitle' => '連線',
 			'connections.addConnection' => '新增連線',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => '使用 Plex 登入或連線至 Jellyfin 或 Emby 伺服器',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '新增至 ${displayName}：Plex、Jellyfin、Emby 或其他設定檔連線',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} 的工作階段已過期',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} 個伺服器的工作階段已過期',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} 拒絕此帳戶存取',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} 台伺服器拒絕此帳戶存取',
 			'connections.signInAgain' => '重新登入',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '編輯 ${product} 連線',
@@ -4656,7 +4644,6 @@ extension on TranslationsZhHant {
 			'hubDetail.noItemsFound' => '找不到項目',
 			'logs.clearLogs' => '清除日誌',
 			'logs.copyLogs' => '複製日誌',
-			'logs.uploadLogs' => '上傳日誌',
 			'startup.failedTitle' => 'Satra 無法啟動',
 			'startup.failedBody' => '啟動期間發生問題。下方詳細資料可識別失敗的原因。',
 			'startup.failedBodyRepairable' => 'Satra 儲存的設定檔已損壞，必須先重建才能啟動。重試無法解決問題 — 請選擇「修復儲存空間」。',
@@ -4665,7 +4652,6 @@ extension on TranslationsZhHant {
 			'startup.hideDetails' => '隱藏詳細資料',
 			'startup.copyDetails' => '複製詳細資料',
 			'startup.detailsCopied' => '詳細資料已複製到剪貼簿',
-			'startup.uploadDetails' => '上傳詳細資料',
 			'startup.repairStorage' => '修復儲存空間',
 			'startup.repairTitle' => '修復已儲存的資料？',
 			'startup.repairBodyCommon' => 'Satra 的設定檔已損壞且無法讀取。修復會將所有設定重設為預設值。',
@@ -4926,8 +4912,6 @@ extension on TranslationsZhHant {
 			'liveTv.recordSettings.skipInLibrary' => '略過媒體庫中已有的劇集',
 			'liveTv.recordSettings.keepUpTo' => '要保留的劇集數',
 			'liveTv.recordSettings.keepUpToHint' => '0 表示保留所有劇集',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => '${minutes} 分鐘後開始',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} 傳回了無效的直播電視播放資料',
@@ -4935,6 +4919,8 @@ extension on TranslationsZhHant {
 			'liveTv.failedToBuildStreamUrl' => '無法建立串流 URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => '無法開始播放此頻道：${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => '無法切換頻道：${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => '收藏集',
 			'collections.collection' => '收藏集',
 			'collections.empty' => '收藏集為空',
@@ -5440,8 +5426,6 @@ extension on TranslationsZhHant {
 			'performanceOverlay.decoderExynosHw' => 'Exynos 硬體',
 			'performanceOverlay.decoderSoftware' => '軟體',
 			'performanceOverlay.decoderHardware' => '硬體',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => '已啟用',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted}（${failures} 個失敗）',
 			'externalPlayer.title' => '外部播放器',
@@ -5449,6 +5433,8 @@ extension on TranslationsZhHant {
 			'externalPlayer.useExternalPlayerDescription' => '在其他應用程式中開啟影片',
 			'externalPlayer.selectPlayer' => '選擇播放器',
 			'externalPlayer.customPlayers' => '自訂播放器',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => '系統預設',
 			'externalPlayer.addCustomPlayer' => '新增自訂播放器',
 			'externalPlayer.playerName' => '播放器名稱',

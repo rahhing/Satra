@@ -401,8 +401,6 @@ class _Translations$settings$ja extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => '独自のリレーサーバーを設定しない限り、公開のOpen Watch Partyリレーサーバーを使用します';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => '有効なHTTPまたはHTTPSのリレーサーバーURLを入力してください。';
-	@override String get crashReporting => 'クラッシュレポート';
-	@override String get crashReportingDescription => 'アプリの改善に役立つクラッシュレポートを送信';
 	@override String get debugLogging => 'デバッグログ';
 	@override String get debugLoggingDescription => 'トラブルシューティング用の詳細なログを有効化';
 	@override String get viewLogs => 'ログを表示';
@@ -1082,9 +1080,6 @@ class _Translations$messages$ja extends Translations$messages$en {
 	@override String get serverBusyBody => 'サーバーがこのファイルのストリーミングを繰り返し拒否しました（HTTP 503）。サーバーが再起動中またはビジー状態か、ファイルのストレージがオフラインの可能性があります。しばらくしてからもう一度お試しください。問題が続く場合は、サーバーの所有者にサーバーとファイルのストレージを確認するよう依頼してください。';
 	@override String get playbackNotAllowedTitle => '再生が許可されていません';
 	@override String get playbackNotAllowedBody => 'サーバーがこのアイテムのストリーミングを拒否しました（HTTP 403）。お使いのアカウントに再生の権限がないか、サーバーがローカルネットワーク内での再生のみを許可している可能性があります。';
-	@override String get logsUploaded => 'ログをアップロードしました';
-	@override String get logsUploadFailed => 'ログのアップロードに失敗しました';
-	@override String get logId => 'ログID';
 	@override String get burnedSubtitlesUseMenu => '字幕はこのストリームに焼き付けられています。字幕メニューから変更してください。';
 	@override String get noVideoUrl => '利用可能な動画URLがありません';
 	@override String get playbackNoMediaSources => 'サーバーから再生可能なメディアソースが返されませんでした';
@@ -1472,7 +1467,6 @@ class _Translations$logs$ja extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'ログをクリア';
 	@override String get copyLogs => 'ログをコピー';
-	@override String get uploadLogs => 'ログをアップロード';
 }
 
 // Path: startup
@@ -1490,7 +1484,6 @@ class _Translations$startup$ja extends Translations$startup$en {
 	@override String get hideDetails => '詳細を非表示';
 	@override String get copyDetails => '詳細をコピー';
 	@override String get detailsCopied => '詳細をクリップボードにコピーしました';
-	@override String get uploadDetails => '詳細をアップロード';
 	@override String get repairStorage => 'ストレージを修復';
 	@override String get repairTitle => '保存データを修復しますか？';
 	@override String get repairBodyCommon => 'Satraの設定ファイルが破損しており読み取れません。修復するとすべての設定がデフォルトにリセットされます。';
@@ -3671,8 +3664,6 @@ extension on TranslationsJa {
 			'settings.watchTogetherRelayDescription' => '独自のリレーサーバーを設定しない限り、公開のOpen Watch Partyリレーサーバーを使用します',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => '有効なHTTPまたはHTTPSのリレーサーバーURLを入力してください。',
-			'settings.crashReporting' => 'クラッシュレポート',
-			'settings.crashReportingDescription' => 'アプリの改善に役立つクラッシュレポートを送信',
 			'settings.debugLogging' => 'デバッグログ',
 			'settings.debugLoggingDescription' => 'トラブルシューティング用の詳細なログを有効化',
 			'settings.viewLogs' => 'ログを表示',
@@ -3897,10 +3888,10 @@ extension on TranslationsJa {
 			'themeEditor.slots.text' => 'テキスト',
 			'themeEditor.slots.textMuted' => '補助テキスト',
 			'themeEditor.slots.accent' => 'アクセント',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => '不透明度',
 			'themeEditor.hexHint' => '#RRGGBB または #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => '他のテーマから',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme}の${color}',
 			'themeEditor.contrast.textOnBg' => '背景上のテキスト',
@@ -4289,9 +4280,6 @@ extension on TranslationsJa {
 			'messages.serverBusyBody' => 'サーバーがこのファイルのストリーミングを繰り返し拒否しました（HTTP 503）。サーバーが再起動中またはビジー状態か、ファイルのストレージがオフラインの可能性があります。しばらくしてからもう一度お試しください。問題が続く場合は、サーバーの所有者にサーバーとファイルのストレージを確認するよう依頼してください。',
 			'messages.playbackNotAllowedTitle' => '再生が許可されていません',
 			'messages.playbackNotAllowedBody' => 'サーバーがこのアイテムのストリーミングを拒否しました（HTTP 403）。お使いのアカウントに再生の権限がないか、サーバーがローカルネットワーク内での再生のみを許可している可能性があります。',
-			'messages.logsUploaded' => 'ログをアップロードしました',
-			'messages.logsUploadFailed' => 'ログのアップロードに失敗しました',
-			'messages.logId' => 'ログID',
 			'messages.burnedSubtitlesUseMenu' => '字幕はこのストリームに焼き付けられています。字幕メニューから変更してください。',
 			'messages.noVideoUrl' => '利用可能な動画URLがありません',
 			'messages.playbackNoMediaSources' => 'サーバーから再生可能なメディアソースが返されませんでした',
@@ -4411,13 +4399,13 @@ extension on TranslationsJa {
 			'profiles.tokenIdentityMismatch' => 'Plexプロフィールのトークンから予期しないサーバーが特定されました',
 			'connections.sectionTitle' => '接続',
 			'connections.addConnection' => '接続を追加',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Plexでサインインするか、JellyfinまたはEmbyサーバーに接続',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName}に追加：Plex、Jellyfin、Emby、または別のプロフィールの接続',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} のセッションの有効期限が切れました',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} 台のサーバーのセッションの有効期限が切れました',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} がこのアカウントへのアクセスを拒否しました',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} 台のサーバーがこのアカウントへのアクセスを拒否しました',
 			'connections.signInAgain' => '再度サインイン',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '${product}接続を編集',
@@ -4655,7 +4643,6 @@ extension on TranslationsJa {
 			'hubDetail.noItemsFound' => 'アイテムが見つかりません',
 			'logs.clearLogs' => 'ログをクリア',
 			'logs.copyLogs' => 'ログをコピー',
-			'logs.uploadLogs' => 'ログをアップロード',
 			'startup.failedTitle' => 'Satraを起動できませんでした',
 			'startup.failedBody' => '起動中に問題が発生しました。以下の詳細に失敗の原因が示されています。',
 			'startup.failedBodyRepairable' => 'Satraの保存済み設定ファイルが破損しているため、Satraを起動する前に再構築する必要があります。再試行しても解決しません —「ストレージを修復」を選択してください。',
@@ -4664,7 +4651,6 @@ extension on TranslationsJa {
 			'startup.hideDetails' => '詳細を非表示',
 			'startup.copyDetails' => '詳細をコピー',
 			'startup.detailsCopied' => '詳細をクリップボードにコピーしました',
-			'startup.uploadDetails' => '詳細をアップロード',
 			'startup.repairStorage' => 'ストレージを修復',
 			'startup.repairTitle' => '保存データを修復しますか？',
 			'startup.repairBodyCommon' => 'Satraの設定ファイルが破損しており読み取れません。修復するとすべての設定がデフォルトにリセットされます。',
@@ -4925,8 +4911,6 @@ extension on TranslationsJa {
 			'liveTv.recordSettings.skipInLibrary' => 'ライブラリにあるエピソードをスキップ',
 			'liveTv.recordSettings.keepUpTo' => '保持するエピソード数',
 			'liveTv.recordSettings.keepUpToHint' => '0 ですべてのエピソードを保持',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => '${minutes}分後に開始',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product}から無効なライブTV再生データが返されました',
@@ -4934,6 +4918,8 @@ extension on TranslationsJa {
 			'liveTv.failedToBuildStreamUrl' => 'ストリームURLを生成できませんでした',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'チャンネルを再生できませんでした: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'チャンネルを切り替えられませんでした: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'コレクション',
 			'collections.collection' => 'コレクション',
 			'collections.empty' => 'コレクションは空です',
@@ -5439,8 +5425,6 @@ extension on TranslationsJa {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'ソフトウェア',
 			'performanceOverlay.decoderHardware' => 'ハードウェア',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => '有効',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted}（${failures}件失敗）',
 			'externalPlayer.title' => '外部プレーヤー',
@@ -5448,6 +5432,8 @@ extension on TranslationsJa {
 			'externalPlayer.useExternalPlayerDescription' => '動画を別のアプリで開きます',
 			'externalPlayer.selectPlayer' => 'プレーヤーを選択',
 			'externalPlayer.customPlayers' => 'カスタムプレーヤー',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'システム既定',
 			'externalPlayer.addCustomPlayer' => 'カスタムプレーヤーを追加',
 			'externalPlayer.playerName' => 'プレーヤー名',

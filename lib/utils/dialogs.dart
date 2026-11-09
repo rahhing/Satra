@@ -6,16 +6,78 @@ import '../focus/focusable_text_field.dart';
 import '../focus/input_mode_tracker.dart';
 import '../i18n/strings.g.dart';
 import '../mixins/controller_disposer_mixin.dart';
+import '../theme/app_motion.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/dialog_action_button.dart';
 import '../widgets/focusable_list_tile.dart';
 import '../widgets/scroll_ink_boundary.dart';
+import '../widgets/glass_surface.dart';
 import 'focus_utils.dart';
+import 'platform_detector.dart';
 
 const _buttonPadding = EdgeInsets.symmetric(horizontal: 18, vertical: 14);
 const _buttonShape = StadiumBorder();
 
 final _dialogOwners = <Route<dynamic>, Set<Route<dynamic>>>{};
+
+/// Desktop dialogs share the same settling motion as the utility panels.
+class _SatraDialogRoute<T> extends DialogRoute<T> {
+  _SatraDialogRoute({
+    required super.context,
+    required super.builder,
+    super.themes,
+    super.barrierColor,
+    super.barrierDismissible,
+    super.traversalEdgeBehavior,
+  });
+
+  bool get _animated => PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
+
+  @override
+  Duration get transitionDuration =>
+      _animated ? AppMotion.systemDuration(const Duration(milliseconds: 320)) : super.transitionDuration;
+
+  @override
+  Duration get reverseTransitionDuration =>
+      _animated ? AppMotion.systemDuration(const Duration(milliseconds: 220)) : super.reverseTransitionDuration;
+
+  @override
+  Widget buildTransitions(
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    if (!_animated) return super.buildTransitions(context, animation, secondaryAnimation, child);
+    if (AppMotion.duration(context) == Duration.zero) return child;
+    final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
+    // Keep the BackdropFilter outside fractional-opacity compositing layers.
+    return GlassTransitionScope(
+      animation: curved,
+      child: SlideTransition(
+        position: Tween(begin: const Offset(0, 0.025), end: Offset.zero).animate(curved),
+        child: ScaleTransition(scale: Tween(begin: 0.97, end: 1.0).animate(curved), child: child),
+      ),
+    );
+  }
+}
+
+/// A root-owned dialog for flows such as profile unlock that outlive a session.
+Future<T?> showAnimatedRootDialog<T>({
+  required BuildContext context,
+  required WidgetBuilder builder,
+  bool barrierDismissible = true,
+}) {
+  final navigator = Navigator.of(context, rootNavigator: true);
+  return navigator.push(
+    _SatraDialogRoute<T>(
+      context: context,
+      builder: builder,
+      themes: InheritedTheme.capture(from: context, to: navigator.context),
+      barrierDismissible: barrierDismissible,
+    ),
+  );
+}
 
 /// Shows a dialog on the nearest navigator instead of Flutter's default root
 /// navigator. Use this for profile/session-owned modal routes so they are
@@ -29,7 +91,7 @@ Future<T?> showScopedDialog<T>({
   assert(debugCheckHasMaterialLocalizations(context));
   final navigator = Navigator.of(context);
   final owner = ModalRoute.of(context);
-  final route = DialogRoute<T>(
+  final route = _SatraDialogRoute<T>(
     context: context,
     builder: builder,
     themes: InheritedTheme.capture(from: context, to: navigator.context),
@@ -77,6 +139,80 @@ Future<bool> showConfirmDialog(
     context: context,
     builder: (dialogContext) {
       final colorScheme = Theme.of(dialogContext).colorScheme;
+      if (PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()) {
+        return Dialog(
+          backgroundColor: Colors.transparent,
+          elevation: 0,
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 460),
+            child: GlassSurface(
+              tint: Theme.of(dialogContext).scaffoldBackgroundColor,
+              opacity: 0.88,
+              borderRadius: BorderRadius.circular(22),
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      title,
+                      style: Theme.of(dialogContext).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                    ),
+                    const SizedBox(height: 12),
+                    Flexible(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(message, style: Theme.of(dialogContext).textTheme.bodyMedium),
+                            if (warning != null) ...[
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(14),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.error.withValues(alpha: 0.14),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(warning, style: TextStyle(color: colorScheme.onSurface)),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    Wrap(
+                      alignment: WrapAlignment.end,
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: [
+                        DialogActionButton(
+                          autofocus: true,
+                          onPressed: () => Navigator.pop(dialogContext, false),
+                          label: cancelText ?? t.common.cancel,
+                        ),
+                        DialogActionButton(
+                          onPressed: () => Navigator.pop(dialogContext, true),
+                          label: confirmText,
+                          isPrimary: true,
+                          style: isDestructive
+                              ? FilledButton.styleFrom(
+                                  backgroundColor: colorScheme.error,
+                                  foregroundColor: colorScheme.onError,
+                                )
+                              : null,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      }
       return AlertDialog(
         title: Text(title),
         content: warning == null

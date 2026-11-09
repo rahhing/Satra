@@ -27,6 +27,7 @@ import 'companion_remote/remote_session_dialog.dart';
 import 'library_management_sheet.dart';
 import 'server_activities_button.dart';
 import 'system_clock.dart';
+import 'utility_panel_route.dart';
 
 /// Shared browsing controls for Home and every library section.
 class BrowseToolbarActions extends StatefulWidget {
@@ -73,10 +74,11 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
   }
 
   void _handleSwitchProfile(BuildContext context) {
-    Navigator.of(
-      context,
-      rootNavigator: true,
-    ).push(MaterialPageRoute(builder: (context) => const ProfileSwitchScreen()));
+    Navigator.of(context, rootNavigator: true).push(
+      PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()
+          ? utilityPanelRoute(child: const ProfileSwitchScreen())
+          : MaterialPageRoute(builder: (context) => const ProfileSwitchScreen()),
+    );
   }
 
   void _handleOpenSettings(BuildContext context) {

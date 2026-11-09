@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "独自のリレーサーバーを設定しない限り、公開のOpen Watch Partyリレーサーバーを使用します",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "有効なHTTPまたはHTTPSのリレーサーバーURLを入力してください。",
-    "crashReporting": "クラッシュレポート",
-    "crashReportingDescription": "アプリの改善に役立つクラッシュレポートを送信",
+
+
     "debugLogging": "デバッグログ",
     "debugLoggingDescription": "トラブルシューティング用の詳細なログを有効化",
     "viewLogs": "ログを表示",
@@ -966,9 +966,8 @@
     "serverBusyBody": "サーバーがこのファイルのストリーミングを繰り返し拒否しました（HTTP 503）。サーバーが再起動中またはビジー状態か、ファイルのストレージがオフラインの可能性があります。しばらくしてからもう一度お試しください。問題が続く場合は、サーバーの所有者にサーバーとファイルのストレージを確認するよう依頼してください。",
     "playbackNotAllowedTitle": "再生が許可されていません",
     "playbackNotAllowedBody": "サーバーがこのアイテムのストリーミングを拒否しました（HTTP 403）。お使いのアカウントに再生の権限がないか、サーバーがローカルネットワーク内での再生のみを許可している可能性があります。",
-    "logsUploaded": "ログをアップロードしました",
-    "logsUploadFailed": "ログのアップロードに失敗しました",
-    "logId": "ログID",
+
+
     "burnedSubtitlesUseMenu": "字幕はこのストリームに焼き付けられています。字幕メニューから変更してください。",
     "noVideoUrl": "利用可能な動画URLがありません",
     "playbackNoMediaSources": "サーバーから再生可能なメディアソースが返されませんでした",
@@ -1385,8 +1384,8 @@
   },
   "logs": {
     "clearLogs": "ログをクリア",
-    "copyLogs": "ログをコピー",
-    "uploadLogs": "ログをアップロード"
+    "copyLogs": "ログをコピー"
+
   },
   "startup": {
     "failedTitle": "Satraを起動できませんでした",
@@ -1397,7 +1396,7 @@
     "hideDetails": "詳細を非表示",
     "copyDetails": "詳細をコピー",
     "detailsCopied": "詳細をクリップボードにコピーしました",
-    "uploadDetails": "詳細をアップロード",
+
     "repairStorage": "ストレージを修復",
     "repairTitle": "保存データを修復しますか？",
     "repairBodyCommon": "Satraの設定ファイルが破損しており読み取れません。修復するとすべての設定がデフォルトにリセットされます。",

@@ -500,20 +500,6 @@ void main() {
   });
 
   group('SettingsService listenables', () {
-    test('refreshListenables updates active prefs outside the resettable surface', () async {
-      final settings = await SettingsService.getInstance();
-      final crashReporting = settings.listenable(SettingsService.crashReporting);
-
-      expect(crashReporting.value, isTrue);
-
-      await settings.prefs.setBool(SettingsService.crashReporting.key, false);
-      expect(crashReporting.value, isTrue);
-
-      settings.refreshListenables();
-
-      expect(crashReporting.value, isFalse);
-    });
-
     test('resetAllSettings refreshes active dynamic tracker prefs', () async {
       final settings = await SettingsService.getInstance();
       final modePref = SettingsService.trackerFilterModePref(TrackerService.trakt);

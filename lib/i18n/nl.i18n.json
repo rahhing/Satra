@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Openbare Open Watch Party-relays, tenzij je een eigen relay instelt",
     "watchTogetherRelayHint": "https://mijn-relay.voorbeeld.nl",
     "watchTogetherRelayInvalid": "Voer een geldige HTTP- of HTTPS-basis-URL voor de relay in.",
-    "crashReporting": "Crashrapportage",
-    "crashReportingDescription": "Crashrapporten verzenden om de app te verbeteren",
+
+
     "debugLogging": "Debuglogboek",
     "debugLoggingDescription": "Schakel gedetailleerde logboekregistratie in om problemen op te lossen",
     "viewLogs": "Logbestanden bekijken",
@@ -970,9 +970,8 @@
     "serverBusyBody": "De server bleef weigeren dit bestand te streamen (HTTP 503). Mogelijk wordt de server opnieuw opgestart, is deze bezet of is de opslag van het bestand offline. Probeer het over een moment opnieuw — als dit blijft gebeuren, vraag dan de servereigenaar om de server en de opslag van het bestand te controleren.",
     "playbackNotAllowedTitle": "Afspelen niet toegestaan",
     "playbackNotAllowedBody": "De server weigerde dit item te streamen (HTTP 403). Je account heeft mogelijk geen toestemming om het af te spelen, of de server staat afspelen alleen toe op het eigen lokale netwerk.",
-    "logsUploaded": "Logbestanden geüpload",
-    "logsUploadFailed": "Uploaden van logbestanden mislukt",
-    "logId": "Logboek-ID",
+
+
     "burnedSubtitlesUseMenu": "De ondertitels zijn in deze stream ingebrand. Wijzig ze via het ondertitelmenu.",
     "noVideoUrl": "Geen video-URL beschikbaar",
     "playbackNoMediaSources": "De server heeft geen afspeelbare mediabronnen geretourneerd",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Logbestanden wissen",
-    "copyLogs": "Logbestanden kopiëren",
-    "uploadLogs": "Logbestanden uploaden"
+    "copyLogs": "Logbestanden kopiëren"
+
   },
   "startup": {
     "failedTitle": "Satra kon niet starten",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Details verbergen",
     "copyDetails": "Details kopiëren",
     "detailsCopied": "Details naar het klembord gekopieerd",
-    "uploadDetails": "Details uploaden",
+
     "repairStorage": "Opslag repareren",
     "repairTitle": "Opgeslagen gegevens repareren?",
     "repairBodyCommon": "Het instellingenbestand van Satra is beschadigd en kan niet worden gelezen. Door te repareren worden alle instellingen teruggezet naar hun standaardwaarde.",

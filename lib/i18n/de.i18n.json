@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Öffentliche Relays von Open Watch Party, sofern du kein eigenes festlegst",
     "watchTogetherRelayHint": "https://mein-relay.beispiel.de",
     "watchTogetherRelayInvalid": "Gib eine gültige HTTP- oder HTTPS-Basis-URL für das Relay ein.",
-    "crashReporting": "Absturzberichte",
-    "crashReportingDescription": "Absturzberichte senden, um die App zu verbessern",
+
+
     "debugLogging": "Debug-Protokollierung",
     "debugLoggingDescription": "Detaillierte Protokolle zur Fehleranalyse aktivieren",
     "viewLogs": "Protokolle anzeigen",
@@ -970,9 +970,8 @@
     "serverBusyBody": "Der Server hat das Streamen dieser Datei wiederholt abgelehnt (HTTP 503). Möglicherweise wird er neu gestartet, ist ausgelastet oder der Speicherort der Datei ist offline. Versuche es gleich noch einmal. Falls das Problem weiterhin auftritt, bitte den Serverbetreiber, den Server und den Speicherort der Datei zu überprüfen.",
     "playbackNotAllowedTitle": "Wiedergabe nicht erlaubt",
     "playbackNotAllowedBody": "Der Server hat das Streamen dieses Elements abgelehnt (HTTP 403). Dein Konto hat möglicherweise keine Berechtigung, es abzuspielen, oder der Server erlaubt die Wiedergabe nur in seinem lokalen Netzwerk.",
-    "logsUploaded": "Protokolle hochgeladen",
-    "logsUploadFailed": "Protokolle konnten nicht hochgeladen werden",
-    "logId": "Protokoll-ID",
+
+
     "burnedSubtitlesUseMenu": "Die Untertitel sind in diesen Stream eingebrannt. Ändere sie über das Untertitelmenü.",
     "noVideoUrl": "Keine Video-URL verfügbar",
     "playbackNoMediaSources": "Der Server hat keine abspielbaren Medienquellen zurückgegeben",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Protokolle löschen",
-    "copyLogs": "Protokolle kopieren",
-    "uploadLogs": "Protokolle hochladen"
+    "copyLogs": "Protokolle kopieren"
+
   },
   "startup": {
     "failedTitle": "Satra konnte nicht gestartet werden",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Details ausblenden",
     "copyDetails": "Details kopieren",
     "detailsCopied": "Details in die Zwischenablage kopiert",
-    "uploadDetails": "Details hochladen",
+
     "repairStorage": "Speicher reparieren",
     "repairTitle": "Gespeicherte Daten reparieren?",
     "repairBodyCommon": "Die Einstellungsdatei von Satra ist beschädigt und kann nicht gelesen werden. Beim Reparieren werden alle Einstellungen auf ihre Standardwerte zurückgesetzt.",

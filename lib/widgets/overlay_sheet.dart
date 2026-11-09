@@ -901,29 +901,32 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
                   color: _explicitBackgroundColor ?? Colors.transparent,
                   borderRadius: borderRadius,
                   clipBehavior: Clip.antiAlias,
-                  child: GlassSurface(
-                    enabled: _explicitBackgroundColor == null,
-                    tint: colorScheme.surface,
-                    borderRadius: borderRadius,
-                    opacity: _blurNativeVideo ? 0.24 : 0.86,
-                    blurNativeVideo: _blurNativeVideo,
-                    child: SafeArea(
-                      top: isTop,
-                      bottom: !isTop,
-                      left: false,
-                      right: false,
-                      // Content is sized by the sheet body, so pushing a nested
-                      // page or resolving async content changes the sheet's
-                      // height. Ease the box between those heights instead of
-                      // snapping. The child is laid out at its final size and
-                      // pinned to the anchored edge throughout, so it is revealed
-                      // rather than stretched.
-                      child: AnimatedSize(
-                        key: ValueKey(_sheetSession),
-                        duration: AppMotion.duration(context),
-                        curve: AppMotion.curve,
-                        alignment: isTop ? Alignment.topCenter : Alignment.bottomCenter,
-                        child: ConstrainedBox(constraints: effectiveConstraints, child: sheetContent),
+                  child: GlassTransitionScope(
+                    animation: _slideCurve,
+                    child: GlassSurface(
+                      enabled: _explicitBackgroundColor == null,
+                      tint: colorScheme.surface,
+                      borderRadius: borderRadius,
+                      opacity: _blurNativeVideo ? 0.24 : 0.86,
+                      blurNativeVideo: _blurNativeVideo,
+                      child: SafeArea(
+                        top: isTop,
+                        bottom: !isTop,
+                        left: false,
+                        right: false,
+                        // Content is sized by the sheet body, so pushing a nested
+                        // page or resolving async content changes the sheet's
+                        // height. Ease the box between those heights instead of
+                        // snapping. The child is laid out at its final size and
+                        // pinned to the anchored edge throughout, so it is revealed
+                        // rather than stretched.
+                        child: AnimatedSize(
+                          key: ValueKey(_sheetSession),
+                          duration: AppMotion.duration(context),
+                          curve: AppMotion.curve,
+                          alignment: isTop ? Alignment.topCenter : Alignment.bottomCenter,
+                          child: ConstrainedBox(constraints: effectiveConstraints, child: sheetContent),
+                        ),
                       ),
                     ),
                   ),

@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Oʻz relengizni belgilamasangiz, ommaviy Open Watch Party relelari ishlatiladi",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Toʻgʻri HTTP yoki HTTPS rele manzilini kiriting.",
-    "crashReporting": "Xatoliklar haqida hisobot",
-    "crashReportingDescription": "Ilovani takomillashtirishga yordam berish uchun xatoliklar hisobotini yuboring",
+
+
     "debugLogging": "Nosozliklarni aniqlash jurnali",
     "debugLoggingDescription": "Muammolarni hal qilish uchun batafsil jurnal yuritishni yoqing",
     "viewLogs": "Jurnallarni koʻrish",
@@ -970,9 +970,8 @@
     "serverBusyBody": "Server bu faylni uzatishni qayta-qayta rad etdi (HTTP 503). U qayta ishga tushayotgan yoki band boʻlishi, yoxud fayl saqlanadigan xotira oflayn boʻlishi mumkin. Birozdan keyin qaytadan urinib koʻring. Muammo davom etsa, server egasidan server va fayl xotirasini tekshirishni soʻrang.",
     "playbackNotAllowedTitle": "Ijro etishga ruxsat berilmagan",
     "playbackNotAllowedBody": "Server bu elementni uzatishni rad etdi (HTTP 403). Hisobingizda uni ijro etishga ruxsat boʻlmasligi yoki server ijroga faqat oʻzining mahalliy tarmogʻida ruxsat berishi mumkin.",
-    "logsUploaded": "Jurnallar yuklandi",
-    "logsUploadFailed": "Jurnallarni yuklab boʻlmadi",
-    "logId": "Jurnal ID-si",
+
+
     "burnedSubtitlesUseMenu": "Subtitrlar bu oqim tasviriga singdirilgan. Ularni subtitr menyusidan oʻzgartiring.",
     "noVideoUrl": "Video URL mavjud emas",
     "playbackNoMediaSources": "Server ijro etiladigan media manbalarini qaytarmadi",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Jurnallarni tozalash",
-    "copyLogs": "Jurnallarni nusxalash",
-    "uploadLogs": "Jurnallarni yuklash"
+    "copyLogs": "Jurnallarni nusxalash"
+
   },
   "startup": {
     "failedTitle": "Satra ishga tusha olmadi",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Tafsilotlarni yashirish",
     "copyDetails": "Tafsilotlarni nusxalash",
     "detailsCopied": "Tafsilotlar buferga nusxalandi",
-    "uploadDetails": "Tafsilotlarni yuklash",
+
     "repairStorage": "Saqlashni tiklash",
     "repairTitle": "Saqlangan maʼlumotlar tikilsinmi?",
     "repairBodyCommon": "Satraning sozlamalar fayli shikastlangan va uni oʻqib boʻlmaydi. Tiklash barcha sozlamalarni standart holatiga qaytaradi.",

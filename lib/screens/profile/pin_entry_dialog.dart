@@ -6,12 +6,15 @@ import '../../focus/dpad_navigator.dart';
 import '../../focus/focus_theme.dart';
 import '../../focus/key_event_utils.dart';
 import '../../focus/focusable_button.dart';
+import '../../focus/input_mode_tracker.dart';
 import '../../i18n/strings.g.dart';
 import '../../mixins/controller_disposer_mixin.dart';
 import '../../profiles/plex_home_switch.dart';
 import '../../utils/platform_detector.dart';
+import '../../utils/dialogs.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/clickable_cursor.dart';
+import '../../widgets/glass_surface.dart';
 
 /// Dialog for entering a 4-digit PIN to access a protected profile.
 class PinEntryDialog extends StatefulWidget {
@@ -126,35 +129,44 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
 
   Widget _buildTvDialog(ThemeData theme) {
     final colorScheme = theme.colorScheme;
+    final desktop = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
 
     return Dialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 56, vertical: 32),
       backgroundColor: Colors.transparent,
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 320),
-        padding: const EdgeInsets.all(14),
-        decoration: BoxDecoration(
-          color: colorScheme.surface.withValues(alpha: 0.96),
-          borderRadius: BorderRadius.circular(28),
-        ),
-        child: Column(
-          mainAxisSize: .min,
-          crossAxisAlignment: .stretch,
-          children: [
-            _buildTitle(theme),
-            const SizedBox(height: 12),
-            _TvPinInput(
-              key: _pinInputKey,
-              onSubmit: _submit,
-              onCancel: _cancel,
-              hasError: widget.errorMessage != null,
-              isMobile: false,
-            ),
-            if (widget.errorMessage != null) ...[
-              const SizedBox(height: 12),
-              Text(widget.errorMessage!, style: TextStyle(color: colorScheme.error, fontSize: 12), maxLines: 2),
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+      child: GlassSurface(
+        enabled: desktop,
+        tint: theme.scaffoldBackgroundColor,
+        opacity: 0.88,
+        borderRadius: BorderRadius.circular(22),
+        child: Container(
+          constraints: BoxConstraints(maxWidth: desktop ? 288 : 320),
+          padding: EdgeInsets.all(desktop ? 24 : 14),
+          decoration: BoxDecoration(
+            color: desktop ? Colors.transparent : colorScheme.surface.withValues(alpha: 0.96),
+            borderRadius: BorderRadius.circular(22),
+          ),
+          child: Column(
+            mainAxisSize: .min,
+            crossAxisAlignment: .stretch,
+            children: [
+              _buildTitle(theme),
+              SizedBox(height: desktop ? 24 : 12),
+              _TvPinInput(
+                key: _pinInputKey,
+                onSubmit: _submit,
+                onCancel: _cancel,
+                hasError: widget.errorMessage != null,
+                isMobile: false,
+              ),
+              if (widget.errorMessage != null) ...[
+                const SizedBox(height: 12),
+                Text(widget.errorMessage!, style: TextStyle(color: colorScheme.error, fontSize: 12), maxLines: 2),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -165,7 +177,13 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
       children: [
         AppIcon(Symbols.lock_outline_rounded, fill: 1, size: 24, color: theme.colorScheme.primary),
         const SizedBox(width: 12),
-        Expanded(child: Text(widget.userName, overflow: .ellipsis)),
+        Expanded(
+          child: Text(
+            widget.userName,
+            overflow: .ellipsis,
+            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
       ],
     );
   }
@@ -512,8 +530,16 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
 
   Widget _buildKey(BuildContext context, _PinKey key, int row, int column) {
     final colorScheme = Theme.of(context).colorScheme;
-    final selected = row == _row && column == _column;
-    final background = selected ? colorScheme.primary : colorScheme.surfaceContainerHighest.withValues(alpha: 0.88);
+    final desktop = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
+    final selected =
+        row == _row &&
+        column == _column &&
+        (PlatformDetector.isTVDevice() || (InputModeTracker.isKeyboardMode(context) && _keypadFocusNode.hasFocus));
+    final background = selected
+        ? colorScheme.primary
+        : (desktop
+              ? colorScheme.onSurface.withValues(alpha: 0.09)
+              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.88));
     final foreground = selected ? colorScheme.onPrimary : colorScheme.onSurface;
 
     return ClickableCursor(
@@ -527,10 +553,10 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
         },
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 120),
-          width: _keySize,
-          height: _keySize,
+          width: desktop ? 54 : _keySize,
+          height: desktop ? 54 : _keySize,
           alignment: .center,
-          decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(16)),
+          decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(desktop ? 27 : 14)),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 4),
             child: _buildKeyContent(context, key, foreground),
@@ -542,14 +568,20 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
 
   Widget _buildKeyContent(BuildContext context, _PinKey key, Color foreground) {
     final icon = key.icon;
-    if (icon != null) return AppIcon(icon, color: foreground, size: 30);
+    if (icon != null) {
+      return AppIcon(
+        icon,
+        color: foreground,
+        size: PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice() ? 22 : 30,
+      );
+    }
 
     return FittedBox(
       fit: BoxFit.scaleDown,
       child: Text(
         key.label,
         maxLines: 1,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foreground, fontWeight: .w800),
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foreground, fontWeight: .w600),
       ),
     );
   }
@@ -560,7 +592,7 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
       mainAxisAlignment: .center,
       children: [
         for (int i = 0; i < 4; i++) ...[
-          if (i > 0) const SizedBox(width: 10),
+          if (i > 0) const SizedBox(width: 12),
           _DigitBox(
             digit: _digits[i],
             isActive: (widget.isMobile ? _mobileFocusNode.hasFocus : true) && _activeIndex == i,
@@ -618,6 +650,17 @@ class _DigitBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    if (PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()) {
+      return AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        width: 12,
+        height: 12,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: theme.colorScheme.onSurface.withValues(alpha: digit != null ? 1 : 0.22),
+        ),
+      );
+    }
     final focusColor = FocusTheme.getFocusBorderColor(context);
 
     return Column(
@@ -683,9 +726,8 @@ class _PinKey {
 Future<String?> showPinEntryDialog(BuildContext context, String userName, {String? errorMessage}) {
   // PIN entry guards root-owned profile activation and must survive disposal of
   // the active profile session while the binder switches users.
-  return showDialog<String>(
+  return showAnimatedRootDialog<String>(
     context: context,
-    useRootNavigator: true,
     barrierDismissible: false,
     builder: (context) => PinEntryDialog(userName: userName, errorMessage: errorMessage),
   );

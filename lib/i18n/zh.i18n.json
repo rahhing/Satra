@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "除非自行设置，否则使用公共 Open Watch Party 中继服务器",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "请输入有效的 HTTP 或 HTTPS 中继服务器基础 URL。",
-    "crashReporting": "崩溃报告",
-    "crashReportingDescription": "发送崩溃报告以帮助改进应用",
+
+
     "debugLogging": "调试日志",
     "debugLoggingDescription": "启用详细日志记录以便故障排除",
     "viewLogs": "查看日志",
@@ -966,9 +966,8 @@
     "serverBusyBody": "服务器持续拒绝传输此文件（HTTP 503）。服务器可能正在重启或正忙，也可能是文件所在的存储设备已离线。请稍后重试；如果问题持续出现，请联系服务器所有者检查服务器和文件存储设备。",
     "playbackNotAllowedTitle": "不允许播放",
     "playbackNotAllowedBody": "服务器拒绝传输此项目（HTTP 403）。此账户可能没有播放权限，或服务器可能仅允许在其局域网内播放。",
-    "logsUploaded": "日志已上传",
-    "logsUploadFailed": "上传日志失败",
-    "logId": "日志 ID",
+
+
     "burnedSubtitlesUseMenu": "字幕已烧录到此视频流中。请从字幕菜单中更改。",
     "noVideoUrl": "没有可用的视频 URL",
     "playbackNoMediaSources": "服务器未返回可播放的媒体源",
@@ -1385,8 +1384,8 @@
   },
   "logs": {
     "clearLogs": "清除日志",
-    "copyLogs": "复制日志",
-    "uploadLogs": "上传日志"
+    "copyLogs": "复制日志"
+
   },
   "startup": {
     "failedTitle": "Satra 无法启动",
@@ -1397,7 +1396,7 @@
     "hideDetails": "隐藏详情",
     "copyDetails": "复制详情",
     "detailsCopied": "详情已复制到剪贴板",
-    "uploadDetails": "上传详情",
+
     "repairStorage": "修复存储",
     "repairTitle": "修复已存储的数据？",
     "repairBodyCommon": "Satra 的设置文件已损坏且无法读取。修复会将所有设置重置为默认值。",

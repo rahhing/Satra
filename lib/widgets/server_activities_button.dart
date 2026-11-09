@@ -10,10 +10,12 @@ import '../focus/focusable_button.dart';
 import '../focus/key_event_utils.dart';
 import '../i18n/strings.g.dart';
 import '../theme/mono_tokens.dart';
+import '../theme/app_motion.dart';
 import 'package:satra/widgets/app_icon.dart';
 import '../models/plex/plex_activity.dart';
 import '../providers/multi_server_provider.dart';
 import '../utils/media_server_http_client.dart';
+import 'glass_surface.dart';
 
 class ServerActivitiesButton extends StatefulWidget {
   const ServerActivitiesButton({super.key});
@@ -41,7 +43,7 @@ class _PanelData {
   static const loading = _PanelData(fetchState: _FetchState.loading, results: []);
 }
 
-class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
+class ServerActivitiesButtonState extends State<ServerActivitiesButton> with SingleTickerProviderStateMixin {
   final _buttonKey = GlobalKey();
   OverlayEntry? _overlayEntry;
   final _panelNotifier = ValueNotifier<_PanelData>(_PanelData.loading);
@@ -56,6 +58,12 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
   Timer? _pollTimer;
   AbortController? _activeLoadAbort;
   int _loadGeneration = 0;
+  late final AnimationController _panelAnimation = AnimationController(
+    vsync: this,
+    duration: AppMotion.systemDuration(const Duration(milliseconds: 240)),
+    reverseDuration: AppMotion.systemDuration(const Duration(milliseconds: 180)),
+  );
+  bool _closing = false;
 
   @override
   void deactivate() {
@@ -66,6 +74,7 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
   @override
   void dispose() {
     _removeOverlay();
+    _panelAnimation.dispose();
     _panelScope.dispose();
     _panelNotifier.dispose();
     super.dispose();
@@ -80,11 +89,19 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
     activeLoadAbort?.abort();
     _overlayEntry?.remove();
     _overlayEntry = null;
+    _closing = false;
+  }
+
+  Future<void> _closeOverlay() async {
+    if (_overlayEntry == null || _closing) return;
+    _closing = true;
+    await _panelAnimation.reverse();
+    if (mounted && _closing) _removeOverlay();
   }
 
   void togglePanel() {
     if (_overlayEntry != null) {
-      _removeOverlay();
+      unawaited(_closeOverlay());
       return;
     }
 
@@ -102,6 +119,7 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
       builder: (_) => _buildOverlay(right: right, top: top),
     );
     Overlay.of(context).insert(_overlayEntry!);
+    _panelAnimation.forward(from: 0);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && _overlayEntry != null) _panelScope.requestFocus();
     });
@@ -208,7 +226,7 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
     return Stack(
       children: [
         Positioned.fill(
-          child: GestureDetector(onTap: _removeOverlay, behavior: HitTestBehavior.opaque),
+          child: GestureDetector(onTap: _closeOverlay, behavior: HitTestBehavior.opaque),
         ),
         Positioned(
           right: right,
@@ -218,12 +236,23 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
           // holding the panel could never hand focus to the cancel buttons
           // inside it. An empty scope keeps primary focus itself, so Back still
           // closes a panel with nothing to cancel.
-          child: FocusScope(
-            node: _panelScope,
-            onKeyEvent: (_, event) => handleBackKeyAction(event, _removeOverlay),
-            child: ValueListenableBuilder<_PanelData>(
-              valueListenable: _panelNotifier,
-              builder: (context, data, _) => _buildPanel(context, data),
+          child: AnimatedBuilder(
+            animation: _panelAnimation,
+            builder: (context, child) => Transform.scale(
+              alignment: Alignment.topRight,
+              scale: 0.94 + 0.06 * AppMotion.curve.transform(_panelAnimation.value),
+              child: child,
+            ),
+            child: GlassTransitionScope(
+              animation: _panelAnimation,
+              child: FocusScope(
+                node: _panelScope,
+                onKeyEvent: (_, event) => handleBackKeyAction(event, () => unawaited(_closeOverlay())),
+                child: ValueListenableBuilder<_PanelData>(
+                  valueListenable: _panelNotifier,
+                  builder: (context, data, _) => _buildPanel(context, data),
+                ),
+              ),
             ),
           ),
         ),
@@ -233,11 +262,11 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
 
   Widget _buildPanel(BuildContext context, _PanelData data) {
     final theme = Theme.of(context);
-    return Material(
-      elevation: 8,
-      borderRadius: BorderRadius.circular(12),
-      clipBehavior: Clip.antiAlias,
-      color: theme.colorScheme.surface,
+    return GlassSurface(
+      tint: theme.scaffoldBackgroundColor,
+      opacity: 0.82,
+      sigma: 30,
+      borderRadius: BorderRadius.circular(18),
       child: SizedBox(
         width: 320,
         child: Column(
@@ -245,7 +274,7 @@ class ServerActivitiesButtonState extends State<ServerActivitiesButton> {
           crossAxisAlignment: .stretch,
           children: [
             _buildPanelHeader(context),
-            Divider(height: 1, color: theme.dividerColor),
+            Divider(height: 1, color: theme.colorScheme.onSurface.withValues(alpha: 0.08)),
             ConstrainedBox(
               constraints: const BoxConstraints(maxHeight: 360),
               child: SingleChildScrollView(child: _buildPanelBody(context, data)),

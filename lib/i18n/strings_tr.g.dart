@@ -401,8 +401,6 @@ class _Translations$settings$tr extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Kendi aktarıcınızı ayarlamadığınız sürece herkese açık Open Watch Party aktarıcıları kullanılır';
 	@override String get watchTogetherRelayHint => 'https://ornek-aktarici.com';
 	@override String get watchTogetherRelayInvalid => 'Geçerli bir HTTP veya HTTPS aktarıcı adresi girin.';
-	@override String get crashReporting => 'Çökme Bildirimi';
-	@override String get crashReportingDescription => 'Uygulamanın geliştirilmesine yardımcı olmak için çökme raporları gönder';
 	@override String get debugLogging => 'Hata Ayıklama Günlüğü';
 	@override String get debugLoggingDescription => 'Sorun giderme için ayrıntılı günlük kaydını etkinleştir';
 	@override String get viewLogs => 'Günlükleri Görüntüle';
@@ -1086,9 +1084,6 @@ class _Translations$messages$tr extends Translations$messages$en {
 	@override String get serverBusyBody => 'Sunucu bu dosyayı yayınlamayı sürekli reddetti (HTTP 503). Sunucu yeniden başlatılıyor veya meşgul olabilir ya da dosyanın bulunduğu depolama birimi çevrim dışı olabilir. Kısa süre sonra tekrar deneyin — sorun devam ederse sunucu sahibinden sunucuyu ve dosyanın bulunduğu depolama birimini kontrol etmesini isteyin.';
 	@override String get playbackNotAllowedTitle => 'Oynatmaya izin verilmiyor';
 	@override String get playbackNotAllowedBody => 'Sunucu bu ögeyi yayınlamayı reddetti (HTTP 403). Hesabınızın bunu oynatma izni olmayabilir veya sunucu oynatmaya yalnızca kendi yerel ağında izin veriyor olabilir.';
-	@override String get logsUploaded => 'Günlükler yüklendi';
-	@override String get logsUploadFailed => 'Günlükler yüklenemedi';
-	@override String get logId => 'Günlük Kimliği (ID)';
 	@override String get burnedSubtitlesUseMenu => 'Altyazılar bu akışın görüntüsüne gömülü. Bunları altyazı menüsünden değiştirin.';
 	@override String get noVideoUrl => 'Kullanılabilir video URL\'si yok';
 	@override String get playbackNoMediaSources => 'Sunucu oynatılabilir medya kaynağı döndürmedi';
@@ -1477,7 +1472,6 @@ class _Translations$logs$tr extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Günlükleri Temizle';
 	@override String get copyLogs => 'Günlükleri Kopyala';
-	@override String get uploadLogs => 'Günlükleri Yükle';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$tr extends Translations$startup$en {
 	@override String get hideDetails => 'Ayrıntıları gizle';
 	@override String get copyDetails => 'Ayrıntıları kopyala';
 	@override String get detailsCopied => 'Ayrıntılar panoya kopyalandı';
-	@override String get uploadDetails => 'Ayrıntıları yükle';
 	@override String get repairStorage => 'Depolama Alanını Onar';
 	@override String get repairTitle => 'Kayıtlı veriler onarılsın mı?';
 	@override String get repairBodyCommon => 'Satra\'nin ayar dosyası hasarlı ve okunamıyor. Onarım, her ayarı varsayılanına sıfırlar.';
@@ -3683,8 +3676,6 @@ extension on TranslationsTr {
 			'settings.watchTogetherRelayDescription' => 'Kendi aktarıcınızı ayarlamadığınız sürece herkese açık Open Watch Party aktarıcıları kullanılır',
 			'settings.watchTogetherRelayHint' => 'https://ornek-aktarici.com',
 			'settings.watchTogetherRelayInvalid' => 'Geçerli bir HTTP veya HTTPS aktarıcı adresi girin.',
-			'settings.crashReporting' => 'Çökme Bildirimi',
-			'settings.crashReportingDescription' => 'Uygulamanın geliştirilmesine yardımcı olmak için çökme raporları gönder',
 			'settings.debugLogging' => 'Hata Ayıklama Günlüğü',
 			'settings.debugLoggingDescription' => 'Sorun giderme için ayrıntılı günlük kaydını etkinleştir',
 			'settings.viewLogs' => 'Günlükleri Görüntüle',
@@ -3909,10 +3900,10 @@ extension on TranslationsTr {
 			'themeEditor.slots.text' => 'Metin',
 			'themeEditor.slots.textMuted' => 'İkincil metin',
 			'themeEditor.slots.accent' => 'Vurgu',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Opaklık',
 			'themeEditor.hexHint' => '#RRGGBB veya #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Diğer temalardan',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} – ${color}',
 			'themeEditor.contrast.textOnBg' => 'Arka plan üzerinde metin',
@@ -4301,9 +4292,6 @@ extension on TranslationsTr {
 			'messages.serverBusyBody' => 'Sunucu bu dosyayı yayınlamayı sürekli reddetti (HTTP 503). Sunucu yeniden başlatılıyor veya meşgul olabilir ya da dosyanın bulunduğu depolama birimi çevrim dışı olabilir. Kısa süre sonra tekrar deneyin — sorun devam ederse sunucu sahibinden sunucuyu ve dosyanın bulunduğu depolama birimini kontrol etmesini isteyin.',
 			'messages.playbackNotAllowedTitle' => 'Oynatmaya izin verilmiyor',
 			'messages.playbackNotAllowedBody' => 'Sunucu bu ögeyi yayınlamayı reddetti (HTTP 403). Hesabınızın bunu oynatma izni olmayabilir veya sunucu oynatmaya yalnızca kendi yerel ağında izin veriyor olabilir.',
-			'messages.logsUploaded' => 'Günlükler yüklendi',
-			'messages.logsUploadFailed' => 'Günlükler yüklenemedi',
-			'messages.logId' => 'Günlük Kimliği (ID)',
 			'messages.burnedSubtitlesUseMenu' => 'Altyazılar bu akışın görüntüsüne gömülü. Bunları altyazı menüsünden değiştirin.',
 			'messages.noVideoUrl' => 'Kullanılabilir video URL\'si yok',
 			'messages.playbackNoMediaSources' => 'Sunucu oynatılabilir medya kaynağı döndürmedi',
@@ -4423,13 +4411,13 @@ extension on TranslationsTr {
 			'profiles.tokenIdentityMismatch' => 'Plex profil belirtecinin beklenmeyen bir sunucuya ait olduğu belirlendi',
 			'connections.sectionTitle' => 'Bağlantılar',
 			'connections.addConnection' => 'Bağlantı ekle',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Plex ile giriş yapın veya bir Jellyfin ya da Emby sunucusu bağlayın',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName} profiline ekle: Plex, Jellyfin, Emby veya başka bir profil bağlantısı',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} için oturum süresi doldu',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} sunucu için oturum süresi doldu',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} bu hesabın erişimini reddetti',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} sunucu bu hesabın erişimini reddetti',
 			'connections.signInAgain' => 'Tekrar giriş yap',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '${product} bağlantısını düzenle',
@@ -4667,7 +4655,6 @@ extension on TranslationsTr {
 			'hubDetail.noItemsFound' => 'Öge bulunamadı',
 			'logs.clearLogs' => 'Günlükleri Temizle',
 			'logs.copyLogs' => 'Günlükleri Kopyala',
-			'logs.uploadLogs' => 'Günlükleri Yükle',
 			'startup.failedTitle' => 'Satra başlatılamadı',
 			'startup.failedBody' => 'Başlatma sırasında bir şeyler ters gitti. Aşağıdaki ayrıntılar neyin başarısız olduğunu gösteriyor.',
 			'startup.failedBodyRepairable' => 'Satra\'nin kayıtlı ayar dosyası hasarlı ve Satra başlamadan önce yeniden oluşturulması gerekiyor. Tekrar denemek işe yaramaz — Depolama Alanını Onar\'ı seçin.',
@@ -4676,7 +4663,6 @@ extension on TranslationsTr {
 			'startup.hideDetails' => 'Ayrıntıları gizle',
 			'startup.copyDetails' => 'Ayrıntıları kopyala',
 			'startup.detailsCopied' => 'Ayrıntılar panoya kopyalandı',
-			'startup.uploadDetails' => 'Ayrıntıları yükle',
 			'startup.repairStorage' => 'Depolama Alanını Onar',
 			'startup.repairTitle' => 'Kayıtlı veriler onarılsın mı?',
 			'startup.repairBodyCommon' => 'Satra\'nin ayar dosyası hasarlı ve okunamıyor. Onarım, her ayarı varsayılanına sıfırlar.',
@@ -4937,8 +4923,6 @@ extension on TranslationsTr {
 			'liveTv.recordSettings.skipInLibrary' => 'Kitaplıkta zaten bulunan bölümleri atla',
 			'liveTv.recordSettings.keepUpTo' => 'Saklanacak bölüm sayısı',
 			'liveTv.recordSettings.keepUpToHint' => '0 tüm bölümleri saklar',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => '${minutes} dk içinde başlıyor',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} saat ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} geçersiz Canlı TV oynatma verileri döndürdü',
@@ -4946,6 +4930,8 @@ extension on TranslationsTr {
 			'liveTv.failedToBuildStreamUrl' => 'Akış URL\'si oluşturulamadı',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kanal başlatılamadı: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kanal değiştirilemedi: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Koleksiyonlar',
 			'collections.collection' => 'Koleksiyon',
 			'collections.empty' => 'Koleksiyon boş',
@@ -5451,8 +5437,6 @@ extension on TranslationsTr {
 			'performanceOverlay.decoderExynosHw' => 'Exynos Donanım',
 			'performanceOverlay.decoderSoftware' => 'Yazılım',
 			'performanceOverlay.decoderHardware' => 'Donanım',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Etkin',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} başarısız)',
 			'externalPlayer.title' => 'Harici Oynatıcı',
@@ -5460,6 +5444,8 @@ extension on TranslationsTr {
 			'externalPlayer.useExternalPlayerDescription' => 'Videoları başka bir uygulamada açın',
 			'externalPlayer.selectPlayer' => 'Oynatıcı Seç',
 			'externalPlayer.customPlayers' => 'Özel Oynatıcılar',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Sistem Varsayılanı',
 			'externalPlayer.addCustomPlayer' => 'Özel Oynatıcı Ekle',
 			'externalPlayer.playerName' => 'Oynatıcı Adı',

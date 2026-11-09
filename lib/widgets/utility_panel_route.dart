@@ -5,13 +5,18 @@ import '../utils/desktop_window_padding.dart';
 import 'glass_surface.dart';
 
 class UtilityPanelScope extends InheritedWidget {
-  const UtilityPanelScope({super.key, required super.child});
+  const UtilityPanelScope({super.key, required super.child, this.route});
+
+  final Route<dynamic>? route;
 
   static bool isPresent(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<UtilityPanelScope>() != null;
 
+  static Route<dynamic>? routeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<UtilityPanelScope>()?.route;
+
   @override
-  bool updateShouldNotify(UtilityPanelScope oldWidget) => false;
+  bool updateShouldNotify(UtilityPanelScope oldWidget) => route != oldWidget.route;
 }
 
 /// Panel pages have transparent scaffolds, so both routes must animate when
@@ -82,6 +87,7 @@ Route<void> utilityPanelRoute({required Widget child, String? name, bool search 
                 sigma: 36,
                 borderRadius: BorderRadius.circular(22),
                 child: UtilityPanelScope(
+                  route: ModalRoute.of(context),
                   child: SideNavigationScope(
                     child: Theme(
                       data: panelTheme,
@@ -115,8 +121,9 @@ Route<void> utilityPanelRoute({required Widget child, String? name, bool search 
   transitionsBuilder: (context, animation, _, child) {
     if (AppMotion.duration(context) == Duration.zero) return child;
     final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
-    return FadeTransition(
-      opacity: curved,
+    // A fractional opacity layer around a BackdropFilter hides its backdrop.
+    return GlassTransitionScope(
+      animation: curved,
       child: SlideTransition(
         position: Tween(begin: Offset(0, search ? -0.025 : 0.035), end: Offset.zero).animate(curved),
         child: ScaleTransition(scale: Tween(begin: 0.97, end: 1.0).animate(curved), child: child),

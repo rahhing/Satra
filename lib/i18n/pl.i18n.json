@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Publiczne serwery pośredniczące Open Watch Party, chyba że ustawisz własny",
     "watchTogetherRelayHint": "https://moj-relay.przyklad.pl",
     "watchTogetherRelayInvalid": "Wprowadź prawidłowy bazowy adres URL serwera pośredniczącego HTTP lub HTTPS.",
-    "crashReporting": "Raportowanie błędów",
-    "crashReportingDescription": "Wysyłaj raporty o błędach, aby pomóc ulepszyć aplikację",
+
+
     "debugLogging": "Rejestrowanie diagnostyczne",
     "debugLoggingDescription": "Włącz szczegółowe rejestrowanie, aby ułatwić rozwiązywanie problemów",
     "viewLogs": "Pokaż logi",
@@ -978,9 +978,8 @@
     "serverBusyBody": "Serwer wielokrotnie odmawiał strumieniowania tego pliku (HTTP 503). Być może jest ponownie uruchamiany lub zajęty albo magazyn danych zawierający plik jest offline. Spróbuj ponownie za chwilę — jeśli problem będzie się powtarzać, poproś właściciela serwera o sprawdzenie serwera i magazynu danych zawierającego plik.",
     "playbackNotAllowedTitle": "Odtwarzanie niedozwolone",
     "playbackNotAllowedBody": "Serwer odmówił strumieniowania tego elementu (HTTP 403). Twoje konto może nie mieć uprawnień do jego odtwarzania albo serwer może zezwalać na odtwarzanie tylko w swojej sieci lokalnej.",
-    "logsUploaded": "Logi przesłane",
-    "logsUploadFailed": "Nie udało się przesłać logów",
-    "logId": "ID logu",
+
+
     "burnedSubtitlesUseMenu": "Napisy są wtopione w ten strumień. Zmień je w menu napisów.",
     "noVideoUrl": "Brak dostępnego adresu URL wideo",
     "playbackNoMediaSources": "Serwer nie zwrócił żadnych możliwych do odtworzenia źródeł multimediów",
@@ -1400,8 +1399,8 @@
   },
   "logs": {
     "clearLogs": "Wyczyść logi",
-    "copyLogs": "Kopiuj logi",
-    "uploadLogs": "Prześlij logi"
+    "copyLogs": "Kopiuj logi"
+
   },
   "startup": {
     "failedTitle": "Nie udało się uruchomić Satra",
@@ -1412,7 +1411,7 @@
     "hideDetails": "Ukryj szczegóły",
     "copyDetails": "Kopiuj szczegóły",
     "detailsCopied": "Skopiowano szczegóły do schowka",
-    "uploadDetails": "Prześlij szczegóły",
+
     "repairStorage": "Napraw pamięć",
     "repairTitle": "Naprawić zapisane dane?",
     "repairBodyCommon": "Plik ustawień Satra jest uszkodzony i nie można go odczytać. Naprawa przywraca wszystkie ustawienia do wartości domyślnych.",

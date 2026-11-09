@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "除非您自行設定，否則使用公開的 Open Watch Party 中繼伺服器",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "請輸入有效的 HTTP 或 HTTPS 中繼伺服器根網址。",
-    "crashReporting": "當機報告",
-    "crashReportingDescription": "傳送當機報告以協助改善應用程式",
+
+
     "debugLogging": "偵錯日誌",
     "debugLoggingDescription": "啟用詳細日誌記錄以便進行疑難排解",
     "viewLogs": "查看日誌",
@@ -966,9 +966,8 @@
     "serverBusyBody": "伺服器持續拒絕串流此檔案（HTTP 503）。伺服器可能正在重新啟動、忙碌中，或檔案所在的儲存裝置可能已離線。請稍後再試；若問題持續發生，請要求伺服器擁有者檢查伺服器及檔案所在的儲存裝置。",
     "playbackNotAllowedTitle": "不允許播放",
     "playbackNotAllowedBody": "伺服器拒絕串流此項目（HTTP 403）。此帳戶可能沒有播放權限，或伺服器可能只允許在其區域網路內播放。",
-    "logsUploaded": "日誌已上傳",
-    "logsUploadFailed": "上傳日誌失敗",
-    "logId": "日誌 ID",
+
+
     "burnedSubtitlesUseMenu": "字幕已燒錄至此串流中。請從字幕選單變更字幕。",
     "noVideoUrl": "沒有可用的視訊 URL",
     "playbackNoMediaSources": "伺服器未傳回可播放的媒體來源",
@@ -1385,8 +1384,8 @@
   },
   "logs": {
     "clearLogs": "清除日誌",
-    "copyLogs": "複製日誌",
-    "uploadLogs": "上傳日誌"
+    "copyLogs": "複製日誌"
+
   },
   "startup": {
     "failedTitle": "Satra 無法啟動",
@@ -1397,7 +1396,7 @@
     "hideDetails": "隱藏詳細資料",
     "copyDetails": "複製詳細資料",
     "detailsCopied": "詳細資料已複製到剪貼簿",
-    "uploadDetails": "上傳詳細資料",
+
     "repairStorage": "修復儲存空間",
     "repairTitle": "修復已儲存的資料？",
     "repairBodyCommon": "Satra 的設定檔已損壞且無法讀取。修復會將所有設定重設為預設值。",

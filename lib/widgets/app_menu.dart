@@ -100,8 +100,8 @@ Future<T?> showAppMenu<T>(
       final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
       final alignment = _transitionAlignment(dialogContext, position: position, anchorRect: anchorRect);
 
-      return FadeTransition(
-        opacity: curved,
+      return GlassTransitionScope(
+        animation: curved,
         child: AnimatedBuilder(
           animation: curved,
           child: child,
@@ -150,8 +150,8 @@ Future<T?> showAnchoredPanel<T>(
     ),
     transitionBuilder: (dialogContext, animation, _, child) {
       final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
-      return FadeTransition(
-        opacity: curved,
+      return GlassTransitionScope(
+        animation: curved,
         child: AnimatedBuilder(
           animation: curved,
           child: child,
@@ -206,12 +206,12 @@ class _AnchoredPanel extends StatelessWidget {
     final effectiveMaxHeight = math.max(120.0, math.min(maxHeight, availableHeight));
 
     final panel = GlassSurface(
-      borderRadius: BorderRadius.circular(tokens(context).radiusMd),
+      borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
       child: Material(
         elevation: 3,
         shadowColor: colorScheme.shadow,
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(tokens(context).radiusMd),
+        borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
         clipBehavior: Clip.antiAlias,
         child: ConstrainedBox(
           constraints: BoxConstraints(minWidth: panelWidth, maxWidth: panelWidth, maxHeight: effectiveMaxHeight),
@@ -588,7 +588,7 @@ class _AppMenuItemTileState<T> extends State<AppMenuItemTile<T>> with FocusableT
                   duration: AppMotion.duration(context, AppMotion.fast),
                   decoration: BoxDecoration(
                     color: background,
-                    borderRadius: BorderRadius.circular(tokens(context).radiusSm),
+                    borderRadius: BorderRadius.circular(tokens(context).radiusSm.clamp(0, 12)),
                   ),
                   constraints: BoxConstraints(minHeight: subtitle == null ? 40 : 52),
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
@@ -829,12 +829,12 @@ class _AppMenuSurface<T> extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return GlassSurface(
-      borderRadius: BorderRadius.circular(tokens(context).radiusMd),
+      borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
       child: Material(
         elevation: 3,
         shadowColor: colorScheme.shadow,
         color: Colors.transparent,
-        borderRadius: BorderRadius.circular(tokens(context).radiusMd),
+        borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
         clipBehavior: Clip.antiAlias,
         child: ConstrainedBox(
           constraints: BoxConstraints(minWidth: width, maxWidth: width, maxHeight: maxHeight),

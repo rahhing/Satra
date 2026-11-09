@@ -196,6 +196,7 @@ void main() {
     // Back still closes the panel once focus has moved into it.
     await tester.sendKeyEvent(LogicalKeyboardKey.escape);
     await tester.pump();
+    await tester.pump(const Duration(milliseconds: 250));
     expect(find.text(t.serverTasks.title), findsNothing);
   });
 }

@@ -15,8 +15,7 @@
 #   <p>/Runner.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/...      the SwiftPM lock
 #   <p>/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved           Xcode's duplicate lock
 # for p in ios, macos, tvos, plus the root mpv-build.lock.json. The duplicate
-# SwiftPM locks are not redundant to us: scripts/checks/check_apple_spm_locks.py
-# fails the build when a pair drifts, and tvos/scripts/test_wire_mpv.rb asserts
+# SwiftPM locks are not redundant: tvos/scripts/test_wire_mpv.rb asserts
 # all ten sites name one commit. android/gradle/verification-metadata.xml moves
 # with them: it repeats the lock's mpv-android sha256 for Gradle's dependency
 # verification, which checks the AAR wherever Gradle resolves it.
@@ -71,7 +70,6 @@
 # omitted with a note. A library's `symbols` map is copied from the same
 # artifacts.json entry; a commit published before mpv-build shipped debug
 # files has none, and its omission is noted the same way.
-# scripts/release/upload_symbols.dart downloads, verifies and uploads them.
 # mpv-build uploads each publish run's binaries to a release of its own and
 # records that release as an `assetBase` beside each asset's name, falling
 # back to its group's legacy `assetBase` for assets published before; a

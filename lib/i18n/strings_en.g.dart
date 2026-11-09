@@ -878,12 +878,6 @@ class Translations$settings$en {
 	/// en: 'Enter a valid HTTP or HTTPS relay base URL.'
 	String get watchTogetherRelayInvalid => 'Enter a valid HTTP or HTTPS relay base URL.';
 
-	/// en: 'Crash Reporting'
-	String get crashReporting => 'Crash Reporting';
-
-	/// en: 'Send crash reports to help improve the app'
-	String get crashReportingDescription => 'Send crash reports to help improve the app';
-
 	/// en: 'Debug Logging'
 	String get debugLogging => 'Debug Logging';
 
@@ -2716,15 +2710,6 @@ class Translations$messages$en {
 	/// en: 'The server refused to stream this item (HTTP 403). Your account may not have permission to play it, or the server may only allow playback on its local network.'
 	String get playbackNotAllowedBody => 'The server refused to stream this item (HTTP 403). Your account may not have permission to play it, or the server may only allow playback on its local network.';
 
-	/// en: 'Logs uploaded'
-	String get logsUploaded => 'Logs uploaded';
-
-	/// en: 'Failed to upload logs'
-	String get logsUploadFailed => 'Failed to upload logs';
-
-	/// en: 'Log ID'
-	String get logId => 'Log ID';
-
 	/// en: 'Subtitles are burned into this stream. Change them from the subtitle menu.'
 	String get burnedSubtitlesUseMenu => 'Subtitles are burned into this stream. Change them from the subtitle menu.';
 
@@ -3641,9 +3626,6 @@ class Translations$logs$en {
 
 	/// en: 'Copy Logs'
 	String get copyLogs => 'Copy Logs';
-
-	/// en: 'Upload Logs'
-	String get uploadLogs => 'Upload Logs';
 }
 
 // Path: startup
@@ -3677,9 +3659,6 @@ class Translations$startup$en {
 
 	/// en: 'Details copied to clipboard'
 	String get detailsCopied => 'Details copied to clipboard';
-
-	/// en: 'Upload details'
-	String get uploadDetails => 'Upload details';
 
 	/// en: 'Repair storage'
 	String get repairStorage => 'Repair storage';
@@ -8410,8 +8389,6 @@ extension on Translations {
 			'settings.watchTogetherRelayDescription' => 'Public Open Watch Party relays unless you set your own',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => 'Enter a valid HTTP or HTTPS relay base URL.',
-			'settings.crashReporting' => 'Crash Reporting',
-			'settings.crashReportingDescription' => 'Send crash reports to help improve the app',
 			'settings.debugLogging' => 'Debug Logging',
 			'settings.debugLoggingDescription' => 'Enable detailed logging for troubleshooting',
 			'settings.viewLogs' => 'View Logs',
@@ -8634,10 +8611,10 @@ extension on Translations {
 			'themeEditor.slots.surface' => 'Surface',
 			'themeEditor.slots.outline' => 'Outline',
 			'themeEditor.slots.text' => 'Text',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.slots.textMuted' => 'Secondary text',
 			'themeEditor.slots.accent' => 'Accent',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.opacity' => 'Opacity',
 			'themeEditor.hexHint' => '#RRGGBB or #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'From other themes',
@@ -9031,9 +9008,6 @@ extension on Translations {
 			'messages.serverBusyBody' => 'The server kept refusing to stream this file (HTTP 503). It may be restarting, busy, or the file\'s storage may be offline. Try again in a moment — if it keeps happening, ask the server owner to check the server and the file\'s storage.',
 			'messages.playbackNotAllowedTitle' => 'Playback not allowed',
 			'messages.playbackNotAllowedBody' => 'The server refused to stream this item (HTTP 403). Your account may not have permission to play it, or the server may only allow playback on its local network.',
-			'messages.logsUploaded' => 'Logs uploaded',
-			'messages.logsUploadFailed' => 'Failed to upload logs',
-			'messages.logId' => 'Log ID',
 			'messages.burnedSubtitlesUseMenu' => 'Subtitles are burned into this stream. Change them from the subtitle menu.',
 			'messages.noVideoUrl' => 'No video URL available',
 			'messages.playbackNoMediaSources' => 'The server returned no playable media sources',
@@ -9148,13 +9122,13 @@ extension on Translations {
 			'profiles.profileNameHint' => 'e.g. Guests, Kids, Family Room',
 			'profiles.pinProtectionOptional' => 'PIN protection (optional)',
 			'profiles.pinExplain' => '4-digit PIN required to switch profiles.',
-			_ => null,
-		} ?? switch (path) {
 			'profiles.continueButton' => 'Continue',
 			'profiles.pinsDontMatch' => 'PINs don\'t match',
 			'profiles.tokenIdentityMismatch' => 'The Plex profile token resolved to an unexpected server',
 			'connections.sectionTitle' => 'Connections',
 			'connections.addConnection' => 'Add connection',
+			_ => null,
+		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Sign in with Plex or connect a Jellyfin or Emby server',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Add to ${displayName}: Plex, Jellyfin, Emby, or another profile connection',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Session expired for ${name}',
@@ -9401,7 +9375,6 @@ extension on Translations {
 			'hubDetail.noItemsFound' => 'No items found',
 			'logs.clearLogs' => 'Clear Logs',
 			'logs.copyLogs' => 'Copy Logs',
-			'logs.uploadLogs' => 'Upload Logs',
 			'startup.failedTitle' => 'Satra could not start',
 			'startup.failedBody' => 'Something went wrong during startup. The details below identify what failed.',
 			'startup.failedBodyRepairable' => 'Satra\'s saved settings file is damaged and has to be rebuilt before Satra can start. Retrying will not help — choose Repair storage.',
@@ -9410,7 +9383,6 @@ extension on Translations {
 			'startup.hideDetails' => 'Hide details',
 			'startup.copyDetails' => 'Copy details',
 			'startup.detailsCopied' => 'Details copied to clipboard',
-			'startup.uploadDetails' => 'Upload details',
 			'startup.repairStorage' => 'Repair storage',
 			'startup.repairTitle' => 'Repair stored data?',
 			'startup.repairBodyCommon' => 'Satra\'s settings file is damaged and cannot be read. Repairing resets every setting to its default.',
@@ -9662,8 +9634,6 @@ extension on Translations {
 			'liveTv.guideReloadRequested' => 'Guide refresh requested',
 			'liveTv.guideReloadFailed' => 'Couldn\'t refresh the guide',
 			'liveTv.rulesProcessRequested' => 'Rule re-evaluation requested',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.rulesProcessFailed' => 'Couldn\'t re-evaluate recording rules',
 			'liveTv.recordShow' => 'Record show',
 			'liveTv.recordSettings.startEarly' => 'Start early (seconds)',
@@ -9671,6 +9641,8 @@ extension on Translations {
 			'liveTv.recordSettings.newOnly' => 'Only new episodes',
 			'liveTv.recordSettings.anyChannel' => 'Record on any channel',
 			'liveTv.recordSettings.anyTime' => 'Record at any time',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.recordSettings.skipInLibrary' => 'Skip episodes already in the library',
 			'liveTv.recordSettings.keepUpTo' => 'Episodes to keep',
 			'liveTv.recordSettings.keepUpToHint' => '0 keeps every episode',
@@ -10176,8 +10148,6 @@ extension on Translations {
 			'performanceOverlay.cacheLimit' => 'Cache Limit',
 			'performanceOverlay.speed' => 'Speed',
 			'performanceOverlay.player' => 'Player',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.playMethod' => 'Play Method',
 			'performanceOverlay.memory' => 'Memory',
 			'performanceOverlay.uiFps' => 'UI FPS',
@@ -10185,6 +10155,8 @@ extension on Translations {
 			'performanceOverlay.decoderAndroidHw' => 'Android HW',
 			'performanceOverlay.decoderNvidiaHw' => 'NVIDIA HW',
 			'performanceOverlay.decoderQualcommHw' => 'Qualcomm HW',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.decoderMediatekHw' => 'MediaTek HW',
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Software',

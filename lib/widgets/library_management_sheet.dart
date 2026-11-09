@@ -27,6 +27,7 @@ import 'app_menu.dart';
 import 'bottom_sheet_page_scaffold.dart';
 import 'media_context_menu.dart' show isAdminActionAllowedForMediaItem;
 import 'overlay_sheet.dart';
+import 'glass_surface.dart';
 
 class ContextMenuItem {
   final String value;
@@ -109,6 +110,12 @@ Future<void> showLibraryManagementSheet(
 
   if (PlatformDetector.isTV()) {
     return showScopedDialog<void>(context: context, builder: (context) => buildSheet(isDialog: true));
+  }
+  if (PlatformDetector.isDesktopOS()) {
+    return showScopedDialog<void>(
+      context: context,
+      builder: (_) => OverlaySheetHost(child: Builder(builder: (_) => buildSheet(isDialog: true))),
+    );
   }
   // Use the host supplied by the calling screen when available while keeping
   // this reusable entry point safe for routes without one. isScrollControlled
@@ -423,38 +430,45 @@ class _LibraryManagementSheetState extends State<_LibraryManagementSheet>
     final hiddenLibraryKeys = hiddenLibrariesProvider.hiddenLibraryKeys;
 
     if (widget.isDialog) {
-      return Dialog(
-        child: PopScope(
-          canPop: false, // Prevent system back from double-popping; handled by handleReorderKeyEvent
-          // ignore: no-empty-block - required callback, blocks system back on Android TV
-          onPopInvokedWithResult: (didPop, result) {},
-          child: Scaffold(
-            appBar: AppBar(
-              title: Row(
-                children: [
-                  const AppIcon(Symbols.edit_rounded, fill: 1),
-                  const SizedBox(width: 12),
-                  Text(t.libraries.manageLibraries),
-                ],
-              ),
-              automaticallyImplyLeading: false,
-              actions: [
-                IconButton(
-                  icon: const AppIcon(Symbols.close_rounded, fill: 1),
-                  onPressed: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-            body: Focus(
-              focusNode: _listFocusNode,
-              descendantsAreFocusable: false,
-              autofocus: InputModeTracker.isKeyboardMode(context),
-              onKeyEvent: handleReorderKeyEvent,
-              child: _buildFlatLibraryList(_dialogScrollController, hiddenLibraryKeys, shrinkWrap: false),
-            ),
+      final glass = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
+      Widget content = PopScope(
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {},
+        child: Scaffold(
+          backgroundColor: glass ? Colors.transparent : null,
+          appBar: AppBar(
+            backgroundColor: glass ? Colors.transparent : null,
+            title: Text(t.libraries.manageLibraries),
+            automaticallyImplyLeading: false,
+            actions: [
+              IconButton(icon: const AppIcon(Symbols.close_rounded, fill: 1), onPressed: () => Navigator.pop(context)),
+            ],
+          ),
+          body: Focus(
+            focusNode: _listFocusNode,
+            descendantsAreFocusable: false,
+            autofocus: InputModeTracker.isKeyboardMode(context),
+            onKeyEvent: handleReorderKeyEvent,
+            child: _buildFlatLibraryList(_dialogScrollController, hiddenLibraryKeys, shrinkWrap: false),
           ),
         ),
       );
+      if (glass) {
+        content = SizedBox(
+          width: 680,
+          height: (96.0 + _tempLibraries.length * 68.0).clamp(
+            240.0,
+            (MediaQuery.sizeOf(context).height * 0.72).clamp(240.0, 650.0),
+          ),
+          child: GlassSurface(
+            tint: Theme.of(context).scaffoldBackgroundColor,
+            opacity: 0.86,
+            borderRadius: BorderRadius.circular(22),
+            child: content,
+          ),
+        );
+      }
+      return Dialog(backgroundColor: glass ? Colors.transparent : null, elevation: glass ? 0 : null, child: content);
     }
 
     return BottomSheetPageScaffold(
@@ -486,7 +500,7 @@ class _LibraryManagementSheetState extends State<_LibraryManagementSheet>
       shrinkWrap: shrinkWrap,
       onReorderItem: _reorderLibraries,
       itemCount: _tempLibraries.length,
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
       buildDefaultDragHandles: false,
       itemBuilder: (context, index) {
         final library = _tempLibraries[index];
@@ -533,7 +547,12 @@ class _LibraryManagementSheetState extends State<_LibraryManagementSheet>
       key: ValueKey(library.globalKey),
       opacity: isHidden ? 0.5 : 1.0,
       child: ListTile(
-        tileColor: tileColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        tileColor:
+            tileColor ??
+            (PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()
+                ? colorScheme.onSurface.withValues(alpha: 0.055)
+                : null),
         leading: Row(
           mainAxisSize: .min,
           children: [

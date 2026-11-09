@@ -401,8 +401,6 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Публичные серверы ретрансляции Open Watch Party, если не указан свой';
 	@override String get watchTogetherRelayHint => 'https://my-relay.example.com';
 	@override String get watchTogetherRelayInvalid => 'Введите допустимый базовый HTTP- или HTTPS-адрес сервера ретрансляции.';
-	@override String get crashReporting => 'Отчёты об ошибках';
-	@override String get crashReportingDescription => 'Отправлять отчёты об ошибках для улучшения приложения';
 	@override String get debugLogging => 'Журнал отладки';
 	@override String get debugLoggingDescription => 'Включить подробное журналирование для устранения неполадок';
 	@override String get viewLogs => 'Просмотр логов';
@@ -1094,9 +1092,6 @@ class _Translations$messages$ru extends Translations$messages$en {
 	@override String get serverBusyBody => 'Сервер продолжает отклонять запросы на потоковую передачу этого файла (HTTP 503). Возможно, он перезапускается, перегружен или хранилище с файлом недоступно. Повторите попытку через некоторое время. Если это продолжает происходить, попросите владельца сервера проверить сервер и хранилище с файлом.';
 	@override String get playbackNotAllowedTitle => 'Воспроизведение запрещено';
 	@override String get playbackNotAllowedBody => 'Сервер отказал в потоковой передаче этого элемента (HTTP 403). Возможно, у вашей учётной записи нет разрешения на его воспроизведение или сервер разрешает воспроизведение только в своей локальной сети.';
-	@override String get logsUploaded => 'Логи загружены';
-	@override String get logsUploadFailed => 'Не удалось загрузить логи';
-	@override String get logId => 'ID лога';
 	@override String get burnedSubtitlesUseMenu => 'Субтитры встроены в этот поток. Изменить их можно в меню субтитров.';
 	@override String get noVideoUrl => 'URL видео недоступен';
 	@override String get playbackNoMediaSources => 'Сервер не вернул пригодных для воспроизведения медиаисточников';
@@ -1487,7 +1482,6 @@ class _Translations$logs$ru extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Очистить логи';
 	@override String get copyLogs => 'Скопировать логи';
-	@override String get uploadLogs => 'Загрузить логи';
 }
 
 // Path: startup
@@ -1505,7 +1499,6 @@ class _Translations$startup$ru extends Translations$startup$en {
 	@override String get hideDetails => 'Скрыть сведения';
 	@override String get copyDetails => 'Копировать сведения';
 	@override String get detailsCopied => 'Сведения скопированы в буфер обмена';
-	@override String get uploadDetails => 'Отправить сведения';
 	@override String get repairStorage => 'Восстановить хранилище';
 	@override String get repairTitle => 'Восстановить сохранённые данные?';
 	@override String get repairBodyCommon => 'Файл настроек Satra повреждён и не может быть прочитан. Восстановление сбросит все настройки к значениям по умолчанию.';
@@ -3707,8 +3700,6 @@ extension on TranslationsRu {
 			'settings.watchTogetherRelayDescription' => 'Публичные серверы ретрансляции Open Watch Party, если не указан свой',
 			'settings.watchTogetherRelayHint' => 'https://my-relay.example.com',
 			'settings.watchTogetherRelayInvalid' => 'Введите допустимый базовый HTTP- или HTTPS-адрес сервера ретрансляции.',
-			'settings.crashReporting' => 'Отчёты об ошибках',
-			'settings.crashReportingDescription' => 'Отправлять отчёты об ошибках для улучшения приложения',
 			'settings.debugLogging' => 'Журнал отладки',
 			'settings.debugLoggingDescription' => 'Включить подробное журналирование для устранения неполадок',
 			'settings.viewLogs' => 'Просмотр логов',
@@ -3933,10 +3924,10 @@ extension on TranslationsRu {
 			'themeEditor.slots.text' => 'Текст',
 			'themeEditor.slots.textMuted' => 'Второстепенный текст',
 			'themeEditor.slots.accent' => 'Акцент',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Непрозрачность',
 			'themeEditor.hexHint' => '#RRGGBB или #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Из других тем',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} темы «${theme}»',
 			'themeEditor.contrast.textOnBg' => 'Текст на фоне',
@@ -4325,9 +4316,6 @@ extension on TranslationsRu {
 			'messages.serverBusyBody' => 'Сервер продолжает отклонять запросы на потоковую передачу этого файла (HTTP 503). Возможно, он перезапускается, перегружен или хранилище с файлом недоступно. Повторите попытку через некоторое время. Если это продолжает происходить, попросите владельца сервера проверить сервер и хранилище с файлом.',
 			'messages.playbackNotAllowedTitle' => 'Воспроизведение запрещено',
 			'messages.playbackNotAllowedBody' => 'Сервер отказал в потоковой передаче этого элемента (HTTP 403). Возможно, у вашей учётной записи нет разрешения на его воспроизведение или сервер разрешает воспроизведение только в своей локальной сети.',
-			'messages.logsUploaded' => 'Логи загружены',
-			'messages.logsUploadFailed' => 'Не удалось загрузить логи',
-			'messages.logId' => 'ID лога',
 			'messages.burnedSubtitlesUseMenu' => 'Субтитры встроены в этот поток. Изменить их можно в меню субтитров.',
 			'messages.noVideoUrl' => 'URL видео недоступен',
 			'messages.playbackNoMediaSources' => 'Сервер не вернул пригодных для воспроизведения медиаисточников',
@@ -4447,13 +4435,13 @@ extension on TranslationsRu {
 			'profiles.tokenIdentityMismatch' => 'Токен профиля Plex указал на неожиданный сервер',
 			'connections.sectionTitle' => 'Подключения',
 			'connections.addConnection' => 'Добавить подключение',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Войдите через Plex или подключите сервер Jellyfin или Emby',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Добавить к ${displayName}: Plex, Jellyfin, Emby или подключение другого профиля',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Сессия истекла для ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Сессия истекла для ${count} серверов',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} отказал в доступе этой учётной записи',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => 'Доступ для этой учётной записи запрещён на ${count} серверах',
 			'connections.signInAgain' => 'Войти снова',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Изменить подключение ${product}',
@@ -4691,7 +4679,6 @@ extension on TranslationsRu {
 			'hubDetail.noItemsFound' => 'Элементы не найдены',
 			'logs.clearLogs' => 'Очистить логи',
 			'logs.copyLogs' => 'Скопировать логи',
-			'logs.uploadLogs' => 'Загрузить логи',
 			'startup.failedTitle' => 'Satra не удалось запустить',
 			'startup.failedBody' => 'Во время запуска что-то пошло не так. Сведения ниже показывают, что именно не удалось.',
 			'startup.failedBodyRepairable' => 'Сохранённый файл настроек Satra повреждён, и его необходимо пересоздать, прежде чем Satra сможет запуститься. Повторные попытки не помогут — выберите «Восстановить хранилище».',
@@ -4700,7 +4687,6 @@ extension on TranslationsRu {
 			'startup.hideDetails' => 'Скрыть сведения',
 			'startup.copyDetails' => 'Копировать сведения',
 			'startup.detailsCopied' => 'Сведения скопированы в буфер обмена',
-			'startup.uploadDetails' => 'Отправить сведения',
 			'startup.repairStorage' => 'Восстановить хранилище',
 			'startup.repairTitle' => 'Восстановить сохранённые данные?',
 			'startup.repairBodyCommon' => 'Файл настроек Satra повреждён и не может быть прочитан. Восстановление сбросит все настройки к значениям по умолчанию.',
@@ -4961,8 +4947,6 @@ extension on TranslationsRu {
 			'liveTv.recordSettings.skipInLibrary' => 'Пропускать эпизоды, уже имеющиеся в библиотеке',
 			'liveTv.recordSettings.keepUpTo' => 'Сколько эпизодов хранить',
 			'liveTv.recordSettings.keepUpToHint' => '0 — хранить все эпизоды',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Начало через ${minutes} мин',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} в ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} вернул некорректные данные для воспроизведения ТВ в прямом эфире',
@@ -4970,6 +4954,8 @@ extension on TranslationsRu {
 			'liveTv.failedToBuildStreamUrl' => 'Не удалось сформировать URL потока',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Не удалось запустить канал: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Не удалось переключить канал: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Коллекции',
 			'collections.collection' => 'Коллекция',
 			'collections.empty' => 'Коллекция пуста',
@@ -5475,8 +5461,6 @@ extension on TranslationsRu {
 			'performanceOverlay.decoderExynosHw' => 'Exynos, аппаратный',
 			'performanceOverlay.decoderSoftware' => 'Программный',
 			'performanceOverlay.decoderHardware' => 'Аппаратный',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Активно',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (ошибок: ${failures})',
 			'externalPlayer.title' => 'Внешний плеер',
@@ -5484,6 +5468,8 @@ extension on TranslationsRu {
 			'externalPlayer.useExternalPlayerDescription' => 'Открывать видео в другом приложении',
 			'externalPlayer.selectPlayer' => 'Выбрать плеер',
 			'externalPlayer.customPlayers' => 'Свои плееры',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Системный по умолчанию',
 			'externalPlayer.addCustomPlayer' => 'Добавить свой плеер',
 			'externalPlayer.playerName' => 'Название плеера',

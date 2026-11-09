@@ -42,7 +42,7 @@ _EXCLUDED_ARGUMENT_RE = re.compile(r"(?:debugLabel|fontFamily)\s*:\s*$")
 _KEY_RE = re.compile(r"(?:\bKey|\bValueKey)\s*\(\s*$")
 # `log:`/`createdLog:` are diagnostic sinks, including inside lambdas.
 _DIAGNOSTIC_RE = re.compile(
-    r"(?:\bappLogger\.|\bSentry\.|\bassert\s*\(|\bthrow\b|(?:\blog|[a-z]Log)\s*:)"
+    r"(?:\bappLogger\.|\bassert\s*\(|\bthrow\b|(?:\blog|[a-z]Log)\s*:)"
 )
 _TRANSLATION_INTERPOLATION_RE = re.compile(
     r"\$\{\s*(?:t\.|context\.t\b|Translations\.of\s*\()"

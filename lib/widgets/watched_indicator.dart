@@ -85,10 +85,8 @@ class WatchedIndicator extends StatelessWidget {
     final bool showWatched = SettingsService.instance.read(SettingsService.showWatchedIndicators);
     final hasActiveProgress = item.hasActiveProgress;
     final unwatched = item.unwatchedCount;
-    final barRadius = BorderRadius.only(
-      bottomLeft: Radius.circular(size.barRadius),
-      bottomRight: Radius.circular(size.barRadius),
-    );
+    final barInset = size == WatchedIndicatorSize.standard ? (tokens(context).radiusSm * 0.5).clamp(10.0, 20.0) : 7.0;
+    final barBottom = size == WatchedIndicatorSize.standard ? (tokens(context).radiusSm * 0.35).clamp(8.0, 14.0) : 6.0;
     final checkInset = size == WatchedIndicatorSize.standard
         ? (tokens(context).radiusSm * 0.28).clamp(size.checkInset, 10.0)
         : size.checkInset;
@@ -124,32 +122,29 @@ class WatchedIndicator extends StatelessWidget {
         // Progress bar for partially watched content (episodes/movies)
         if (hasActiveProgress)
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ClipRRect(
-              borderRadius: barRadius,
-              child: MediaProgressBar(
-                viewOffset: item.viewOffsetMs!,
-                duration: item.durationMs!,
-                minHeight: size.barMinHeight,
-              ),
+            bottom: barBottom,
+            left: barInset,
+            right: barInset,
+            child: MediaProgressBar(
+              viewOffset: item.viewOffsetMs!,
+              duration: item.durationMs!,
+              minHeight: size.barMinHeight + 1,
+              backgroundColor: Colors.black.withValues(alpha: 0.65),
+              valueColor: Colors.white,
             ),
           ),
         // Progress bar for seasons (viewed leaves / total leaves).
         if (item.isSeason && item.isPartiallyWatched)
           Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: ClipRRect(
-              borderRadius: barRadius,
-              child: LinearProgressIndicator(
-                value: item.leafWatchFraction,
-                backgroundColor: tokens(context).outline,
-                valueColor: AlwaysStoppedAnimation<Color>(Theme.of(context).colorScheme.primary),
-                minHeight: size.barMinHeight,
-              ),
+            bottom: barBottom,
+            left: barInset,
+            right: barInset,
+            child: LinearProgressIndicator(
+              value: item.leafWatchFraction,
+              backgroundColor: Colors.black.withValues(alpha: 0.65),
+              valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
+              minHeight: size.barMinHeight + 1,
+              borderRadius: BorderRadius.circular(99),
             ),
           ),
       ],

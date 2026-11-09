@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "직접 설정하지 않으면 공개 Open Watch Party 릴레이를 사용합니다",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "올바른 HTTP 또는 HTTPS 릴레이 기본 URL을 입력하세요.",
-    "crashReporting": "충돌 보고",
-    "crashReportingDescription": "앱 개선을 위해 충돌 보고서 전송",
+
+
     "debugLogging": "디버그 로깅",
     "debugLoggingDescription": "문제 해결을 위해 상세 로깅 활성화",
     "viewLogs": "로그 보기",
@@ -966,9 +966,8 @@
     "serverBusyBody": "서버에서 이 파일의 스트리밍을 계속 거부했습니다(HTTP 503). 서버가 다시 시작 중이거나 사용량이 많을 수 있으며, 파일이 저장된 저장소가 오프라인일 수도 있습니다. 잠시 후 다시 시도하세요. 문제가 계속되면 서버 소유자에게 서버와 파일 저장소를 확인해 달라고 요청하세요.",
     "playbackNotAllowedTitle": "재생이 허용되지 않음",
     "playbackNotAllowedBody": "서버에서 이 항목의 스트리밍을 거부했습니다(HTTP 403). 계정에 재생 권한이 없거나 서버가 로컬 네트워크에서만 재생을 허용할 수 있습니다.",
-    "logsUploaded": "로그 업로드 완료",
-    "logsUploadFailed": "로그 업로드 실패",
-    "logId": "로그 ID",
+
+
     "burnedSubtitlesUseMenu": "자막이 이 스트림에 입혀져 있습니다. 자막 메뉴에서 변경하세요.",
     "noVideoUrl": "사용 가능한 비디오 URL이 없습니다",
     "playbackNoMediaSources": "서버에서 재생 가능한 미디어 소스를 반환하지 않았습니다",
@@ -1385,8 +1384,8 @@
   },
   "logs": {
     "clearLogs": "로그 지우기",
-    "copyLogs": "로그 복사",
-    "uploadLogs": "로그 업로드"
+    "copyLogs": "로그 복사"
+
   },
   "startup": {
     "failedTitle": "Satra를 시작하지 못했습니다",
@@ -1397,7 +1396,7 @@
     "hideDetails": "세부 정보 숨기기",
     "copyDetails": "세부 정보 복사",
     "detailsCopied": "세부 정보가 클립보드에 복사되었습니다",
-    "uploadDetails": "세부 정보 업로드",
+
     "repairStorage": "저장소 복구",
     "repairTitle": "저장된 데이터를 복구할까요?",
     "repairBodyCommon": "Satra의 설정 파일이 손상되어 읽을 수 없습니다. 복구하면 모든 설정이 기본값으로 재설정됩니다.",

@@ -308,8 +308,8 @@
     "watchTogetherRelayDescription": "Offentliga Open Watch Party-reläservrar om du inte anger en egen",
     "watchTogetherRelayHint": "https://mitt-rela.exempel.se",
     "watchTogetherRelayInvalid": "Ange en giltig HTTP- eller HTTPS-bas-URL för reläservern.",
-    "crashReporting": "Kraschrapportering",
-    "crashReportingDescription": "Skicka kraschrapporter för att förbättra appen",
+
+
     "debugLogging": "Felsökningsloggning",
     "debugLoggingDescription": "Aktivera detaljerad loggning för felsökning",
     "viewLogs": "Visa loggar",
@@ -970,9 +970,8 @@
     "serverBusyBody": "Servern nekade upprepade gånger att strömma den här filen (HTTP 503). Den kan hålla på att startas om eller vara upptagen, eller så kan lagringen där filen finns vara offline. Försök igen om en stund – om det fortsätter, be serverns ägare att kontrollera servern och lagringen där filen finns.",
     "playbackNotAllowedTitle": "Uppspelning tillåts inte",
     "playbackNotAllowedBody": "Servern vägrade att strömma det här objektet (HTTP 403). Ditt konto kanske inte har behörighet att spela upp det, eller så tillåter servern kanske bara uppspelning i sitt lokala nätverk.",
-    "logsUploaded": "Loggarna har laddats upp",
-    "logsUploadFailed": "Det gick inte att ladda upp loggarna",
-    "logId": "Logg-ID",
+
+
     "burnedSubtitlesUseMenu": "Undertexterna är inbrända i den här strömmen. Ändra dem via undertextmenyn.",
     "noVideoUrl": "Ingen video-URL är tillgänglig",
     "playbackNoMediaSources": "Servern returnerade inga spelbara mediekällor",
@@ -1390,8 +1389,8 @@
   },
   "logs": {
     "clearLogs": "Rensa loggar",
-    "copyLogs": "Kopiera loggar",
-    "uploadLogs": "Ladda upp loggar"
+    "copyLogs": "Kopiera loggar"
+
   },
   "startup": {
     "failedTitle": "Satra kunde inte starta",
@@ -1402,7 +1401,7 @@
     "hideDetails": "Dölj detaljer",
     "copyDetails": "Kopiera detaljer",
     "detailsCopied": "Detaljer kopierade till urklipp",
-    "uploadDetails": "Ladda upp detaljer",
+
     "repairStorage": "Reparera lagring",
     "repairTitle": "Reparera lagrade data?",
     "repairBodyCommon": "Satras inställningsfil är skadad och kan inte läsas. Reparationen återställer alla inställningar till standard.",

@@ -29,6 +29,7 @@ class MediaProgressBar extends StatelessWidget {
       backgroundColor: backgroundColor ?? Theme.of(context).colorScheme.surfaceContainerHighest,
       valueColor: AlwaysStoppedAnimation<Color>(valueColor ?? Theme.of(context).colorScheme.primary),
       minHeight: minHeight ?? 4,
+      borderRadius: BorderRadius.circular(99),
     );
   }
 }

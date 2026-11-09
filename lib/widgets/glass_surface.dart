@@ -8,6 +8,15 @@ import 'package:flutter/services.dart';
 import '../theme/app_motion.dart';
 import 'linux_video_blur.dart';
 
+/// Drives a glass surface without placing its backdrop filter in an opacity layer.
+class GlassTransitionScope extends InheritedNotifier<Animation<double>> {
+  const GlassTransitionScope({super.key, required Animation<double> animation, required super.child})
+    : super(notifier: animation);
+
+  static Animation<double>? of(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<GlassTransitionScope>()?.notifier;
+}
+
 /// A translucent pane with one GPU backdrop blur clipped to its bounds.
 class GlassSurface extends StatelessWidget {
   const GlassSurface({
@@ -39,24 +48,34 @@ class GlassSurface extends StatelessWidget {
     if (!enabled) return child;
     final scheme = Theme.of(context).colorScheme;
     final effects = AppMotion.effectsEnabled(context);
+    final animation = GlassTransitionScope.of(context);
+    final visibility = (animation?.value ?? 1.0).clamp(0.0, 1.0);
     final surface = tint ?? scheme.surface;
-    final effectiveAlpha = effects ? opacity : 1.0;
+    final effectiveAlpha = (effects ? opacity : 1.0) * visibility;
     final pane = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: borderRadius,
         color: surface.withValues(alpha: effectiveAlpha),
         border: border
-            ? Border.all(color: Colors.white.withValues(alpha: scheme.brightness == Brightness.dark ? 0.10 : 0.8))
+            ? Border.all(
+                color: Colors.white.withValues(alpha: (scheme.brightness == Brightness.dark ? 0.10 : 0.8) * visibility),
+              )
             : null,
         gradient: effects
             ? LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
-                colors: [Colors.white.withValues(alpha: 0.055), Colors.transparent],
+                colors: [
+                  Colors.white.withValues(alpha: 0.055 * visibility),
+                  Colors.transparent,
+                ],
               )
             : null,
       ),
-      child: Material(type: MaterialType.transparency, child: child),
+      child: Material(
+        type: MaterialType.transparency,
+        child: animation == null ? child : Opacity(opacity: visibility, child: child),
+      ),
     );
     final glass = ClipRRect(
       borderRadius: borderRadius,
@@ -79,7 +98,11 @@ class GlassSurface extends StatelessWidget {
             )
           : BackdropFilter(
               enabled: effects,
-              filter: ui.ImageFilter.blur(sigmaX: sigma, sigmaY: sigma, tileMode: ui.TileMode.clamp),
+              filter: ui.ImageFilter.blur(
+                sigmaX: sigma * visibility,
+                sigmaY: sigma * visibility,
+                tileMode: ui.TileMode.clamp,
+              ),
               child: pane,
             ),
     );

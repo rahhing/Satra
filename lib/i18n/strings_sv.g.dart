@@ -401,8 +401,6 @@ class _Translations$settings$sv extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Offentliga Open Watch Party-reläservrar om du inte anger en egen';
 	@override String get watchTogetherRelayHint => 'https://mitt-rela.exempel.se';
 	@override String get watchTogetherRelayInvalid => 'Ange en giltig HTTP- eller HTTPS-bas-URL för reläservern.';
-	@override String get crashReporting => 'Kraschrapportering';
-	@override String get crashReportingDescription => 'Skicka kraschrapporter för att förbättra appen';
 	@override String get debugLogging => 'Felsökningsloggning';
 	@override String get debugLoggingDescription => 'Aktivera detaljerad loggning för felsökning';
 	@override String get viewLogs => 'Visa loggar';
@@ -1086,9 +1084,6 @@ class _Translations$messages$sv extends Translations$messages$en {
 	@override String get serverBusyBody => 'Servern nekade upprepade gånger att strömma den här filen (HTTP 503). Den kan hålla på att startas om eller vara upptagen, eller så kan lagringen där filen finns vara offline. Försök igen om en stund – om det fortsätter, be serverns ägare att kontrollera servern och lagringen där filen finns.';
 	@override String get playbackNotAllowedTitle => 'Uppspelning tillåts inte';
 	@override String get playbackNotAllowedBody => 'Servern vägrade att strömma det här objektet (HTTP 403). Ditt konto kanske inte har behörighet att spela upp det, eller så tillåter servern kanske bara uppspelning i sitt lokala nätverk.';
-	@override String get logsUploaded => 'Loggarna har laddats upp';
-	@override String get logsUploadFailed => 'Det gick inte att ladda upp loggarna';
-	@override String get logId => 'Logg-ID';
 	@override String get burnedSubtitlesUseMenu => 'Undertexterna är inbrända i den här strömmen. Ändra dem via undertextmenyn.';
 	@override String get noVideoUrl => 'Ingen video-URL är tillgänglig';
 	@override String get playbackNoMediaSources => 'Servern returnerade inga spelbara mediekällor';
@@ -1477,7 +1472,6 @@ class _Translations$logs$sv extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Rensa loggar';
 	@override String get copyLogs => 'Kopiera loggar';
-	@override String get uploadLogs => 'Ladda upp loggar';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$sv extends Translations$startup$en {
 	@override String get hideDetails => 'Dölj detaljer';
 	@override String get copyDetails => 'Kopiera detaljer';
 	@override String get detailsCopied => 'Detaljer kopierade till urklipp';
-	@override String get uploadDetails => 'Ladda upp detaljer';
 	@override String get repairStorage => 'Reparera lagring';
 	@override String get repairTitle => 'Reparera lagrade data?';
 	@override String get repairBodyCommon => 'Satras inställningsfil är skadad och kan inte läsas. Reparationen återställer alla inställningar till standard.';
@@ -3683,8 +3676,6 @@ extension on TranslationsSv {
 			'settings.watchTogetherRelayDescription' => 'Offentliga Open Watch Party-reläservrar om du inte anger en egen',
 			'settings.watchTogetherRelayHint' => 'https://mitt-rela.exempel.se',
 			'settings.watchTogetherRelayInvalid' => 'Ange en giltig HTTP- eller HTTPS-bas-URL för reläservern.',
-			'settings.crashReporting' => 'Kraschrapportering',
-			'settings.crashReportingDescription' => 'Skicka kraschrapporter för att förbättra appen',
 			'settings.debugLogging' => 'Felsökningsloggning',
 			'settings.debugLoggingDescription' => 'Aktivera detaljerad loggning för felsökning',
 			'settings.viewLogs' => 'Visa loggar',
@@ -3909,10 +3900,10 @@ extension on TranslationsSv {
 			'themeEditor.slots.text' => 'Text',
 			'themeEditor.slots.textMuted' => 'Sekundär text',
 			'themeEditor.slots.accent' => 'Accentfärg',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Opacitet',
 			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Från andra teman',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Text på bakgrund',
@@ -4301,9 +4292,6 @@ extension on TranslationsSv {
 			'messages.serverBusyBody' => 'Servern nekade upprepade gånger att strömma den här filen (HTTP 503). Den kan hålla på att startas om eller vara upptagen, eller så kan lagringen där filen finns vara offline. Försök igen om en stund – om det fortsätter, be serverns ägare att kontrollera servern och lagringen där filen finns.',
 			'messages.playbackNotAllowedTitle' => 'Uppspelning tillåts inte',
 			'messages.playbackNotAllowedBody' => 'Servern vägrade att strömma det här objektet (HTTP 403). Ditt konto kanske inte har behörighet att spela upp det, eller så tillåter servern kanske bara uppspelning i sitt lokala nätverk.',
-			'messages.logsUploaded' => 'Loggarna har laddats upp',
-			'messages.logsUploadFailed' => 'Det gick inte att ladda upp loggarna',
-			'messages.logId' => 'Logg-ID',
 			'messages.burnedSubtitlesUseMenu' => 'Undertexterna är inbrända i den här strömmen. Ändra dem via undertextmenyn.',
 			'messages.noVideoUrl' => 'Ingen video-URL är tillgänglig',
 			'messages.playbackNoMediaSources' => 'Servern returnerade inga spelbara mediekällor',
@@ -4423,13 +4411,13 @@ extension on TranslationsSv {
 			'profiles.tokenIdentityMismatch' => 'Plex-profiltoken kopplades till en oväntad server',
 			'connections.sectionTitle' => 'Anslutningar',
 			'connections.addConnection' => 'Lägg till anslutning',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Logga in med Plex eller anslut en Jellyfin- eller Emby-server',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Lägg till för ${displayName}: Plex, Jellyfin, Emby eller en annan profilanslutning',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessionen har gått ut för ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessionen har gått ut för ${count} servrar',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} nekade åtkomst för det här kontot',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servrar nekade åtkomst för det här kontot',
 			'connections.signInAgain' => 'Logga in igen',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Redigera ${product}-anslutning',
@@ -4667,7 +4655,6 @@ extension on TranslationsSv {
 			'hubDetail.noItemsFound' => 'Inga objekt hittades',
 			'logs.clearLogs' => 'Rensa loggar',
 			'logs.copyLogs' => 'Kopiera loggar',
-			'logs.uploadLogs' => 'Ladda upp loggar',
 			'startup.failedTitle' => 'Satra kunde inte starta',
 			'startup.failedBody' => 'Något gick fel under starten. Detaljerna nedan visar vad som misslyckades.',
 			'startup.failedBodyRepairable' => 'Satras sparade inställningsfil är skadad och måste byggas om innan Satra kan starta. Att försöka igen hjälper inte — välj Reparera lagring.',
@@ -4676,7 +4663,6 @@ extension on TranslationsSv {
 			'startup.hideDetails' => 'Dölj detaljer',
 			'startup.copyDetails' => 'Kopiera detaljer',
 			'startup.detailsCopied' => 'Detaljer kopierade till urklipp',
-			'startup.uploadDetails' => 'Ladda upp detaljer',
 			'startup.repairStorage' => 'Reparera lagring',
 			'startup.repairTitle' => 'Reparera lagrade data?',
 			'startup.repairBodyCommon' => 'Satras inställningsfil är skadad och kan inte läsas. Reparationen återställer alla inställningar till standard.',
@@ -4937,8 +4923,6 @@ extension on TranslationsSv {
 			'liveTv.recordSettings.skipInLibrary' => 'Hoppa över avsnitt som redan finns i biblioteket',
 			'liveTv.recordSettings.keepUpTo' => 'Avsnitt att behålla',
 			'liveTv.recordSettings.keepUpToHint' => '0 behåller alla avsnitt',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Börjar om ${minutes} min',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} kl. ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} returnerade ogiltiga uppspelningsdata för Live-TV',
@@ -4946,6 +4930,8 @@ extension on TranslationsSv {
 			'liveTv.failedToBuildStreamUrl' => 'Kunde inte skapa strömmens URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Det gick inte att starta kanalen: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Det gick inte att byta kanal: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Samlingar',
 			'collections.collection' => 'Samling',
 			'collections.empty' => 'Samlingen är tom',
@@ -5451,8 +5437,6 @@ extension on TranslationsSv {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Programvara',
 			'performanceOverlay.decoderHardware' => 'Maskinvara',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Aktiv',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} misslyckades)',
 			'externalPlayer.title' => 'Extern spelare',
@@ -5460,6 +5444,8 @@ extension on TranslationsSv {
 			'externalPlayer.useExternalPlayerDescription' => 'Öppna videor i en annan app',
 			'externalPlayer.selectPlayer' => 'Välj spelare',
 			'externalPlayer.customPlayers' => 'Anpassade spelare',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Lägg till anpassad spelare',
 			'externalPlayer.playerName' => 'Spelarnamn',

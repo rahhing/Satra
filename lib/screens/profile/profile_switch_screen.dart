@@ -24,6 +24,7 @@ import '../../widgets/focusable_popup_menu_button.dart';
 import '../../widgets/focused_scroll_scaffold.dart';
 import '../../widgets/profile_switching_overlay.dart';
 import '../../widgets/deep_link_dialog.dart';
+import '../../widgets/utility_panel_route.dart';
 import '../libraries/state_messages.dart';
 import 'add_local_profile_screen.dart';
 import 'pin_entry_dialog.dart';
@@ -225,6 +226,9 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
             // wrapper sits inside the Card (clipped by its shape) rather than
             // around it.
             child: Card(
+              color: UtilityPanelScope.isPresent(context)
+                  ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)
+                  : null,
               shape: RoundedRectangleBorder(borderRadius: tileRadii),
               clipBehavior: Clip.antiAlias,
               child: FocusableWrapper(
@@ -410,6 +414,7 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
     setState(() => _switching = true);
     try {
       final route = ModalRoute.of(context);
+      final panelRoute = UtilityPanelScope.routeOf(context);
       final navigator = Navigator.of(context, rootNavigator: true);
       final switched = await switchProfileFromUi(context, profile);
       if (!mounted || !switched) return;
@@ -420,8 +425,12 @@ class _ProfileSwitchScreenState extends State<ProfileSwitchScreen> with MountedS
       // `navigator.pop(true)` after the unbounded switch-await pops
       // whatever is topmost — it can dismiss a confirmation dialog WITH
       // `true` (auto-confirming a delete) or close the wrong screen.
-      if (route != null && route.isCurrent) {
-        navigator.pop(true);
+      if (route != null && route.isCurrent && (panelRoute == null || panelRoute.isCurrent)) {
+        if (panelRoute != null) {
+          navigator.pop();
+        } else {
+          navigator.pop(true);
+        }
       }
     } finally {
       setStateIfMounted(() => _switching = false);

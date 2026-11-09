@@ -13,6 +13,8 @@ import '../../focus/focusable_button.dart';
 import '../../focus/key_event_utils.dart';
 import '../dialog_action_button.dart';
 import '../app_icon.dart';
+import '../glass_surface.dart';
+import '../../utils/platform_detector.dart';
 
 class RemoteSessionDialog extends StatefulWidget {
   const RemoteSessionDialog({super.key});
@@ -140,85 +142,94 @@ class _RemoteSessionDialogState extends State<RemoteSessionDialog> with MountedS
             );
           }
 
+          final glass = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
           return Dialog(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 500),
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: .min,
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    Row(
-                      children: [
-                        const AppIcon(Symbols.phone_android_rounded, size: 32),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: .start,
-                            children: [
-                              Text(t.companionRemote.title, style: Theme.of(context).textTheme.headlineSmall),
-                              const SizedBox(height: 4),
-                              _buildStatusLine(context, provider),
-                            ],
+            backgroundColor: glass ? Colors.transparent : null,
+            elevation: glass ? 0 : null,
+            child: GlassSurface(
+              enabled: glass,
+              tint: Theme.of(context).scaffoldBackgroundColor,
+              opacity: 0.88,
+              borderRadius: BorderRadius.circular(22),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 500),
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: .min,
+                    crossAxisAlignment: .stretch,
+                    children: [
+                      Row(
+                        children: [
+                          const AppIcon(Symbols.phone_android_rounded, size: 32),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: .start,
+                              children: [
+                                Text(t.companionRemote.title, style: Theme.of(context).textTheme.headlineSmall),
+                                const SizedBox(height: 4),
+                                _buildStatusLine(context, provider),
+                              ],
+                            ),
                           ),
-                        ),
-                        FocusableButton(
-                          focusNode: _closeFocusNode,
-                          onPressed: _close,
-                          onBack: _close,
-                          onNavigateDown: () => _toggleFocusNode.requestFocus(),
-                          useBackgroundFocus: true,
-                          child: IconButton(icon: const AppIcon(Symbols.close_rounded), onPressed: _close),
-                        ),
+                          FocusableButton(
+                            focusNode: _closeFocusNode,
+                            onPressed: _close,
+                            onBack: _close,
+                            onNavigateDown: () => _toggleFocusNode.requestFocus(),
+                            useBackgroundFocus: true,
+                            child: IconButton(icon: const AppIcon(Symbols.close_rounded), onPressed: _close),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+
+                      _buildServerStatus(context, provider),
+
+                      if (provider.connectedDevice != null) ...[
+                        const SizedBox(height: 16),
+                        _buildConnectedDevice(context, provider),
                       ],
-                    ),
-                    const SizedBox(height: 24),
 
-                    _buildServerStatus(context, provider),
-
-                    if (provider.connectedDevice != null) ...[
-                      const SizedBox(height: 16),
-                      _buildConnectedDevice(context, provider),
-                    ],
-
-                    const SizedBox(height: 24),
-                    Row(
-                      mainAxisAlignment: .end,
-                      children: [
-                        FocusableButton(
-                          autofocus: true,
-                          focusNode: _toggleFocusNode,
-                          onPressed: _toggleServer,
-                          onBack: _close,
-                          onNavigateUp: () => _closeFocusNode.requestFocus(),
-                          onNavigateRight: () => _minimizeFocusNode.requestFocus(),
-                          useBackgroundFocus: true,
-                          child: TextButton.icon(
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisAlignment: .end,
+                        children: [
+                          FocusableButton(
+                            autofocus: true,
+                            focusNode: _toggleFocusNode,
                             onPressed: _toggleServer,
-                            icon: AppIcon(
-                              provider.isHostServerRunning ? Symbols.stop_rounded : Symbols.play_arrow_rounded,
-                            ),
-                            label: Text(
-                              provider.isHostServerRunning
-                                  ? t.companionRemote.session.stopServer
-                                  : t.companionRemote.session.startServer,
+                            onBack: _close,
+                            onNavigateUp: () => _closeFocusNode.requestFocus(),
+                            onNavigateRight: () => _minimizeFocusNode.requestFocus(),
+                            useBackgroundFocus: true,
+                            child: TextButton.icon(
+                              onPressed: _toggleServer,
+                              icon: AppIcon(
+                                provider.isHostServerRunning ? Symbols.stop_rounded : Symbols.play_arrow_rounded,
+                              ),
+                              label: Text(
+                                provider.isHostServerRunning
+                                    ? t.companionRemote.session.stopServer
+                                    : t.companionRemote.session.startServer,
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 8),
-                        FocusableButton(
-                          focusNode: _minimizeFocusNode,
-                          onPressed: _close,
-                          onBack: _close,
-                          onNavigateUp: () => _closeFocusNode.requestFocus(),
-                          onNavigateLeft: () => _toggleFocusNode.requestFocus(),
-                          useBackgroundFocus: true,
-                          child: FilledButton(onPressed: _close, child: Text(t.companionRemote.session.minimize)),
-                        ),
-                      ],
-                    ),
-                  ],
+                          const SizedBox(width: 8),
+                          FocusableButton(
+                            focusNode: _minimizeFocusNode,
+                            onPressed: _close,
+                            onBack: _close,
+                            onNavigateUp: () => _closeFocusNode.requestFocus(),
+                            onNavigateLeft: () => _toggleFocusNode.requestFocus(),
+                            useBackgroundFocus: true,
+                            child: FilledButton(onPressed: _close, child: Text(t.companionRemote.session.minimize)),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -251,6 +262,9 @@ class _RemoteSessionDialogState extends State<RemoteSessionDialog> with MountedS
     final isRunning = provider.isHostServerRunning;
 
     return Card(
+      color: PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()
+          ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Row(
@@ -300,6 +314,9 @@ class _RemoteSessionDialogState extends State<RemoteSessionDialog> with MountedS
   Widget _buildConnectedDevice(BuildContext context, CompanionRemoteProvider provider) {
     final device = provider.connectedDevice!;
     return Card(
+      color: PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()
+          ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)
+          : null,
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(

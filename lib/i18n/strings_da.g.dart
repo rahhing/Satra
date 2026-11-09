@@ -401,8 +401,6 @@ class _Translations$settings$da extends Translations$settings$en {
 	@override String get watchTogetherRelayDescription => 'Offentlige Open Watch Party-relayservere, medmindre du angiver din egen';
 	@override String get watchTogetherRelayHint => 'https://min-relay.eksempel.dk';
 	@override String get watchTogetherRelayInvalid => 'Angiv en gyldig basis-URL til en HTTP- eller HTTPS-relayserver.';
-	@override String get crashReporting => 'Fejlrapportering';
-	@override String get crashReportingDescription => 'Send fejlrapporter for at hjælpe med at forbedre appen';
 	@override String get debugLogging => 'Fejlfindingslogning';
 	@override String get debugLoggingDescription => 'Aktiver detaljeret logning til fejlfinding';
 	@override String get viewLogs => 'Vis logfiler';
@@ -1086,9 +1084,6 @@ class _Translations$messages$da extends Translations$messages$en {
 	@override String get serverBusyBody => 'Serveren blev ved med at afvise at streame denne fil (HTTP 503). Den er muligvis ved at genstarte eller optaget, eller filens lager er muligvis offline. Prøv igen om et øjeblik – hvis det bliver ved med at ske, skal du bede serverejeren om at kontrollere serveren og filens lager.';
 	@override String get playbackNotAllowedTitle => 'Afspilning er ikke tilladt';
 	@override String get playbackNotAllowedBody => 'Serveren afviste at streame dette emne (HTTP 403). Din konto har muligvis ikke tilladelse til at afspille det, eller serveren tillader muligvis kun afspilning på sit lokale netværk.';
-	@override String get logsUploaded => 'Logfilerne blev uploadet';
-	@override String get logsUploadFailed => 'Logfilerne kunne ikke uploades';
-	@override String get logId => 'Log-ID';
 	@override String get burnedSubtitlesUseMenu => 'Underteksterne er indbrændt i denne stream. Skift dem i undertekstmenuen.';
 	@override String get noVideoUrl => 'Ingen video-URL er tilgængelig';
 	@override String get playbackNoMediaSources => 'Serveren returnerede ingen mediekilder, der kan afspilles';
@@ -1477,7 +1472,6 @@ class _Translations$logs$da extends Translations$logs$en {
 	// Translations
 	@override String get clearLogs => 'Ryd logfiler';
 	@override String get copyLogs => 'Kopiér logfiler';
-	@override String get uploadLogs => 'Upload logfiler';
 }
 
 // Path: startup
@@ -1495,7 +1489,6 @@ class _Translations$startup$da extends Translations$startup$en {
 	@override String get hideDetails => 'Skjul detaljer';
 	@override String get copyDetails => 'Kopiér detaljer';
 	@override String get detailsCopied => 'Detaljer kopieret til udklipsholder';
-	@override String get uploadDetails => 'Upload detaljer';
 	@override String get repairStorage => 'Reparer lager';
 	@override String get repairTitle => 'Reparer gemte data?';
 	@override String get repairBodyCommon => 'Satra\'s indstillingsfil er beskadiget og kan ikke læses. Reparation nulstiller alle indstillinger til deres standardværdier.';
@@ -3683,8 +3676,6 @@ extension on TranslationsDa {
 			'settings.watchTogetherRelayDescription' => 'Offentlige Open Watch Party-relayservere, medmindre du angiver din egen',
 			'settings.watchTogetherRelayHint' => 'https://min-relay.eksempel.dk',
 			'settings.watchTogetherRelayInvalid' => 'Angiv en gyldig basis-URL til en HTTP- eller HTTPS-relayserver.',
-			'settings.crashReporting' => 'Fejlrapportering',
-			'settings.crashReportingDescription' => 'Send fejlrapporter for at hjælpe med at forbedre appen',
 			'settings.debugLogging' => 'Fejlfindingslogning',
 			'settings.debugLoggingDescription' => 'Aktiver detaljeret logning til fejlfinding',
 			'settings.viewLogs' => 'Vis logfiler',
@@ -3909,10 +3900,10 @@ extension on TranslationsDa {
 			'themeEditor.slots.text' => 'Tekst',
 			'themeEditor.slots.textMuted' => 'Sekundær tekst',
 			'themeEditor.slots.accent' => 'Accentfarve',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.opacity' => 'Opacitet',
 			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.fromOtherThemes' => 'Fra andre temaer',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Tekst på baggrund',
@@ -4301,9 +4292,6 @@ extension on TranslationsDa {
 			'messages.serverBusyBody' => 'Serveren blev ved med at afvise at streame denne fil (HTTP 503). Den er muligvis ved at genstarte eller optaget, eller filens lager er muligvis offline. Prøv igen om et øjeblik – hvis det bliver ved med at ske, skal du bede serverejeren om at kontrollere serveren og filens lager.',
 			'messages.playbackNotAllowedTitle' => 'Afspilning er ikke tilladt',
 			'messages.playbackNotAllowedBody' => 'Serveren afviste at streame dette emne (HTTP 403). Din konto har muligvis ikke tilladelse til at afspille det, eller serveren tillader muligvis kun afspilning på sit lokale netværk.',
-			'messages.logsUploaded' => 'Logfilerne blev uploadet',
-			'messages.logsUploadFailed' => 'Logfilerne kunne ikke uploades',
-			'messages.logId' => 'Log-ID',
 			'messages.burnedSubtitlesUseMenu' => 'Underteksterne er indbrændt i denne stream. Skift dem i undertekstmenuen.',
 			'messages.noVideoUrl' => 'Ingen video-URL er tilgængelig',
 			'messages.playbackNoMediaSources' => 'Serveren returnerede ingen mediekilder, der kan afspilles',
@@ -4423,13 +4411,13 @@ extension on TranslationsDa {
 			'profiles.tokenIdentityMismatch' => 'Plex-profiltokenet blev knyttet til en uventet server',
 			'connections.sectionTitle' => 'Forbindelser',
 			'connections.addConnection' => 'Tilføj forbindelse',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnectionSubtitleNoProfile' => 'Log ind med Plex eller forbind til en Jellyfin- eller Emby-server',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Føj til ${displayName}: Plex, Jellyfin, Emby eller en anden profilforbindelse',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessionen er udløbet for ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessionerne er udløbet for ${count} servere',
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} nægtede adgang for denne konto',
+			_ => null,
+		} ?? switch (path) {
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servere nægtede adgang for denne konto',
 			'connections.signInAgain' => 'Log ind igen',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Rediger ${product}-forbindelse',
@@ -4667,7 +4655,6 @@ extension on TranslationsDa {
 			'hubDetail.noItemsFound' => 'Ingen elementer fundet',
 			'logs.clearLogs' => 'Ryd logfiler',
 			'logs.copyLogs' => 'Kopiér logfiler',
-			'logs.uploadLogs' => 'Upload logfiler',
 			'startup.failedTitle' => 'Satra kunne ikke starte',
 			'startup.failedBody' => 'Der gik noget galt under opstart. Oplysningerne nedenfor viser, hvad der gik galt.',
 			'startup.failedBodyRepairable' => 'Satra\'s gemte indstillingsfil er beskadiget og skal genopbygges, før Satra kan starte. Det hjælper ikke at prøve igen — vælg Reparer lager.',
@@ -4676,7 +4663,6 @@ extension on TranslationsDa {
 			'startup.hideDetails' => 'Skjul detaljer',
 			'startup.copyDetails' => 'Kopiér detaljer',
 			'startup.detailsCopied' => 'Detaljer kopieret til udklipsholder',
-			'startup.uploadDetails' => 'Upload detaljer',
 			'startup.repairStorage' => 'Reparer lager',
 			'startup.repairTitle' => 'Reparer gemte data?',
 			'startup.repairBodyCommon' => 'Satra\'s indstillingsfil er beskadiget og kan ikke læses. Reparation nulstiller alle indstillinger til deres standardværdier.',
@@ -4937,8 +4923,6 @@ extension on TranslationsDa {
 			'liveTv.recordSettings.skipInLibrary' => 'Spring afsnit over, der allerede er i biblioteket',
 			'liveTv.recordSettings.keepUpTo' => 'Afsnit der skal beholdes',
 			'liveTv.recordSettings.keepUpToHint' => '0 beholder alle afsnit',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.startingInMinutes' => ({required Object minutes}) => 'Starter om ${minutes} min',
 			'liveTv.dayAtTime' => ({required Object day, required Object time}) => '${day} kl. ${time}',
 			'liveTv.invalidPlaybackData' => ({required Object product}) => '${product} returnerede ugyldige afspilningsdata for Live TV',
@@ -4946,6 +4930,8 @@ extension on TranslationsDa {
 			'liveTv.failedToBuildStreamUrl' => 'Kunne ikke oprette stream-URL\'en',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kunne ikke starte kanalen: ${reason}',
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kunne ikke skifte kanal: ${reason}',
+			_ => null,
+		} ?? switch (path) {
 			'collections.title' => 'Samlinger',
 			'collections.collection' => 'Samling',
 			'collections.empty' => 'Samlingen er tom',
@@ -5451,8 +5437,6 @@ extension on TranslationsDa {
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',
 			'performanceOverlay.decoderSoftware' => 'Software',
 			'performanceOverlay.decoderHardware' => 'Hardware',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.tunnelingActive' => 'Aktiv',
 			'performanceOverlay.dvRpuFailed' => ({required Object converted, required Object failures}) => '${converted} (${failures} mislykkedes)',
 			'externalPlayer.title' => 'Ekstern afspiller',
@@ -5460,6 +5444,8 @@ extension on TranslationsDa {
 			'externalPlayer.useExternalPlayerDescription' => 'Åbn videoer i en anden app',
 			'externalPlayer.selectPlayer' => 'Vælg afspiller',
 			'externalPlayer.customPlayers' => 'Brugerdefinerede afspillere',
+			_ => null,
+		} ?? switch (path) {
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Tilføj brugerdefineret afspiller',
 			'externalPlayer.playerName' => 'Afspillernavn',

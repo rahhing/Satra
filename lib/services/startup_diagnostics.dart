@@ -34,10 +34,9 @@ enum StartupRepairResult {
 /// which step failed, and `Future.wait` discarded every error but the first,
 /// so even that was ambiguous between four concurrent steps (#1732). Every
 /// step now carries a stable identifier that reaches the failure screen, the
-/// log, the persisted record and Sentry.
+/// log and the persisted record.
 enum StartupPhase {
   preferences('preferences'),
-  crashReporting('crash-reporting'),
   locale('locale'),
   windowManager('window-manager'),
   deviceCapabilities('device-capabilities'),
@@ -49,7 +48,7 @@ enum StartupPhase {
 
   const StartupPhase(this.id);
 
-  /// Stable wire/log identifier. Do not rename: persisted records and Sentry
+  /// Stable wire/log identifier. Do not rename: persisted records and logs
   /// tags are matched on it.
   final String id;
 
@@ -105,7 +104,6 @@ class StartupFailureRecord {
     required this.appVersion,
     required this.platform,
     this.repairable = false,
-    this.reported = false,
     String? id,
   }) : id = id ?? _newRecordId(),
        message = LogRedactionManager.redact(message),
@@ -159,9 +157,7 @@ class StartupFailureRecord {
   /// Distinguishes this record from any other, including one written moments
   /// later by a retry that also failed.
   ///
-  /// A slow flush can still be sending record A when a retry writes record B;
-  /// without an identity, marking A reported would overwrite B on disk and
-  /// lose the newer failure entirely.
+  /// This lets the local diagnostics distinguish a later retry failure.
   final String id;
 
   final StartupPhase? phase;
@@ -179,27 +175,6 @@ class StartupFailureRecord {
 
   /// Whether the gate can offer an in-app repair for this failure.
   final bool repairable;
-
-  /// Whether this record has already reached the crash reporter.
-  ///
-  /// The earliest gate phases run before crash reporting is initialised, so a
-  /// failure there is captured by a no-op hub and silently discarded. Records
-  /// are therefore always persisted first and sent once the reporter is up —
-  /// on the in-app retry, or on the next launch (#1732).
-  final bool reported;
-
-  StartupFailureRecord copyWith({bool? reported}) => StartupFailureRecord(
-    id: id,
-    phase: phase,
-    errorType: errorType,
-    message: message,
-    stackTrace: stackTrace,
-    timestamp: timestamp,
-    appVersion: appVersion,
-    platform: platform,
-    repairable: repairable,
-    reported: reported ?? this.reported,
-  );
 
   String get phaseId => phase?.id ?? 'unknown';
 
@@ -241,7 +216,6 @@ class StartupFailureRecord {
     'appVersion': appVersion,
     'platform': platform,
     'repairable': repairable,
-    'reported': reported,
   };
 
   static StartupFailureRecord? fromJson(Map<String, Object?> json) {
@@ -261,7 +235,6 @@ class StartupFailureRecord {
       appVersion: json['appVersion'] as String? ?? 'unknown',
       platform: json['platform'] as String? ?? 'unknown',
       repairable: json['repairable'] as bool? ?? false,
-      reported: json['reported'] as bool? ?? false,
     );
   }
 }
@@ -283,9 +256,6 @@ abstract final class StartupDiagnosticsStore {
   static Directory? debugDirectoryOverride;
 
   static StartupFailureRecord? _pending;
-
-  /// A crash-report flush that must finish before the record may be consumed.
-  static Future<void>? _flushInFlight;
 
   /// The persist started by [record]. Callers launch it unawaited from the
   /// failure path, so every later reader has to settle it first or it can land
@@ -321,7 +291,7 @@ abstract final class StartupDiagnosticsStore {
   /// Writes are launched unawaited from the failure path, and a retry that
   /// also fails writes while the first one may still be running. Two
   /// concurrent writers to one file can land out of order, and a
-  /// read-modify-write like [markReported] can interleave with a write and
+  /// read-modify-write can interleave with a write and
   /// resurrect the record it just superseded. Chaining makes disk order match
   /// call order and makes the compare-and-set atomic against writes (#1732).
   static Future<void> _enqueueWrite(Future<void> Function() operation) {
@@ -364,98 +334,15 @@ abstract final class StartupDiagnosticsStore {
     }
   }
 
-  /// Registers a crash-report flush so [consumePrevious] cannot delete the
-  /// record out from under it.
-  ///
-  /// The flush is deliberately off the startup critical path, and the success
-  /// path consumes the record as soon as the gate completes. Without this gate
-  /// a fast launch could delete the file before the flush had read it, losing
-  /// the report entirely — the exact failure this whole path exists to
-  /// prevent (#1732).
-  static void holdForFlush(Future<void> flush) {
-    _flushInFlight = flush;
-  }
-
-  /// Reads a persisted record without consuming it.
-  ///
-  /// Used by the crash-report flush, which has to run before the record is
-  /// consumed for display and must not remove it if the send fails.
-  static Future<StartupFailureRecord?> peekPersisted() async {
-    await _settleWrite();
-    try {
-      final file = await _file();
-      if (file == null || !await file.exists()) return null;
-      final decoded = jsonDecode(await file.readAsString());
-      if (decoded is! Map) return null;
-      return StartupFailureRecord.fromJson(decoded.cast<String, Object?>());
-    } catch (error, stackTrace) {
-      appLogger.d('Could not peek at the startup failure record', error: error, stackTrace: stackTrace);
-      return null;
-    }
-  }
-
-  /// Rewrites the persisted record as already reported, so a later launch does
-  /// not send it a second time. It stays on disk for Settings > Logs.
-  static Future<void> markReported(StartupFailureRecord failure) {
-    // Queued with the writes: reading and rewriting outside the queue lets a
-    // concurrent `record` land between the two and be overwritten, losing the
-    // newer failure.
-    return _enqueueWrite(() async {
-      try {
-        final file = await _file();
-        if (file == null || !await file.exists()) return;
-        // Compare and set: a retry may have failed too and replaced this
-        // record while the send was in flight.
-        final current = await _decodeFile(file);
-        await debugAfterReportedRead?.call();
-        if (current == null || current.id != failure.id) {
-          appLogger.d('Startup failure record was superseded before it could be marked reported');
-          return;
-        }
-        final updated = failure.copyWith(reported: true);
-        if (_pending?.id == failure.id) _pending = updated;
-        await file.writeAsString(jsonEncode(updated.toJson()), flush: true);
-      } catch (error, stackTrace) {
-        appLogger.d('Could not mark the startup failure record as reported', error: error, stackTrace: stackTrace);
-      }
-    });
-  }
-
-  /// Test seam: pauses [markReported] between its read and its write so the
-  /// compare-and-set can be exercised against a concurrent record.
-  @visibleForTesting
-  static Future<void> Function()? debugAfterReportedRead;
-
   static Future<StartupFailureRecord?> _decodeFile(File file) async {
     final decoded = jsonDecode(await file.readAsString());
     if (decoded is! Map) return null;
     return StartupFailureRecord.fromJson(decoded.cast<String, Object?>());
   }
 
-  /// Loads a record written by an earlier launch, deleting it only once it has
-  /// been reported.
-  ///
-  /// An unreported record is the crash reporter's only retry: the reporter can
-  /// be uninitialised, offline, or backed by a no-op hub that accepts events
-  /// and drops them. Deleting it here would silently end the retry, which is
-  /// the failure this whole path exists to prevent (#1732). A record that can
-  /// never be sent — no crash reporting compiled in, or the user opted out —
-  /// is marked reported by the flush, so nothing lingers indefinitely.
-  ///
-  /// Either way the value lands in [pending] so the logs screen can show it
-  /// for the rest of the session.
+  /// Loads a locally persisted failure for display in the current session.
   static Future<StartupFailureRecord?> consumePrevious() async {
     await _settleWrite();
-    final flush = _flushInFlight;
-    if (flush != null) {
-      _flushInFlight = null;
-      // A failed flush must not block the display path.
-      try {
-        await flush;
-      } catch (error, stackTrace) {
-        appLogger.d('Startup failure flush failed before consumption', error: error, stackTrace: stackTrace);
-      }
-    }
     try {
       final file = await _file();
       if (file == null || !await file.exists()) return null;
@@ -465,7 +352,7 @@ abstract final class StartupDiagnosticsStore {
         await file.delete();
         return null;
       }
-      if (record.reported) await file.delete();
+      await file.delete();
       _pending = record;
       return record;
     } catch (error, stackTrace) {
@@ -489,9 +376,7 @@ abstract final class StartupDiagnosticsStore {
   @visibleForTesting
   static void resetForTesting() {
     _pending = null;
-    _flushInFlight = null;
     _writeInFlight = null;
-    debugAfterReportedRead = null;
     debugDirectoryOverride = null;
   }
 

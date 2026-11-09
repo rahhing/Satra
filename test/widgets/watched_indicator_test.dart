@@ -54,6 +54,22 @@ void main() {
     expect(find.byIcon(Symbols.check_rounded), findsOneWidget);
   });
 
+  testWidgets('watch progress is inset and rounded on artwork', (tester) async {
+    await pump(
+      tester,
+      WatchedIndicator(item: testMediaItem(kind: MediaKind.movie, durationMs: 100000, viewOffsetMs: 10000)),
+    );
+    final progress = tester.widget<LinearProgressIndicator>(find.byType(LinearProgressIndicator));
+    expect(progress.value, 0.1);
+    expect(progress.borderRadius, BorderRadius.circular(99));
+    final box = tester.widget<Positioned>(
+      find.ancestor(of: find.byType(MediaProgressBar), matching: find.byType(Positioned)).first,
+    );
+    expect(box.left, greaterThan(0));
+    expect(box.right, greaterThan(0));
+    expect(box.bottom, greaterThan(0));
+  });
+
   testWidgets('hides only the checkmark when watched indicators are off (#1998)', (tester) async {
     await SettingsService.instance.write(SettingsService.showWatchedIndicators, false);
     final partiallyWatchedShow = testMediaItem(id: 'show', kind: MediaKind.show, leafCount: 10, viewedLeafCount: 4);
