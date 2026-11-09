@@ -115,8 +115,8 @@ class _Translations$appIcon$sv extends Translations$appIcon$en {
 	@override String get title => 'Appikon';
 	@override String get defaultIcon => 'Standard';
 	@override String get current => 'Aktuell ikon';
-	@override String get locked => 'Supporter-förmån';
-	@override String get lockedHint => 'Alternativa ikoner är en Supporter-förmån.';
+	@override String get locked => 'Ingår i Tema- och ikonpaketet';
+	@override String get lockedHint => 'Alternativa ikoner ingår i Tema- och ikonpaketet.';
 	@override String get changeFailed => 'Kunde inte byta appikon';
 	@override String get launcherHint => 'Den nya ikonen visas på hemskärmen när du lämnar Satra.';
 	@override String get tvLauncherHint => 'Den nya bannern visas när du lämnar Satra. Android TV kan fortsätta visa den gamla tills TV:n startas om.';
@@ -246,8 +246,8 @@ class _Translations$supporter$sv extends Translations$supporter$en {
 	final TranslationsSv _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Satra Supporter';
-	@override String get intro => 'Ett engångsköp som stöder utvecklingen av Satra och låser upp kosmetiska extrafunktioner:';
+	@override String get title => 'Tema- och ikonpaket';
+	@override String get intro => 'Ett valfritt engångsköp med kosmetiska extrafunktioner:';
 	@override String get presetThemes => 'Förinställda teman';
 	@override String get presetThemesDescription => 'Glöd, Glaciär, Skog, Plommon och Papper';
 	@override String get customTheme => 'Anpassat tema';
@@ -258,11 +258,11 @@ class _Translations$supporter$sv extends Translations$supporter$en {
 	@override String get loadingPrice => 'Hämtar pris...';
 	@override String get restore => 'Återställ köp';
 	@override String get pending => 'Ditt köp väntar på betalning eller godkännande. Extrafunktionerna låses upp så snart butiken har slutfört det.';
-	@override String get thankYouTitle => 'Tack för att du stöder Satra';
-	@override String get thankYouBody => 'Dina Supporter-extrafunktioner är upplåsta.';
+	@override String get thankYouTitle => 'Tack för ditt köp';
+	@override String get thankYouBody => 'Tema- och ikonpaketet är upplåst.';
 	@override String get tileSubtitle => 'Lås upp teman och appikoner med ett engångsköp';
 	@override String get tileSubtitleThemesOnly => 'Lås upp teman med ett engångsköp';
-	@override String get tileUnlocked => 'Tack för ditt stöd';
+	@override String get tileUnlocked => 'Upplåst — tack för ditt köp';
 	@override late final _Translations$supporter$errors$sv errors = _Translations$supporter$errors$sv._(_root);
 }
 
@@ -600,6 +600,7 @@ class _Translations$settings$sv extends Translations$settings$en {
 	@override String get scopePlaybackSpeed => 'Uppspelningshastighet';
 	@override String get scopeShaderPreset => 'Förinställning för shader';
 	@override String get scopeAspectRatio => 'Bildförhållande';
+	@override String get scopeZoom => 'Zoom';
 	@override String get scopeSyncOffsets => 'Synkronisering av ljud och undertexter';
 	@override String get playerScopeOff => 'Spara inte';
 	@override String get playerScopeGlobal => 'Överallt';
@@ -621,8 +622,8 @@ class _Translations$themeEditor$sv extends Translations$themeEditor$en {
 	@override String get customEmpty => 'Inte skapat ännu';
 	@override String get editCustom => 'Redigera anpassat tema';
 	@override String get editCustomDescription => 'Välj alla färger själv';
-	@override String get locked => 'Lås upp med Supporter';
-	@override String get savedLocked => 'Sparat — låses upp med Supporter';
+	@override String get locked => 'Lås upp med Tema- och ikonpaketet';
+	@override String get savedLocked => 'Sparat — låses upp med Tema- och ikonpaketet';
 	@override String get title => 'Anpassat tema';
 	@override String get startFrom => 'Utgå från';
 	@override String get startFromDescription => 'Kopiera alla färger från ett annat tema';
@@ -2534,11 +2535,11 @@ class _Translations$supporter$errors$sv extends Translations$supporter$errors$en
 
 	// Translations
 	@override String get storeUnavailable => 'Köp är inte tillgängliga. Kontrollera att du är inloggad i butiken och att köp är tillåtna på den här enheten.';
-	@override String get productNotFound => 'Supporter-köpet är inte tillgängligt i din butik just nu.';
+	@override String get productNotFound => 'Tema- och ikonpaketet är inte tillgängligt i din butik just nu.';
 	@override String get productQueryFailed => 'Kunde inte hämta priset. Kontrollera anslutningen och försök igen.';
 	@override String get purchaseFailed => 'Köpet gick inte igenom. Försök igen.';
 	@override String get restoreFailed => 'Kunde inte nå butiken för att återställa ditt köp. Försök igen.';
-	@override String get nothingToRestore => 'Inget Supporter-köp hittades för det här butikskontot.';
+	@override String get nothingToRestore => 'Inget köp av Tema- och ikonpaketet hittades för det här butikskontot.';
 }
 
 // Path: themeEditor.slots
@@ -3394,8 +3395,8 @@ extension on TranslationsSv {
 			'appIcon.title' => 'Appikon',
 			'appIcon.defaultIcon' => 'Standard',
 			'appIcon.current' => 'Aktuell ikon',
-			'appIcon.locked' => 'Supporter-förmån',
-			'appIcon.lockedHint' => 'Alternativa ikoner är en Supporter-förmån.',
+			'appIcon.locked' => 'Ingår i Tema- och ikonpaketet',
+			'appIcon.lockedHint' => 'Alternativa ikoner ingår i Tema- och ikonpaketet.',
 			'appIcon.changeFailed' => 'Kunde inte byta appikon',
 			'appIcon.launcherHint' => 'Den nya ikonen visas på hemskärmen när du lämnar Satra.',
 			'appIcon.tvLauncherHint' => 'Den nya bannern visas när du lämnar Satra. Android TV kan fortsätta visa den gamla tills TV:n startas om.',
@@ -3525,8 +3526,8 @@ extension on TranslationsSv {
 			'update.viewRelease' => 'Visa versionsinformation',
 			'update.latestVersion' => 'Du har den senaste versionen',
 			'update.checkFailed' => 'Det gick inte att söka efter uppdateringar',
-			'supporter.title' => 'Satra Supporter',
-			'supporter.intro' => 'Ett engångsköp som stöder utvecklingen av Satra och låser upp kosmetiska extrafunktioner:',
+			'supporter.title' => 'Tema- och ikonpaket',
+			'supporter.intro' => 'Ett valfritt engångsköp med kosmetiska extrafunktioner:',
 			'supporter.presetThemes' => 'Förinställda teman',
 			'supporter.presetThemesDescription' => 'Glöd, Glaciär, Skog, Plommon och Papper',
 			'supporter.customTheme' => 'Anpassat tema',
@@ -3537,17 +3538,17 @@ extension on TranslationsSv {
 			'supporter.loadingPrice' => 'Hämtar pris...',
 			'supporter.restore' => 'Återställ köp',
 			'supporter.pending' => 'Ditt köp väntar på betalning eller godkännande. Extrafunktionerna låses upp så snart butiken har slutfört det.',
-			'supporter.thankYouTitle' => 'Tack för att du stöder Satra',
-			'supporter.thankYouBody' => 'Dina Supporter-extrafunktioner är upplåsta.',
+			'supporter.thankYouTitle' => 'Tack för ditt köp',
+			'supporter.thankYouBody' => 'Tema- och ikonpaketet är upplåst.',
 			'supporter.tileSubtitle' => 'Lås upp teman och appikoner med ett engångsköp',
 			'supporter.tileSubtitleThemesOnly' => 'Lås upp teman med ett engångsköp',
-			'supporter.tileUnlocked' => 'Tack för ditt stöd',
+			'supporter.tileUnlocked' => 'Upplåst — tack för ditt köp',
 			'supporter.errors.storeUnavailable' => 'Köp är inte tillgängliga. Kontrollera att du är inloggad i butiken och att köp är tillåtna på den här enheten.',
-			'supporter.errors.productNotFound' => 'Supporter-köpet är inte tillgängligt i din butik just nu.',
+			'supporter.errors.productNotFound' => 'Tema- och ikonpaketet är inte tillgängligt i din butik just nu.',
 			'supporter.errors.productQueryFailed' => 'Kunde inte hämta priset. Kontrollera anslutningen och försök igen.',
 			'supporter.errors.purchaseFailed' => 'Köpet gick inte igenom. Försök igen.',
 			'supporter.errors.restoreFailed' => 'Kunde inte nå butiken för att återställa ditt köp. Försök igen.',
-			'supporter.errors.nothingToRestore' => 'Inget Supporter-köp hittades för det här butikskontot.',
+			'supporter.errors.nothingToRestore' => 'Inget köp av Tema- och ikonpaketet hittades för det här butikskontot.',
 			'settings.title' => 'Inställningar',
 			'settings.supportDeveloper' => 'Stöd Satra',
 			'settings.supportDeveloperDescription' => 'Donera via Liberapay för att finansiera utvecklingen',
@@ -3875,6 +3876,7 @@ extension on TranslationsSv {
 			'settings.scopePlaybackSpeed' => 'Uppspelningshastighet',
 			'settings.scopeShaderPreset' => 'Förinställning för shader',
 			'settings.scopeAspectRatio' => 'Bildförhållande',
+			'settings.scopeZoom' => 'Zoom',
 			'settings.scopeSyncOffsets' => 'Synkronisering av ljud och undertexter',
 			'settings.playerScopeOff' => 'Spara inte',
 			'settings.playerScopeGlobal' => 'Överallt',
@@ -3887,8 +3889,8 @@ extension on TranslationsSv {
 			'themeEditor.customEmpty' => 'Inte skapat ännu',
 			'themeEditor.editCustom' => 'Redigera anpassat tema',
 			'themeEditor.editCustomDescription' => 'Välj alla färger själv',
-			'themeEditor.locked' => 'Lås upp med Supporter',
-			'themeEditor.savedLocked' => 'Sparat — låses upp med Supporter',
+			'themeEditor.locked' => 'Lås upp med Tema- och ikonpaketet',
+			'themeEditor.savedLocked' => 'Sparat — låses upp med Tema- och ikonpaketet',
 			'themeEditor.title' => 'Anpassat tema',
 			'themeEditor.startFrom' => 'Utgå från',
 			'themeEditor.startFromDescription' => 'Kopiera alla färger från ett annat tema',
@@ -3901,9 +3903,9 @@ extension on TranslationsSv {
 			'themeEditor.slots.textMuted' => 'Sekundär text',
 			'themeEditor.slots.accent' => 'Accentfärg',
 			'themeEditor.opacity' => 'Opacitet',
-			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Från andra teman',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Text på bakgrund',
@@ -4415,9 +4417,9 @@ extension on TranslationsSv {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Lägg till för ${displayName}: Plex, Jellyfin, Emby eller en annan profilanslutning',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessionen har gått ut för ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessionen har gått ut för ${count} servrar',
-			'connections.accessDeniedOne' => ({required Object name}) => '${name} nekade åtkomst för det här kontot',
 			_ => null,
 		} ?? switch (path) {
+			'connections.accessDeniedOne' => ({required Object name}) => '${name} nekade åtkomst för det här kontot',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servrar nekade åtkomst för det här kontot',
 			'connections.signInAgain' => 'Logga in igen',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Redigera ${product}-anslutning',
@@ -4929,9 +4931,9 @@ extension on TranslationsSv {
 			'liveTv.failedToStartChannel' => 'Kunde inte starta livekanalen',
 			'liveTv.failedToBuildStreamUrl' => 'Kunde inte skapa strömmens URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Det gick inte att starta kanalen: ${reason}',
-			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Det gick inte att byta kanal: ${reason}',
 			_ => null,
 		} ?? switch (path) {
+			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Det gick inte att byta kanal: ${reason}',
 			'collections.title' => 'Samlingar',
 			'collections.collection' => 'Samling',
 			'collections.empty' => 'Samlingen är tom',
@@ -5443,9 +5445,9 @@ extension on TranslationsSv {
 			'externalPlayer.useExternalPlayer' => 'Använd extern spelare',
 			'externalPlayer.useExternalPlayerDescription' => 'Öppna videor i en annan app',
 			'externalPlayer.selectPlayer' => 'Välj spelare',
-			'externalPlayer.customPlayers' => 'Anpassade spelare',
 			_ => null,
 		} ?? switch (path) {
+			'externalPlayer.customPlayers' => 'Anpassade spelare',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Lägg till anpassad spelare',
 			'externalPlayer.playerName' => 'Spelarnamn',

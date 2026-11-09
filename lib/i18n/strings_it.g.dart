@@ -115,8 +115,8 @@ class _Translations$appIcon$it extends Translations$appIcon$en {
 	@override String get title => 'Icona dell\'app';
 	@override String get defaultIcon => 'Predefinita';
 	@override String get current => 'Icona attuale';
-	@override String get locked => 'Vantaggio Supporter';
-	@override String get lockedHint => 'Le icone alternative sono un vantaggio Supporter.';
+	@override String get locked => 'Incluso nel Pacchetto temi e icone';
+	@override String get lockedHint => 'Le icone alternative sono incluse nel Pacchetto temi e icone.';
 	@override String get changeFailed => 'Impossibile cambiare l\'icona dell\'app';
 	@override String get launcherHint => 'La nuova icona appare nella schermata Home quando esci da Satra.';
 	@override String get tvLauncherHint => 'Il nuovo banner appare quando esci da Satra. Android TV potrebbe continuare a mostrare quello precedente fino al riavvio del televisore.';
@@ -246,8 +246,8 @@ class _Translations$supporter$it extends Translations$supporter$en {
 	final TranslationsIt _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Satra Supporter';
-	@override String get intro => 'Un acquisto una tantum che sostiene lo sviluppo di Satra e sblocca extra estetici:';
+	@override String get title => 'Pacchetto temi e icone';
+	@override String get intro => 'Un acquisto una tantum facoltativo che aggiunge extra estetici:';
 	@override String get presetThemes => 'Temi preimpostati';
 	@override String get presetThemesDescription => 'Brace, Ghiacciaio, Foresta, Prugna e Carta';
 	@override String get customTheme => 'Tema personalizzato';
@@ -258,11 +258,11 @@ class _Translations$supporter$it extends Translations$supporter$en {
 	@override String get loadingPrice => 'Caricamento del prezzo...';
 	@override String get restore => 'Ripristina acquisti';
 	@override String get pending => 'Il tuo acquisto è in attesa di pagamento o approvazione. Gli extra verranno sbloccati non appena lo store lo avrà completato.';
-	@override String get thankYouTitle => 'Grazie per sostenere Satra';
-	@override String get thankYouBody => 'Gli extra di Supporter sono stati sbloccati.';
+	@override String get thankYouTitle => 'Grazie per l\'acquisto';
+	@override String get thankYouBody => 'Il Pacchetto temi e icone è sbloccato.';
 	@override String get tileSubtitle => 'Sblocca temi e icone dell\'app con un acquisto una tantum';
 	@override String get tileSubtitleThemesOnly => 'Sblocca i temi con un acquisto una tantum';
-	@override String get tileUnlocked => 'Grazie per il tuo sostegno';
+	@override String get tileUnlocked => 'Sbloccato — grazie per l\'acquisto';
 	@override late final _Translations$supporter$errors$it errors = _Translations$supporter$errors$it._(_root);
 }
 
@@ -600,6 +600,7 @@ class _Translations$settings$it extends Translations$settings$en {
 	@override String get scopePlaybackSpeed => 'Velocità di riproduzione';
 	@override String get scopeShaderPreset => 'Preimpostazione shader';
 	@override String get scopeAspectRatio => 'Proporzioni';
+	@override String get scopeZoom => 'Zoom';
 	@override String get scopeSyncOffsets => 'Sincronizzazione audio e sottotitoli';
 	@override String get playerScopeOff => 'Non salvare';
 	@override String get playerScopeGlobal => 'Ovunque';
@@ -621,8 +622,8 @@ class _Translations$themeEditor$it extends Translations$themeEditor$en {
 	@override String get customEmpty => 'Non ancora creato';
 	@override String get editCustom => 'Modifica tema personalizzato';
 	@override String get editCustomDescription => 'Scegli tu ogni colore';
-	@override String get locked => 'Sblocca con Supporter';
-	@override String get savedLocked => 'Salvato — si sblocca con Supporter';
+	@override String get locked => 'Sblocca con il Pacchetto temi e icone';
+	@override String get savedLocked => 'Salvato — si sblocca con il Pacchetto temi e icone';
 	@override String get title => 'Tema personalizzato';
 	@override String get startFrom => 'Parti da';
 	@override String get startFromDescription => 'Copia tutti i colori da un altro tema';
@@ -2534,11 +2535,11 @@ class _Translations$supporter$errors$it extends Translations$supporter$errors$en
 
 	// Translations
 	@override String get storeUnavailable => 'Gli acquisti non sono disponibili. Verifica di aver effettuato l\'accesso allo store e che gli acquisti siano consentiti su questo dispositivo.';
-	@override String get productNotFound => 'L\'acquisto Supporter non è al momento disponibile nel tuo store.';
+	@override String get productNotFound => 'Il Pacchetto temi e icone non è al momento disponibile nel tuo store.';
 	@override String get productQueryFailed => 'Impossibile caricare il prezzo. Controlla la connessione e riprova.';
 	@override String get purchaseFailed => 'L\'acquisto non è andato a buon fine. Riprova.';
 	@override String get restoreFailed => 'Impossibile raggiungere lo store per ripristinare l\'acquisto. Riprova.';
-	@override String get nothingToRestore => 'Nessun acquisto Supporter trovato per questo account dello store.';
+	@override String get nothingToRestore => 'Nessun acquisto del Pacchetto temi e icone trovato per questo account dello store.';
 }
 
 // Path: themeEditor.slots
@@ -3394,8 +3395,8 @@ extension on TranslationsIt {
 			'appIcon.title' => 'Icona dell\'app',
 			'appIcon.defaultIcon' => 'Predefinita',
 			'appIcon.current' => 'Icona attuale',
-			'appIcon.locked' => 'Vantaggio Supporter',
-			'appIcon.lockedHint' => 'Le icone alternative sono un vantaggio Supporter.',
+			'appIcon.locked' => 'Incluso nel Pacchetto temi e icone',
+			'appIcon.lockedHint' => 'Le icone alternative sono incluse nel Pacchetto temi e icone.',
 			'appIcon.changeFailed' => 'Impossibile cambiare l\'icona dell\'app',
 			'appIcon.launcherHint' => 'La nuova icona appare nella schermata Home quando esci da Satra.',
 			'appIcon.tvLauncherHint' => 'Il nuovo banner appare quando esci da Satra. Android TV potrebbe continuare a mostrare quello precedente fino al riavvio del televisore.',
@@ -3525,8 +3526,8 @@ extension on TranslationsIt {
 			'update.viewRelease' => 'Visualizza note di rilascio',
 			'update.latestVersion' => 'La versione installata è l\'ultima disponibile',
 			'update.checkFailed' => 'Impossibile controllare gli aggiornamenti',
-			'supporter.title' => 'Satra Supporter',
-			'supporter.intro' => 'Un acquisto una tantum che sostiene lo sviluppo di Satra e sblocca extra estetici:',
+			'supporter.title' => 'Pacchetto temi e icone',
+			'supporter.intro' => 'Un acquisto una tantum facoltativo che aggiunge extra estetici:',
 			'supporter.presetThemes' => 'Temi preimpostati',
 			'supporter.presetThemesDescription' => 'Brace, Ghiacciaio, Foresta, Prugna e Carta',
 			'supporter.customTheme' => 'Tema personalizzato',
@@ -3537,17 +3538,17 @@ extension on TranslationsIt {
 			'supporter.loadingPrice' => 'Caricamento del prezzo...',
 			'supporter.restore' => 'Ripristina acquisti',
 			'supporter.pending' => 'Il tuo acquisto è in attesa di pagamento o approvazione. Gli extra verranno sbloccati non appena lo store lo avrà completato.',
-			'supporter.thankYouTitle' => 'Grazie per sostenere Satra',
-			'supporter.thankYouBody' => 'Gli extra di Supporter sono stati sbloccati.',
+			'supporter.thankYouTitle' => 'Grazie per l\'acquisto',
+			'supporter.thankYouBody' => 'Il Pacchetto temi e icone è sbloccato.',
 			'supporter.tileSubtitle' => 'Sblocca temi e icone dell\'app con un acquisto una tantum',
 			'supporter.tileSubtitleThemesOnly' => 'Sblocca i temi con un acquisto una tantum',
-			'supporter.tileUnlocked' => 'Grazie per il tuo sostegno',
+			'supporter.tileUnlocked' => 'Sbloccato — grazie per l\'acquisto',
 			'supporter.errors.storeUnavailable' => 'Gli acquisti non sono disponibili. Verifica di aver effettuato l\'accesso allo store e che gli acquisti siano consentiti su questo dispositivo.',
-			'supporter.errors.productNotFound' => 'L\'acquisto Supporter non è al momento disponibile nel tuo store.',
+			'supporter.errors.productNotFound' => 'Il Pacchetto temi e icone non è al momento disponibile nel tuo store.',
 			'supporter.errors.productQueryFailed' => 'Impossibile caricare il prezzo. Controlla la connessione e riprova.',
 			'supporter.errors.purchaseFailed' => 'L\'acquisto non è andato a buon fine. Riprova.',
 			'supporter.errors.restoreFailed' => 'Impossibile raggiungere lo store per ripristinare l\'acquisto. Riprova.',
-			'supporter.errors.nothingToRestore' => 'Nessun acquisto Supporter trovato per questo account dello store.',
+			'supporter.errors.nothingToRestore' => 'Nessun acquisto del Pacchetto temi e icone trovato per questo account dello store.',
 			'settings.title' => 'Impostazioni',
 			'settings.supportDeveloper' => 'Supporta Satra',
 			'settings.supportDeveloperDescription' => 'Dona tramite Liberapay per finanziare lo sviluppo',
@@ -3875,6 +3876,7 @@ extension on TranslationsIt {
 			'settings.scopePlaybackSpeed' => 'Velocità di riproduzione',
 			'settings.scopeShaderPreset' => 'Preimpostazione shader',
 			'settings.scopeAspectRatio' => 'Proporzioni',
+			'settings.scopeZoom' => 'Zoom',
 			'settings.scopeSyncOffsets' => 'Sincronizzazione audio e sottotitoli',
 			'settings.playerScopeOff' => 'Non salvare',
 			'settings.playerScopeGlobal' => 'Ovunque',
@@ -3887,8 +3889,8 @@ extension on TranslationsIt {
 			'themeEditor.customEmpty' => 'Non ancora creato',
 			'themeEditor.editCustom' => 'Modifica tema personalizzato',
 			'themeEditor.editCustomDescription' => 'Scegli tu ogni colore',
-			'themeEditor.locked' => 'Sblocca con Supporter',
-			'themeEditor.savedLocked' => 'Salvato — si sblocca con Supporter',
+			'themeEditor.locked' => 'Sblocca con il Pacchetto temi e icone',
+			'themeEditor.savedLocked' => 'Salvato — si sblocca con il Pacchetto temi e icone',
 			'themeEditor.title' => 'Tema personalizzato',
 			'themeEditor.startFrom' => 'Parti da',
 			'themeEditor.startFromDescription' => 'Copia tutti i colori da un altro tema',
@@ -3901,9 +3903,9 @@ extension on TranslationsIt {
 			'themeEditor.slots.textMuted' => 'Testo secondario',
 			'themeEditor.slots.accent' => 'Accento',
 			'themeEditor.opacity' => 'Opacità',
-			'themeEditor.hexHint' => '#RRGGBB o #AARRGGBB',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.hexHint' => '#RRGGBB o #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Da altri temi',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} ${theme}',
 			'themeEditor.contrast.textOnBg' => 'Testo sullo sfondo',
@@ -4415,9 +4417,9 @@ extension on TranslationsIt {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Aggiungi a ${displayName}: Plex, Jellyfin, Emby o la connessione di un altro profilo',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessione scaduta per ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessione scaduta per ${count} server',
-			'connections.accessDeniedOne' => ({required Object name}) => '${name} ha negato l\'accesso a questo account',
 			_ => null,
 		} ?? switch (path) {
+			'connections.accessDeniedOne' => ({required Object name}) => '${name} ha negato l\'accesso a questo account',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} server hanno negato l\'accesso a questo account',
 			'connections.signInAgain' => 'Accedi di nuovo',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Modifica connessione ${product}',
@@ -4929,9 +4931,9 @@ extension on TranslationsIt {
 			'liveTv.failedToStartChannel' => 'Impossibile avviare il canale in diretta',
 			'liveTv.failedToBuildStreamUrl' => 'Impossibile creare l\'URL dello stream',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Impossibile avviare il canale: ${reason}',
-			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Impossibile cambiare canale: ${reason}',
 			_ => null,
 		} ?? switch (path) {
+			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Impossibile cambiare canale: ${reason}',
 			'collections.title' => 'Raccolte',
 			'collections.collection' => 'Raccolta',
 			'collections.empty' => 'La raccolta è vuota',
@@ -5443,9 +5445,9 @@ extension on TranslationsIt {
 			'externalPlayer.useExternalPlayer' => 'Usa un lettore esterno',
 			'externalPlayer.useExternalPlayerDescription' => 'Apri i video in un\'altra app',
 			'externalPlayer.selectPlayer' => 'Seleziona il lettore',
-			'externalPlayer.customPlayers' => 'Lettori personalizzati',
 			_ => null,
 		} ?? switch (path) {
+			'externalPlayer.customPlayers' => 'Lettori personalizzati',
 			'externalPlayer.systemDefault' => 'Predefinito di sistema',
 			'externalPlayer.addCustomPlayer' => 'Aggiungi lettore personalizzato',
 			'externalPlayer.playerName' => 'Nome del lettore',

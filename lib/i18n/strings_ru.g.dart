@@ -115,8 +115,8 @@ class _Translations$appIcon$ru extends Translations$appIcon$en {
 	@override String get title => 'Значок приложения';
 	@override String get defaultIcon => 'Стандартный';
 	@override String get current => 'Текущий значок';
-	@override String get locked => 'Бонус Supporter';
-	@override String get lockedHint => 'Альтернативные значки — бонус Supporter.';
+	@override String get locked => 'Входит в набор тем и значков';
+	@override String get lockedHint => 'Альтернативные значки входят в набор тем и значков.';
 	@override String get changeFailed => 'Не удалось сменить значок приложения';
 	@override String get launcherHint => 'Новый значок появится на главном экране, когда вы выйдете из Satra.';
 	@override String get tvLauncherHint => 'Новый баннер появится, когда вы выйдете из Satra. Android TV может показывать старый до перезапуска телевизора.';
@@ -246,8 +246,8 @@ class _Translations$supporter$ru extends Translations$supporter$en {
 	final TranslationsRu _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Satra Supporter';
-	@override String get intro => 'Разовая покупка, которая поддерживает разработку Satra и открывает косметические дополнения:';
+	@override String get title => 'Набор тем и значков';
+	@override String get intro => 'Необязательная разовая покупка, которая добавляет косметические дополнения:';
 	@override String get presetThemes => 'Готовые темы';
 	@override String get presetThemesDescription => 'Уголёк, Ледник, Лес, Слива и Бумага';
 	@override String get customTheme => 'Своя тема';
@@ -258,11 +258,11 @@ class _Translations$supporter$ru extends Translations$supporter$en {
 	@override String get loadingPrice => 'Загрузка цены...';
 	@override String get restore => 'Восстановить покупки';
 	@override String get pending => 'Покупка ожидает оплаты или подтверждения. Дополнения откроются, как только магазин её завершит.';
-	@override String get thankYouTitle => 'Спасибо за поддержку Satra';
-	@override String get thankYouBody => 'Дополнения Supporter разблокированы.';
+	@override String get thankYouTitle => 'Спасибо за покупку';
+	@override String get thankYouBody => 'Набор тем и значков разблокирован.';
 	@override String get tileSubtitle => 'Откройте темы и значки приложения разовой покупкой';
 	@override String get tileSubtitleThemesOnly => 'Откройте темы разовой покупкой';
-	@override String get tileUnlocked => 'Спасибо за вашу поддержку';
+	@override String get tileUnlocked => 'Разблокировано — спасибо за покупку';
 	@override late final _Translations$supporter$errors$ru errors = _Translations$supporter$errors$ru._(_root);
 }
 
@@ -600,6 +600,7 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get scopePlaybackSpeed => 'Скорость воспроизведения';
 	@override String get scopeShaderPreset => 'Предустановка шейдера';
 	@override String get scopeAspectRatio => 'Соотношение сторон';
+	@override String get scopeZoom => 'Масштаб';
 	@override String get scopeSyncOffsets => 'Синхронизация аудио и субтитров';
 	@override String get playerScopeOff => 'Не сохранять';
 	@override String get playerScopeGlobal => 'Везде';
@@ -621,8 +622,8 @@ class _Translations$themeEditor$ru extends Translations$themeEditor$en {
 	@override String get customEmpty => 'Ещё не создана';
 	@override String get editCustom => 'Изменить свою тему';
 	@override String get editCustomDescription => 'Выберите каждый цвет сами';
-	@override String get locked => 'Доступно с Supporter';
-	@override String get savedLocked => 'Сохранено — станет доступно с Supporter';
+	@override String get locked => 'Доступно с набором тем и значков';
+	@override String get savedLocked => 'Сохранено — станет доступно с набором тем и значков';
 	@override String get title => 'Своя тема';
 	@override String get startFrom => 'Взять за основу';
 	@override String get startFromDescription => 'Скопировать все цвета из другой темы';
@@ -2554,11 +2555,11 @@ class _Translations$supporter$errors$ru extends Translations$supporter$errors$en
 
 	// Translations
 	@override String get storeUnavailable => 'Покупки недоступны. Убедитесь, что вы вошли в магазин и покупки разрешены на этом устройстве.';
-	@override String get productNotFound => 'Покупка Supporter сейчас недоступна в вашем магазине.';
+	@override String get productNotFound => 'Набор тем и значков сейчас недоступен в вашем магазине.';
 	@override String get productQueryFailed => 'Не удалось загрузить цену. Проверьте подключение и попробуйте снова.';
 	@override String get purchaseFailed => 'Покупка не прошла. Попробуйте снова.';
 	@override String get restoreFailed => 'Не удалось связаться с магазином для восстановления покупки. Попробуйте снова.';
-	@override String get nothingToRestore => 'Для этой учётной записи магазина покупка Supporter не найдена.';
+	@override String get nothingToRestore => 'Для этой учётной записи магазина покупка набора тем и значков не найдена.';
 }
 
 // Path: themeEditor.slots
@@ -3418,8 +3419,8 @@ extension on TranslationsRu {
 			'appIcon.title' => 'Значок приложения',
 			'appIcon.defaultIcon' => 'Стандартный',
 			'appIcon.current' => 'Текущий значок',
-			'appIcon.locked' => 'Бонус Supporter',
-			'appIcon.lockedHint' => 'Альтернативные значки — бонус Supporter.',
+			'appIcon.locked' => 'Входит в набор тем и значков',
+			'appIcon.lockedHint' => 'Альтернативные значки входят в набор тем и значков.',
 			'appIcon.changeFailed' => 'Не удалось сменить значок приложения',
 			'appIcon.launcherHint' => 'Новый значок появится на главном экране, когда вы выйдете из Satra.',
 			'appIcon.tvLauncherHint' => 'Новый баннер появится, когда вы выйдете из Satra. Android TV может показывать старый до перезапуска телевизора.',
@@ -3549,8 +3550,8 @@ extension on TranslationsRu {
 			'update.viewRelease' => 'Посмотреть релиз',
 			'update.latestVersion' => 'У вас последняя версия',
 			'update.checkFailed' => 'Не удалось проверить обновления',
-			'supporter.title' => 'Satra Supporter',
-			'supporter.intro' => 'Разовая покупка, которая поддерживает разработку Satra и открывает косметические дополнения:',
+			'supporter.title' => 'Набор тем и значков',
+			'supporter.intro' => 'Необязательная разовая покупка, которая добавляет косметические дополнения:',
 			'supporter.presetThemes' => 'Готовые темы',
 			'supporter.presetThemesDescription' => 'Уголёк, Ледник, Лес, Слива и Бумага',
 			'supporter.customTheme' => 'Своя тема',
@@ -3561,17 +3562,17 @@ extension on TranslationsRu {
 			'supporter.loadingPrice' => 'Загрузка цены...',
 			'supporter.restore' => 'Восстановить покупки',
 			'supporter.pending' => 'Покупка ожидает оплаты или подтверждения. Дополнения откроются, как только магазин её завершит.',
-			'supporter.thankYouTitle' => 'Спасибо за поддержку Satra',
-			'supporter.thankYouBody' => 'Дополнения Supporter разблокированы.',
+			'supporter.thankYouTitle' => 'Спасибо за покупку',
+			'supporter.thankYouBody' => 'Набор тем и значков разблокирован.',
 			'supporter.tileSubtitle' => 'Откройте темы и значки приложения разовой покупкой',
 			'supporter.tileSubtitleThemesOnly' => 'Откройте темы разовой покупкой',
-			'supporter.tileUnlocked' => 'Спасибо за вашу поддержку',
+			'supporter.tileUnlocked' => 'Разблокировано — спасибо за покупку',
 			'supporter.errors.storeUnavailable' => 'Покупки недоступны. Убедитесь, что вы вошли в магазин и покупки разрешены на этом устройстве.',
-			'supporter.errors.productNotFound' => 'Покупка Supporter сейчас недоступна в вашем магазине.',
+			'supporter.errors.productNotFound' => 'Набор тем и значков сейчас недоступен в вашем магазине.',
 			'supporter.errors.productQueryFailed' => 'Не удалось загрузить цену. Проверьте подключение и попробуйте снова.',
 			'supporter.errors.purchaseFailed' => 'Покупка не прошла. Попробуйте снова.',
 			'supporter.errors.restoreFailed' => 'Не удалось связаться с магазином для восстановления покупки. Попробуйте снова.',
-			'supporter.errors.nothingToRestore' => 'Для этой учётной записи магазина покупка Supporter не найдена.',
+			'supporter.errors.nothingToRestore' => 'Для этой учётной записи магазина покупка набора тем и значков не найдена.',
 			'settings.title' => 'Настройки',
 			'settings.supportDeveloper' => 'Поддержать Satra',
 			'settings.supportDeveloperDescription' => 'Пожертвуйте через Liberapay на развитие',
@@ -3899,6 +3900,7 @@ extension on TranslationsRu {
 			'settings.scopePlaybackSpeed' => 'Скорость воспроизведения',
 			'settings.scopeShaderPreset' => 'Предустановка шейдера',
 			'settings.scopeAspectRatio' => 'Соотношение сторон',
+			'settings.scopeZoom' => 'Масштаб',
 			'settings.scopeSyncOffsets' => 'Синхронизация аудио и субтитров',
 			'settings.playerScopeOff' => 'Не сохранять',
 			'settings.playerScopeGlobal' => 'Везде',
@@ -3911,8 +3913,8 @@ extension on TranslationsRu {
 			'themeEditor.customEmpty' => 'Ещё не создана',
 			'themeEditor.editCustom' => 'Изменить свою тему',
 			'themeEditor.editCustomDescription' => 'Выберите каждый цвет сами',
-			'themeEditor.locked' => 'Доступно с Supporter',
-			'themeEditor.savedLocked' => 'Сохранено — станет доступно с Supporter',
+			'themeEditor.locked' => 'Доступно с набором тем и значков',
+			'themeEditor.savedLocked' => 'Сохранено — станет доступно с набором тем и значков',
 			'themeEditor.title' => 'Своя тема',
 			'themeEditor.startFrom' => 'Взять за основу',
 			'themeEditor.startFromDescription' => 'Скопировать все цвета из другой темы',
@@ -3925,9 +3927,9 @@ extension on TranslationsRu {
 			'themeEditor.slots.textMuted' => 'Второстепенный текст',
 			'themeEditor.slots.accent' => 'Акцент',
 			'themeEditor.opacity' => 'Непрозрачность',
-			'themeEditor.hexHint' => '#RRGGBB или #AARRGGBB',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.hexHint' => '#RRGGBB или #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Из других тем',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} темы «${theme}»',
 			'themeEditor.contrast.textOnBg' => 'Текст на фоне',
@@ -4439,9 +4441,9 @@ extension on TranslationsRu {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Добавить к ${displayName}: Plex, Jellyfin, Emby или подключение другого профиля',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Сессия истекла для ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Сессия истекла для ${count} серверов',
-			'connections.accessDeniedOne' => ({required Object name}) => '${name} отказал в доступе этой учётной записи',
 			_ => null,
 		} ?? switch (path) {
+			'connections.accessDeniedOne' => ({required Object name}) => '${name} отказал в доступе этой учётной записи',
 			'connections.accessDeniedMany' => ({required Object count}) => 'Доступ для этой учётной записи запрещён на ${count} серверах',
 			'connections.signInAgain' => 'Войти снова',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Изменить подключение ${product}',
@@ -4953,9 +4955,9 @@ extension on TranslationsRu {
 			'liveTv.failedToStartChannel' => 'Не удалось запустить канал в прямом эфире',
 			'liveTv.failedToBuildStreamUrl' => 'Не удалось сформировать URL потока',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Не удалось запустить канал: ${reason}',
-			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Не удалось переключить канал: ${reason}',
 			_ => null,
 		} ?? switch (path) {
+			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Не удалось переключить канал: ${reason}',
 			'collections.title' => 'Коллекции',
 			'collections.collection' => 'Коллекция',
 			'collections.empty' => 'Коллекция пуста',
@@ -5467,9 +5469,9 @@ extension on TranslationsRu {
 			'externalPlayer.useExternalPlayer' => 'Использовать внешний плеер',
 			'externalPlayer.useExternalPlayerDescription' => 'Открывать видео в другом приложении',
 			'externalPlayer.selectPlayer' => 'Выбрать плеер',
-			'externalPlayer.customPlayers' => 'Свои плееры',
 			_ => null,
 		} ?? switch (path) {
+			'externalPlayer.customPlayers' => 'Свои плееры',
 			'externalPlayer.systemDefault' => 'Системный по умолчанию',
 			'externalPlayer.addCustomPlayer' => 'Добавить свой плеер',
 			'externalPlayer.playerName' => 'Название плеера',

@@ -115,8 +115,8 @@ class _Translations$appIcon$hu extends Translations$appIcon$en {
 	@override String get title => 'Alkalmazásikon';
 	@override String get defaultIcon => 'Alapértelmezett';
 	@override String get current => 'Jelenlegi ikon';
-	@override String get locked => 'Supporter-előny';
-	@override String get lockedHint => 'Az alternatív ikonok a Supporter-előnyök közé tartoznak.';
+	@override String get locked => 'A Téma- és ikoncsomag része';
+	@override String get lockedHint => 'Az alternatív ikonok a Téma- és ikoncsomag részei.';
 	@override String get changeFailed => 'Nem sikerült módosítani az alkalmazásikont';
 	@override String get launcherHint => 'Az új ikon azután jelenik meg a kezdőképernyőn, hogy kiléptél a Satraből.';
 	@override String get tvLauncherHint => 'Az új banner azután jelenik meg, hogy kiléptél a Satraből. Az Android TV a TV újraindításáig még a régit is mutathatja.';
@@ -246,8 +246,8 @@ class _Translations$supporter$hu extends Translations$supporter$en {
 	final TranslationsHu _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Satra Supporter';
-	@override String get intro => 'Egyszeri vásárlás, amely a Satra fejlesztését támogatja, és kozmetikai extrákat old fel:';
+	@override String get title => 'Téma- és ikoncsomag';
+	@override String get intro => 'Opcionális, egyszeri vásárlás kozmetikai extrákkal:';
 	@override String get presetThemes => 'Előre beállított témák';
 	@override String get presetThemesDescription => 'Parázs, Gleccser, Erdő, Szilva és Papír';
 	@override String get customTheme => 'Egyéni téma';
@@ -258,11 +258,11 @@ class _Translations$supporter$hu extends Translations$supporter$en {
 	@override String get loadingPrice => 'Ár betöltése...';
 	@override String get restore => 'Vásárlások visszaállítása';
 	@override String get pending => 'A vásárlásod fizetésre vagy jóváhagyásra vár. Az extrák azonnal feloldódnak, amint az áruház lezárja a folyamatot.';
-	@override String get thankYouTitle => 'Köszönjük, hogy támogatod a Satrat';
-	@override String get thankYouBody => 'A Supporter-extráid fel vannak oldva.';
+	@override String get thankYouTitle => 'Köszönjük a vásárlást';
+	@override String get thankYouBody => 'A Téma- és ikoncsomag fel van oldva.';
 	@override String get tileSubtitle => 'Témák és alkalmazásikonok feloldása egyszeri vásárlással';
 	@override String get tileSubtitleThemesOnly => 'Témák feloldása egyszeri vásárlással';
-	@override String get tileUnlocked => 'Köszönjük a támogatásodat';
+	@override String get tileUnlocked => 'Feloldva — köszönjük a vásárlást';
 	@override late final _Translations$supporter$errors$hu errors = _Translations$supporter$errors$hu._(_root);
 }
 
@@ -600,6 +600,7 @@ class _Translations$settings$hu extends Translations$settings$en {
 	@override String get scopePlaybackSpeed => 'Lejátszási sebesség';
 	@override String get scopeShaderPreset => 'Shader-előbeállítás';
 	@override String get scopeAspectRatio => 'Képarány';
+	@override String get scopeZoom => 'Nagyítás';
 	@override String get scopeSyncOffsets => 'Hang- és feliratszinkronizálás';
 	@override String get playerScopeOff => 'Ne mentse';
 	@override String get playerScopeGlobal => 'Mindenhol';
@@ -621,8 +622,8 @@ class _Translations$themeEditor$hu extends Translations$themeEditor$en {
 	@override String get customEmpty => 'Még nincs létrehozva';
 	@override String get editCustom => 'Egyéni téma szerkesztése';
 	@override String get editCustomDescription => 'Válaszd ki magad az összes színt';
-	@override String get locked => 'Supporterrel oldható fel';
-	@override String get savedLocked => 'Mentve — Supporterrel oldható fel';
+	@override String get locked => 'A Téma- és ikoncsomaggal oldható fel';
+	@override String get savedLocked => 'Mentve — a Téma- és ikoncsomaggal oldható fel';
 	@override String get title => 'Egyéni téma';
 	@override String get startFrom => 'Kiindulási téma';
 	@override String get startFromDescription => 'Az összes szín átmásolása egy másik témából';
@@ -2534,11 +2535,11 @@ class _Translations$supporter$errors$hu extends Translations$supporter$errors$en
 
 	// Translations
 	@override String get storeUnavailable => 'A vásárlás nem érhető el. Ellenőrizd, hogy be vagy-e jelentkezve az áruházba, és engedélyezett-e a vásárlás ezen az eszközön.';
-	@override String get productNotFound => 'A Supporter-vásárlás jelenleg nem érhető el az áruházadban.';
+	@override String get productNotFound => 'A Téma- és ikoncsomag jelenleg nem érhető el az áruházadban.';
 	@override String get productQueryFailed => 'Nem sikerült betölteni az árat. Ellenőrizd a kapcsolatot, majd próbáld újra.';
 	@override String get purchaseFailed => 'A vásárlás nem sikerült. Próbáld újra.';
 	@override String get restoreFailed => 'Nem sikerült elérni az áruházat a vásárlás visszaállításához. Próbáld újra.';
-	@override String get nothingToRestore => 'Ehhez az áruházfiókhoz nem található Supporter-vásárlás.';
+	@override String get nothingToRestore => 'Ehhez az áruházfiókhoz nem található Téma- és ikoncsomag-vásárlás.';
 }
 
 // Path: themeEditor.slots
@@ -3394,8 +3395,8 @@ extension on TranslationsHu {
 			'appIcon.title' => 'Alkalmazásikon',
 			'appIcon.defaultIcon' => 'Alapértelmezett',
 			'appIcon.current' => 'Jelenlegi ikon',
-			'appIcon.locked' => 'Supporter-előny',
-			'appIcon.lockedHint' => 'Az alternatív ikonok a Supporter-előnyök közé tartoznak.',
+			'appIcon.locked' => 'A Téma- és ikoncsomag része',
+			'appIcon.lockedHint' => 'Az alternatív ikonok a Téma- és ikoncsomag részei.',
 			'appIcon.changeFailed' => 'Nem sikerült módosítani az alkalmazásikont',
 			'appIcon.launcherHint' => 'Az új ikon azután jelenik meg a kezdőképernyőn, hogy kiléptél a Satraből.',
 			'appIcon.tvLauncherHint' => 'Az új banner azután jelenik meg, hogy kiléptél a Satraből. Az Android TV a TV újraindításáig még a régit is mutathatja.',
@@ -3525,8 +3526,8 @@ extension on TranslationsHu {
 			'update.viewRelease' => 'Kiadási megjegyzések',
 			'update.latestVersion' => 'A legújabb verziót használod',
 			'update.checkFailed' => 'Nem sikerült az újabb frissítések ellenőrzése',
-			'supporter.title' => 'Satra Supporter',
-			'supporter.intro' => 'Egyszeri vásárlás, amely a Satra fejlesztését támogatja, és kozmetikai extrákat old fel:',
+			'supporter.title' => 'Téma- és ikoncsomag',
+			'supporter.intro' => 'Opcionális, egyszeri vásárlás kozmetikai extrákkal:',
 			'supporter.presetThemes' => 'Előre beállított témák',
 			'supporter.presetThemesDescription' => 'Parázs, Gleccser, Erdő, Szilva és Papír',
 			'supporter.customTheme' => 'Egyéni téma',
@@ -3537,17 +3538,17 @@ extension on TranslationsHu {
 			'supporter.loadingPrice' => 'Ár betöltése...',
 			'supporter.restore' => 'Vásárlások visszaállítása',
 			'supporter.pending' => 'A vásárlásod fizetésre vagy jóváhagyásra vár. Az extrák azonnal feloldódnak, amint az áruház lezárja a folyamatot.',
-			'supporter.thankYouTitle' => 'Köszönjük, hogy támogatod a Satrat',
-			'supporter.thankYouBody' => 'A Supporter-extráid fel vannak oldva.',
+			'supporter.thankYouTitle' => 'Köszönjük a vásárlást',
+			'supporter.thankYouBody' => 'A Téma- és ikoncsomag fel van oldva.',
 			'supporter.tileSubtitle' => 'Témák és alkalmazásikonok feloldása egyszeri vásárlással',
 			'supporter.tileSubtitleThemesOnly' => 'Témák feloldása egyszeri vásárlással',
-			'supporter.tileUnlocked' => 'Köszönjük a támogatásodat',
+			'supporter.tileUnlocked' => 'Feloldva — köszönjük a vásárlást',
 			'supporter.errors.storeUnavailable' => 'A vásárlás nem érhető el. Ellenőrizd, hogy be vagy-e jelentkezve az áruházba, és engedélyezett-e a vásárlás ezen az eszközön.',
-			'supporter.errors.productNotFound' => 'A Supporter-vásárlás jelenleg nem érhető el az áruházadban.',
+			'supporter.errors.productNotFound' => 'A Téma- és ikoncsomag jelenleg nem érhető el az áruházadban.',
 			'supporter.errors.productQueryFailed' => 'Nem sikerült betölteni az árat. Ellenőrizd a kapcsolatot, majd próbáld újra.',
 			'supporter.errors.purchaseFailed' => 'A vásárlás nem sikerült. Próbáld újra.',
 			'supporter.errors.restoreFailed' => 'Nem sikerült elérni az áruházat a vásárlás visszaállításához. Próbáld újra.',
-			'supporter.errors.nothingToRestore' => 'Ehhez az áruházfiókhoz nem található Supporter-vásárlás.',
+			'supporter.errors.nothingToRestore' => 'Ehhez az áruházfiókhoz nem található Téma- és ikoncsomag-vásárlás.',
 			'settings.title' => 'Beállítások',
 			'settings.supportDeveloper' => 'Satra támogatása',
 			'settings.supportDeveloperDescription' => 'A fejlesztés támogatása Liberapay-en keresztül',
@@ -3875,6 +3876,7 @@ extension on TranslationsHu {
 			'settings.scopePlaybackSpeed' => 'Lejátszási sebesség',
 			'settings.scopeShaderPreset' => 'Shader-előbeállítás',
 			'settings.scopeAspectRatio' => 'Képarány',
+			'settings.scopeZoom' => 'Nagyítás',
 			'settings.scopeSyncOffsets' => 'Hang- és feliratszinkronizálás',
 			'settings.playerScopeOff' => 'Ne mentse',
 			'settings.playerScopeGlobal' => 'Mindenhol',
@@ -3887,8 +3889,8 @@ extension on TranslationsHu {
 			'themeEditor.customEmpty' => 'Még nincs létrehozva',
 			'themeEditor.editCustom' => 'Egyéni téma szerkesztése',
 			'themeEditor.editCustomDescription' => 'Válaszd ki magad az összes színt',
-			'themeEditor.locked' => 'Supporterrel oldható fel',
-			'themeEditor.savedLocked' => 'Mentve — Supporterrel oldható fel',
+			'themeEditor.locked' => 'A Téma- és ikoncsomaggal oldható fel',
+			'themeEditor.savedLocked' => 'Mentve — a Téma- és ikoncsomaggal oldható fel',
 			'themeEditor.title' => 'Egyéni téma',
 			'themeEditor.startFrom' => 'Kiindulási téma',
 			'themeEditor.startFromDescription' => 'Az összes szín átmásolása egy másik témából',
@@ -3901,9 +3903,9 @@ extension on TranslationsHu {
 			'themeEditor.slots.textMuted' => 'Másodlagos szöveg',
 			'themeEditor.slots.accent' => 'Kiemelőszín',
 			'themeEditor.opacity' => 'Átlátszatlanság',
-			'themeEditor.hexHint' => '#RRGGBB vagy #AARRGGBB',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.hexHint' => '#RRGGBB vagy #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Más témákból',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} – ${color}',
 			'themeEditor.contrast.textOnBg' => 'Szöveg a háttéren',
@@ -4415,9 +4417,9 @@ extension on TranslationsHu {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Hozzáadás a következőhöz (${displayName}): Plex, Jellyfin, Emby vagy más profilkapcsolat',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'A(z) ${name} munkamenete lejárt',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} szerver munkamenete lejárt',
-			'connections.accessDeniedOne' => ({required Object name}) => 'A(z) ${name} megtagadta a hozzáférést ettől a fióktól',
 			_ => null,
 		} ?? switch (path) {
+			'connections.accessDeniedOne' => ({required Object name}) => 'A(z) ${name} megtagadta a hozzáférést ettől a fióktól',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} szerver megtagadta a hozzáférést ettől a fióktól',
 			'connections.signInAgain' => 'Bejelentkezés újra',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'A(z) ${product} kapcsolat szerkesztése',
@@ -4929,9 +4931,9 @@ extension on TranslationsHu {
 			'liveTv.failedToStartChannel' => 'Nem sikerült elindítani az élő csatornát',
 			'liveTv.failedToBuildStreamUrl' => 'Nem sikerült összeállítani a stream URL-címét',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Nem sikerült elindítani a csatornát: ${reason}',
-			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Nem sikerült csatornát váltani: ${reason}',
 			_ => null,
 		} ?? switch (path) {
+			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Nem sikerült csatornát váltani: ${reason}',
 			'collections.title' => 'Gyűjtemények',
 			'collections.collection' => 'Gyűjtemény',
 			'collections.empty' => 'A gyűjtemény üres',
@@ -5443,9 +5445,9 @@ extension on TranslationsHu {
 			'externalPlayer.useExternalPlayer' => 'Külső lejátszó használata',
 			'externalPlayer.useExternalPlayerDescription' => 'Videók megnyitása egy másik alkalmazásban',
 			'externalPlayer.selectPlayer' => 'Lejátszó kiválasztása',
-			'externalPlayer.customPlayers' => 'Egyéni lejátszók',
 			_ => null,
 		} ?? switch (path) {
+			'externalPlayer.customPlayers' => 'Egyéni lejátszók',
 			'externalPlayer.systemDefault' => 'Rendszer alapértelmezése',
 			'externalPlayer.addCustomPlayer' => 'Egyéni lejátszó hozzáadása',
 			'externalPlayer.playerName' => 'Lejátszó neve',

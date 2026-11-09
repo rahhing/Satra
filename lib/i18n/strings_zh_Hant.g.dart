@@ -116,8 +116,8 @@ class _Translations$appIcon$zh_Hant extends Translations$appIcon$zh {
 	@override String get title => '應用程式圖示';
 	@override String get defaultIcon => '預設';
 	@override String get current => '目前圖示';
-	@override String get locked => 'Supporter 專屬';
-	@override String get lockedHint => '其他圖示為 Supporter 專屬福利。';
+	@override String get locked => '包含在主題與圖示包中';
+	@override String get lockedHint => '其他圖示包含在主題與圖示包中。';
 	@override String get changeFailed => '無法變更應用程式圖示';
 	@override String get launcherHint => '離開 Satra 後，新圖示就會出現在主畫面上。';
 	@override String get tvLauncherHint => '離開 Satra 後就會顯示新橫幅。在電視重新啟動前，Android TV 可能仍會顯示舊橫幅。';
@@ -247,8 +247,8 @@ class _Translations$supporter$zh_Hant extends Translations$supporter$zh {
 	final TranslationsZhHant _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Satra Supporter';
-	@override String get intro => '一次性購買，支持 Satra 的開發並解鎖外觀加值項目：';
+	@override String get title => '主題與圖示包';
+	@override String get intro => '可選的一次性購買，提供外觀加值項目：';
 	@override String get presetThemes => '精選主題';
 	@override String get presetThemesDescription => '餘燼、冰河、森林、李子與紙張';
 	@override String get customTheme => '自訂主題';
@@ -259,11 +259,11 @@ class _Translations$supporter$zh_Hant extends Translations$supporter$zh {
 	@override String get loadingPrice => '正在載入價格…';
 	@override String get restore => '恢復購買';
 	@override String get pending => '您的購買正在等待付款或核准。商店完成交易後，加值項目就會立即解鎖。';
-	@override String get thankYouTitle => '感謝您支持 Satra';
-	@override String get thankYouBody => '您的 Supporter 加值項目已解鎖。';
+	@override String get thankYouTitle => '感謝您的購買';
+	@override String get thankYouBody => '主題與圖示包已解鎖。';
 	@override String get tileSubtitle => '一次性購買即可解鎖主題與應用程式圖示';
 	@override String get tileSubtitleThemesOnly => '一次性購買即可解鎖主題';
-	@override String get tileUnlocked => '感謝您的支持';
+	@override String get tileUnlocked => '已解鎖 — 感謝您的購買';
 	@override late final _Translations$supporter$errors$zh_Hant errors = _Translations$supporter$errors$zh_Hant._(_root);
 }
 
@@ -601,6 +601,7 @@ class _Translations$settings$zh_Hant extends Translations$settings$zh {
 	@override String get scopePlaybackSpeed => '播放速度';
 	@override String get scopeShaderPreset => '著色器預設';
 	@override String get scopeAspectRatio => '顯示比例';
+	@override String get scopeZoom => '縮放';
 	@override String get scopeSyncOffsets => '音訊與字幕同步';
 	@override String get playerScopeOff => '不要儲存';
 	@override String get playerScopeGlobal => '全部';
@@ -622,8 +623,8 @@ class _Translations$themeEditor$zh_Hant extends Translations$themeEditor$zh {
 	@override String get customEmpty => '尚未建立';
 	@override String get editCustom => '編輯自訂主題';
 	@override String get editCustomDescription => '自行選擇每一種顏色';
-	@override String get locked => '透過 Supporter 解鎖';
-	@override String get savedLocked => '已儲存 — 透過 Supporter 解鎖';
+	@override String get locked => '透過主題與圖示包解鎖';
+	@override String get savedLocked => '已儲存 — 透過主題與圖示包解鎖';
 	@override String get title => '自訂主題';
 	@override String get startFrom => '從現有主題開始';
 	@override String get startFromDescription => '從其他主題複製所有顏色';
@@ -2525,11 +2526,11 @@ class _Translations$supporter$errors$zh_Hant extends Translations$supporter$erro
 
 	// Translations
 	@override String get storeUnavailable => '目前無法購買。請確認您已登入商店，且此裝置允許購買。';
-	@override String get productNotFound => '您的商店目前無法購買 Supporter。';
+	@override String get productNotFound => '您的商店目前無法購買主題與圖示包。';
 	@override String get productQueryFailed => '無法載入價格。請檢查網路連線後重試。';
 	@override String get purchaseFailed => '購買未完成。請重試。';
 	@override String get restoreFailed => '無法連線至商店以恢復您的購買。請重試。';
-	@override String get nothingToRestore => '此商店帳號找不到 Supporter 購買紀錄。';
+	@override String get nothingToRestore => '此商店帳號找不到主題與圖示包的購買紀錄。';
 }
 
 // Path: themeEditor.slots
@@ -3383,8 +3384,8 @@ extension on TranslationsZhHant {
 			'appIcon.title' => '應用程式圖示',
 			'appIcon.defaultIcon' => '預設',
 			'appIcon.current' => '目前圖示',
-			'appIcon.locked' => 'Supporter 專屬',
-			'appIcon.lockedHint' => '其他圖示為 Supporter 專屬福利。',
+			'appIcon.locked' => '包含在主題與圖示包中',
+			'appIcon.lockedHint' => '其他圖示包含在主題與圖示包中。',
 			'appIcon.changeFailed' => '無法變更應用程式圖示',
 			'appIcon.launcherHint' => '離開 Satra 後，新圖示就會出現在主畫面上。',
 			'appIcon.tvLauncherHint' => '離開 Satra 後就會顯示新橫幅。在電視重新啟動前，Android TV 可能仍會顯示舊橫幅。',
@@ -3514,8 +3515,8 @@ extension on TranslationsZhHant {
 			'update.viewRelease' => '查看版本詳情',
 			'update.latestVersion' => '已安裝的版本為最新版本',
 			'update.checkFailed' => '無法檢查更新',
-			'supporter.title' => 'Satra Supporter',
-			'supporter.intro' => '一次性購買，支持 Satra 的開發並解鎖外觀加值項目：',
+			'supporter.title' => '主題與圖示包',
+			'supporter.intro' => '可選的一次性購買，提供外觀加值項目：',
 			'supporter.presetThemes' => '精選主題',
 			'supporter.presetThemesDescription' => '餘燼、冰河、森林、李子與紙張',
 			'supporter.customTheme' => '自訂主題',
@@ -3526,17 +3527,17 @@ extension on TranslationsZhHant {
 			'supporter.loadingPrice' => '正在載入價格…',
 			'supporter.restore' => '恢復購買',
 			'supporter.pending' => '您的購買正在等待付款或核准。商店完成交易後，加值項目就會立即解鎖。',
-			'supporter.thankYouTitle' => '感謝您支持 Satra',
-			'supporter.thankYouBody' => '您的 Supporter 加值項目已解鎖。',
+			'supporter.thankYouTitle' => '感謝您的購買',
+			'supporter.thankYouBody' => '主題與圖示包已解鎖。',
 			'supporter.tileSubtitle' => '一次性購買即可解鎖主題與應用程式圖示',
 			'supporter.tileSubtitleThemesOnly' => '一次性購買即可解鎖主題',
-			'supporter.tileUnlocked' => '感謝您的支持',
+			'supporter.tileUnlocked' => '已解鎖 — 感謝您的購買',
 			'supporter.errors.storeUnavailable' => '目前無法購買。請確認您已登入商店，且此裝置允許購買。',
-			'supporter.errors.productNotFound' => '您的商店目前無法購買 Supporter。',
+			'supporter.errors.productNotFound' => '您的商店目前無法購買主題與圖示包。',
 			'supporter.errors.productQueryFailed' => '無法載入價格。請檢查網路連線後重試。',
 			'supporter.errors.purchaseFailed' => '購買未完成。請重試。',
 			'supporter.errors.restoreFailed' => '無法連線至商店以恢復您的購買。請重試。',
-			'supporter.errors.nothingToRestore' => '此商店帳號找不到 Supporter 購買紀錄。',
+			'supporter.errors.nothingToRestore' => '此商店帳號找不到主題與圖示包的購買紀錄。',
 			'settings.title' => '設定',
 			'settings.supportDeveloper' => '贊助 Satra',
 			'settings.supportDeveloperDescription' => '透過 Liberapay 捐款支持開發者',
@@ -3864,6 +3865,7 @@ extension on TranslationsZhHant {
 			'settings.scopePlaybackSpeed' => '播放速度',
 			'settings.scopeShaderPreset' => '著色器預設',
 			'settings.scopeAspectRatio' => '顯示比例',
+			'settings.scopeZoom' => '縮放',
 			'settings.scopeSyncOffsets' => '音訊與字幕同步',
 			'settings.playerScopeOff' => '不要儲存',
 			'settings.playerScopeGlobal' => '全部',
@@ -3876,8 +3878,8 @@ extension on TranslationsZhHant {
 			'themeEditor.customEmpty' => '尚未建立',
 			'themeEditor.editCustom' => '編輯自訂主題',
 			'themeEditor.editCustomDescription' => '自行選擇每一種顏色',
-			'themeEditor.locked' => '透過 Supporter 解鎖',
-			'themeEditor.savedLocked' => '已儲存 — 透過 Supporter 解鎖',
+			'themeEditor.locked' => '透過主題與圖示包解鎖',
+			'themeEditor.savedLocked' => '已儲存 — 透過主題與圖示包解鎖',
 			'themeEditor.title' => '自訂主題',
 			'themeEditor.startFrom' => '從現有主題開始',
 			'themeEditor.startFromDescription' => '從其他主題複製所有顏色',
@@ -3890,9 +3892,9 @@ extension on TranslationsZhHant {
 			'themeEditor.slots.textMuted' => '次要文字',
 			'themeEditor.slots.accent' => '強調色',
 			'themeEditor.opacity' => '不透明度',
-			'themeEditor.hexHint' => '#RRGGBB 或 #AARRGGBB',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.hexHint' => '#RRGGBB 或 #AARRGGBB',
 			'themeEditor.fromOtherThemes' => '來自其他主題',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} ${color}',
 			'themeEditor.contrast.textOnBg' => '背景上的文字',
@@ -4404,9 +4406,9 @@ extension on TranslationsZhHant {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '新增至 ${displayName}：Plex、Jellyfin、Emby 或其他設定檔連線',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} 的工作階段已過期',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} 個伺服器的工作階段已過期',
-			'connections.accessDeniedOne' => ({required Object name}) => '${name} 拒絕此帳戶存取',
 			_ => null,
 		} ?? switch (path) {
+			'connections.accessDeniedOne' => ({required Object name}) => '${name} 拒絕此帳戶存取',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} 台伺服器拒絕此帳戶存取',
 			'connections.signInAgain' => '重新登入',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => '編輯 ${product} 連線',
@@ -4918,9 +4920,9 @@ extension on TranslationsZhHant {
 			'liveTv.failedToStartChannel' => '無法啟動直播頻道',
 			'liveTv.failedToBuildStreamUrl' => '無法建立串流 URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => '無法開始播放此頻道：${reason}',
-			'liveTv.channelSwitchFailed' => ({required Object reason}) => '無法切換頻道：${reason}',
 			_ => null,
 		} ?? switch (path) {
+			'liveTv.channelSwitchFailed' => ({required Object reason}) => '無法切換頻道：${reason}',
 			'collections.title' => '收藏集',
 			'collections.collection' => '收藏集',
 			'collections.empty' => '收藏集為空',
@@ -5432,9 +5434,9 @@ extension on TranslationsZhHant {
 			'externalPlayer.useExternalPlayer' => '使用外部播放器',
 			'externalPlayer.useExternalPlayerDescription' => '在其他應用程式中開啟影片',
 			'externalPlayer.selectPlayer' => '選擇播放器',
-			'externalPlayer.customPlayers' => '自訂播放器',
 			_ => null,
 		} ?? switch (path) {
+			'externalPlayer.customPlayers' => '自訂播放器',
 			'externalPlayer.systemDefault' => '系統預設',
 			'externalPlayer.addCustomPlayer' => '新增自訂播放器',
 			'externalPlayer.playerName' => '播放器名稱',

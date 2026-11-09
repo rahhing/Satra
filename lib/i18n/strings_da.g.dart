@@ -115,8 +115,8 @@ class _Translations$appIcon$da extends Translations$appIcon$en {
 	@override String get title => 'Appikon';
 	@override String get defaultIcon => 'Standard';
 	@override String get current => 'Nuværende ikon';
-	@override String get locked => 'Supporter-fordel';
-	@override String get lockedHint => 'Alternative ikoner er en Supporter-fordel.';
+	@override String get locked => 'Del af Tema- og ikonpakken';
+	@override String get lockedHint => 'Alternative ikoner er en del af Tema- og ikonpakken.';
 	@override String get changeFailed => 'Kunne ikke ændre appikonet';
 	@override String get launcherHint => 'Det nye ikon vises på din startskærm, når du forlader Satra.';
 	@override String get tvLauncherHint => 'Det nye banner vises, når du forlader Satra. Android TV kan blive ved med at vise det gamle, indtil tv\'et genstartes.';
@@ -246,8 +246,8 @@ class _Translations$supporter$da extends Translations$supporter$en {
 	final TranslationsDa _root; // ignore: unused_field
 
 	// Translations
-	@override String get title => 'Satra Supporter';
-	@override String get intro => 'Et engangskøb, der støtter udviklingen af Satra og låser op for kosmetiske tilføjelser:';
+	@override String get title => 'Tema- og ikonpakke';
+	@override String get intro => 'Et valgfrit engangskøb med kosmetiske tilføjelser:';
 	@override String get presetThemes => 'Forudindstillede temaer';
 	@override String get presetThemesDescription => 'Glød, Gletsjer, Skov, Blomme og Papir';
 	@override String get customTheme => 'Brugerdefineret tema';
@@ -258,11 +258,11 @@ class _Translations$supporter$da extends Translations$supporter$en {
 	@override String get loadingPrice => 'Indlæser pris...';
 	@override String get restore => 'Gendan køb';
 	@override String get pending => 'Dit køb afventer betaling eller godkendelse. Tilføjelserne låses op, så snart butikken har gennemført det.';
-	@override String get thankYouTitle => 'Tak for din støtte til Satra';
-	@override String get thankYouBody => 'Dine Supporter-tilføjelser er låst op.';
+	@override String get thankYouTitle => 'Tak for dit køb';
+	@override String get thankYouBody => 'Tema- og ikonpakken er låst op.';
 	@override String get tileSubtitle => 'Lås temaer og appikoner op med et engangskøb';
 	@override String get tileSubtitleThemesOnly => 'Lås temaer op med et engangskøb';
-	@override String get tileUnlocked => 'Tak for din støtte';
+	@override String get tileUnlocked => 'Låst op — tak for dit køb';
 	@override late final _Translations$supporter$errors$da errors = _Translations$supporter$errors$da._(_root);
 }
 
@@ -600,6 +600,7 @@ class _Translations$settings$da extends Translations$settings$en {
 	@override String get scopePlaybackSpeed => 'Afspilningshastighed';
 	@override String get scopeShaderPreset => 'Shader-forudindstilling';
 	@override String get scopeAspectRatio => 'Billedformat';
+	@override String get scopeZoom => 'Zoom';
 	@override String get scopeSyncOffsets => 'Synkronisering af lyd og undertekster';
 	@override String get playerScopeOff => 'Gem ikke';
 	@override String get playerScopeGlobal => 'Overalt';
@@ -621,8 +622,8 @@ class _Translations$themeEditor$da extends Translations$themeEditor$en {
 	@override String get customEmpty => 'Ikke oprettet endnu';
 	@override String get editCustom => 'Rediger brugerdefineret tema';
 	@override String get editCustomDescription => 'Vælg selv alle farver';
-	@override String get locked => 'Lås op med Supporter';
-	@override String get savedLocked => 'Gemt — låses op med Supporter';
+	@override String get locked => 'Lås op med Tema- og ikonpakken';
+	@override String get savedLocked => 'Gemt — låses op med Tema- og ikonpakken';
 	@override String get title => 'Brugerdefineret tema';
 	@override String get startFrom => 'Start fra';
 	@override String get startFromDescription => 'Kopiér alle farver fra et andet tema';
@@ -2534,11 +2535,11 @@ class _Translations$supporter$errors$da extends Translations$supporter$errors$en
 
 	// Translations
 	@override String get storeUnavailable => 'Køb er ikke tilgængelige. Tjek, at du er logget ind i butikken, og at køb er tilladt på denne enhed.';
-	@override String get productNotFound => 'Supporter-købet er ikke tilgængeligt i din butik lige nu.';
+	@override String get productNotFound => 'Tema- og ikonpakken er ikke tilgængelig i din butik lige nu.';
 	@override String get productQueryFailed => 'Kunne ikke indlæse prisen. Tjek din forbindelse, og prøv igen.';
 	@override String get purchaseFailed => 'Købet blev ikke gennemført. Prøv igen.';
 	@override String get restoreFailed => 'Kunne ikke kontakte butikken for at gendanne dit køb. Prøv igen.';
-	@override String get nothingToRestore => 'Der blev ikke fundet noget Supporter-køb for denne butikskonto.';
+	@override String get nothingToRestore => 'Der blev ikke fundet noget køb af Tema- og ikonpakken for denne butikskonto.';
 }
 
 // Path: themeEditor.slots
@@ -3394,8 +3395,8 @@ extension on TranslationsDa {
 			'appIcon.title' => 'Appikon',
 			'appIcon.defaultIcon' => 'Standard',
 			'appIcon.current' => 'Nuværende ikon',
-			'appIcon.locked' => 'Supporter-fordel',
-			'appIcon.lockedHint' => 'Alternative ikoner er en Supporter-fordel.',
+			'appIcon.locked' => 'Del af Tema- og ikonpakken',
+			'appIcon.lockedHint' => 'Alternative ikoner er en del af Tema- og ikonpakken.',
 			'appIcon.changeFailed' => 'Kunne ikke ændre appikonet',
 			'appIcon.launcherHint' => 'Det nye ikon vises på din startskærm, når du forlader Satra.',
 			'appIcon.tvLauncherHint' => 'Det nye banner vises, når du forlader Satra. Android TV kan blive ved med at vise det gamle, indtil tv\'et genstartes.',
@@ -3525,8 +3526,8 @@ extension on TranslationsDa {
 			'update.viewRelease' => 'Vis udgivelse',
 			'update.latestVersion' => 'Du har den nyeste version',
 			'update.checkFailed' => 'Kunne ikke søge efter opdateringer',
-			'supporter.title' => 'Satra Supporter',
-			'supporter.intro' => 'Et engangskøb, der støtter udviklingen af Satra og låser op for kosmetiske tilføjelser:',
+			'supporter.title' => 'Tema- og ikonpakke',
+			'supporter.intro' => 'Et valgfrit engangskøb med kosmetiske tilføjelser:',
 			'supporter.presetThemes' => 'Forudindstillede temaer',
 			'supporter.presetThemesDescription' => 'Glød, Gletsjer, Skov, Blomme og Papir',
 			'supporter.customTheme' => 'Brugerdefineret tema',
@@ -3537,17 +3538,17 @@ extension on TranslationsDa {
 			'supporter.loadingPrice' => 'Indlæser pris...',
 			'supporter.restore' => 'Gendan køb',
 			'supporter.pending' => 'Dit køb afventer betaling eller godkendelse. Tilføjelserne låses op, så snart butikken har gennemført det.',
-			'supporter.thankYouTitle' => 'Tak for din støtte til Satra',
-			'supporter.thankYouBody' => 'Dine Supporter-tilføjelser er låst op.',
+			'supporter.thankYouTitle' => 'Tak for dit køb',
+			'supporter.thankYouBody' => 'Tema- og ikonpakken er låst op.',
 			'supporter.tileSubtitle' => 'Lås temaer og appikoner op med et engangskøb',
 			'supporter.tileSubtitleThemesOnly' => 'Lås temaer op med et engangskøb',
-			'supporter.tileUnlocked' => 'Tak for din støtte',
+			'supporter.tileUnlocked' => 'Låst op — tak for dit køb',
 			'supporter.errors.storeUnavailable' => 'Køb er ikke tilgængelige. Tjek, at du er logget ind i butikken, og at køb er tilladt på denne enhed.',
-			'supporter.errors.productNotFound' => 'Supporter-købet er ikke tilgængeligt i din butik lige nu.',
+			'supporter.errors.productNotFound' => 'Tema- og ikonpakken er ikke tilgængelig i din butik lige nu.',
 			'supporter.errors.productQueryFailed' => 'Kunne ikke indlæse prisen. Tjek din forbindelse, og prøv igen.',
 			'supporter.errors.purchaseFailed' => 'Købet blev ikke gennemført. Prøv igen.',
 			'supporter.errors.restoreFailed' => 'Kunne ikke kontakte butikken for at gendanne dit køb. Prøv igen.',
-			'supporter.errors.nothingToRestore' => 'Der blev ikke fundet noget Supporter-køb for denne butikskonto.',
+			'supporter.errors.nothingToRestore' => 'Der blev ikke fundet noget køb af Tema- og ikonpakken for denne butikskonto.',
 			'settings.title' => 'Indstillinger',
 			'settings.supportDeveloper' => 'Støt Satra',
 			'settings.supportDeveloperDescription' => 'Doner via Liberapay for at finansiere udviklingen',
@@ -3875,6 +3876,7 @@ extension on TranslationsDa {
 			'settings.scopePlaybackSpeed' => 'Afspilningshastighed',
 			'settings.scopeShaderPreset' => 'Shader-forudindstilling',
 			'settings.scopeAspectRatio' => 'Billedformat',
+			'settings.scopeZoom' => 'Zoom',
 			'settings.scopeSyncOffsets' => 'Synkronisering af lyd og undertekster',
 			'settings.playerScopeOff' => 'Gem ikke',
 			'settings.playerScopeGlobal' => 'Overalt',
@@ -3887,8 +3889,8 @@ extension on TranslationsDa {
 			'themeEditor.customEmpty' => 'Ikke oprettet endnu',
 			'themeEditor.editCustom' => 'Rediger brugerdefineret tema',
 			'themeEditor.editCustomDescription' => 'Vælg selv alle farver',
-			'themeEditor.locked' => 'Lås op med Supporter',
-			'themeEditor.savedLocked' => 'Gemt — låses op med Supporter',
+			'themeEditor.locked' => 'Lås op med Tema- og ikonpakken',
+			'themeEditor.savedLocked' => 'Gemt — låses op med Tema- og ikonpakken',
 			'themeEditor.title' => 'Brugerdefineret tema',
 			'themeEditor.startFrom' => 'Start fra',
 			'themeEditor.startFromDescription' => 'Kopiér alle farver fra et andet tema',
@@ -3901,9 +3903,9 @@ extension on TranslationsDa {
 			'themeEditor.slots.textMuted' => 'Sekundær tekst',
 			'themeEditor.slots.accent' => 'Accentfarve',
 			'themeEditor.opacity' => 'Opacitet',
-			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Fra andre temaer',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Tekst på baggrund',
@@ -4415,9 +4417,9 @@ extension on TranslationsDa {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Føj til ${displayName}: Plex, Jellyfin, Emby eller en anden profilforbindelse',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessionen er udløbet for ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessionerne er udløbet for ${count} servere',
-			'connections.accessDeniedOne' => ({required Object name}) => '${name} nægtede adgang for denne konto',
 			_ => null,
 		} ?? switch (path) {
+			'connections.accessDeniedOne' => ({required Object name}) => '${name} nægtede adgang for denne konto',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servere nægtede adgang for denne konto',
 			'connections.signInAgain' => 'Log ind igen',
 			'connections.editMediaBrowserTitle' => ({required Object product}) => 'Rediger ${product}-forbindelse',
@@ -4929,9 +4931,9 @@ extension on TranslationsDa {
 			'liveTv.failedToStartChannel' => 'Kunne ikke starte livekanalen',
 			'liveTv.failedToBuildStreamUrl' => 'Kunne ikke oprette stream-URL\'en',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kunne ikke starte kanalen: ${reason}',
-			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kunne ikke skifte kanal: ${reason}',
 			_ => null,
 		} ?? switch (path) {
+			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kunne ikke skifte kanal: ${reason}',
 			'collections.title' => 'Samlinger',
 			'collections.collection' => 'Samling',
 			'collections.empty' => 'Samlingen er tom',
@@ -5443,9 +5445,9 @@ extension on TranslationsDa {
 			'externalPlayer.useExternalPlayer' => 'Brug ekstern afspiller',
 			'externalPlayer.useExternalPlayerDescription' => 'Åbn videoer i en anden app',
 			'externalPlayer.selectPlayer' => 'Vælg afspiller',
-			'externalPlayer.customPlayers' => 'Brugerdefinerede afspillere',
 			_ => null,
 		} ?? switch (path) {
+			'externalPlayer.customPlayers' => 'Brugerdefinerede afspillere',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Tilføj brugerdefineret afspiller',
 			'externalPlayer.playerName' => 'Afspillernavn',
