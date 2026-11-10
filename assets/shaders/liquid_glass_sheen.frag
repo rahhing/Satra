@@ -3,7 +3,7 @@
 #include <flutter/runtime_effect.glsl>
 
 uniform vec2 u_size;
-uniform vec4 u_radii;     // (topRight, bottomRight, topLeft, bottomLeft)
+uniform vec4 u_radii;     // (bottomRight, topRight, bottomLeft, topLeft)
 uniform float u_bevel;
 uniform float u_intensity;
 uniform float u_is_dark;
@@ -19,8 +19,21 @@ float sdRoundBox(vec2 p, vec2 b, vec4 r) {
 
 void main() {
   vec2 pos = FlutterFragCoord().xy;
-  vec2 halfSize = u_size * 0.5;
-  vec2 p = pos - halfSize;
+  float bevel = max(u_bevel, 4.0);
+  // When a sheet is docked flush against the top or bottom viewport edge
+  // (0px corners on the anchored edge, rounded corners on the opposite edge),
+  // extend the virtual SDF box past the anchored edge so the vertical glass
+  // rims run cleanly into sharp 90° corners with no bottom/top miter crease.
+  float padTop = (u_radii.y <= 0.5 && u_radii.w <= 0.5 && (u_radii.x > 0.5 || u_radii.z > 0.5))
+      ? (bevel + 6.0)
+      : 0.0;
+  float padBottom = (u_radii.x <= 0.5 && u_radii.z <= 0.5 && (u_radii.y > 0.5 || u_radii.w > 0.5))
+      ? (bevel + 6.0)
+      : 0.0;
+  vec2 boxMin = vec2(0.0, -padTop);
+  vec2 boxMax = vec2(u_size.x, u_size.y + padBottom);
+  vec2 halfSize = (boxMax - boxMin) * 0.5;
+  vec2 p = pos - (boxMin + boxMax) * 0.5;
 
   float d = sdRoundBox(p, halfSize, u_radii);
   if (d > 0.5) {
@@ -37,7 +50,6 @@ void main() {
   vec2 grad = normalize(vec2(dx, dy) + vec2(1e-5));
 
   float distIn = max(-d, 0.0);
-  float bevel = max(u_bevel, 4.0);
   float rimFactor = clamp(1.0 - distIn / bevel, 0.0, 1.0);
   // Steep curve keeps sheen strictly near the outer bevel, leaving interior dark
   float slope = pow(rimFactor, 2.35);

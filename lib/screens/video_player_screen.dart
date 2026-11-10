@@ -3163,6 +3163,7 @@ class VideoPlayerScreenState extends State<VideoPlayerScreen>
         // Host owns sheet + system back: a back with a sheet open closes it;
         // with no sheet, exit the player. canPop:false keeps swipe-back disabled
         // so it doesn't fight timeline scrubbing.
+        blurNativeVideo: true,
         canPop: false,
         onSystemBack: () {
           if (BackKeyCoordinator.consumeIfHandled()) return;

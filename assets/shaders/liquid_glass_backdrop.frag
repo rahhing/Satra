@@ -3,7 +3,7 @@
 #include <flutter/runtime_effect.glsl>
 
 uniform vec2 u_size;
-uniform vec4 u_radii;     // (topRight, bottomRight, topLeft, bottomLeft)
+uniform vec4 u_radii;     // (bottomRight, topRight, bottomLeft, topLeft)
 uniform float u_strength;
 uniform float u_is_dark;
 uniform sampler2D u_texture_input;
@@ -24,8 +24,19 @@ vec2 sampleUv(vec2 uv) {
 void main() {
   vec2 frag = FlutterFragCoord().xy;
   vec2 safeSize = max(u_size, vec2(1.0));
-  vec2 halfSize = safeSize * 0.5;
-  vec2 p = frag - halfSize;
+  // Sleek, understated meniscus bevel (HiDPI-aware)
+  float minSide = min(safeSize.x, safeSize.y);
+  float bevel = clamp(minSide * 0.16, 10.0, 34.0);
+  float padTop = (u_radii.y <= 0.5 && u_radii.w <= 0.5 && (u_radii.x > 0.5 || u_radii.z > 0.5))
+      ? (bevel + 6.0)
+      : 0.0;
+  float padBottom = (u_radii.x <= 0.5 && u_radii.z <= 0.5 && (u_radii.y > 0.5 || u_radii.w > 0.5))
+      ? (bevel + 6.0)
+      : 0.0;
+  vec2 boxMin = vec2(0.0, -padTop);
+  vec2 boxMax = vec2(safeSize.x, safeSize.y + padBottom);
+  vec2 halfSize = (boxMax - boxMin) * 0.5;
+  vec2 p = frag - (boxMin + boxMax) * 0.5;
 
   float d = sdRoundBox(p, halfSize, u_radii);
   const float eps = 1.25;
@@ -35,9 +46,6 @@ void main() {
              sdRoundBox(p - vec2(0.0, eps), halfSize, u_radii);
   vec2 normal2d = normalize(vec2(dx, dy) + vec2(1e-5));
 
-  // Sleek, understated meniscus bevel (HiDPI-aware)
-  float minSide = min(safeSize.x, safeSize.y);
-  float bevel = clamp(minSide * 0.16, 10.0, 34.0);
   float distIn = max(-d, 0.0);
   float rim = clamp(1.0 - distIn / bevel, 0.0, 1.0);
   // Keep optical bend concentrated softly along the curved outer edge

@@ -117,10 +117,16 @@ class GlassSurface extends StatelessWidget {
         : rawSurface;
 
     // Rich smoked dark density so bright artwork behind Spotlight, toolbars, or
-    // panels never washes out the glass into pale milky gray.
-    final baseOpacity = useLiquid
-        ? (isDark ? (opacity + (1.0 - opacity) * 0.28).clamp(0.70, 0.88) : (opacity * 0.94).clamp(0.46, 0.86))
-        : opacity;
+    // panels never washes out the glass, while native-video sheets let blurred
+    // video colors glow richly underneath.
+    final double baseOpacity;
+    if (blurNativeVideo && effects) {
+      baseOpacity = isDark ? (useLiquid ? 0.56 : 0.48) : opacity.clamp(0.36, 0.72);
+    } else if (useLiquid) {
+      baseOpacity = isDark ? (opacity + (1.0 - opacity) * 0.24).clamp(0.68, 0.88) : (opacity * 0.94).clamp(0.46, 0.86);
+    } else {
+      baseOpacity = opacity;
+    }
 
     if (animation == null) {
       final staticContent = RepaintBoundary(
@@ -160,7 +166,10 @@ class GlassSurface extends StatelessWidget {
           surface: surface,
           baseOpacity: baseOpacity,
           visibility: visibility,
-          content: visibility >= 0.999 ? cachedChild! : Opacity(opacity: visibility, child: cachedChild),
+          // Keep Opacity permanently in the element tree (RenderOpacity is a
+          // no-op at alpha 255) so child State and FocusNodes never unmount
+          // when an opening sheet animation reaches 1.0.
+          content: Opacity(opacity: visibility, child: cachedChild),
         );
       },
     );
@@ -178,28 +187,22 @@ class GlassSurface extends StatelessWidget {
     required Widget content,
   }) {
     final effectiveAlpha = (effects ? baseOpacity : 1.0) * visibility;
+    final baseFill = surface.withValues(alpha: effectiveAlpha);
 
-    final pane = DecoratedBox(
-      decoration: BoxDecoration(
-        borderRadius: borderRadius,
-        color: surface.withValues(alpha: effectiveAlpha),
-        border: border
-            ? Border.all(
-                width: 1.0,
-                color: Colors.white.withValues(
-                  alpha: ((isDark ? (useLiquid ? 0.11 : 0.085) : 0.80) * visibility).clamp(0.0, 1.0),
-                ),
-              )
-            : null,
-        gradient: effects
-            ? LinearGradient(
+    // Keep `color` and `gradient` on separate DecoratedBoxes because Flutter's
+    // BoxDecoration replaces `paint.color` RGB when `paint.shader` is non-null.
+    final Widget gradedContent = effects
+        ? DecoratedBox(
+            decoration: BoxDecoration(
+              borderRadius: borderRadius,
+              gradient: LinearGradient(
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
                 colors: isDark
                     ? [
                         Colors.white.withValues(alpha: 0.016 * visibility),
-                        Colors.black.withValues(alpha: 0.06 * visibility),
-                        Colors.black.withValues(alpha: (useLiquid ? 0.20 : 0.14) * visibility),
+                        Colors.black.withValues(alpha: 0.04 * visibility),
+                        Colors.black.withValues(alpha: (useLiquid ? 0.14 : 0.10) * visibility),
                       ]
                     : (useLiquid
                           ? [
@@ -208,10 +211,26 @@ class GlassSurface extends StatelessWidget {
                               Colors.white.withValues(alpha: 0.08 * visibility),
                             ]
                           : [Colors.white.withValues(alpha: 0.06 * visibility), Colors.transparent]),
+              ),
+            ),
+            child: content,
+          )
+        : content;
+
+    final pane = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: borderRadius,
+        color: baseFill,
+        border: border
+            ? Border.all(
+                width: 1.0,
+                color: Colors.white.withValues(
+                  alpha: ((isDark ? (useLiquid ? 0.11 : 0.085) : 0.80) * visibility).clamp(0.0, 1.0),
+                ),
               )
             : null,
       ),
-      child: content,
+      child: gradedContent,
     );
 
     final Widget filteredContent;
@@ -415,7 +434,17 @@ double _meniscusBevelFor(Size size) => (math.min(size.width, size.height) * 0.32
 double _meniscusLipFor(Size size) => (_meniscusBevelFor(size) * 0.32).clamp(3.0, 7.5);
 
 RRect _deflateRRect(RRect rrect, double delta) {
-  final rect = rrect.outerRect.deflate(delta);
+  final outer = rrect.outerRect;
+  final topDocked =
+      rrect.tlRadiusX <= 0.5 && rrect.trRadiusX <= 0.5 && (rrect.blRadiusX > 0.5 || rrect.brRadiusX > 0.5);
+  final bottomDocked =
+      rrect.blRadiusX <= 0.5 && rrect.brRadiusX <= 0.5 && (rrect.tlRadiusX > 0.5 || rrect.trRadiusX > 0.5);
+  final rect = Rect.fromLTRB(
+    outer.left + delta,
+    topDocked ? outer.top : outer.top + delta,
+    outer.right - delta,
+    bottomDocked ? outer.bottom : outer.bottom - delta,
+  );
   if (rect.width <= 0 || rect.height <= 0) {
     return RRect.fromRectXY(Rect.fromCenter(center: rrect.center, width: 0, height: 0), 0, 0);
   }
@@ -546,13 +575,15 @@ class _ImpellerLiquidShaderFilterConfig implements ImageFilterConfig {
   @override
   ui.ImageFilter resolve(ImageFilterContext context) {
     final shader = program.fragmentShader();
-    // u_size (0, 1) is populated by Impeller to physical texture dimensions
+    // u_size (0, 1) is populated to physical texture dimensions.
+    // In FlutterFragCoord (+y down), p.y > 0 is bottom and p.y <= 0 is top, so
+    // sdRoundBox expects u_radii = (bottomRight, topRight, bottomLeft, topLeft).
     shader.setFloat(0, math.max(1.0, context.bounds.width * devicePixelRatio));
     shader.setFloat(1, math.max(1.0, context.bounds.height * devicePixelRatio));
-    shader.setFloat(2, borderRadius.topRight.x * devicePixelRatio);
-    shader.setFloat(3, borderRadius.bottomRight.x * devicePixelRatio);
-    shader.setFloat(4, borderRadius.topLeft.x * devicePixelRatio);
-    shader.setFloat(5, borderRadius.bottomLeft.x * devicePixelRatio);
+    shader.setFloat(2, borderRadius.bottomRight.x * devicePixelRatio);
+    shader.setFloat(3, borderRadius.topRight.x * devicePixelRatio);
+    shader.setFloat(4, borderRadius.bottomLeft.x * devicePixelRatio);
+    shader.setFloat(5, borderRadius.topLeft.x * devicePixelRatio);
     shader.setFloat(6, strength);
     shader.setFloat(7, isDark ? 1.0 : 0.0);
 
@@ -604,12 +635,13 @@ class _LiquidSheenPainter extends CustomPainter {
 
     final fragShader = shader;
     if (fragShader != null) {
+      // sdRoundBox expects u_radii = (bottomRight, topRight, bottomLeft, topLeft).
       fragShader.setFloat(0, size.width);
       fragShader.setFloat(1, size.height);
-      fragShader.setFloat(2, borderRadius.topRight.x);
-      fragShader.setFloat(3, borderRadius.bottomRight.x);
-      fragShader.setFloat(4, borderRadius.topLeft.x);
-      fragShader.setFloat(5, borderRadius.bottomLeft.x);
+      fragShader.setFloat(2, borderRadius.bottomRight.x);
+      fragShader.setFloat(3, borderRadius.topRight.x);
+      fragShader.setFloat(4, borderRadius.bottomLeft.x);
+      fragShader.setFloat(5, borderRadius.topLeft.x);
       fragShader.setFloat(6, bevel);
       fragShader.setFloat(7, visibility);
       fragShader.setFloat(8, isDark ? 1.0 : 0.0);
@@ -618,7 +650,19 @@ class _LiquidSheenPainter extends CustomPainter {
     }
 
     // Fallback specular meniscus rim before shader program finishes loading
-    final rrect = borderRadius.toRRect(rect).deflate(0.75);
+    final topDocked = borderRadius.topLeft.x <= 0.5 &&
+        borderRadius.topRight.x <= 0.5 &&
+        (borderRadius.bottomLeft.x > 0.5 || borderRadius.bottomRight.x > 0.5);
+    final bottomDocked = borderRadius.bottomLeft.x <= 0.5 &&
+        borderRadius.bottomRight.x <= 0.5 &&
+        (borderRadius.topLeft.x > 0.5 || borderRadius.topRight.x > 0.5);
+    final rimRect = Rect.fromLTRB(
+      rect.left + 0.75,
+      topDocked ? rect.top - 4.0 : rect.top + 0.75,
+      rect.right - 0.75,
+      bottomDocked ? rect.bottom + 4.0 : rect.bottom - 0.75,
+    );
+    final rrect = borderRadius.toRRect(rimRect);
     final rimPaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 1.25
@@ -632,7 +676,10 @@ class _LiquidSheenPainter extends CustomPainter {
         ],
         const [0.0, 0.5, 1.0],
       );
+    canvas.save();
+    canvas.clipRect(rect);
     canvas.drawRRect(rrect, rimPaint);
+    canvas.restore();
   }
 
   @override

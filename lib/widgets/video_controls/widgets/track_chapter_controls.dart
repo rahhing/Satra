@@ -208,6 +208,7 @@ class TrackChapterControls extends StatelessWidget {
                     state.onCancelAutoHide?.call();
                     OverlaySheetController.of(context)
                         .show(
+                          blurNativeVideo: true,
                           builder: (_) => TrackSheet(player: player, trackControlsState: state),
                         )
                         .whenComplete(() => state.onStartAutoHide?.call());
@@ -232,6 +233,7 @@ class TrackChapterControls extends StatelessWidget {
                 state.onCancelAutoHide?.call();
                 OverlaySheetController.of(context)
                     .show(
+                      blurNativeVideo: true,
                       builder: (_) => ChapterSheet(
                         player: player,
                         chapters: chapters,
@@ -261,7 +263,10 @@ class TrackChapterControls extends StatelessWidget {
               onPressed: () {
                 state.onCancelAutoHide?.call();
                 OverlaySheetController.of(context)
-                    .show(builder: (_) => QueueSheet(onItemSelected: state.onQueueItemSelected!))
+                    .show(
+                      blurNativeVideo: true,
+                      builder: (_) => QueueSheet(onItemSelected: state.onQueueItemSelected!),
+                    )
                     .whenComplete(() => state.onStartAutoHide?.call());
               },
             ),

@@ -72,7 +72,7 @@ class OverlaySheetController {
     FocusNode? initialFocusNode,
     Alignment alignment = Alignment.bottomCenter,
     bool showDragHandle = false,
-    bool blurNativeVideo = false,
+    bool? blurNativeVideo,
   }) {
     return _state._show<T>(
       builder: builder,
@@ -145,6 +145,7 @@ class OverlaySheetController {
     FocusNode? initialFocusNode,
     Alignment alignment = Alignment.bottomCenter,
     bool showDragHandle = false,
+    bool? blurNativeVideo,
   }) async {
     final controller = maybeOf(context);
     if (controller != null) {
@@ -156,6 +157,7 @@ class OverlaySheetController {
         initialFocusNode: initialFocusNode,
         alignment: alignment,
         showDragHandle: showDragHandle,
+        blurNativeVideo: blurNativeVideo,
       );
     }
     // Apply the same default constraints the overlay system uses so sheets
@@ -289,7 +291,18 @@ class OverlaySheetHost extends StatefulWidget {
   /// so the system path dedups against the key path.
   final VoidCallback? onSystemBack;
 
-  const OverlaySheetHost({super.key, required this.child, this.onOpenChanged, this.canPop, this.onSystemBack});
+  /// Whether sheets hosted here sit above a native video plane and should blur
+  /// that underlay by default unless overridden per `show(...)` call.
+  final bool blurNativeVideo;
+
+  const OverlaySheetHost({
+    super.key,
+    required this.child,
+    this.onOpenChanged,
+    this.canPop,
+    this.onSystemBack,
+    this.blurNativeVideo = false,
+  });
 
   @override
   State<OverlaySheetHost> createState() => _OverlaySheetHostState();
@@ -372,7 +385,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
     FocusNode? initialFocusNode,
     Alignment alignment = Alignment.bottomCenter,
     bool showDragHandle = false,
-    bool blurNativeVideo = false,
+    bool? blurNativeVideo,
   }) {
     BackKeyCoordinator.clear();
     // If already open, close first (instant)
@@ -400,7 +413,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
       _showDragHandle = showDragHandle;
       _constraints = constraints;
       _explicitBackgroundColor = backgroundColor;
-      _blurNativeVideo = blurNativeVideo;
+      _blurNativeVideo = blurNativeVideo ?? widget.blurNativeVideo;
       _alignment = alignment;
       _sheetHorizontalAnchor = horizontalAnchor;
       _dragOffset = 0;

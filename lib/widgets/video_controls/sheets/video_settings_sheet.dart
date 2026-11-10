@@ -623,6 +623,7 @@ class _VideoSettingsSheetState extends State<VideoSettingsSheet> {
     controller
         .show(
           alignment: .topCenter,
+          blurNativeVideo: true,
           constraints: const BoxConstraints(maxHeight: 80, maxWidth: 900),
           initialFocusNode: sliderFocusNode,
           builder: (_) => _CompactSyncBar(
