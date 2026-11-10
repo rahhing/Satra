@@ -210,6 +210,8 @@
     "paperTheme": "纸张",
     "libraryDensity": "媒体库密度",
     "displayScale": "界面缩放",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "紧凑",
     "comfortable": "舒适",
     "gridSpacing": "网格间距",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "始终在推荐栏标题中显示服务器名称。",
     "groupLibrariesByServer": "按服务器分组媒体库",
     "groupLibrariesByServerDescription": "在侧边栏中按媒体服务器分组媒体库。",
-    "alwaysKeepSidebarOpen": "始终保持侧边栏展开",
-    "alwaysKeepSidebarOpenDescription": "侧边栏保持展开状态，内容区域自动调整",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "显示未观看数量",
     "showUnwatchedCountDescription": "在剧集和季上显示未观看集数",
     "showWatchedIndicators": "显示已观看标记",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "完整效果",
     "visualEffectsReduced": "简化",
     "visualEffectsReducedDescription": "减少动画并使用较低分辨率的封面图片",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "隐藏未看剧集的剧透内容",
     "hideSpoilersDescription": "模糊未观看剧集的缩略图和描述",
     "playerBackend": "播放器引擎",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "除非自行设置，否则使用公共 Open Watch Party 中继服务器",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "请输入有效的 HTTP 或 HTTPS 中继服务器基础 URL。",
-
-
     "debugLogging": "调试日志",
     "debugLoggingDescription": "启用详细日志记录以便故障排除",
     "viewLogs": "查看日志",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "还原经胶转磁（telecine）处理为 29.97 fps 的电影和动画的原始帧，常见于 NTSC DVD。为电视拍摄的视频会出现卡顿。直播电视使用“视频”模式",
     "requireProfileSelectionOnOpen": "打开应用时选择用户资料",
     "requireProfileSelectionOnOpenDescription": "每次打开应用时都显示用户资料选择界面",
-    "forceTvMode": "强制 TV 模式",
-    "forceTvModeDescription": "强制 TV 布局。适用于无法自动检测的设备。需要重启。",
     "startInFullscreen": "以全屏模式启动",
     "startInFullscreenDescription": "启动时以全屏模式打开 Satra",
     "exitFullscreenOnPlayerClose": "关闭播放器时退出全屏",
@@ -561,12 +563,52 @@
     "previewSwitch": "自动播放",
     "previewMutedText": "次要文字看起来是这样的"
   },
-  "search": {
-    "hint": "搜索电影、剧集、音乐…",
-    "tryDifferentTerm": "尝试不同的搜索词",
-    "searchYourMedia": "搜索媒体",
-    "enterTitleActorOrKeyword": "输入标题、演员或关键词",
-    "people": "人物"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "为 ${actionName} 设置快捷键",
@@ -918,7 +960,6 @@
     },
     "removedFromContinueWatching": "已从继续观看中移除",
     "errorLoading": "出错：${error}",
-    "searchPartialResults": "部分媒体服务器无法搜索。正在显示可用的结果。",
     "streamInterrupted": "视频流已中断。按播放键或拖动进度条重试。",
     "liveStreamInterrupted": "直播流已中断。按播放键重试。",
     "fileInfoNotAvailable": "文件信息不可用",
@@ -952,7 +993,6 @@
     "noEpisodesFound": "在第一季中未找到剧集",
     "noEpisodesFoundGeneral": "未找到剧集",
     "episodesLoadFailed": "无法加载剧集",
-    "noResultsFound": "未找到结果",
     "sleepTimerSet": "睡眠定时器已设置为 ${label}",
     "noItemsAvailable": "没有可用的项目",
     "failedToCreatePlayQueueNoItems": "创建播放队列失败：没有可用项目",
@@ -967,8 +1007,6 @@
     "serverBusyBody": "服务器持续拒绝传输此文件（HTTP 503）。服务器可能正在重启或正忙，也可能是文件所在的存储设备已离线。请稍后重试；如果问题持续出现，请联系服务器所有者检查服务器和文件存储设备。",
     "playbackNotAllowedTitle": "不允许播放",
     "playbackNotAllowedBody": "服务器拒绝传输此项目（HTTP 403）。此账户可能没有播放权限，或服务器可能仅允许在其局域网内播放。",
-
-
     "burnedSubtitlesUseMenu": "字幕已烧录到此视频流中。请从字幕菜单中更改。",
     "noVideoUrl": "没有可用的视频 URL",
     "playbackNoMediaSources": "服务器未返回可播放的媒体源",
@@ -1218,7 +1256,6 @@
   },
   "errors": {
     "searchFailed": "搜索失败：${error}",
-    "searchUnavailable": "搜索无法连接任何媒体服务器。",
     "connectionTimeout": "加载 ${context} 时连接超时",
     "connectionFailed": "无法连接到媒体服务器",
     "unableToLoad": "无法加载${context}。请重试。",
@@ -1254,7 +1291,6 @@
     "failedToAnalyze": "无法分析媒体库：${error}",
     "noLibrariesFound": "未找到媒体库",
     "allLibrariesHidden": "所有媒体库已隐藏",
-    "hiddenLibrariesCount": "已隐藏的媒体库 (${count})",
     "thisLibraryIsEmpty": "此媒体库为空",
     "noItemsMatchFilters": "没有项目符合当前筛选条件",
     "resetFilters": "重置筛选条件",
@@ -1386,7 +1422,6 @@
   "logs": {
     "clearLogs": "清除日志",
     "copyLogs": "复制日志"
-
   },
   "startup": {
     "failedTitle": "Satra 无法启动",
@@ -1397,7 +1432,6 @@
     "hideDetails": "隐藏详情",
     "copyDetails": "复制详情",
     "detailsCopied": "详情已复制到剪贴板",
-
     "repairStorage": "修复存储",
     "repairTitle": "修复已存储的数据？",
     "repairBodyCommon": "Satra 的设置文件已损坏且无法读取。修复会将所有设置重置为默认值。",
@@ -1767,7 +1801,6 @@
     "trackCount": {
       "other": "${n} 首"
     },
-    "nowPlaying": "正在播放",
     "playingFrom": "播放来源：${title}",
     "queue": "播放队列",
     "clearQueue": "清空队列",

@@ -69,10 +69,9 @@ List<LibraryTabType> visibleLibraryTabs(MediaLibrary library) {
 }
 
 class LibrariesScreen extends StatefulWidget {
-  final VoidCallback? onLibraryOrderChanged;
   final ValueChanged<String>? onLibrarySelected;
 
-  const LibrariesScreen({super.key, this.onLibraryOrderChanged, this.onLibrarySelected});
+  const LibrariesScreen({super.key, this.onLibrarySelected});
 
   @override
   State<LibrariesScreen> createState() => _LibrariesScreenState();
@@ -512,12 +511,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     };
   }
 
-  /// Notify parent that library order changed
-  void _notifyLibraryOrderChanged() {
-    widget.onLibraryOrderChanged?.call();
-  }
-
-  /// Public method to load a library by key (called from MainScreen side nav)
+  /// Public method to load a library by key (called from MainScreen)
   @override
   void loadLibraryByKey(String libraryGlobalKey, {bool defaultToRecommended = false}) {
     _loadLibraryContent(libraryGlobalKey, defaultToRecommended: defaultToRecommended);
@@ -693,7 +687,6 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   void _showLibraryManagementSheet() {
     showLibraryManagementSheet(
       context,
-      onOrderChanged: _notifyLibraryOrderChanged,
       onToggleVisibility: _toggleLibraryVisibility,
     );
   }
@@ -775,7 +768,6 @@ class _LibrariesScreenState extends State<LibrariesScreen>
               isSelected: false,
               focusNode: _homeChipFocusNode,
               onSelect: () => MainScreenFocusScope.of(context, listen: false)?.selectHome?.call(),
-              onNavigateLeft: onTabBarBack,
               onNavigateRight: mainServerLibraries.isNotEmpty
                   ? () => _focusNodeForLibraryChip(mainServerLibraries.first.globalKey).requestFocus()
                   : (hasLibraryTabs

@@ -210,6 +210,8 @@
     "paperTheme": "ペーパー",
     "libraryDensity": "ライブラリの密度",
     "displayScale": "表示スケール",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "コンパクト",
     "comfortable": "ゆったり",
     "gridSpacing": "グリッド間隔",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "ハブのタイトルに常にサーバー名を表示します。",
     "groupLibrariesByServer": "サーバーごとにライブラリをグループ化",
     "groupLibrariesByServerDescription": "サイドバーのライブラリをメディアサーバーごとにまとめます。",
-    "alwaysKeepSidebarOpen": "サイドバーを常に開いておく",
-    "alwaysKeepSidebarOpenDescription": "サイドバーを展開したままにし、コンテンツ領域を幅に合わせて調整します",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "未視聴数を表示",
     "showUnwatchedCountDescription": "番組とシーズンに未視聴エピソード数を表示",
     "showWatchedIndicators": "視聴済みマークを表示",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "フル",
     "visualEffectsReduced": "軽減",
     "visualEffectsReducedDescription": "アニメーションを減らし、低解像度のアートワークを使用します",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "未視聴エピソードのネタバレを非表示",
     "hideSpoilersDescription": "未視聴エピソードのサムネイルと説明をぼかします",
     "playerBackend": "プレーヤーバックエンド",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "独自のリレーサーバーを設定しない限り、公開のOpen Watch Partyリレーサーバーを使用します",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "有効なHTTPまたはHTTPSのリレーサーバーURLを入力してください。",
-
-
     "debugLogging": "デバッグログ",
     "debugLoggingDescription": "トラブルシューティング用の詳細なログを有効化",
     "viewLogs": "ログを表示",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "NTSC DVDによくある、29.97fpsにテレシネされた映画やアニメの元のフレームを復元します。テレビ用に撮影された映像はカクつきます。ライブTVでは「ビデオ」を使用します",
     "requireProfileSelectionOnOpen": "アプリ起動時にプロフィールを確認",
     "requireProfileSelectionOnOpenDescription": "アプリを開くたびにプロフィール選択を表示",
-    "forceTvMode": "TVモードを強制",
-    "forceTvModeDescription": "TVレイアウトを強制します。自動検出しないデバイス向けです。再起動が必要です。",
     "startInFullscreen": "全画面表示で起動",
     "startInFullscreenDescription": "起動時にSatraを全画面モードで開きます",
     "exitFullscreenOnPlayerClose": "プレイヤーを閉じたときに全画面を終了",
@@ -561,12 +563,52 @@
     "previewSwitch": "自動再生",
     "previewMutedText": "補助テキストはこのように表示されます"
   },
-  "search": {
-    "hint": "映画、番組、音楽を検索…",
-    "tryDifferentTerm": "別の検索語をお試しください",
-    "searchYourMedia": "メディアを検索",
-    "enterTitleActorOrKeyword": "タイトル、俳優、またはキーワードを入力",
-    "people": "人物"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "${actionName}のショートカットを設定",
@@ -918,7 +960,6 @@
     },
     "removedFromContinueWatching": "視聴中から削除しました",
     "errorLoading": "エラー: ${error}",
-    "searchPartialResults": "一部のメディアサーバーを検索できませんでした。利用可能な結果を表示しています。",
     "streamInterrupted": "ストリームが中断されました。再生を押すかシークして再試行してください。",
     "liveStreamInterrupted": "ライブストリームが中断されました。再生を押して再試行してください。",
     "fileInfoNotAvailable": "ファイル情報が利用できません",
@@ -952,7 +993,6 @@
     "noEpisodesFound": "最初のシーズンにエピソードが見つかりません",
     "noEpisodesFoundGeneral": "エピソードが見つかりません",
     "episodesLoadFailed": "エピソードを読み込めませんでした",
-    "noResultsFound": "結果が見つかりません",
     "sleepTimerSet": "スリープタイマーを${label}に設定しました",
     "noItemsAvailable": "アイテムがありません",
     "failedToCreatePlayQueueNoItems": "再生キューを作成できませんでした — アイテムがありません",
@@ -967,8 +1007,6 @@
     "serverBusyBody": "サーバーがこのファイルのストリーミングを繰り返し拒否しました（HTTP 503）。サーバーが再起動中またはビジー状態か、ファイルのストレージがオフラインの可能性があります。しばらくしてからもう一度お試しください。問題が続く場合は、サーバーの所有者にサーバーとファイルのストレージを確認するよう依頼してください。",
     "playbackNotAllowedTitle": "再生が許可されていません",
     "playbackNotAllowedBody": "サーバーがこのアイテムのストリーミングを拒否しました（HTTP 403）。お使いのアカウントに再生の権限がないか、サーバーがローカルネットワーク内での再生のみを許可している可能性があります。",
-
-
     "burnedSubtitlesUseMenu": "字幕はこのストリームに焼き付けられています。字幕メニューから変更してください。",
     "noVideoUrl": "利用可能な動画URLがありません",
     "playbackNoMediaSources": "サーバーから再生可能なメディアソースが返されませんでした",
@@ -1218,7 +1256,6 @@
   },
   "errors": {
     "searchFailed": "検索に失敗しました: ${error}",
-    "searchUnavailable": "検索中にメディアサーバーへ接続できませんでした。",
     "connectionTimeout": "${context}の読み込み中に接続がタイムアウトしました",
     "connectionFailed": "メディアサーバーに接続できません",
     "unableToLoad": "${context}を読み込めませんでした。もう一度お試しください。",
@@ -1254,7 +1291,6 @@
     "failedToAnalyze": "ライブラリの解析に失敗しました: ${error}",
     "noLibrariesFound": "ライブラリが見つかりません",
     "allLibrariesHidden": "すべてのライブラリが非表示です",
-    "hiddenLibrariesCount": "非表示のライブラリ (${count})",
     "thisLibraryIsEmpty": "このライブラリは空です",
     "noItemsMatchFilters": "有効なフィルターに一致する項目はありません",
     "resetFilters": "フィルターをリセット",
@@ -1386,7 +1422,6 @@
   "logs": {
     "clearLogs": "ログをクリア",
     "copyLogs": "ログをコピー"
-
   },
   "startup": {
     "failedTitle": "Satraを起動できませんでした",
@@ -1397,7 +1432,6 @@
     "hideDetails": "詳細を非表示",
     "copyDetails": "詳細をコピー",
     "detailsCopied": "詳細をクリップボードにコピーしました",
-
     "repairStorage": "ストレージを修復",
     "repairTitle": "保存データを修復しますか？",
     "repairBodyCommon": "Satraの設定ファイルが破損しており読み取れません。修復するとすべての設定がデフォルトにリセットされます。",
@@ -1767,7 +1801,6 @@
     "trackCount": {
       "other": "${n}曲"
     },
-    "nowPlaying": "再生中",
     "playingFrom": "${title}から再生",
     "queue": "再生キュー",
     "clearQueue": "キューをクリア",

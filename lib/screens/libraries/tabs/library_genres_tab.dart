@@ -16,7 +16,6 @@ import '../../../utils/platform_detector.dart';
 import '../../../utils/provider_extensions.dart';
 import '../../../widgets/nested_tab_scrollbar.dart';
 import '../../../widgets/optimized_media_image.dart';
-import '../../main_screen.dart';
 import 'base_library_tab.dart';
 
 /// Genres tab: one tile per genre of the library, the way Plex Web's
@@ -99,10 +98,6 @@ class _LibraryGenresTabState extends BaseLibraryTabState<LibraryGenre, LibraryGe
     }
   }
 
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
-  }
-
   @override
   Widget buildContent(List<LibraryGenre> items) {
     final client = context.tryGetMediaClientForServer(serverIdOrNull(widget.library.serverId));
@@ -168,7 +163,7 @@ class _LibraryGenresTabState extends BaseLibraryTabState<LibraryGenre, LibraryGe
       onNavigateUp: row == 0 ? widget.onBack : () => _focusTile(index - columns),
       // A short last row: DOWN from a column it lacks lands on its last tile.
       onNavigateDown: row == lastRow ? _ignore : () => _focusTile(math.min(index + columns, count - 1)),
-      onNavigateLeft: column == 0 ? _navigateToSidebar : () => _focusTile(index - 1),
+      onNavigateLeft: column == 0 ? _ignore : () => _focusTile(index - 1),
       onNavigateRight: column == columns - 1 || index == count - 1 ? _ignore : () => _focusTile(index + 1),
       onBack: widget.onBack,
       onFocusChange: (hasFocus) => trackGridItemFocus(index, hasFocus),

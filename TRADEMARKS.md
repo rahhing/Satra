@@ -32,7 +32,7 @@ or a website, must be clearly a different app:
   AniList, Simkl, and MDBList app registrations. Register your own, and run your own instance of [`server/`](server/)
   for the OAuth proxy.
 
-Internal identifiers users never see, such as the Dart package name and the `com.edde746.plezy` Kotlin package, can
+Internal identifiers users never see, such as the Dart package name and the `com.rahhing.plezy` Kotlin package, can
 stay. Keeping them makes upstream changes easier to merge.
 
 You can say your app is a fork of, or based on, Plezy in your README, store listing, and About screen, as long as it

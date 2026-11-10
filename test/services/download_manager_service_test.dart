@@ -81,15 +81,15 @@ void main() {
   });
 
   group('isRelocatedRootTaskDirectory', () {
-    const baseAppDir = '/mnt/expand/9f2a/user/0/com.edde746.satra/app_flutter';
+    const baseAppDir = '/mnt/expand/9f2a/user/0/com.rahhing.satra/app_flutter';
     // Task strips one leading separator from `directory`, so a root-anchored task is
     // rejoined against the downloader's own root base before it can be compared.
     const rootBase = '/';
 
     test('flags an absolute directory left behind by the previous app location', () {
-      final task = _rootTask('t', 'srv:item-1', '/data/user/0/com.edde746.satra/app_flutter/downloads/srv/item-1');
+      final task = _rootTask('t', 'srv:item-1', '/data/user/0/com.rahhing.satra/app_flutter/downloads/srv/item-1');
 
-      expect(task.directory, 'data/user/0/com.edde746.satra/app_flutter/downloads/srv/item-1');
+      expect(task.directory, 'data/user/0/com.rahhing.satra/app_flutter/downloads/srv/item-1');
       expect(isRelocatedRootTaskDirectory(task: task, rootBasePath: rootBase, baseAppDirPath: baseAppDir), isTrue);
     });
 
@@ -4539,7 +4539,7 @@ DownloadTask _downloadTask(String taskId, String globalKey) {
 }
 
 /// Where the app's private storage lived before it was moved to another volume.
-const _previousAppDir = '/data/user/0/com.edde746.satra/app_flutter';
+const _previousAppDir = '/data/user/0/com.rahhing.satra/app_flutter';
 
 DownloadTask _rootTask(String taskId, String globalKey, String directory) {
   return DownloadTask(

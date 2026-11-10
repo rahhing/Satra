@@ -3,14 +3,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:satra/navigation/main_screen_scope.dart';
 
 void main() {
-  testWidgets('focusSidebarOf invokes the scope callback', (tester) async {
-    var focusCalls = 0;
+  testWidgets('non-listening MainScreenFocusScope.of exposes shell action callbacks', (tester) async {
+    var downloadsCalls = 0;
+    var settingsCalls = 0;
+    String? spotlightQuery;
     late BuildContext childContext;
 
     await tester.pumpWidget(
       MaterialApp(
         home: MainScreenFocusScope(
-          focusSidebar: () => focusCalls++,
+          openDownloads: () => downloadsCalls++,
+          openSettings: () => settingsCalls++,
+          openSpotlight: ({initialQuery}) => spotlightQuery = initialQuery ?? '',
           sideNavigationWidth: 0,
           child: Builder(
             builder: (context) {
@@ -22,12 +26,17 @@ void main() {
       ),
     );
 
-    MainScreenFocusScope.focusSidebarOf(childContext);
+    final scope = MainScreenFocusScope.of(childContext, listen: false)!;
+    scope.openDownloads?.call();
+    scope.openSettings?.call();
+    scope.openSpotlight?.call(initialQuery: 'matrix');
 
-    expect(focusCalls, 1);
+    expect(downloadsCalls, 1);
+    expect(settingsCalls, 1);
+    expect(spotlightQuery, 'matrix');
   });
 
-  testWidgets('focusSidebarOf is a no-op without a scope', (tester) async {
+  testWidgets('MainScreenFocusScope.of returns null without a scope', (tester) async {
     late BuildContext childContext;
 
     await tester.pumpWidget(
@@ -41,18 +50,18 @@ void main() {
       ),
     );
 
-    expect(() => MainScreenFocusScope.focusSidebarOf(childContext), returnsNormally);
+    expect(MainScreenFocusScope.of(childContext, listen: false), isNull);
   });
 
-  testWidgets('focusSidebarOf does not register an inherited dependency', (tester) async {
-    var sideNavigationWidth = 0.0;
+  testWidgets('non-listening MainScreenFocusScope.of does not register an inherited dependency', (tester) async {
+    var foregroundWidth = 1280.0;
     var childBuilds = 0;
-    var focusCalls = 0;
+    var spotlightCalls = 0;
     late StateSetter rebuildScope;
     final child = Builder(
       builder: (context) {
         childBuilds++;
-        MainScreenFocusScope.focusSidebarOf(context);
+        MainScreenFocusScope.of(context, listen: false)?.openSpotlight?.call();
         return const SizedBox.shrink();
       },
     );
@@ -63,8 +72,8 @@ void main() {
           builder: (context, setState) {
             rebuildScope = setState;
             return MainScreenFocusScope(
-              focusSidebar: () => focusCalls++,
-              sideNavigationWidth: sideNavigationWidth,
+              openSpotlight: ({initialQuery}) => spotlightCalls++,
+              foregroundWidth: foregroundWidth,
               child: child,
             );
           },
@@ -73,12 +82,12 @@ void main() {
     );
 
     expect(childBuilds, 1);
-    expect(focusCalls, 1);
+    expect(spotlightCalls, 1);
 
-    rebuildScope(() => sideNavigationWidth = 100);
+    rebuildScope(() => foregroundWidth = 1440);
     await tester.pump();
 
     expect(childBuilds, 1);
-    expect(focusCalls, 1);
+    expect(spotlightCalls, 1);
   });
 }

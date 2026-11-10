@@ -210,6 +210,8 @@
     "paperTheme": "Papier",
     "libraryDensity": "Densité des bibliothèques",
     "displayScale": "Échelle d'affichage",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Compact",
     "comfortable": "Confortable",
     "gridSpacing": "Espacement de la grille",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Toujours afficher les noms des serveurs dans les titres des hubs.",
     "groupLibrariesByServer": "Grouper les bibliothèques par serveur",
     "groupLibrariesByServerDescription": "Regrouper les bibliothèques de la barre latérale par serveur multimédia.",
-    "alwaysKeepSidebarOpen": "Toujours garder la barre latérale ouverte",
-    "alwaysKeepSidebarOpenDescription": "La barre latérale reste étendue et la zone de contenu s'adapte",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Afficher le nombre d’éléments non vus",
     "showUnwatchedCountDescription": "Afficher le nombre d’épisodes non vus pour les séries et les saisons",
     "showWatchedIndicators": "Afficher les indicateurs de visionnage",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Complets",
     "visualEffectsReduced": "Réduits",
     "visualEffectsReducedDescription": "Moins d’animations et d’illustrations de plus faible résolution",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Masquer les spoilers des épisodes non vus",
     "hideSpoilersDescription": "Flouter les miniatures et descriptions des épisodes non vus",
     "playerBackend": "Moteur de lecture",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Relais publics Open Watch Party, sauf si vous définissez le vôtre",
     "watchTogetherRelayHint": "https://mon-relais.exemple.fr",
     "watchTogetherRelayInvalid": "Saisissez une URL de base HTTP ou HTTPS valide pour le relais.",
-
-
     "debugLogging": "Journalisation de débogage",
     "debugLoggingDescription": "Activer la journalisation détaillée pour le dépannage",
     "viewLogs": "Voir les journaux",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Restaurer les images d’origine des films et animations convertis en 29,97 i/s par télécinéma, un cas fréquent sur les DVD NTSC. Les vidéos tournées pour la télévision saccadent. La TV en direct utilise le mode Vidéo",
     "requireProfileSelectionOnOpen": "Demander le profil à l'ouverture",
     "requireProfileSelectionOnOpenDescription": "Afficher la sélection de profil à chaque ouverture de l'application",
-    "forceTvMode": "Forcer le mode TV",
-    "forceTvModeDescription": "Forcer l’interface TV sur les appareils qui ne sont pas détectés automatiquement. Redémarrage requis.",
     "startInFullscreen": "Démarrer en plein écran",
     "startInFullscreenDescription": "Ouvrir Satra en mode plein écran au lancement",
     "exitFullscreenOnPlayerClose": "Quitter le plein écran à la fermeture du lecteur",
@@ -561,12 +563,52 @@
     "previewSwitch": "Lecture automatique",
     "previewMutedText": "Voici à quoi ressemble le texte secondaire"
   },
-  "search": {
-    "hint": "Rechercher des films, des séries, de la musique...",
-    "tryDifferentTerm": "Essayez un autre terme de recherche",
-    "searchYourMedia": "Rechercher dans vos médias",
-    "enterTitleActorOrKeyword": "Entrez un titre, un acteur ou un mot-clé",
-    "people": "Personnes"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Définir un raccourci pour ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Supprimé de « Continuer à regarder »",
     "errorLoading": "Erreur : ${error}",
-    "searchPartialResults": "Certains serveurs multimédia n'ont pas pu être interrogés. Affichage des résultats disponibles.",
     "streamInterrupted": "La lecture a été interrompue. Appuyez sur Lecture ou avancez pour réessayer.",
     "liveStreamInterrupted": "Le direct a été interrompu. Appuyez sur Lecture pour réessayer.",
     "fileInfoNotAvailable": "Informations sur le fichier non disponibles",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Aucun épisode trouvé dans la première saison",
     "noEpisodesFoundGeneral": "Aucun épisode trouvé",
     "episodesLoadFailed": "Impossible de charger les épisodes",
-    "noResultsFound": "Aucun résultat trouvé",
     "sleepTimerSet": "Minuterie de mise en veille réglée sur ${label}",
     "noItemsAvailable": "Aucun élément disponible",
     "failedToCreatePlayQueueNoItems": "Impossible de créer la file d’attente de lecture : aucun élément",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Le serveur a refusé à plusieurs reprises de diffuser ce fichier (HTTP 503). Il est peut-être en cours de redémarrage ou occupé, ou le stockage du fichier est peut-être hors ligne. Réessayez dans un instant. Si le problème persiste, demandez au propriétaire du serveur de vérifier le serveur et le stockage du fichier.",
     "playbackNotAllowedTitle": "Lecture non autorisée",
     "playbackNotAllowedBody": "Le serveur a refusé de diffuser cet élément (HTTP 403). Votre compte n'a peut-être pas l'autorisation de le lire, ou le serveur n'autorise peut-être la lecture que sur son réseau local.",
-
-
     "burnedSubtitlesUseMenu": "Les sous-titres sont incrustés à l’image de ce flux. Modifiez-les depuis le menu des sous-titres.",
     "noVideoUrl": "Aucune URL vidéo disponible",
     "playbackNoMediaSources": "Le serveur n’a renvoyé aucune source multimédia lisible",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Échec de la recherche : ${error}",
-    "searchUnavailable": "La recherche n'a pu atteindre aucun serveur multimédia.",
     "connectionTimeout": "Délai d'attente de connexion dépassé pendant le chargement ${context}",
     "connectionFailed": "Impossible de se connecter au serveur multimédia",
     "unableToLoad": "Impossible de charger ${context}. Réessayez.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Échec de l’analyse de la bibliothèque : ${error}",
     "noLibrariesFound": "Aucune bibliothèque trouvée",
     "allLibrariesHidden": "Toutes les bibliothèques sont masquées",
-    "hiddenLibrariesCount": "Bibliothèques masquées (${count})",
     "thisLibraryIsEmpty": "Cette bibliothèque est vide",
     "noItemsMatchFilters": "Aucun élément ne correspond aux filtres actifs",
     "resetFilters": "Réinitialiser les filtres",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Effacer les journaux",
     "copyLogs": "Copier les journaux"
-
   },
   "startup": {
     "failedTitle": "Satra n'a pas pu démarrer",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Masquer les détails",
     "copyDetails": "Copier les détails",
     "detailsCopied": "Détails copiés dans le presse-papiers",
-
     "repairStorage": "Réparer le stockage",
     "repairTitle": "Réparer les données stockées ?",
     "repairBodyCommon": "Le fichier de paramètres de Satra est endommagé et illisible. La réparation rétablit tous les paramètres par défaut.",
@@ -1778,7 +1812,6 @@
       "one": "${n} titre",
       "other": "${n} titres"
     },
-    "nowPlaying": "Lecture en cours",
     "playingFrom": "Lecture depuis ${title}",
     "queue": "File d'attente",
     "clearQueue": "Vider la file d'attente",

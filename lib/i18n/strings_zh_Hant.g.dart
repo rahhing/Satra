@@ -49,7 +49,6 @@ class TranslationsZhHant extends TranslationsZh with BaseTranslations<AppLocale,
 	@override late final _Translations$supporter$zh_Hant supporter = _Translations$supporter$zh_Hant._(_root);
 	@override late final _Translations$settings$zh_Hant settings = _Translations$settings$zh_Hant._(_root);
 	@override late final _Translations$themeEditor$zh_Hant themeEditor = _Translations$themeEditor$zh_Hant._(_root);
-	@override late final _Translations$search$zh_Hant search = _Translations$search$zh_Hant._(_root);
 	@override late final _Translations$hotkeys$zh_Hant hotkeys = _Translations$hotkeys$zh_Hant._(_root);
 	@override late final _Translations$fileInfo$zh_Hant fileInfo = _Translations$fileInfo$zh_Hant._(_root);
 	@override late final _Translations$mediaMenu$zh_Hant mediaMenu = _Translations$mediaMenu$zh_Hant._(_root);
@@ -328,8 +327,6 @@ class _Translations$settings$zh_Hant extends Translations$settings$zh {
 	@override String get showServerNameOnHubsDescription => '一律在推薦區標題中顯示伺服器名稱。';
 	@override String get groupLibrariesByServer => '依伺服器將媒體庫分組';
 	@override String get groupLibrariesByServerDescription => '將側邊欄中的媒體庫依伺服器進行分組。';
-	@override String get alwaysKeepSidebarOpen => '一律保持側邊欄展開';
-	@override String get alwaysKeepSidebarOpenDescription => '側邊欄保持展開狀態，內容區域自動調整';
 	@override String get showUnwatchedCount => '顯示未觀看數量';
 	@override String get showUnwatchedCountDescription => '在影集和單季上顯示未觀看的集數';
 	@override String get showWatchedIndicators => '顯示已觀看指示';
@@ -554,8 +551,6 @@ class _Translations$settings$zh_Hant extends Translations$settings$zh {
 	@override String get deinterlaceFilmDescription => '還原經 telecine 轉為 29.97 fps 的電影與動畫原始影格，常見於 NTSC DVD。為電視拍攝的影片會出現卡頓。直播電視會使用「視訊」';
 	@override String get requireProfileSelectionOnOpen => '開啟應用程式時要求選擇使用者';
 	@override String get requireProfileSelectionOnOpenDescription => '每次開啟應用程式時顯示使用者設定檔選擇畫面';
-	@override String get forceTvMode => '強制 TV 模式';
-	@override String get forceTvModeDescription => '強制使用 TV 介面版面。適用於無法自動辨識 TV 的裝置。需要重新啟動。';
 	@override String get startInFullscreen => '以全螢幕模式啟動';
 	@override String get startInFullscreenDescription => '啟動時直接以全螢幕開啟 Satra';
 	@override String get exitFullscreenOnPlayerClose => '關閉播放器時退出全螢幕';
@@ -644,20 +639,6 @@ class _Translations$themeEditor$zh_Hant extends Translations$themeEditor$zh {
 	@override String previewCardSubtitle({required Object minutes}) => '剩餘 ${minutes} 分鐘';
 	@override String get previewSwitch => '自動播放';
 	@override String get previewMutedText => '次要文字看起來像這樣';
-}
-
-// Path: search
-class _Translations$search$zh_Hant extends Translations$search$zh {
-	_Translations$search$zh_Hant._(TranslationsZhHant root) : this._root = root, super.internal(root);
-
-	final TranslationsZhHant _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => '搜尋電影、影集、音樂…';
-	@override String get tryDifferentTerm => '嘗試不同的關鍵字';
-	@override String get searchYourMedia => '搜尋媒體庫';
-	@override String get enterTitleActorOrKeyword => '輸入標題、演員或關鍵字';
-	@override String get people => '人物';
 }
 
 // Path: hotkeys
@@ -1034,7 +1015,6 @@ class _Translations$messages$zh_Hant extends Translations$messages$zh {
 	);
 	@override String get removedFromContinueWatching => '已從「繼續觀看」中移除';
 	@override String errorLoading({required Object error}) => '錯誤：${error}';
-	@override String get searchPartialResults => '部分媒體伺服器無法搜尋。目前顯示可取得的結果。';
 	@override String get streamInterrupted => '影片串流中斷。請按播放鍵或拖動進度條重試。';
 	@override String get liveStreamInterrupted => '直播串流中斷。請按播放鍵重試。';
 	@override String get fileInfoNotAvailable => '無法取得檔案資訊';
@@ -1068,7 +1048,6 @@ class _Translations$messages$zh_Hant extends Translations$messages$zh {
 	@override String get noEpisodesFound => '在第一季中找不到單集';
 	@override String get noEpisodesFoundGeneral => '找不到單集';
 	@override String get episodesLoadFailed => '無法載入單集';
-	@override String get noResultsFound => '找不到結果';
 	@override String sleepTimerSet({required Object label}) => '睡眠計時器已設定為 ${label}';
 	@override String get noItemsAvailable => '沒有可用的項目';
 	@override String get failedToCreatePlayQueueNoItems => '無法建立播放佇列 — 沒有項目';
@@ -1345,7 +1324,6 @@ class _Translations$errors$zh_Hant extends Translations$errors$zh {
 
 	// Translations
 	@override String searchFailed({required Object error}) => '搜尋失敗：${error}';
-	@override String get searchUnavailable => '搜尋無法連線至任何媒體伺服器。';
 	@override String connectionTimeout({required Object context}) => '載入 ${context} 時連線逾時';
 	@override String get connectionFailed => '無法連線至媒體伺服器';
 	@override String unableToLoad({required Object context}) => '無法載入 ${context}。請重試。';
@@ -1388,7 +1366,6 @@ class _Translations$libraries$zh_Hant extends Translations$libraries$zh {
 	@override String failedToAnalyze({required Object error}) => '無法分析媒體庫：${error}';
 	@override String get noLibrariesFound => '找不到媒體庫';
 	@override String get allLibrariesHidden => '所有媒體庫都已隱藏';
-	@override String hiddenLibrariesCount({required Object count}) => '已隱藏的媒體庫（${count}）';
 	@override String get thisLibraryIsEmpty => '此媒體庫為空';
 	@override String get noItemsMatchFilters => '沒有符合目前篩選條件的項目';
 	@override String get resetFilters => '重設篩選條件';
@@ -1758,7 +1735,6 @@ class _Translations$music$zh_Hant extends Translations$music$zh {
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
 		other: '${n} 首',
 	);
-	@override String get nowPlaying => '正在播放';
 	@override String playingFrom({required Object title}) => '來自 ${title}';
 	@override String get queue => '播放佇列';
 	@override String get clearQueue => '清空佇列';
@@ -3592,8 +3568,6 @@ extension on TranslationsZhHant {
 			'settings.showServerNameOnHubsDescription' => '一律在推薦區標題中顯示伺服器名稱。',
 			'settings.groupLibrariesByServer' => '依伺服器將媒體庫分組',
 			'settings.groupLibrariesByServerDescription' => '將側邊欄中的媒體庫依伺服器進行分組。',
-			'settings.alwaysKeepSidebarOpen' => '一律保持側邊欄展開',
-			'settings.alwaysKeepSidebarOpenDescription' => '側邊欄保持展開狀態，內容區域自動調整',
 			'settings.showUnwatchedCount' => '顯示未觀看數量',
 			'settings.showUnwatchedCountDescription' => '在影集和單季上顯示未觀看的集數',
 			'settings.showWatchedIndicators' => '顯示已觀看指示',
@@ -3818,8 +3792,6 @@ extension on TranslationsZhHant {
 			'settings.deinterlaceFilmDescription' => '還原經 telecine 轉為 29.97 fps 的電影與動畫原始影格，常見於 NTSC DVD。為電視拍攝的影片會出現卡頓。直播電視會使用「視訊」',
 			'settings.requireProfileSelectionOnOpen' => '開啟應用程式時要求選擇使用者',
 			'settings.requireProfileSelectionOnOpenDescription' => '每次開啟應用程式時顯示使用者設定檔選擇畫面',
-			'settings.forceTvMode' => '強制 TV 模式',
-			'settings.forceTvModeDescription' => '強制使用 TV 介面版面。適用於無法自動辨識 TV 的裝置。需要重新啟動。',
 			'settings.startInFullscreen' => '以全螢幕模式啟動',
 			'settings.startInFullscreenDescription' => '啟動時直接以全螢幕開啟 Satra',
 			'settings.exitFullscreenOnPlayerClose' => '關閉播放器時退出全螢幕',
@@ -3892,12 +3864,12 @@ extension on TranslationsZhHant {
 			'themeEditor.slots.textMuted' => '次要文字',
 			'themeEditor.slots.accent' => '強調色',
 			'themeEditor.opacity' => '不透明度',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB 或 #AARRGGBB',
 			'themeEditor.fromOtherThemes' => '來自其他主題',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} ${color}',
 			'themeEditor.contrast.textOnBg' => '背景上的文字',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => '面板上的文字',
 			'themeEditor.contrast.textMutedOnBg' => '背景上的次要文字',
 			'themeEditor.contrast.textMutedOnSurface' => '面板上的次要文字',
@@ -3912,11 +3884,6 @@ extension on TranslationsZhHant {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '剩餘 ${minutes} 分鐘',
 			'themeEditor.previewSwitch' => '自動播放',
 			'themeEditor.previewMutedText' => '次要文字看起來像這樣',
-			'search.hint' => '搜尋電影、影集、音樂…',
-			'search.tryDifferentTerm' => '嘗試不同的關鍵字',
-			'search.searchYourMedia' => '搜尋媒體庫',
-			'search.enterTitleActorOrKeyword' => '輸入標題、演員或關鍵字',
-			'search.people' => '人物',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => '為 ${actionName} 設定快速鍵',
 			'hotkeys.clearShortcut' => '清除快速鍵',
 			'hotkeys.noShortcutSet' => '未設定快速鍵',
@@ -4235,7 +4202,6 @@ extension on TranslationsZhHant {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '已自動移除 ${n} 個已觀看的下載內容', ), 
 			'messages.removedFromContinueWatching' => '已從「繼續觀看」中移除',
 			'messages.errorLoading' => ({required Object error}) => '錯誤：${error}',
-			'messages.searchPartialResults' => '部分媒體伺服器無法搜尋。目前顯示可取得的結果。',
 			'messages.streamInterrupted' => '影片串流中斷。請按播放鍵或拖動進度條重試。',
 			'messages.liveStreamInterrupted' => '直播串流中斷。請按播放鍵重試。',
 			'messages.fileInfoNotAvailable' => '無法取得檔案資訊',
@@ -4269,7 +4235,6 @@ extension on TranslationsZhHant {
 			'messages.noEpisodesFound' => '在第一季中找不到單集',
 			'messages.noEpisodesFoundGeneral' => '找不到單集',
 			'messages.episodesLoadFailed' => '無法載入單集',
-			'messages.noResultsFound' => '找不到結果',
 			'messages.sleepTimerSet' => ({required Object label}) => '睡眠計時器已設定為 ${label}',
 			'messages.noItemsAvailable' => '沒有可用的項目',
 			'messages.failedToCreatePlayQueueNoItems' => '無法建立播放佇列 — 沒有項目',
@@ -4406,8 +4371,6 @@ extension on TranslationsZhHant {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '新增至 ${displayName}：Plex、Jellyfin、Emby 或其他設定檔連線',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} 的工作階段已過期',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} 個伺服器的工作階段已過期',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} 拒絕此帳戶存取',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} 台伺服器拒絕此帳戶存取',
 			'connections.signInAgain' => '重新登入',
@@ -4419,6 +4382,8 @@ extension on TranslationsZhHant {
 			'accountPreferences.pickAccount' => '每個帳戶都會儲存各自的偏好設定。請選擇要編輯的帳戶。',
 			'accountPreferences.storedOnAccount' => '這些選項會儲存在帳戶本身，因此登入該帳戶的所有應用程式都會使用它們，包括您其他裝置上的 Satra。',
 			'accountPreferences.noAccounts' => '沒有可設定的帳戶',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => '登入 Plex，或連線至 Jellyfin 或 Emby 伺服器，儲存在該帳戶上的偏好設定便會顯示在此處。',
 			'accountPreferences.unavailable' => '無法連線至此帳戶',
 			'accountPreferences.loadFailed' => '無法載入這些偏好設定',
@@ -4501,7 +4466,6 @@ extension on TranslationsZhHant {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date}（${age} 歲）',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date}（享年 ${age} 歲）',
 			'errors.searchFailed' => ({required Object error}) => '搜尋失敗：${error}',
-			'errors.searchUnavailable' => '搜尋無法連線至任何媒體伺服器。',
 			'errors.connectionTimeout' => ({required Object context}) => '載入 ${context} 時連線逾時',
 			'errors.connectionFailed' => '無法連線至媒體伺服器',
 			'errors.unableToLoad' => ({required Object context}) => '無法載入 ${context}。請重試。',
@@ -4535,7 +4499,6 @@ extension on TranslationsZhHant {
 			'libraries.failedToAnalyze' => ({required Object error}) => '無法分析媒體庫：${error}',
 			'libraries.noLibrariesFound' => '找不到媒體庫',
 			'libraries.allLibrariesHidden' => '所有媒體庫都已隱藏',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => '已隱藏的媒體庫（${count}）',
 			'libraries.thisLibraryIsEmpty' => '此媒體庫為空',
 			'libraries.noItemsMatchFilters' => '沒有符合目前篩選條件的項目',
 			'libraries.resetFilters' => '重設篩選條件',
@@ -4920,8 +4883,6 @@ extension on TranslationsZhHant {
 			'liveTv.failedToStartChannel' => '無法啟動直播頻道',
 			'liveTv.failedToBuildStreamUrl' => '無法建立串流 URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => '無法開始播放此頻道：${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => '無法切換頻道：${reason}',
 			'collections.title' => '收藏集',
 			'collections.collection' => '收藏集',
@@ -4935,6 +4896,8 @@ extension on TranslationsZhHant {
 			'collections.collectionName' => '收藏集名稱',
 			'collections.enterCollectionName' => '輸入收藏集名稱',
 			'collections.addedToCollection' => '已新增至收藏集',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => '新增至收藏集失敗',
 			'collections.created' => '已建立收藏集',
 			'collections.removeFromCollection' => '從收藏集移除',
@@ -4976,7 +4939,6 @@ extension on TranslationsZhHant {
 			'music.addToQueue' => '新增至佇列',
 			'music.discNumber' => ({required Object n}) => 'CD ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 首', ), 
-			'music.nowPlaying' => '正在播放',
 			'music.playingFrom' => ({required Object title}) => '來自 ${title}',
 			'music.queue' => '播放佇列',
 			'music.clearQueue' => '清空佇列',
@@ -5434,8 +5396,6 @@ extension on TranslationsZhHant {
 			'externalPlayer.useExternalPlayer' => '使用外部播放器',
 			'externalPlayer.useExternalPlayerDescription' => '在其他應用程式中開啟影片',
 			'externalPlayer.selectPlayer' => '選擇播放器',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => '自訂播放器',
 			'externalPlayer.systemDefault' => '系統預設',
 			'externalPlayer.addCustomPlayer' => '新增自訂播放器',
@@ -5450,6 +5410,8 @@ extension on TranslationsZhHant {
 			'externalPlayer.playInExternalPlayer' => '在外部播放器播放',
 			'metadataEdit.editMetadata' => '編輯…',
 			'metadataEdit.screenTitle' => '編輯中繼資料',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => '基本資訊',
 			'metadataEdit.artwork' => '海報與背景',
 			'metadataEdit.advancedSettings' => '進階設定',

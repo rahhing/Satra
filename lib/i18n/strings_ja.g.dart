@@ -48,7 +48,6 @@ class TranslationsJa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$ja supporter = _Translations$supporter$ja._(_root);
 	@override late final _Translations$settings$ja settings = _Translations$settings$ja._(_root);
 	@override late final _Translations$themeEditor$ja themeEditor = _Translations$themeEditor$ja._(_root);
-	@override late final _Translations$search$ja search = _Translations$search$ja._(_root);
 	@override late final _Translations$hotkeys$ja hotkeys = _Translations$hotkeys$ja._(_root);
 	@override late final _Translations$fileInfo$ja fileInfo = _Translations$fileInfo$ja._(_root);
 	@override late final _Translations$mediaMenu$ja mediaMenu = _Translations$mediaMenu$ja._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$ja extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'ハブのタイトルに常にサーバー名を表示します。';
 	@override String get groupLibrariesByServer => 'サーバーごとにライブラリをグループ化';
 	@override String get groupLibrariesByServerDescription => 'サイドバーのライブラリをメディアサーバーごとにまとめます。';
-	@override String get alwaysKeepSidebarOpen => 'サイドバーを常に開いておく';
-	@override String get alwaysKeepSidebarOpenDescription => 'サイドバーを展開したままにし、コンテンツ領域を幅に合わせて調整します';
 	@override String get showUnwatchedCount => '未視聴数を表示';
 	@override String get showUnwatchedCountDescription => '番組とシーズンに未視聴エピソード数を表示';
 	@override String get showWatchedIndicators => '視聴済みマークを表示';
@@ -553,8 +550,6 @@ class _Translations$settings$ja extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'NTSC DVDによくある、29.97fpsにテレシネされた映画やアニメの元のフレームを復元します。テレビ用に撮影された映像はカクつきます。ライブTVでは「ビデオ」を使用します';
 	@override String get requireProfileSelectionOnOpen => 'アプリ起動時にプロフィールを確認';
 	@override String get requireProfileSelectionOnOpenDescription => 'アプリを開くたびにプロフィール選択を表示';
-	@override String get forceTvMode => 'TVモードを強制';
-	@override String get forceTvModeDescription => 'TVレイアウトを強制します。自動検出しないデバイス向けです。再起動が必要です。';
 	@override String get startInFullscreen => '全画面表示で起動';
 	@override String get startInFullscreenDescription => '起動時にSatraを全画面モードで開きます';
 	@override String get exitFullscreenOnPlayerClose => 'プレイヤーを閉じたときに全画面を終了';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$ja extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '残り${minutes}分';
 	@override String get previewSwitch => '自動再生';
 	@override String get previewMutedText => '補助テキストはこのように表示されます';
-}
-
-// Path: search
-class _Translations$search$ja extends Translations$search$en {
-	_Translations$search$ja._(TranslationsJa root) : this._root = root, super.internal(root);
-
-	final TranslationsJa _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => '映画、番組、音楽を検索…';
-	@override String get tryDifferentTerm => '別の検索語をお試しください';
-	@override String get searchYourMedia => 'メディアを検索';
-	@override String get enterTitleActorOrKeyword => 'タイトル、俳優、またはキーワードを入力';
-	@override String get people => '人物';
 }
 
 // Path: hotkeys
@@ -1033,7 +1014,6 @@ class _Translations$messages$ja extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => '視聴中から削除しました';
 	@override String errorLoading({required Object error}) => 'エラー: ${error}';
-	@override String get searchPartialResults => '一部のメディアサーバーを検索できませんでした。利用可能な結果を表示しています。';
 	@override String get streamInterrupted => 'ストリームが中断されました。再生を押すかシークして再試行してください。';
 	@override String get liveStreamInterrupted => 'ライブストリームが中断されました。再生を押して再試行してください。';
 	@override String get fileInfoNotAvailable => 'ファイル情報が利用できません';
@@ -1067,7 +1047,6 @@ class _Translations$messages$ja extends Translations$messages$en {
 	@override String get noEpisodesFound => '最初のシーズンにエピソードが見つかりません';
 	@override String get noEpisodesFoundGeneral => 'エピソードが見つかりません';
 	@override String get episodesLoadFailed => 'エピソードを読み込めませんでした';
-	@override String get noResultsFound => '結果が見つかりません';
 	@override String sleepTimerSet({required Object label}) => 'スリープタイマーを${label}に設定しました';
 	@override String get noItemsAvailable => 'アイテムがありません';
 	@override String get failedToCreatePlayQueueNoItems => '再生キューを作成できませんでした — アイテムがありません';
@@ -1344,7 +1323,6 @@ class _Translations$errors$ja extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => '検索に失敗しました: ${error}';
-	@override String get searchUnavailable => '検索中にメディアサーバーへ接続できませんでした。';
 	@override String connectionTimeout({required Object context}) => '${context}の読み込み中に接続がタイムアウトしました';
 	@override String get connectionFailed => 'メディアサーバーに接続できません';
 	@override String unableToLoad({required Object context}) => '${context}を読み込めませんでした。もう一度お試しください。';
@@ -1387,7 +1365,6 @@ class _Translations$libraries$ja extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'ライブラリの解析に失敗しました: ${error}';
 	@override String get noLibrariesFound => 'ライブラリが見つかりません';
 	@override String get allLibrariesHidden => 'すべてのライブラリが非表示です';
-	@override String hiddenLibrariesCount({required Object count}) => '非表示のライブラリ (${count})';
 	@override String get thisLibraryIsEmpty => 'このライブラリは空です';
 	@override String get noItemsMatchFilters => '有効なフィルターに一致する項目はありません';
 	@override String get resetFilters => 'フィルターをリセット';
@@ -1757,7 +1734,6 @@ class _Translations$music$ja extends Translations$music$en {
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(n,
 		other: '${n}曲',
 	);
-	@override String get nowPlaying => '再生中';
 	@override String playingFrom({required Object title}) => '${title}から再生';
 	@override String get queue => '再生キュー';
 	@override String get clearQueue => 'キューをクリア';
@@ -3591,8 +3567,6 @@ extension on TranslationsJa {
 			'settings.showServerNameOnHubsDescription' => 'ハブのタイトルに常にサーバー名を表示します。',
 			'settings.groupLibrariesByServer' => 'サーバーごとにライブラリをグループ化',
 			'settings.groupLibrariesByServerDescription' => 'サイドバーのライブラリをメディアサーバーごとにまとめます。',
-			'settings.alwaysKeepSidebarOpen' => 'サイドバーを常に開いておく',
-			'settings.alwaysKeepSidebarOpenDescription' => 'サイドバーを展開したままにし、コンテンツ領域を幅に合わせて調整します',
 			'settings.showUnwatchedCount' => '未視聴数を表示',
 			'settings.showUnwatchedCountDescription' => '番組とシーズンに未視聴エピソード数を表示',
 			'settings.showWatchedIndicators' => '視聴済みマークを表示',
@@ -3817,8 +3791,6 @@ extension on TranslationsJa {
 			'settings.deinterlaceFilmDescription' => 'NTSC DVDによくある、29.97fpsにテレシネされた映画やアニメの元のフレームを復元します。テレビ用に撮影された映像はカクつきます。ライブTVでは「ビデオ」を使用します',
 			'settings.requireProfileSelectionOnOpen' => 'アプリ起動時にプロフィールを確認',
 			'settings.requireProfileSelectionOnOpenDescription' => 'アプリを開くたびにプロフィール選択を表示',
-			'settings.forceTvMode' => 'TVモードを強制',
-			'settings.forceTvModeDescription' => 'TVレイアウトを強制します。自動検出しないデバイス向けです。再起動が必要です。',
 			'settings.startInFullscreen' => '全画面表示で起動',
 			'settings.startInFullscreenDescription' => '起動時にSatraを全画面モードで開きます',
 			'settings.exitFullscreenOnPlayerClose' => 'プレイヤーを閉じたときに全画面を終了',
@@ -3891,12 +3863,12 @@ extension on TranslationsJa {
 			'themeEditor.slots.textMuted' => '補助テキスト',
 			'themeEditor.slots.accent' => 'アクセント',
 			'themeEditor.opacity' => '不透明度',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB または #AARRGGBB',
 			'themeEditor.fromOtherThemes' => '他のテーマから',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme}の${color}',
 			'themeEditor.contrast.textOnBg' => '背景上のテキスト',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'サーフェス上のテキスト',
 			'themeEditor.contrast.textMutedOnBg' => '背景上の補助テキスト',
 			'themeEditor.contrast.textMutedOnSurface' => 'サーフェス上の補助テキスト',
@@ -3911,11 +3883,6 @@ extension on TranslationsJa {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '残り${minutes}分',
 			'themeEditor.previewSwitch' => '自動再生',
 			'themeEditor.previewMutedText' => '補助テキストはこのように表示されます',
-			'search.hint' => '映画、番組、音楽を検索…',
-			'search.tryDifferentTerm' => '別の検索語をお試しください',
-			'search.searchYourMedia' => 'メディアを検索',
-			'search.enterTitleActorOrKeyword' => 'タイトル、俳優、またはキーワードを入力',
-			'search.people' => '人物',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => '${actionName}のショートカットを設定',
 			'hotkeys.clearShortcut' => 'ショートカットをクリア',
 			'hotkeys.noShortcutSet' => 'ショートカット未設定',
@@ -4234,7 +4201,6 @@ extension on TranslationsJa {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(n, other: '視聴済みダウンロードを${n}件自動削除しました', ), 
 			'messages.removedFromContinueWatching' => '視聴中から削除しました',
 			'messages.errorLoading' => ({required Object error}) => 'エラー: ${error}',
-			'messages.searchPartialResults' => '一部のメディアサーバーを検索できませんでした。利用可能な結果を表示しています。',
 			'messages.streamInterrupted' => 'ストリームが中断されました。再生を押すかシークして再試行してください。',
 			'messages.liveStreamInterrupted' => 'ライブストリームが中断されました。再生を押して再試行してください。',
 			'messages.fileInfoNotAvailable' => 'ファイル情報が利用できません',
@@ -4268,7 +4234,6 @@ extension on TranslationsJa {
 			'messages.noEpisodesFound' => '最初のシーズンにエピソードが見つかりません',
 			'messages.noEpisodesFoundGeneral' => 'エピソードが見つかりません',
 			'messages.episodesLoadFailed' => 'エピソードを読み込めませんでした',
-			'messages.noResultsFound' => '結果が見つかりません',
 			'messages.sleepTimerSet' => ({required Object label}) => 'スリープタイマーを${label}に設定しました',
 			'messages.noItemsAvailable' => 'アイテムがありません',
 			'messages.failedToCreatePlayQueueNoItems' => '再生キューを作成できませんでした — アイテムがありません',
@@ -4405,8 +4370,6 @@ extension on TranslationsJa {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName}に追加：Plex、Jellyfin、Emby、または別のプロフィールの接続',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} のセッションの有効期限が切れました',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} 台のサーバーのセッションの有効期限が切れました',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} がこのアカウントへのアクセスを拒否しました',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} 台のサーバーがこのアカウントへのアクセスを拒否しました',
 			'connections.signInAgain' => '再度サインイン',
@@ -4418,6 +4381,8 @@ extension on TranslationsJa {
 			'accountPreferences.pickAccount' => '各アカウントに独自の設定が保存されています。編集するアカウントを選択してください。',
 			'accountPreferences.storedOnAccount' => 'これらのオプションはアカウント自体に保存されるため、サインインしているすべてのアプリ（他のデバイスのSatraを含む）で使用されます。',
 			'accountPreferences.noAccounts' => '設定できるアカウントがありません',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Plexにサインインするか、JellyfinまたはEmbyサーバーに接続すると、そのアカウントに保存された設定がここに表示されます。',
 			'accountPreferences.unavailable' => 'このアカウントにアクセスできません',
 			'accountPreferences.loadFailed' => 'この設定を読み込めませんでした',
@@ -4500,7 +4465,6 @@ extension on TranslationsJa {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date}（${age}歳）',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date}（${age}歳没）',
 			'errors.searchFailed' => ({required Object error}) => '検索に失敗しました: ${error}',
-			'errors.searchUnavailable' => '検索中にメディアサーバーへ接続できませんでした。',
 			'errors.connectionTimeout' => ({required Object context}) => '${context}の読み込み中に接続がタイムアウトしました',
 			'errors.connectionFailed' => 'メディアサーバーに接続できません',
 			'errors.unableToLoad' => ({required Object context}) => '${context}を読み込めませんでした。もう一度お試しください。',
@@ -4534,7 +4498,6 @@ extension on TranslationsJa {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'ライブラリの解析に失敗しました: ${error}',
 			'libraries.noLibrariesFound' => 'ライブラリが見つかりません',
 			'libraries.allLibrariesHidden' => 'すべてのライブラリが非表示です',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => '非表示のライブラリ (${count})',
 			'libraries.thisLibraryIsEmpty' => 'このライブラリは空です',
 			'libraries.noItemsMatchFilters' => '有効なフィルターに一致する項目はありません',
 			'libraries.resetFilters' => 'フィルターをリセット',
@@ -4919,8 +4882,6 @@ extension on TranslationsJa {
 			'liveTv.failedToStartChannel' => 'ライブチャンネルを開始できませんでした',
 			'liveTv.failedToBuildStreamUrl' => 'ストリームURLを生成できませんでした',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'チャンネルを再生できませんでした: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'チャンネルを切り替えられませんでした: ${reason}',
 			'collections.title' => 'コレクション',
 			'collections.collection' => 'コレクション',
@@ -4934,6 +4895,8 @@ extension on TranslationsJa {
 			'collections.collectionName' => 'コレクション名',
 			'collections.enterCollectionName' => 'コレクション名を入力',
 			'collections.addedToCollection' => 'コレクションに追加しました',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'コレクションへの追加に失敗しました',
 			'collections.created' => 'コレクションを作成しました',
 			'collections.removeFromCollection' => 'コレクションから削除',
@@ -4975,7 +4938,6 @@ extension on TranslationsJa {
 			'music.addToQueue' => 'キューに追加',
 			'music.discNumber' => ({required Object n}) => 'ディスク ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ja'))(n, other: '${n}曲', ), 
-			'music.nowPlaying' => '再生中',
 			'music.playingFrom' => ({required Object title}) => '${title}から再生',
 			'music.queue' => '再生キュー',
 			'music.clearQueue' => 'キューをクリア',
@@ -5433,8 +5395,6 @@ extension on TranslationsJa {
 			'externalPlayer.useExternalPlayer' => '外部プレーヤーを使用',
 			'externalPlayer.useExternalPlayerDescription' => '動画を別のアプリで開きます',
 			'externalPlayer.selectPlayer' => 'プレーヤーを選択',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'カスタムプレーヤー',
 			'externalPlayer.systemDefault' => 'システム既定',
 			'externalPlayer.addCustomPlayer' => 'カスタムプレーヤーを追加',
@@ -5449,6 +5409,8 @@ extension on TranslationsJa {
 			'externalPlayer.playInExternalPlayer' => '外部プレーヤーで再生',
 			'metadataEdit.editMetadata' => '編集…',
 			'metadataEdit.screenTitle' => 'メタデータを編集',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => '基本情報',
 			'metadataEdit.artwork' => 'アートワーク',
 			'metadataEdit.advancedSettings' => '詳細設定',

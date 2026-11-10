@@ -210,6 +210,8 @@
     "paperTheme": "Qogʻoz",
     "libraryDensity": "Kutubxona zichligi",
     "displayScale": "Ekran miqyosi",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Ixcham",
     "comfortable": "Qulay",
     "gridSpacing": "Toʻr oraligʻi",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Boʻlim sarlavhalarida har doim server nomini koʻrsatish.",
     "groupLibrariesByServer": "Kutubxonalarni server boʻyicha guruhlash",
     "groupLibrariesByServerDescription": "Yon menyudagi kutubxonalarni serverlar boʻyicha guruhlash.",
-    "alwaysKeepSidebarOpen": "Yon menyuni har doim ochiq saqlash",
-    "alwaysKeepSidebarOpenDescription": "Yon menyu ochiq holatda qoladi, kontent maydoni unga moslashadi",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Koʻrilmaganlar sonini koʻrsatish",
     "showUnwatchedCountDescription": "Seriallar va mavsumlarda koʻrilmagan qismlar sonini koʻrsatish",
     "showWatchedIndicators": "Koʻrilgan belgilarni koʻrsatish",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Toʻliq",
     "visualEffectsReduced": "Kamaytirilgan",
     "visualEffectsReducedDescription": "Kamroq animatsiya va pastroq sifatli rasmlar",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Koʻrilmagan qismlar uchun spoylerlarni yashirish",
     "hideSpoilersDescription": "Koʻrilmagan qismlar rasmlari va tavsiflarini xiralashtirish",
     "playerBackend": "Pleyer infratuzilmasi",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Oʻz relengizni belgilamasangiz, ommaviy Open Watch Party relelari ishlatiladi",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Toʻgʻri HTTP yoki HTTPS rele manzilini kiriting.",
-
-
     "debugLogging": "Nosozliklarni aniqlash jurnali",
     "debugLoggingDescription": "Muammolarni hal qilish uchun batafsil jurnal yuritishni yoqing",
     "viewLogs": "Jurnallarni koʻrish",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "NTSC DVD-larda keng tarqalgan, 29.97 fps ga telesine qilingan film va animatsiyaning asl kadrlarini tiklash. Televideniye uchun suratga olingan video uzilib-uzilib koʻrinadi. Jonli TV Video rejimidan foydalanadi",
     "requireProfileSelectionOnOpen": "Ochilganda profilni soʻrash",
     "requireProfileSelectionOnOpenDescription": "Ilova ochilgan har safar profilni tanlashni koʻrsatish",
-    "forceTvMode": "TV rejimini majburlash",
-    "forceTvModeDescription": "TV interfeysini majburiy yoqish. Avtomatik aniqlanmaydigan qurilmalar uchun. Qayta ishga tushirish talab qilinadi.",
     "startInFullscreen": "Toʻliq ekranda boshlash",
     "startInFullscreenDescription": "Satra-ni ochganda toʻliq ekran rejimida ochish",
     "exitFullscreenOnPlayerClose": "Pleyer yopilganda toʻliq ekrandan chiqish",
@@ -561,12 +563,52 @@
     "previewSwitch": "Avtomatik ijro",
     "previewMutedText": "Ikkilamchi matn shunday koʻrinadi"
   },
-  "search": {
-    "hint": "Filmlar, seriallar, musiqa qidirish...",
-    "tryDifferentTerm": "Boshqa qidiruv soʻzini kiriting",
-    "searchYourMedia": "Medialaringizdan qidiring",
-    "enterTitleActorOrKeyword": "Nomini, aktyorni yoki kalit soʻzni kiriting",
-    "people": "Odamlar"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "${actionName} uchun tugmalar birlashmasini oʻrnatish",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "\"Tomoshani davom ettirish\"dan oʻchirildi",
     "errorLoading": "Xatolik: ${error}",
-    "searchPartialResults": "Baʼzi media serverlarda qidiruv amalga oshmadi. Mavjud natijalar koʻrsatilmoqda.",
     "streamInterrupted": "Oqim uzildi. Qayta urinish uchun ijro tugmasini bosing yoki boshqa joyga oʻting.",
     "liveStreamInterrupted": "Jonli oqim uzildi. Qayta urinish uchun ijro tugmasini bosing.",
     "fileInfoNotAvailable": "Fayl haqida maʼlumot mavjud emas",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Birinchi mavsumda qismlar topilmadi",
     "noEpisodesFoundGeneral": "Qismlar topilmadi",
     "episodesLoadFailed": "Qismlarni yuklab boʻlmadi",
-    "noResultsFound": "Natijalar topilmadi",
     "sleepTimerSet": "Uyqu taymeri ${label} vaqtiga oʻrnatildi",
     "noItemsAvailable": "Elementlar yoʻq",
     "failedToCreatePlayQueueNoItems": "Ijro navbatini yaratib boʻlmadi — elementlar yoʻq",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Server bu faylni uzatishni qayta-qayta rad etdi (HTTP 503). U qayta ishga tushayotgan yoki band boʻlishi, yoxud fayl saqlanadigan xotira oflayn boʻlishi mumkin. Birozdan keyin qaytadan urinib koʻring. Muammo davom etsa, server egasidan server va fayl xotirasini tekshirishni soʻrang.",
     "playbackNotAllowedTitle": "Ijro etishga ruxsat berilmagan",
     "playbackNotAllowedBody": "Server bu elementni uzatishni rad etdi (HTTP 403). Hisobingizda uni ijro etishga ruxsat boʻlmasligi yoki server ijroga faqat oʻzining mahalliy tarmogʻida ruxsat berishi mumkin.",
-
-
     "burnedSubtitlesUseMenu": "Subtitrlar bu oqim tasviriga singdirilgan. Ularni subtitr menyusidan oʻzgartiring.",
     "noVideoUrl": "Video URL mavjud emas",
     "playbackNoMediaSources": "Server ijro etiladigan media manbalarini qaytarmadi",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Qidiruv xatoligi: ${error}",
-    "searchUnavailable": "Qidiruv hech bir media serverga ulana olmadi.",
     "connectionTimeout": "${context} yuklanish vaqti tugadi",
     "connectionFailed": "Media serveriga ulanib boʻlmadi",
     "unableToLoad": "${context} yuklab boʻlmadi.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Tahlil qilib boʻlmadi: ${error}",
     "noLibrariesFound": "Kutubxonalar topilmadi",
     "allLibrariesHidden": "Barcha kutubxonalar yashirilgan",
-    "hiddenLibrariesCount": "Yashirin kutubxonalar (${count})",
     "thisLibraryIsEmpty": "Ushbu kutubxona boʻsh",
     "noItemsMatchFilters": "Filtrlarga mos keladigan elementlar topilmadi",
     "resetFilters": "Filtrlarni qayta oʻrnatish",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Jurnallarni tozalash",
     "copyLogs": "Jurnallarni nusxalash"
-
   },
   "startup": {
     "failedTitle": "Satra ishga tusha olmadi",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Tafsilotlarni yashirish",
     "copyDetails": "Tafsilotlarni nusxalash",
     "detailsCopied": "Tafsilotlar buferga nusxalandi",
-
     "repairStorage": "Saqlashni tiklash",
     "repairTitle": "Saqlangan maʼlumotlar tikilsinmi?",
     "repairBodyCommon": "Satraning sozlamalar fayli shikastlangan va uni oʻqib boʻlmaydi. Tiklash barcha sozlamalarni standart holatiga qaytaradi.",
@@ -1778,7 +1812,6 @@
       "one": "${n} tarona",
       "other": "${n} tarona"
     },
-    "nowPlaying": "Hozir ijro etilmoqda",
     "playingFrom": "${title} manbasidan",
     "queue": "Navbat",
     "clearQueue": "Navbatni tozalash",

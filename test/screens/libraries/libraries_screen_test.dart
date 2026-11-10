@@ -643,7 +643,6 @@ void main() {
             theme: monoTheme(MonoPalette.dark),
             home: OverlaySheetHost(
               child: MainScreenFocusScope(
-                focusSidebar: () {},
                 sideNavigationWidth: 64,
                 selectHome: () => homeSelected = true,
                 openSettings: () => settingsOpened = true,
@@ -744,7 +743,6 @@ void main() {
             theme: monoTheme(MonoPalette.dark),
             home: OverlaySheetHost(
               child: MainScreenFocusScope(
-                focusSidebar: () {},
                 sideNavigationWidth: 64,
                 selectHome: () {},
                 selectLibrary: (_) {},

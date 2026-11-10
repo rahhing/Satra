@@ -48,7 +48,6 @@ class TranslationsNl extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$nl supporter = _Translations$supporter$nl._(_root);
 	@override late final _Translations$settings$nl settings = _Translations$settings$nl._(_root);
 	@override late final _Translations$themeEditor$nl themeEditor = _Translations$themeEditor$nl._(_root);
-	@override late final _Translations$search$nl search = _Translations$search$nl._(_root);
 	@override late final _Translations$hotkeys$nl hotkeys = _Translations$hotkeys$nl._(_root);
 	@override late final _Translations$fileInfo$nl fileInfo = _Translations$fileInfo$nl._(_root);
 	@override late final _Translations$mediaMenu$nl mediaMenu = _Translations$mediaMenu$nl._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Toon servernamen altijd in hubtitels.';
 	@override String get groupLibrariesByServer => 'Bibliotheken groeperen per server';
 	@override String get groupLibrariesByServerDescription => 'Groepeer zijbalkbibliotheken onder elke mediaserver.';
-	@override String get alwaysKeepSidebarOpen => 'Zijbalk altijd open houden';
-	@override String get alwaysKeepSidebarOpenDescription => 'Zijbalk blijft uitgevouwen en inhoudsgebied past zich aan';
 	@override String get showUnwatchedCount => 'Aantal ongekeken tonen';
 	@override String get showUnwatchedCountDescription => 'Toon aantal ongekeken afleveringen bij series en seizoenen';
 	@override String get showWatchedIndicators => 'Bekeken-markeringen tonen';
@@ -553,8 +550,6 @@ class _Translations$settings$nl extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Herstel de originele beelden van film en animatie die met telecine naar 29,97 fps zijn omgezet, gebruikelijk op NTSC-DVD\'s. Video die voor tv is opgenomen, gaat haperen. Live-tv gebruikt Video';
 	@override String get requireProfileSelectionOnOpen => 'Vraag om profiel bij openen';
 	@override String get requireProfileSelectionOnOpenDescription => 'Toon profielselectie telkens wanneer de app wordt geopend';
-	@override String get forceTvMode => 'Tv-modus afdwingen';
-	@override String get forceTvModeDescription => 'Dwing de tv-indeling af op apparaten zonder automatische detectie. Herstart vereist.';
 	@override String get startInFullscreen => 'Starten in volledig scherm';
 	@override String get startInFullscreenDescription => 'Open Satra bij het starten in volledig scherm';
 	@override String get exitFullscreenOnPlayerClose => 'Volledig scherm verlaten bij sluiten van speler';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$nl extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => 'Nog ${minutes} min';
 	@override String get previewSwitch => 'Automatisch afspelen';
 	@override String get previewMutedText => 'Secundaire tekst ziet er zo uit';
-}
-
-// Path: search
-class _Translations$search$nl extends Translations$search$en {
-	_Translations$search$nl._(TranslationsNl root) : this._root = root, super.internal(root);
-
-	final TranslationsNl _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Zoek films, series, muziek...';
-	@override String get tryDifferentTerm => 'Probeer een andere zoekterm';
-	@override String get searchYourMedia => 'Zoek in je media';
-	@override String get enterTitleActorOrKeyword => 'Voer een titel, acteur of trefwoord in';
-	@override String get people => 'Personen';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$nl extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Verwijderd uit \'Doorgaan met kijken\'';
 	@override String errorLoading({required Object error}) => 'Fout: ${error}';
-	@override String get searchPartialResults => 'Sommige mediaservers konden niet worden doorzocht. Beschikbare resultaten worden getoond.';
 	@override String get streamInterrupted => 'De stream is onderbroken. Druk op afspelen of spoel om het opnieuw te proberen.';
 	@override String get liveStreamInterrupted => 'De livestream is onderbroken. Druk op afspelen om het opnieuw te proberen.';
 	@override String get fileInfoNotAvailable => 'Bestandsinformatie niet beschikbaar';
@@ -1071,7 +1051,6 @@ class _Translations$messages$nl extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Geen afleveringen gevonden in eerste seizoen';
 	@override String get noEpisodesFoundGeneral => 'Geen afleveringen gevonden';
 	@override String get episodesLoadFailed => 'Kan afleveringen niet laden';
-	@override String get noResultsFound => 'Geen resultaten gevonden';
 	@override String sleepTimerSet({required Object label}) => 'Slaaptimer ingesteld op ${label}';
 	@override String get noItemsAvailable => 'Geen items beschikbaar';
 	@override String get failedToCreatePlayQueueNoItems => 'Afspeelwachtrij maken mislukt — geen items';
@@ -1349,7 +1328,6 @@ class _Translations$errors$nl extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Zoeken mislukt: ${error}';
-	@override String get searchUnavailable => 'Zoeken kon geen enkele mediaserver bereiken.';
 	@override String connectionTimeout({required Object context}) => 'Time-out van verbinding tijdens het laden van ${context}';
 	@override String get connectionFailed => 'Kan geen verbinding maken met mediaserver';
 	@override String unableToLoad({required Object context}) => 'Kan ${context} niet laden. Probeer het opnieuw.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$nl extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Kon bibliotheek niet analyseren: ${error}';
 	@override String get noLibrariesFound => 'Geen bibliotheken gevonden';
 	@override String get allLibrariesHidden => 'Alle bibliotheken zijn verborgen';
-	@override String hiddenLibrariesCount({required Object count}) => 'Verborgen bibliotheken (${count})';
 	@override String get thisLibraryIsEmpty => 'Deze bibliotheek is leeg';
 	@override String get noItemsMatchFilters => 'Geen items komen overeen met de actieve filters';
 	@override String get resetFilters => 'Filters opnieuw instellen';
@@ -1766,7 +1743,6 @@ class _Translations$music$nl extends Translations$music$en {
 		one: '${n} nummer',
 		other: '${n} nummers',
 	);
-	@override String get nowPlaying => 'Nu afspelen';
 	@override String playingFrom({required Object title}) => 'Afspelen vanaf ${title}';
 	@override String get queue => 'Wachtrij';
 	@override String get clearQueue => 'Wachtrij wissen';
@@ -3603,8 +3579,6 @@ extension on TranslationsNl {
 			'settings.showServerNameOnHubsDescription' => 'Toon servernamen altijd in hubtitels.',
 			'settings.groupLibrariesByServer' => 'Bibliotheken groeperen per server',
 			'settings.groupLibrariesByServerDescription' => 'Groepeer zijbalkbibliotheken onder elke mediaserver.',
-			'settings.alwaysKeepSidebarOpen' => 'Zijbalk altijd open houden',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Zijbalk blijft uitgevouwen en inhoudsgebied past zich aan',
 			'settings.showUnwatchedCount' => 'Aantal ongekeken tonen',
 			'settings.showUnwatchedCountDescription' => 'Toon aantal ongekeken afleveringen bij series en seizoenen',
 			'settings.showWatchedIndicators' => 'Bekeken-markeringen tonen',
@@ -3829,8 +3803,6 @@ extension on TranslationsNl {
 			'settings.deinterlaceFilmDescription' => 'Herstel de originele beelden van film en animatie die met telecine naar 29,97 fps zijn omgezet, gebruikelijk op NTSC-DVD\'s. Video die voor tv is opgenomen, gaat haperen. Live-tv gebruikt Video',
 			'settings.requireProfileSelectionOnOpen' => 'Vraag om profiel bij openen',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Toon profielselectie telkens wanneer de app wordt geopend',
-			'settings.forceTvMode' => 'Tv-modus afdwingen',
-			'settings.forceTvModeDescription' => 'Dwing de tv-indeling af op apparaten zonder automatische detectie. Herstart vereist.',
 			'settings.startInFullscreen' => 'Starten in volledig scherm',
 			'settings.startInFullscreenDescription' => 'Open Satra bij het starten in volledig scherm',
 			'settings.exitFullscreenOnPlayerClose' => 'Volledig scherm verlaten bij sluiten van speler',
@@ -3903,12 +3875,12 @@ extension on TranslationsNl {
 			'themeEditor.slots.textMuted' => 'Secundaire tekst',
 			'themeEditor.slots.accent' => 'Accent',
 			'themeEditor.opacity' => 'Dekking',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB of #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Uit andere thema\'s',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} van ${theme}',
 			'themeEditor.contrast.textOnBg' => 'Tekst op achtergrond',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Tekst op oppervlak',
 			'themeEditor.contrast.textMutedOnBg' => 'Secundaire tekst op achtergrond',
 			'themeEditor.contrast.textMutedOnSurface' => 'Secundaire tekst op oppervlak',
@@ -3923,11 +3895,6 @@ extension on TranslationsNl {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => 'Nog ${minutes} min',
 			'themeEditor.previewSwitch' => 'Automatisch afspelen',
 			'themeEditor.previewMutedText' => 'Secundaire tekst ziet er zo uit',
-			'search.hint' => 'Zoek films, series, muziek...',
-			'search.tryDifferentTerm' => 'Probeer een andere zoekterm',
-			'search.searchYourMedia' => 'Zoek in je media',
-			'search.enterTitleActorOrKeyword' => 'Voer een titel, acteur of trefwoord in',
-			'search.people' => 'Personen',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Stel sneltoets in voor ${actionName}',
 			'hotkeys.clearShortcut' => 'Wis sneltoets',
 			'hotkeys.noShortcutSet' => 'Geen sneltoets ingesteld',
@@ -4246,7 +4213,6 @@ extension on TranslationsNl {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nl'))(n, one: 'Automatisch ${n} bekeken download verwijderd', other: 'Automatisch ${n} bekeken downloads verwijderd', ), 
 			'messages.removedFromContinueWatching' => 'Verwijderd uit \'Doorgaan met kijken\'',
 			'messages.errorLoading' => ({required Object error}) => 'Fout: ${error}',
-			'messages.searchPartialResults' => 'Sommige mediaservers konden niet worden doorzocht. Beschikbare resultaten worden getoond.',
 			'messages.streamInterrupted' => 'De stream is onderbroken. Druk op afspelen of spoel om het opnieuw te proberen.',
 			'messages.liveStreamInterrupted' => 'De livestream is onderbroken. Druk op afspelen om het opnieuw te proberen.',
 			'messages.fileInfoNotAvailable' => 'Bestandsinformatie niet beschikbaar',
@@ -4280,7 +4246,6 @@ extension on TranslationsNl {
 			'messages.noEpisodesFound' => 'Geen afleveringen gevonden in eerste seizoen',
 			'messages.noEpisodesFoundGeneral' => 'Geen afleveringen gevonden',
 			'messages.episodesLoadFailed' => 'Kan afleveringen niet laden',
-			'messages.noResultsFound' => 'Geen resultaten gevonden',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Slaaptimer ingesteld op ${label}',
 			'messages.noItemsAvailable' => 'Geen items beschikbaar',
 			'messages.failedToCreatePlayQueueNoItems' => 'Afspeelwachtrij maken mislukt — geen items',
@@ -4417,8 +4382,6 @@ extension on TranslationsNl {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Toevoegen aan ${displayName}: Plex, Jellyfin, Emby of een andere profielverbinding',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessie verlopen voor ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessie verlopen voor ${count} servers',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} weigerde toegang voor dit account',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servers weigerden toegang voor dit account',
 			'connections.signInAgain' => 'Opnieuw aanmelden',
@@ -4430,6 +4393,8 @@ extension on TranslationsNl {
 			'accountPreferences.pickAccount' => 'Elk account slaat zijn eigen voorkeuren op. Kies het account dat je wilt bewerken.',
 			'accountPreferences.storedOnAccount' => 'Deze opties worden op het account zelf opgeslagen, zodat elke app die ermee is aangemeld ze gebruikt — ook Satra op je andere apparaten.',
 			'accountPreferences.noAccounts' => 'Geen accounts om te configureren',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Log in bij Plex of verbind een Jellyfin- of Emby-server en de voorkeuren die op dat account zijn opgeslagen, verschijnen hier.',
 			'accountPreferences.unavailable' => 'Dit account is niet bereikbaar',
 			'accountPreferences.loadFailed' => 'Deze voorkeuren konden niet worden geladen',
@@ -4512,7 +4477,6 @@ extension on TranslationsNl {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} jaar)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (op ${age}-jarige leeftijd)',
 			'errors.searchFailed' => ({required Object error}) => 'Zoeken mislukt: ${error}',
-			'errors.searchUnavailable' => 'Zoeken kon geen enkele mediaserver bereiken.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Time-out van verbinding tijdens het laden van ${context}',
 			'errors.connectionFailed' => 'Kan geen verbinding maken met mediaserver',
 			'errors.unableToLoad' => ({required Object context}) => 'Kan ${context} niet laden. Probeer het opnieuw.',
@@ -4546,7 +4510,6 @@ extension on TranslationsNl {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Kon bibliotheek niet analyseren: ${error}',
 			'libraries.noLibrariesFound' => 'Geen bibliotheken gevonden',
 			'libraries.allLibrariesHidden' => 'Alle bibliotheken zijn verborgen',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Verborgen bibliotheken (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Deze bibliotheek is leeg',
 			'libraries.noItemsMatchFilters' => 'Geen items komen overeen met de actieve filters',
 			'libraries.resetFilters' => 'Filters opnieuw instellen',
@@ -4931,8 +4894,6 @@ extension on TranslationsNl {
 			'liveTv.failedToStartChannel' => 'Kon de livezender niet starten',
 			'liveTv.failedToBuildStreamUrl' => 'Kon de stream-URL niet samenstellen',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kon het kanaal niet starten: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kon niet van kanaal wisselen: ${reason}',
 			'collections.title' => 'Collecties',
 			'collections.collection' => 'Collectie',
@@ -4946,6 +4907,8 @@ extension on TranslationsNl {
 			'collections.collectionName' => 'Collectienaam',
 			'collections.enterCollectionName' => 'Voer een collectienaam in',
 			'collections.addedToCollection' => 'Toegevoegd aan collectie',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Fout bij toevoegen aan collectie',
 			'collections.created' => 'Collectie gemaakt',
 			'collections.removeFromCollection' => 'Verwijderen uit collectie',
@@ -4987,7 +4950,6 @@ extension on TranslationsNl {
 			'music.addToQueue' => 'Toevoegen aan wachtrij',
 			'music.discNumber' => ({required Object n}) => 'Schijf ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nl'))(n, one: '${n} nummer', other: '${n} nummers', ), 
-			'music.nowPlaying' => 'Nu afspelen',
 			'music.playingFrom' => ({required Object title}) => 'Afspelen vanaf ${title}',
 			'music.queue' => 'Wachtrij',
 			'music.clearQueue' => 'Wachtrij wissen',
@@ -5445,8 +5407,6 @@ extension on TranslationsNl {
 			'externalPlayer.useExternalPlayer' => 'Externe speler gebruiken',
 			'externalPlayer.useExternalPlayerDescription' => 'Open video\'s in een andere app',
 			'externalPlayer.selectPlayer' => 'Speler selecteren',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Aangepaste spelers',
 			'externalPlayer.systemDefault' => 'Systeemstandaard',
 			'externalPlayer.addCustomPlayer' => 'Aangepaste speler toevoegen',
@@ -5461,6 +5421,8 @@ extension on TranslationsNl {
 			'externalPlayer.playInExternalPlayer' => 'Afspelen in externe speler',
 			'metadataEdit.editMetadata' => 'Bewerken...',
 			'metadataEdit.screenTitle' => 'Metadata bewerken',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Basisinformatie',
 			'metadataEdit.artwork' => 'Illustraties',
 			'metadataEdit.advancedSettings' => 'Geavanceerde instellingen',

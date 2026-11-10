@@ -23,7 +23,6 @@ import 'package:satra/utils/platform_detector.dart';
 import 'package:satra/widgets/animated_dim_scrim.dart';
 import 'package:satra/widgets/media_card.dart';
 import 'package:satra/widgets/rasterized_gradient.dart';
-import 'package:satra/widgets/side_navigation_rail.dart';
 import 'package:satra/widgets/tv_browse_rail.dart';
 import 'package:satra/widgets/tv_spotlight_scaffold.dart';
 import 'package:provider/provider.dart';
@@ -39,13 +38,12 @@ void main() {
   group('TvBrowseRailLayout', () {
     test('every density step changes card width on the 960x540 TV canvas', () {
       // Every mainstream TV lays Satra out at 960x540 logical, so the rail
-      // gets the 0.85 scale floor and the width left beside the collapsed
-      // sidebar. A card-width floor above the fitted width collapses several
-      // densities onto one size, which made densities 1-3 look identical.
+      // gets the 0.85 scale floor. A card-width floor above the fitted width
+      // collapses several densities onto one size, which made densities 1-3
+      // look identical.
       const size = Size(960, 540);
       final scale = TvBrowseRailLayout.scaleForSize(size);
-      final availableWidth =
-          size.width - SideNavigationRailState.tvCollapsedWidth - TvBrowseRailLayout.horizontalInsetForScale(scale);
+      final availableWidth = size.width - 64.0 - TvBrowseRailLayout.horizontalInsetForScale(scale);
       final movie = testMediaItem(id: 'movie_1', backend: MediaBackend.plex, kind: MediaKind.movie, title: 'Movie');
       final episode = testMediaItem(
         id: 'episode_1',
@@ -2428,7 +2426,7 @@ void main() {
                 focusMemory: focusMemory,
                 hubs: [hub],
                 iconForHub: (_, _) => Icons.movie_rounded,
-                backgroundBleedLeft: SideNavigationRailState.expandedWidth,
+                backgroundBleedLeft: 220.0,
               ),
             ),
           ),
@@ -2442,7 +2440,7 @@ void main() {
       find.ancestor(of: gradient.first, matching: find.byType(Positioned)).first,
     );
 
-    expect(backgroundPosition.left, -SideNavigationRailState.expandedWidth);
+    expect(backgroundPosition.left, -220.0);
     expect(backgroundPosition.width, 1280);
   });
 
@@ -2485,7 +2483,7 @@ void main() {
     focusedItemIds.clear();
     activeHubIds.clear();
 
-    await tester.pumpWidget(buildRail(SideNavigationRailState.expandedWidth));
+    await tester.pumpWidget(buildRail(220.0));
     await tester.pump();
 
     expect(focusedItemIds, isEmpty);

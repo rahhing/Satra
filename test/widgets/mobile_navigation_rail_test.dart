@@ -9,6 +9,7 @@ void main() {
   setUp(() {
     LocaleSettings.setLocaleSync(AppLocale.en);
     TvDetectionService.debugReset();
+    TvDetectionService.debugSetAppleTVOverride(false);
     addTearDown(TvDetectionService.debugReset);
   });
 
@@ -43,8 +44,8 @@ void main() {
       ),
     );
 
-    await tester.tap(find.text(t.common.search));
-    expect(selected, NavigationTabId.search);
+    await tester.tap(find.text(t.navigation.downloads));
+    expect(selected, NavigationTabId.downloads);
   });
 
   testWidgets('labels follow the nav bar label setting', (tester) async {
@@ -75,8 +76,8 @@ void main() {
   });
 
   testWidgets('labels give way on a viewport too short to show every destination', (tester) async {
-    // A landscape phone: ~410dp tall, six labelled destinations need ~430.
-    tester.view.physicalSize = const Size(900, 410);
+    // A landscape phone: ~350dp tall, five labelled destinations need ~376.
+    tester.view.physicalSize = const Size(900, 350);
     tester.view.devicePixelRatio = 1;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
@@ -92,10 +93,10 @@ void main() {
     expect(tester.getSize(find.text(t.navigation.libraries)), Size.zero);
     expect(tester.takeException(), isNull);
     // Every destination is still reachable without scrolling.
-    expect(tester.getBottomLeft(find.byType(NavigationRail)).dy, lessThanOrEqualTo(410));
+    expect(tester.getBottomLeft(find.byType(NavigationRail)).dy, lessThanOrEqualTo(350));
 
-    expect(MobileNavigationRail.labelsFit(destinations: 6, hasLeading: false, height: 410), isFalse);
-    expect(MobileNavigationRail.labelsFit(destinations: 6, hasLeading: false, height: 600), isTrue);
+    expect(MobileNavigationRail.labelsFit(destinations: 5, hasLeading: false, height: 350), isFalse);
+    expect(MobileNavigationRail.labelsFit(destinations: 5, hasLeading: false, height: 600), isTrue);
     expect(MobileNavigationRail.labelsFit(destinations: 7, hasLeading: true, height: 500), isFalse);
   });
 

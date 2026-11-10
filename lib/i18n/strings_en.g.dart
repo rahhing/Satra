@@ -49,7 +49,7 @@ class Translations with BaseTranslations<AppLocale, Translations> {
 	late final Translations$supporter$en supporter = Translations$supporter$en.internal(_root);
 	late final Translations$settings$en settings = Translations$settings$en.internal(_root);
 	late final Translations$themeEditor$en themeEditor = Translations$themeEditor$en.internal(_root);
-	late final Translations$search$en search = Translations$search$en.internal(_root);
+	late final Translations$spotlight$en spotlight = Translations$spotlight$en.internal(_root);
 	late final Translations$hotkeys$en hotkeys = Translations$hotkeys$en.internal(_root);
 	late final Translations$fileInfo$en fileInfo = Translations$fileInfo$en.internal(_root);
 	late final Translations$mediaMenu$en mediaMenu = Translations$mediaMenu$en.internal(_root);
@@ -653,14 +653,20 @@ class Translations$settings$en {
 	/// en: 'Group Libraries by Server'
 	String get groupLibrariesByServer => 'Group Libraries by Server';
 
-	/// en: 'Group sidebar libraries under each media server.'
-	String get groupLibrariesByServerDescription => 'Group sidebar libraries under each media server.';
+	/// en: 'Group libraries under each media server.'
+	String get groupLibrariesByServerDescription => 'Group libraries under each media server.';
 
-	/// en: 'Always Keep Sidebar Open'
-	String get alwaysKeepSidebarOpen => 'Always Keep Sidebar Open';
+	/// en: 'Corner Rounding'
+	String get cornerRounding => 'Corner Rounding';
 
-	/// en: 'Sidebar stays expanded and content area adjusts to fit'
-	String get alwaysKeepSidebarOpenDescription => 'Sidebar stays expanded and content area adjusts to fit';
+	/// en: 'Shape cards, Continue Watching, and navigation pills.'
+	String get cornerRoundingDescription => 'Shape cards, Continue Watching, and navigation pills.';
+
+	/// en: 'Square'
+	String get cornerSquare => 'Square';
+
+	/// en: 'Rounded'
+	String get cornerRounded => 'Rounded';
 
 	/// en: 'Show Unwatched Count'
 	String get showUnwatchedCount => 'Show Unwatched Count';
@@ -715,6 +721,12 @@ class Translations$settings$en {
 
 	/// en: 'Fewer animations and lower-resolution artwork'
 	String get visualEffectsReducedDescription => 'Fewer animations and lower-resolution artwork';
+
+	/// en: 'Liquid Glass'
+	String get liquidGlass => 'Liquid Glass';
+
+	/// en: 'Apply optical lens distortion and specular refraction to blurred surfaces'
+	String get liquidGlassDescription => 'Apply optical lens distortion and specular refraction to blurred surfaces';
 
 	/// en: 'Hide Spoilers for Unwatched Episodes'
 	String get hideSpoilers => 'Hide Spoilers for Unwatched Episodes';
@@ -1334,12 +1346,6 @@ class Translations$settings$en {
 	/// en: 'Show profile selection every time the app is opened'
 	String get requireProfileSelectionOnOpenDescription => 'Show profile selection every time the app is opened';
 
-	/// en: 'Force TV mode'
-	String get forceTvMode => 'Force TV mode';
-
-	/// en: 'Force TV layout. For devices that don't auto-detect. Requires restart.'
-	String get forceTvModeDescription => 'Force TV layout. For devices that don\'t auto-detect. Requires restart.';
-
 	/// en: 'Start in fullscreen'
 	String get startInFullscreen => 'Start in fullscreen';
 
@@ -1585,28 +1591,39 @@ class Translations$themeEditor$en {
 	String get previewMutedText => 'Secondary text reads like this';
 }
 
-// Path: search
-class Translations$search$en {
-	Translations$search$en.internal(this._root);
+// Path: spotlight
+class Translations$spotlight$en {
+	Translations$spotlight$en.internal(this._root);
 
 	final Translations _root; // ignore: unused_field
 
 	// Translations
 
-	/// en: 'Search movies, shows, music...'
-	String get hint => 'Search movies, shows, music...';
+	/// en: 'Spotlight'
+	String get title => 'Spotlight';
 
-	/// en: 'Try a different search term'
-	String get tryDifferentTerm => 'Try a different search term';
+	/// en: 'Search movies, shows, libraries, settings, actions...'
+	String get placeholder => 'Search movies, shows, libraries, settings, actions...';
 
-	/// en: 'Search your media'
-	String get searchYourMedia => 'Search your media';
+	/// en: 'Ctrl+Space'
+	String get shortcutHint => 'Ctrl+Space';
 
-	/// en: 'Enter a title, actor, or keyword'
-	String get enterTitleActorOrKeyword => 'Enter a title, actor, or keyword';
+	/// en: 'Search everything in Satra'
+	String get emptyPromptTitle => 'Search everything in Satra';
 
-	/// en: 'People'
-	String get people => 'People';
+	/// en: 'Find shows, movies, libraries, settings, or quick actions'
+	String get emptyPromptSubtitle => 'Find shows, movies, libraries, settings, or quick actions';
+
+	/// en: 'No matches for "${query}"'
+	String noResultsTitle({required Object query}) => 'No matches for "${query}"';
+
+	/// en: 'Try a title, library name, setting, or action'
+	String get noResultsSubtitle => 'Try a title, library name, setting, or action';
+
+	late final Translations$spotlight$categories$en categories = Translations$spotlight$categories$en.internal(_root);
+	late final Translations$spotlight$sections$en sections = Translations$spotlight$sections$en.internal(_root);
+	late final Translations$spotlight$hints$en hints = Translations$spotlight$hints$en.internal(_root);
+	late final Translations$spotlight$actions$en actions = Translations$spotlight$actions$en.internal(_root);
 }
 
 // Path: hotkeys
@@ -2566,9 +2583,6 @@ class Translations$messages$en {
 	/// en: 'Error: ${error}'
 	String errorLoading({required Object error}) => 'Error: ${error}';
 
-	/// en: 'Some media servers could not be searched. Showing available results.'
-	String get searchPartialResults => 'Some media servers could not be searched. Showing available results.';
-
 	/// en: 'The stream was interrupted. Press play or seek to retry.'
 	String get streamInterrupted => 'The stream was interrupted. Press play or seek to retry.';
 
@@ -2667,9 +2681,6 @@ class Translations$messages$en {
 
 	/// en: 'Couldn't load episodes'
 	String get episodesLoadFailed => 'Couldn\'t load episodes';
-
-	/// en: 'No results found'
-	String get noResultsFound => 'No results found';
 
 	/// en: 'Sleep timer set for ${label}'
 	String sleepTimerSet({required Object label}) => 'Sleep timer set for ${label}';
@@ -3351,9 +3362,6 @@ class Translations$errors$en {
 	/// en: 'Search failed: ${error}'
 	String searchFailed({required Object error}) => 'Search failed: ${error}';
 
-	/// en: 'Search could not reach any media server.'
-	String get searchUnavailable => 'Search could not reach any media server.';
-
 	/// en: 'Connection timeout while loading ${context}'
 	String connectionTimeout({required Object context}) => 'Connection timeout while loading ${context}';
 
@@ -3461,9 +3469,6 @@ class Translations$libraries$en {
 
 	/// en: 'All libraries are hidden'
 	String get allLibrariesHidden => 'All libraries are hidden';
-
-	/// en: 'Hidden libraries (${count})'
-	String hiddenLibrariesCount({required Object count}) => 'Hidden libraries (${count})';
 
 	/// en: 'This library is empty'
 	String get thisLibraryIsEmpty => 'This library is empty';
@@ -4325,9 +4330,6 @@ class Translations$music$en {
 		one: '${n} track',
 		other: '${n} tracks',
 	);
-
-	/// en: 'Now Playing'
-	String get nowPlaying => 'Now Playing';
 
 	/// en: 'Playing from ${title}'
 	String playingFrom({required Object title}) => 'Playing from ${title}';
@@ -6413,6 +6415,132 @@ class Translations$themeEditor$contrast$en {
 	String get labelOnAccent => 'Button label on accent';
 }
 
+// Path: spotlight.categories
+class Translations$spotlight$categories$en {
+	Translations$spotlight$categories$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'All'
+	String get all => 'All';
+
+	/// en: 'Movies'
+	String get movies => 'Movies';
+
+	/// en: 'Shows'
+	String get shows => 'Shows';
+
+	/// en: 'Episodes'
+	String get episodes => 'Episodes';
+
+	/// en: 'Music'
+	String get music => 'Music';
+
+	/// en: 'Libraries'
+	String get libraries => 'Libraries';
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
+
+	/// en: 'Actions'
+	String get actions => 'Actions';
+
+	/// en: 'People'
+	String get people => 'People';
+}
+
+// Path: spotlight.sections
+class Translations$spotlight$sections$en {
+	Translations$spotlight$sections$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Quick Actions'
+	String get quickActions => 'Quick Actions';
+
+	/// en: 'Libraries'
+	String get libraries => 'Libraries';
+
+	/// en: 'Settings'
+	String get settings => 'Settings';
+
+	/// en: 'Downloaded'
+	String get downloads => 'Downloaded';
+}
+
+// Path: spotlight.hints
+class Translations$spotlight$hints$en {
+	Translations$spotlight$hints$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Navigate'
+	String get navigate => 'Navigate';
+
+	/// en: 'Open'
+	String get open => 'Open';
+
+	/// en: 'Filter'
+	String get filter => 'Filter';
+
+	/// en: 'Close'
+	String get close => 'Close';
+}
+
+// Path: spotlight.actions
+class Translations$spotlight$actions$en {
+	Translations$spotlight$actions$en.internal(this._root);
+
+	final Translations _root; // ignore: unused_field
+
+	// Translations
+
+	/// en: 'Go to Home'
+	String get goHome => 'Go to Home';
+
+	/// en: 'Open Downloads'
+	String get openDownloads => 'Open Downloads';
+
+	/// en: 'Open Settings'
+	String get openSettings => 'Open Settings';
+
+	/// en: 'Open Explore'
+	String get openExplore => 'Open Explore';
+
+	/// en: 'Open Live TV'
+	String get openLiveTv => 'Open Live TV';
+
+	/// en: 'Toggle Fullscreen'
+	String get toggleFullscreen => 'Toggle Fullscreen';
+
+	/// en: 'Switch Profile'
+	String get switchProfile => 'Switch Profile';
+
+	/// en: 'Watch Together'
+	String get watchTogether => 'Watch Together';
+
+	/// en: 'Companion Remote'
+	String get companionRemote => 'Companion Remote';
+
+	/// en: 'Manage Libraries'
+	String get manageLibraries => 'Manage Libraries';
+
+	/// en: 'Refresh Current View'
+	String get refreshLibrary => 'Refresh Current View';
+
+	/// en: 'Add Server Connection'
+	String get addServer => 'Add Server Connection';
+
+	/// en: 'Reconnect to Servers'
+	String get reconnectServers => 'Reconnect to Servers';
+}
+
 // Path: hotkeys.actions
 class Translations$hotkeys$actions$en {
 	Translations$hotkeys$actions$en.internal(this._root);
@@ -8317,9 +8445,11 @@ extension on Translations {
 			'settings.showServerNameOnHubs' => 'Show Server Name on Hubs',
 			'settings.showServerNameOnHubsDescription' => 'Always show server names in hub titles.',
 			'settings.groupLibrariesByServer' => 'Group Libraries by Server',
-			'settings.groupLibrariesByServerDescription' => 'Group sidebar libraries under each media server.',
-			'settings.alwaysKeepSidebarOpen' => 'Always Keep Sidebar Open',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Sidebar stays expanded and content area adjusts to fit',
+			'settings.groupLibrariesByServerDescription' => 'Group libraries under each media server.',
+			'settings.cornerRounding' => 'Corner Rounding',
+			'settings.cornerRoundingDescription' => 'Shape cards, Continue Watching, and navigation pills.',
+			'settings.cornerSquare' => 'Square',
+			'settings.cornerRounded' => 'Rounded',
 			'settings.showUnwatchedCount' => 'Show Unwatched Count',
 			'settings.showUnwatchedCountDescription' => 'Display unwatched episode count on shows and seasons',
 			'settings.showWatchedIndicators' => 'Show Watched Indicators',
@@ -8338,6 +8468,8 @@ extension on Translations {
 			'settings.visualEffectsFull' => 'Full',
 			'settings.visualEffectsReduced' => 'Reduced',
 			'settings.visualEffectsReducedDescription' => 'Fewer animations and lower-resolution artwork',
+			'settings.liquidGlass' => 'Liquid Glass',
+			'settings.liquidGlassDescription' => 'Apply optical lens distortion and specular refraction to blurred surfaces',
 			'settings.hideSpoilers' => 'Hide Spoilers for Unwatched Episodes',
 			'settings.hideSpoilersDescription' => 'Blur thumbnails and descriptions for unwatched episodes',
 			'settings.playerBackend' => 'Player Backend',
@@ -8544,8 +8676,6 @@ extension on Translations {
 			'settings.deinterlaceFilmDescription' => 'Restore the original frames of film and animation telecined to 29.97 fps, common on NTSC DVDs. Video shot for TV stutters. Live TV uses Video',
 			'settings.requireProfileSelectionOnOpen' => 'Ask for profile on app open',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Show profile selection every time the app is opened',
-			'settings.forceTvMode' => 'Force TV mode',
-			'settings.forceTvModeDescription' => 'Force TV layout. For devices that don\'t auto-detect. Requires restart.',
 			'settings.startInFullscreen' => 'Start in fullscreen',
 			'settings.startInFullscreenDescription' => 'Open Satra in fullscreen mode at launch',
 			'settings.exitFullscreenOnPlayerClose' => 'Exit fullscreen on player close',
@@ -8614,10 +8744,10 @@ extension on Translations {
 			'themeEditor.slots.bg' => 'Background',
 			'themeEditor.slots.surface' => 'Surface',
 			'themeEditor.slots.outline' => 'Outline',
-			'themeEditor.slots.text' => 'Text',
-			'themeEditor.slots.textMuted' => 'Secondary text',
 			_ => null,
 		} ?? switch (path) {
+			'themeEditor.slots.text' => 'Text',
+			'themeEditor.slots.textMuted' => 'Secondary text',
 			'themeEditor.slots.accent' => 'Accent',
 			'themeEditor.opacity' => 'Opacity',
 			'themeEditor.hexHint' => '#RRGGBB or #AARRGGBB',
@@ -8638,11 +8768,43 @@ extension on Translations {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} min left',
 			'themeEditor.previewSwitch' => 'Autoplay',
 			'themeEditor.previewMutedText' => 'Secondary text reads like this',
-			'search.hint' => 'Search movies, shows, music...',
-			'search.tryDifferentTerm' => 'Try a different search term',
-			'search.searchYourMedia' => 'Search your media',
-			'search.enterTitleActorOrKeyword' => 'Enter a title, actor, or keyword',
-			'search.people' => 'People',
+			'spotlight.title' => 'Spotlight',
+			'spotlight.placeholder' => 'Search movies, shows, libraries, settings, actions...',
+			'spotlight.shortcutHint' => 'Ctrl+Space',
+			'spotlight.emptyPromptTitle' => 'Search everything in Satra',
+			'spotlight.emptyPromptSubtitle' => 'Find shows, movies, libraries, settings, or quick actions',
+			'spotlight.noResultsTitle' => ({required Object query}) => 'No matches for "${query}"',
+			'spotlight.noResultsSubtitle' => 'Try a title, library name, setting, or action',
+			'spotlight.categories.all' => 'All',
+			'spotlight.categories.movies' => 'Movies',
+			'spotlight.categories.shows' => 'Shows',
+			'spotlight.categories.episodes' => 'Episodes',
+			'spotlight.categories.music' => 'Music',
+			'spotlight.categories.libraries' => 'Libraries',
+			'spotlight.categories.settings' => 'Settings',
+			'spotlight.categories.actions' => 'Actions',
+			'spotlight.categories.people' => 'People',
+			'spotlight.sections.quickActions' => 'Quick Actions',
+			'spotlight.sections.libraries' => 'Libraries',
+			'spotlight.sections.settings' => 'Settings',
+			'spotlight.sections.downloads' => 'Downloaded',
+			'spotlight.hints.navigate' => 'Navigate',
+			'spotlight.hints.open' => 'Open',
+			'spotlight.hints.filter' => 'Filter',
+			'spotlight.hints.close' => 'Close',
+			'spotlight.actions.goHome' => 'Go to Home',
+			'spotlight.actions.openDownloads' => 'Open Downloads',
+			'spotlight.actions.openSettings' => 'Open Settings',
+			'spotlight.actions.openExplore' => 'Open Explore',
+			'spotlight.actions.openLiveTv' => 'Open Live TV',
+			'spotlight.actions.toggleFullscreen' => 'Toggle Fullscreen',
+			'spotlight.actions.switchProfile' => 'Switch Profile',
+			'spotlight.actions.watchTogether' => 'Watch Together',
+			'spotlight.actions.companionRemote' => 'Companion Remote',
+			'spotlight.actions.manageLibraries' => 'Manage Libraries',
+			'spotlight.actions.refreshLibrary' => 'Refresh Current View',
+			'spotlight.actions.addServer' => 'Add Server Connection',
+			'spotlight.actions.reconnectServers' => 'Reconnect to Servers',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Set Shortcut for ${actionName}',
 			'hotkeys.clearShortcut' => 'Clear shortcut',
 			'hotkeys.noShortcutSet' => 'No shortcut set',
@@ -8963,7 +9125,6 @@ extension on Translations {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: 'Auto-removed ${n} watched download', other: 'Auto-removed ${n} watched downloads', ), 
 			'messages.removedFromContinueWatching' => 'Removed from Continue Watching',
 			'messages.errorLoading' => ({required Object error}) => 'Error: ${error}',
-			'messages.searchPartialResults' => 'Some media servers could not be searched. Showing available results.',
 			'messages.streamInterrupted' => 'The stream was interrupted. Press play or seek to retry.',
 			'messages.liveStreamInterrupted' => 'The live stream was interrupted. Press play to retry.',
 			'messages.fileInfoNotAvailable' => 'File information not available',
@@ -8997,7 +9158,6 @@ extension on Translations {
 			'messages.noEpisodesFound' => 'No episodes found in first season',
 			'messages.noEpisodesFoundGeneral' => 'No episodes found',
 			'messages.episodesLoadFailed' => 'Couldn\'t load episodes',
-			'messages.noResultsFound' => 'No results found',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Sleep timer set for ${label}',
 			'messages.noItemsAvailable' => 'No items available',
 			'messages.failedToCreatePlayQueueNoItems' => 'Failed to create a play queue — no items',
@@ -9098,6 +9258,8 @@ extension on Translations {
 			'profiles.removePin' => 'Remove',
 			'profiles.connectionsLabel' => 'Connections',
 			'profiles.add' => 'Add',
+			_ => null,
+		} ?? switch (path) {
 			'profiles.deleteProfileButton' => 'Delete profile',
 			'profiles.noConnectionsHint' => 'No connections — add one to use this profile.',
 			'profiles.noConnections' => 'No connections',
@@ -9130,8 +9292,6 @@ extension on Translations {
 			'profiles.pinsDontMatch' => 'PINs don\'t match',
 			'profiles.tokenIdentityMismatch' => 'The Plex profile token resolved to an unexpected server',
 			'connections.sectionTitle' => 'Connections',
-			_ => null,
-		} ?? switch (path) {
 			'connections.addConnection' => 'Add connection',
 			'connections.addConnectionSubtitleNoProfile' => 'Sign in with Plex or connect a Jellyfin or Emby server',
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Add to ${displayName}: Plex, Jellyfin, Emby, or another profile connection',
@@ -9231,7 +9391,6 @@ extension on Translations {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (age ${age})',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (aged ${age})',
 			'errors.searchFailed' => ({required Object error}) => 'Search failed: ${error}',
-			'errors.searchUnavailable' => 'Search could not reach any media server.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Connection timeout while loading ${context}',
 			'errors.connectionFailed' => 'Unable to connect to media server',
 			'errors.unableToLoad' => ({required Object context}) => 'Unable to load ${context}. Please try again.',
@@ -9265,7 +9424,6 @@ extension on Translations {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Failed to analyze library: ${error}',
 			'libraries.noLibrariesFound' => 'No libraries found',
 			'libraries.allLibrariesHidden' => 'All libraries are hidden',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Hidden libraries (${count})',
 			'libraries.thisLibraryIsEmpty' => 'This library is empty',
 			'libraries.noItemsMatchFilters' => 'No items match the active filters',
 			'libraries.resetFilters' => 'Reset filters',
@@ -9614,6 +9772,8 @@ extension on Translations {
 			'liveTv.scheduledRecordings' => 'Scheduled',
 			'liveTv.recordingRules' => 'Recording Rules',
 			'liveTv.noScheduledRecordings' => 'Nothing scheduled to record',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.manageRecording' => 'Manage recording',
 			'liveTv.cancelRecording' => 'Cancel recording',
 			'liveTv.cancelRecordingTitle' => 'Cancel this recording?',
@@ -9644,8 +9804,6 @@ extension on Translations {
 			'liveTv.recordSettings.endLate' => 'End late (seconds)',
 			'liveTv.recordSettings.newOnly' => 'Only new episodes',
 			'liveTv.recordSettings.anyChannel' => 'Record on any channel',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.recordSettings.anyTime' => 'Record at any time',
 			'liveTv.recordSettings.skipInLibrary' => 'Skip episodes already in the library',
 			'liveTv.recordSettings.keepUpTo' => 'Episodes to keep',
@@ -9710,7 +9868,6 @@ extension on Translations {
 			'music.addToQueue' => 'Add to queue',
 			'music.discNumber' => ({required Object n}) => 'Disc ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('en'))(n, one: '${n} track', other: '${n} tracks', ), 
-			'music.nowPlaying' => 'Now Playing',
 			'music.playingFrom' => ({required Object title}) => 'Playing from ${title}',
 			'music.queue' => 'Queue',
 			'music.clearQueue' => 'Clear queue',
@@ -10129,6 +10286,8 @@ extension on Translations {
 			'performanceOverlay.dvRouteBaseLayerHdr10' => 'HDR10 base layer',
 			'performanceOverlay.dvRouteBaseLayerHlg' => 'HLG base layer',
 			'performanceOverlay.dvRouteBaseLayerSdr' => 'SDR base layer',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.dvRouteReshaped' => 'RPU reshaped (gpu-next)',
 			'performanceOverlay.p7Conversion' => 'P7 Conv',
 			'performanceOverlay.sampleRate' => 'Sample Rate',
@@ -10158,8 +10317,6 @@ extension on Translations {
 			'performanceOverlay.fps' => 'FPS',
 			'performanceOverlay.decoderAndroidHw' => 'Android HW',
 			'performanceOverlay.decoderNvidiaHw' => 'NVIDIA HW',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.decoderQualcommHw' => 'Qualcomm HW',
 			'performanceOverlay.decoderMediatekHw' => 'MediaTek HW',
 			'performanceOverlay.decoderExynosHw' => 'Exynos HW',

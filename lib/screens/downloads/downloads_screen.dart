@@ -31,7 +31,10 @@ import '../../widgets/focusable_media_card.dart';
 import '../../widgets/media_card_sliver_layout.dart';
 import '../../widgets/download_tree_view.dart';
 import '../libraries/library_browse_grouping.dart';
-import '../main_screen.dart';
+import '../../navigation/main_screen_scope.dart';
+import '../../navigation/settings_shortcut.dart';
+import '../../services/fullscreen_state_manager.dart';
+import '../../widgets/utility_panel_route.dart';
 import '../libraries/state_messages.dart';
 import '../libraries/content_state_builder.dart';
 import 'downloads_options.dart';
@@ -162,8 +165,33 @@ class DownloadsScreenState extends State<DownloadsScreen>
     return Text(t.downloads.title);
   }
 
+  void _handleOpenSettings(BuildContext context) {
+    final mainScope = MainScreenFocusScope.of(context, listen: false);
+    if (mainScope?.openSettings != null) {
+      mainScope!.openSettings!();
+      return;
+    }
+    Navigator.push(context, buildSettingsRoute());
+  }
+
   @override
   Widget build(BuildContext context) {
+    final inPanel = UtilityPanelScope.isPresent(context);
+    final useSideNav = PlatformDetector.shouldUseSideNavigation(context);
+    final showTopShellActions = useSideNav && !inPanel;
+    final showFullscreenButton =
+        showTopShellActions && PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
+    final reconnectCallback = MainScreenFocusScope.of(context, listen: false)?.reconnectOffline;
+
+    final hasFailedDownloads = context.select<DownloadProvider, bool>((provider) => provider.hasFailedDownloads);
+    // Retrying the last failure removes the focused action;
+    // hand D-pad focus to its neighbour instead of dropping it.
+    if (!hasFailedDownloads && _retryFailedFocusNode.hasFocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _actionBarKey.currentState?.requestFocusOnFirst();
+      });
+    }
+
     return Scaffold(
       body: CustomScrollView(
         primary: false,
@@ -177,16 +205,10 @@ class DownloadsScreenState extends State<DownloadsScreen>
             shadowColor: Colors.transparent,
             scrolledUnderElevation: 0,
             actions: [
-              Selector<DownloadProvider, bool>(
-                selector: (_, provider) => provider.hasFailedDownloads,
-                builder: (context, hasFailedDownloads, _) {
-                  // Retrying the last failure removes the focused action;
-                  // hand D-pad focus to its neighbour instead of dropping it.
-                  if (!hasFailedDownloads && _retryFailedFocusNode.hasFocus) {
-                    WidgetsBinding.instance.addPostFrameCallback((_) {
-                      if (mounted) _actionBarKey.currentState?.requestFocusOnFirst();
-                    });
-                  }
+              ListenableBuilder(
+                listenable: Listenable.merge([FullscreenStateManager(), tabController]),
+                builder: (context, _) {
+                  final isFullscreen = FullscreenStateManager().isFullscreen;
                   return FocusableActionBar(
                     key: _actionBarKey,
                     onNavigateLeft: () => getTabChipFocusNode(tabCount - 1).requestFocus(),
@@ -215,6 +237,27 @@ class DownloadsScreenState extends State<DownloadsScreen>
                           tooltip: t.downloads.options,
                           debugLabel: 'downloads_options',
                           onPressed: () => _activeOptionsTab()?.showOptionsSheet(),
+                        ),
+                      if (showTopShellActions && reconnectCallback != null)
+                        FocusableAction(
+                          icon: Symbols.wifi_rounded,
+                          tooltip: t.common.reconnect,
+                          debugLabel: 'downloads_reconnect',
+                          onPressed: reconnectCallback,
+                        ),
+                      if (showTopShellActions)
+                        FocusableAction(
+                          icon: Symbols.settings_rounded,
+                          tooltip: t.common.settings,
+                          debugLabel: 'settings',
+                          onPressed: () => _handleOpenSettings(context),
+                        ),
+                      if (showFullscreenButton)
+                        FocusableAction(
+                          icon: isFullscreen ? Symbols.fullscreen_exit_rounded : Symbols.fullscreen_rounded,
+                          tooltip: isFullscreen ? t.common.exitFullscreen : t.common.fullscreen,
+                          debugLabel: 'fullscreen',
+                          onPressed: () => unawaited(FullscreenStateManager().toggleFullscreen()),
                         ),
                     ],
                   );
@@ -284,7 +327,6 @@ class DownloadsScreenState extends State<DownloadsScreen>
                               onRetryAll: _retryDownloads,
                               onCancel: downloadProvider.cancelDownload,
                               onDelete: downloadProvider.deleteDownload,
-                              onNavigateLeft: () => MainScreenFocusScope.focusSidebarOf(context),
                               onBack: focusTabBar,
                               suppressAutoFocus: suppressAutoFocus,
                             );
@@ -376,9 +418,6 @@ class _DownloadsGridContentState extends State<_DownloadsGridContent>
 
   @override
   void navigateToTabBar() => widget.onBack?.call();
-
-  @override
-  void navigateToSidebar() => MainScreenFocusScope.focusSidebarOf(context);
 
   /// Items for the active grouping with filters and sort applied. The
   /// `collections` and `library` groupings work on the tab's default item
@@ -491,7 +530,6 @@ class _DownloadsGridContentState extends State<_DownloadsGridContent>
           isOffline: true, // Downloaded content works without server
           fullBleedImage: fullCardLayout && position.isGrid,
           onNavigateUp: position.isFirstRow ? firstRowUp : null,
-          onNavigateLeft: position.isFirstColumn ? navigateToSidebar : null,
         );
       },
     );
@@ -529,7 +567,6 @@ class _DownloadsGridContentState extends State<_DownloadsGridContent>
         actionIcon: Symbols.clear_all_rounded,
         actionFocusNode: firstItemFocusNode,
         onActionNavigateUp: navigateToChips,
-        onActionNavigateLeft: navigateToSidebar,
         onActionBack: widget.onBack,
       );
     }
@@ -605,9 +642,6 @@ class _DownloadedMusicContentState extends State<_DownloadedMusicContent>
 
   @override
   void navigateToTabBar() => widget.onBack?.call();
-
-  @override
-  void navigateToSidebar() => MainScreenFocusScope.focusSidebarOf(context);
 
   Future<void> _playAlbumFrom(List<MediaItem> albumTracks, MediaItem track) async {
     await playTracks(
@@ -883,7 +917,6 @@ class _DownloadedMusicContentState extends State<_DownloadedMusicContent>
               isOffline: true, // Downloaded content works without server
               fullBleedImage: fullCardLayout && position.isGrid,
               onNavigateUp: i == 0 && position.isFirstRow ? navigateToChips : null,
-              onNavigateLeft: position.isFirstColumn ? navigateToSidebar : null,
             );
           },
         ),
@@ -903,7 +936,6 @@ class _DownloadedMusicContentState extends State<_DownloadedMusicContent>
         actionIcon: Symbols.clear_all_rounded,
         actionFocusNode: firstItemFocusNode,
         onActionNavigateUp: navigateToChips,
-        onActionNavigateLeft: navigateToSidebar,
         onActionBack: widget.onBack,
       );
     }

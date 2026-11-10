@@ -20,7 +20,6 @@ Future<void> pumpLibraryTab(
   DownloadProvider? downloads,
   Size size = const Size(1280, 720),
   double devicePixelRatio = 1,
-  VoidCallback? focusSidebar,
 }) async {
   tester.view.devicePixelRatio = devicePixelRatio;
   tester.view.physicalSize = size * devicePixelRatio;
@@ -39,7 +38,6 @@ Future<void> pumpLibraryTab(
         child: MaterialApp(
           theme: monoTheme(MonoPalette.dark),
           home: MainScreenFocusScope(
-            focusSidebar: focusSidebar ?? () {},
             sideNavigationWidth: 0,
             child: Scaffold(
               body: NestedScrollView(

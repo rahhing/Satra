@@ -48,7 +48,6 @@ class TranslationsZh extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final Translations$supporter$zh supporter = Translations$supporter$zh.internal(_root);
 	@override late final Translations$settings$zh settings = Translations$settings$zh.internal(_root);
 	@override late final Translations$themeEditor$zh themeEditor = Translations$themeEditor$zh.internal(_root);
-	@override late final Translations$search$zh search = Translations$search$zh.internal(_root);
 	@override late final Translations$hotkeys$zh hotkeys = Translations$hotkeys$zh.internal(_root);
 	@override late final Translations$fileInfo$zh fileInfo = Translations$fileInfo$zh.internal(_root);
 	@override late final Translations$mediaMenu$zh mediaMenu = Translations$mediaMenu$zh.internal(_root);
@@ -327,8 +326,6 @@ class Translations$settings$zh extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => '始终在推荐栏标题中显示服务器名称。';
 	@override String get groupLibrariesByServer => '按服务器分组媒体库';
 	@override String get groupLibrariesByServerDescription => '在侧边栏中按媒体服务器分组媒体库。';
-	@override String get alwaysKeepSidebarOpen => '始终保持侧边栏展开';
-	@override String get alwaysKeepSidebarOpenDescription => '侧边栏保持展开状态，内容区域自动调整';
 	@override String get showUnwatchedCount => '显示未观看数量';
 	@override String get showUnwatchedCountDescription => '在剧集和季上显示未观看集数';
 	@override String get showWatchedIndicators => '显示已观看标记';
@@ -553,8 +550,6 @@ class Translations$settings$zh extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => '还原经胶转磁（telecine）处理为 29.97 fps 的电影和动画的原始帧，常见于 NTSC DVD。为电视拍摄的视频会出现卡顿。直播电视使用“视频”模式';
 	@override String get requireProfileSelectionOnOpen => '打开应用时选择用户资料';
 	@override String get requireProfileSelectionOnOpenDescription => '每次打开应用时都显示用户资料选择界面';
-	@override String get forceTvMode => '强制 TV 模式';
-	@override String get forceTvModeDescription => '强制 TV 布局。适用于无法自动检测的设备。需要重启。';
 	@override String get startInFullscreen => '以全屏模式启动';
 	@override String get startInFullscreenDescription => '启动时以全屏模式打开 Satra';
 	@override String get exitFullscreenOnPlayerClose => '关闭播放器时退出全屏';
@@ -643,20 +638,6 @@ class Translations$themeEditor$zh extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '剩余 ${minutes} 分钟';
 	@override String get previewSwitch => '自动播放';
 	@override String get previewMutedText => '次要文字看起来是这样的';
-}
-
-// Path: search
-class Translations$search$zh extends Translations$search$en {
-	Translations$search$zh.internal(TranslationsZh root) : this._root = root, super.internal(root);
-
-	final TranslationsZh _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => '搜索电影、剧集、音乐…';
-	@override String get tryDifferentTerm => '尝试不同的搜索词';
-	@override String get searchYourMedia => '搜索媒体';
-	@override String get enterTitleActorOrKeyword => '输入标题、演员或关键词';
-	@override String get people => '人物';
 }
 
 // Path: hotkeys
@@ -1033,7 +1014,6 @@ class Translations$messages$zh extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => '已从继续观看中移除';
 	@override String errorLoading({required Object error}) => '出错：${error}';
-	@override String get searchPartialResults => '部分媒体服务器无法搜索。正在显示可用的结果。';
 	@override String get streamInterrupted => '视频流已中断。按播放键或拖动进度条重试。';
 	@override String get liveStreamInterrupted => '直播流已中断。按播放键重试。';
 	@override String get fileInfoNotAvailable => '文件信息不可用';
@@ -1067,7 +1047,6 @@ class Translations$messages$zh extends Translations$messages$en {
 	@override String get noEpisodesFound => '在第一季中未找到剧集';
 	@override String get noEpisodesFoundGeneral => '未找到剧集';
 	@override String get episodesLoadFailed => '无法加载剧集';
-	@override String get noResultsFound => '未找到结果';
 	@override String sleepTimerSet({required Object label}) => '睡眠定时器已设置为 ${label}';
 	@override String get noItemsAvailable => '没有可用的项目';
 	@override String get failedToCreatePlayQueueNoItems => '创建播放队列失败：没有可用项目';
@@ -1344,7 +1323,6 @@ class Translations$errors$zh extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => '搜索失败：${error}';
-	@override String get searchUnavailable => '搜索无法连接任何媒体服务器。';
 	@override String connectionTimeout({required Object context}) => '加载 ${context} 时连接超时';
 	@override String get connectionFailed => '无法连接到媒体服务器';
 	@override String unableToLoad({required Object context}) => '无法加载${context}。请重试。';
@@ -1387,7 +1365,6 @@ class Translations$libraries$zh extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => '无法分析媒体库：${error}';
 	@override String get noLibrariesFound => '未找到媒体库';
 	@override String get allLibrariesHidden => '所有媒体库已隐藏';
-	@override String hiddenLibrariesCount({required Object count}) => '已隐藏的媒体库 (${count})';
 	@override String get thisLibraryIsEmpty => '此媒体库为空';
 	@override String get noItemsMatchFilters => '没有项目符合当前筛选条件';
 	@override String get resetFilters => '重置筛选条件';
@@ -1757,7 +1734,6 @@ class Translations$music$zh extends Translations$music$en {
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n,
 		other: '${n} 首',
 	);
-	@override String get nowPlaying => '正在播放';
 	@override String playingFrom({required Object title}) => '播放来源：${title}';
 	@override String get queue => '播放队列';
 	@override String get clearQueue => '清空队列';
@@ -3591,8 +3567,6 @@ extension on TranslationsZh {
 			'settings.showServerNameOnHubsDescription' => '始终在推荐栏标题中显示服务器名称。',
 			'settings.groupLibrariesByServer' => '按服务器分组媒体库',
 			'settings.groupLibrariesByServerDescription' => '在侧边栏中按媒体服务器分组媒体库。',
-			'settings.alwaysKeepSidebarOpen' => '始终保持侧边栏展开',
-			'settings.alwaysKeepSidebarOpenDescription' => '侧边栏保持展开状态，内容区域自动调整',
 			'settings.showUnwatchedCount' => '显示未观看数量',
 			'settings.showUnwatchedCountDescription' => '在剧集和季上显示未观看集数',
 			'settings.showWatchedIndicators' => '显示已观看标记',
@@ -3817,8 +3791,6 @@ extension on TranslationsZh {
 			'settings.deinterlaceFilmDescription' => '还原经胶转磁（telecine）处理为 29.97 fps 的电影和动画的原始帧，常见于 NTSC DVD。为电视拍摄的视频会出现卡顿。直播电视使用“视频”模式',
 			'settings.requireProfileSelectionOnOpen' => '打开应用时选择用户资料',
 			'settings.requireProfileSelectionOnOpenDescription' => '每次打开应用时都显示用户资料选择界面',
-			'settings.forceTvMode' => '强制 TV 模式',
-			'settings.forceTvModeDescription' => '强制 TV 布局。适用于无法自动检测的设备。需要重启。',
 			'settings.startInFullscreen' => '以全屏模式启动',
 			'settings.startInFullscreenDescription' => '启动时以全屏模式打开 Satra',
 			'settings.exitFullscreenOnPlayerClose' => '关闭播放器时退出全屏',
@@ -3891,12 +3863,12 @@ extension on TranslationsZh {
 			'themeEditor.slots.textMuted' => '次要文字',
 			'themeEditor.slots.accent' => '强调色',
 			'themeEditor.opacity' => '不透明度',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB 或 #AARRGGBB',
 			'themeEditor.fromOtherThemes' => '来自其他主题',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} · ${color}',
 			'themeEditor.contrast.textOnBg' => '背景上的文字',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => '表面上的文字',
 			'themeEditor.contrast.textMutedOnBg' => '背景上的次要文字',
 			'themeEditor.contrast.textMutedOnSurface' => '表面上的次要文字',
@@ -3911,11 +3883,6 @@ extension on TranslationsZh {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '剩余 ${minutes} 分钟',
 			'themeEditor.previewSwitch' => '自动播放',
 			'themeEditor.previewMutedText' => '次要文字看起来是这样的',
-			'search.hint' => '搜索电影、剧集、音乐…',
-			'search.tryDifferentTerm' => '尝试不同的搜索词',
-			'search.searchYourMedia' => '搜索媒体',
-			'search.enterTitleActorOrKeyword' => '输入标题、演员或关键词',
-			'search.people' => '人物',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => '为 ${actionName} 设置快捷键',
 			'hotkeys.clearShortcut' => '清除快捷键',
 			'hotkeys.noShortcutSet' => '未设置快捷键',
@@ -4234,7 +4201,6 @@ extension on TranslationsZh {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '已自动移除 ${n} 个看过的下载', ), 
 			'messages.removedFromContinueWatching' => '已从继续观看中移除',
 			'messages.errorLoading' => ({required Object error}) => '出错：${error}',
-			'messages.searchPartialResults' => '部分媒体服务器无法搜索。正在显示可用的结果。',
 			'messages.streamInterrupted' => '视频流已中断。按播放键或拖动进度条重试。',
 			'messages.liveStreamInterrupted' => '直播流已中断。按播放键重试。',
 			'messages.fileInfoNotAvailable' => '文件信息不可用',
@@ -4268,7 +4234,6 @@ extension on TranslationsZh {
 			'messages.noEpisodesFound' => '在第一季中未找到剧集',
 			'messages.noEpisodesFoundGeneral' => '未找到剧集',
 			'messages.episodesLoadFailed' => '无法加载剧集',
-			'messages.noResultsFound' => '未找到结果',
 			'messages.sleepTimerSet' => ({required Object label}) => '睡眠定时器已设置为 ${label}',
 			'messages.noItemsAvailable' => '没有可用的项目',
 			'messages.failedToCreatePlayQueueNoItems' => '创建播放队列失败：没有可用项目',
@@ -4405,8 +4370,6 @@ extension on TranslationsZh {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '添加到 ${displayName}：Plex、Jellyfin、Emby，或其他用户资料的连接',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} 的会话已过期',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} 个服务器的会话已过期',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} 拒绝此账户访问',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} 台服务器拒绝此账户访问',
 			'connections.signInAgain' => '重新登录',
@@ -4418,6 +4381,8 @@ extension on TranslationsZh {
 			'accountPreferences.pickAccount' => '每个账户都保存自己的偏好设置。选择要编辑的账户。',
 			'accountPreferences.storedOnAccount' => '这些选项保存在账户本身，因此所有登录该账户的应用都会使用它们——包括你其他设备上的 Satra。',
 			'accountPreferences.noAccounts' => '没有可配置的账户',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => '登录 Plex，或连接 Jellyfin 或 Emby 服务器，该账户上保存的偏好设置就会显示在这里。',
 			'accountPreferences.unavailable' => '无法访问此账户',
 			'accountPreferences.loadFailed' => '无法加载这些偏好设置',
@@ -4500,7 +4465,6 @@ extension on TranslationsZh {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date}（${age} 岁）',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date}（享年 ${age} 岁）',
 			'errors.searchFailed' => ({required Object error}) => '搜索失败：${error}',
-			'errors.searchUnavailable' => '搜索无法连接任何媒体服务器。',
 			'errors.connectionTimeout' => ({required Object context}) => '加载 ${context} 时连接超时',
 			'errors.connectionFailed' => '无法连接到媒体服务器',
 			'errors.unableToLoad' => ({required Object context}) => '无法加载${context}。请重试。',
@@ -4534,7 +4498,6 @@ extension on TranslationsZh {
 			'libraries.failedToAnalyze' => ({required Object error}) => '无法分析媒体库：${error}',
 			'libraries.noLibrariesFound' => '未找到媒体库',
 			'libraries.allLibrariesHidden' => '所有媒体库已隐藏',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => '已隐藏的媒体库 (${count})',
 			'libraries.thisLibraryIsEmpty' => '此媒体库为空',
 			'libraries.noItemsMatchFilters' => '没有项目符合当前筛选条件',
 			'libraries.resetFilters' => '重置筛选条件',
@@ -4919,8 +4882,6 @@ extension on TranslationsZh {
 			'liveTv.failedToStartChannel' => '无法播放直播频道',
 			'liveTv.failedToBuildStreamUrl' => '无法生成视频流 URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => '无法启动该频道：${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => '无法切换频道：${reason}',
 			'collections.title' => '合集',
 			'collections.collection' => '合集',
@@ -4934,6 +4895,8 @@ extension on TranslationsZh {
 			'collections.collectionName' => '合集名称',
 			'collections.enterCollectionName' => '输入合集名称',
 			'collections.addedToCollection' => '已添加到合集',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => '添加到合集失败',
 			'collections.created' => '已创建合集',
 			'collections.removeFromCollection' => '从合集移除',
@@ -4975,7 +4938,6 @@ extension on TranslationsZh {
 			'music.addToQueue' => '添加到队列',
 			'music.discNumber' => ({required Object n}) => '碟片 ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('zh'))(n, other: '${n} 首', ), 
-			'music.nowPlaying' => '正在播放',
 			'music.playingFrom' => ({required Object title}) => '播放来源：${title}',
 			'music.queue' => '播放队列',
 			'music.clearQueue' => '清空队列',
@@ -5433,8 +5395,6 @@ extension on TranslationsZh {
 			'externalPlayer.useExternalPlayer' => '使用外部播放器',
 			'externalPlayer.useExternalPlayerDescription' => '在其他应用中打开视频',
 			'externalPlayer.selectPlayer' => '选择播放器',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => '自定义播放器',
 			'externalPlayer.systemDefault' => '系统默认',
 			'externalPlayer.addCustomPlayer' => '添加自定义播放器',
@@ -5449,6 +5409,8 @@ extension on TranslationsZh {
 			'externalPlayer.playInExternalPlayer' => '在外部播放器中播放',
 			'metadataEdit.editMetadata' => '编辑…',
 			'metadataEdit.screenTitle' => '编辑元数据',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => '基本信息',
 			'metadataEdit.artwork' => '封面图片',
 			'metadataEdit.advancedSettings' => '高级设置',

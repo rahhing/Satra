@@ -16,7 +16,6 @@ import '../../../widgets/nested_tab_scrollbar.dart';
 import '../../../widgets/settings_builder.dart';
 import '../../../widgets/skeleton_media_card.dart';
 import '../../../widgets/sliver_child_memo.dart';
-import '../../main_screen.dart';
 import 'base_library_tab.dart';
 
 /// Library tabs whose whole body is one paginated grid of media cards.
@@ -186,7 +185,7 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
     final columnCount = position.columnCount;
     final navigateUp = position.isFirstRow ? widget.onBack : () => _focusGridItem(index - columnCount);
     final navigateDown = index + columnCount < totalSize ? () => _focusGridItem(index + columnCount) : null;
-    final navigateLeft = position.isFirstColumn ? _navigateToSidebar : () => _focusGridItem(index - 1);
+    final navigateLeft = position.isFirstColumn ? null : () => _focusGridItem(index - 1);
     final navigateRight = !position.isLastColumn && index + 1 < totalSize ? () => _focusGridItem(index + 1) : null;
 
     return FocusableMediaCard(
@@ -226,10 +225,6 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
         if (mounted) node.requestFocus();
       });
     }
-  }
-
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
   }
 
   @override

@@ -64,7 +64,7 @@ void main() {
         getLabel: () => 'Bibliothèque',
       ),
       NavigationTab(id: NavigationTabId.explore, onlineOnly: false, icon: Icons.explore, getLabel: () => 'Explorer'),
-      NavigationTab(id: NavigationTabId.search, onlineOnly: false, icon: Icons.search, getLabel: () => 'Recherche'),
+      NavigationTab(id: NavigationTabId.liveTv, onlineOnly: true, icon: Icons.live_tv, getLabel: () => 'Direct'),
       NavigationTab(
         id: NavigationTabId.downloads,
         onlineOnly: false,

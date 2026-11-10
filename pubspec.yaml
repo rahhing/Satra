@@ -185,6 +185,9 @@ flutter:
     # App icon picker thumbnails; scripts/codegen/generate_app_icons.py renders them from
     # assets/app_icons/source, which stays out of the bundle.
     - assets/app_icons/previews/
+  shaders:
+    - assets/shaders/liquid_glass_sheen.frag
+    - assets/shaders/liquid_glass_backdrop.frag
   # Registered as UI font families so the Linux build, whose fontconfig may
   # lack CJK fonts, can fall back to the bundled subtitle fonts (mono_theme).
   fonts:

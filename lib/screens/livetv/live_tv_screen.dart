@@ -16,6 +16,7 @@ import '../../models/livetv_dvr.dart';
 import '../../models/livetv_program.dart';
 import '../../mixins/refreshable.dart';
 import '../../mixins/tab_navigation_mixin.dart';
+import '../../navigation/main_screen_scope.dart';
 import '../../providers/multi_server_provider.dart';
 import '../../services/settings_service.dart';
 import '../../utils/app_logger.dart';
@@ -769,7 +770,22 @@ class _LiveTvScreenState extends State<LiveTvScreen>
   }
 
   List<Widget> _buildTabChipItems() {
+    final selectHome = MainScreenFocusScope.of(context, listen: false)?.selectHome;
     return [
+      if (selectHome != null) ...[
+        FocusableTabChip(
+          label: t.common.home,
+          isSelected: false,
+          onSelect: selectHome,
+          onNavigateRight: _visibleTabs.isNotEmpty
+              ? () => getTabChipFocusNode(0).requestFocus()
+              : () => _actionBarKey.currentState?.requestFocusOnFirst(),
+          onNavigateDown: _focusCurrentTab,
+          onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+          onBack: selectHome,
+        ),
+        if (_visibleTabs.isNotEmpty) const SizedBox(width: 8),
+      ],
       for (int i = 0; i < _visibleTabs.length; i++) ...[
         if (i > 0) const SizedBox(width: 8),
         buildTabChip(

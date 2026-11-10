@@ -51,7 +51,6 @@ import 'package:satra/theme/mono_theme.dart';
 import 'package:satra/utils/layout_constants.dart';
 import 'package:satra/utils/platform_detector.dart';
 import 'package:satra/watch_together/watch_together.dart';
-import 'package:satra/widgets/side_navigation_rail.dart';
 import 'package:satra/widgets/tv_browse_rail.dart';
 import 'package:satra/widgets/system_clock.dart';
 import 'package:satra/widgets/toolbar_scrim.dart';
@@ -61,6 +60,9 @@ import 'package:provider/provider.dart';
 import '../test_helpers/prefs.dart';
 import '../test_helpers/media_items.dart';
 import '../test_helpers/multi_server_fixtures.dart';
+
+const double _testExpandedBleed = 220.0;
+const double _testCollapsedBleed = 64.0;
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -131,9 +133,9 @@ void main() {
       isProfileBinding: () => activeProfileProvider.isBinding,
     );
     final discoverKey = GlobalKey<State<DiscoverScreen>>();
-    const targetSidebarOffset = SideNavigationRailState.expandedWidth;
+    const targetSidebarOffset = _testExpandedBleed;
     const currentForegroundLeft = 120.0;
-    const foregroundWidth = 1280 - SideNavigationRailState.tvCollapsedWidth;
+    const foregroundWidth = 1280 - _testCollapsedBleed;
 
     addTearDown(() async {
       discoverProvider.dispose();
@@ -162,9 +164,8 @@ void main() {
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark),
             home: MainScreenFocusScope(
-              focusSidebar: () {},
               sideNavigationWidth: targetSidebarOffset,
-              reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+              reservedSideNavigationWidth: _testCollapsedBleed,
               foregroundLeft: currentForegroundLeft,
               foregroundWidth: foregroundWidth,
               viewportWidth: 1280,
@@ -330,9 +331,8 @@ void main() {
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark),
             home: MainScreenFocusScope(
-              focusSidebar: () {},
-              sideNavigationWidth: SideNavigationRailState.expandedWidth,
-              reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+              sideNavigationWidth: _testExpandedBleed,
+              reservedSideNavigationWidth: _testCollapsedBleed,
               foregroundLeft: 0,
               foregroundWidth: 1280,
               viewportWidth: 1280,
@@ -444,9 +444,8 @@ void main() {
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark),
             home: MainScreenFocusScope(
-              focusSidebar: () {},
-              sideNavigationWidth: SideNavigationRailState.expandedWidth,
-              reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+              sideNavigationWidth: _testExpandedBleed,
+              reservedSideNavigationWidth: _testCollapsedBleed,
               foregroundLeft: 0,
               foregroundWidth: 1280,
               viewportWidth: 1280,
@@ -548,7 +547,7 @@ void main() {
       profileId: null,
       isProfileBinding: () => activeProfileProvider.isBinding,
     );
-    const foregroundWidth = 1280 - SideNavigationRailState.tvCollapsedWidth;
+    const foregroundWidth = 1280 - _testCollapsedBleed;
 
     addTearDown(() async {
       discoverProvider.dispose();
@@ -577,9 +576,8 @@ void main() {
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark),
             home: MainScreenFocusScope(
-              focusSidebar: () {},
-              sideNavigationWidth: SideNavigationRailState.expandedWidth,
-              reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+              sideNavigationWidth: _testExpandedBleed,
+              reservedSideNavigationWidth: _testCollapsedBleed,
               foregroundLeft: 0,
               foregroundWidth: foregroundWidth,
               viewportWidth: 1280,
@@ -687,9 +685,8 @@ void main() {
             child: MaterialApp(
               theme: monoTheme(MonoPalette.dark),
               home: MainScreenFocusScope(
-                focusSidebar: () {},
-                sideNavigationWidth: SideNavigationRailState.expandedWidth,
-                reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+                sideNavigationWidth: _testExpandedBleed,
+                reservedSideNavigationWidth: _testCollapsedBleed,
                 foregroundLeft: 0,
                 foregroundWidth: 1280,
                 viewportWidth: 1280,
@@ -850,8 +847,7 @@ void main() {
             child: MaterialApp(
               theme: monoTheme(MonoPalette.dark),
               home: MainScreenFocusScope(
-                focusSidebar: () {},
-                sideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+                sideNavigationWidth: _testCollapsedBleed,
                 selectLibrary: (key) => selectedLibraryKey = key,
                 child: const DiscoverScreen(),
               ),
@@ -1151,9 +1147,8 @@ Future<_GatedDiscover> _pumpGatedDiscover(WidgetTester tester, {bool underRootCo
         ],
       ),
       MainScreenFocusScope(
-        focusSidebar: () {},
-        sideNavigationWidth: SideNavigationRailState.expandedWidth,
-        reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+        sideNavigationWidth: _testExpandedBleed,
+        reservedSideNavigationWidth: _testCollapsedBleed,
         foregroundLeft: 80,
         foregroundWidth: 1200,
         viewportWidth: 1280,
@@ -1287,9 +1282,8 @@ Future<void> _pumpDiscoverShell(WidgetTester tester, {required bool isTv, WatchT
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark),
             home: MainScreenFocusScope(
-              focusSidebar: () {},
-              sideNavigationWidth: SideNavigationRailState.expandedWidth,
-              reservedSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
+              sideNavigationWidth: _testExpandedBleed,
+              reservedSideNavigationWidth: _testCollapsedBleed,
               foregroundLeft: 0,
               foregroundWidth: 1280,
               viewportWidth: 1280,

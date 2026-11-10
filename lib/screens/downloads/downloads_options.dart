@@ -549,7 +549,6 @@ mixin DownloadsTabOptionsMixin<T extends StatefulWidget> on State<T> implements 
       ],
       onNavigateDown: _navigateToContent,
       onNavigateUp: navigateToTabBar,
-      onNavigateLeftEdge: navigateToSidebar,
       onBack: navigateToTabBar,
     );
   }
@@ -598,9 +597,6 @@ mixin DownloadsTabOptionsMixin<T extends StatefulWidget> on State<T> implements 
 
   /// BACK/UP escape to the screen's tab bar — supplied by the host widget.
   void navigateToTabBar();
-
-  /// LEFT edge escape to the sidebar — supplied by the host widget.
-  void navigateToSidebar();
 }
 
 /// One `serverId:libraryId` bucket of downloaded items for the `library`

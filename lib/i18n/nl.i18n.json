@@ -210,6 +210,8 @@
     "paperTheme": "Papier",
     "libraryDensity": "Bibliotheekdichtheid",
     "displayScale": "Weergaveschaal",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Compact",
     "comfortable": "Comfortabel",
     "gridSpacing": "Rasterafstand",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Toon servernamen altijd in hubtitels.",
     "groupLibrariesByServer": "Bibliotheken groeperen per server",
     "groupLibrariesByServerDescription": "Groepeer zijbalkbibliotheken onder elke mediaserver.",
-    "alwaysKeepSidebarOpen": "Zijbalk altijd open houden",
-    "alwaysKeepSidebarOpenDescription": "Zijbalk blijft uitgevouwen en inhoudsgebied past zich aan",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Aantal ongekeken tonen",
     "showUnwatchedCountDescription": "Toon aantal ongekeken afleveringen bij series en seizoenen",
     "showWatchedIndicators": "Bekeken-markeringen tonen",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Volledig",
     "visualEffectsReduced": "Verminderd",
     "visualEffectsReducedDescription": "Minder animaties en illustraties met lagere resolutie",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Spoilers voor ongekeken afleveringen verbergen",
     "hideSpoilersDescription": "Vervaag miniaturen en beschrijvingen van ongekeken afleveringen",
     "playerBackend": "Afspeelbackend",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Openbare Open Watch Party-relays, tenzij je een eigen relay instelt",
     "watchTogetherRelayHint": "https://mijn-relay.voorbeeld.nl",
     "watchTogetherRelayInvalid": "Voer een geldige HTTP- of HTTPS-basis-URL voor de relay in.",
-
-
     "debugLogging": "Debuglogboek",
     "debugLoggingDescription": "Schakel gedetailleerde logboekregistratie in om problemen op te lossen",
     "viewLogs": "Logbestanden bekijken",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Herstel de originele beelden van film en animatie die met telecine naar 29,97 fps zijn omgezet, gebruikelijk op NTSC-DVD's. Video die voor tv is opgenomen, gaat haperen. Live-tv gebruikt Video",
     "requireProfileSelectionOnOpen": "Vraag om profiel bij openen",
     "requireProfileSelectionOnOpenDescription": "Toon profielselectie telkens wanneer de app wordt geopend",
-    "forceTvMode": "Tv-modus afdwingen",
-    "forceTvModeDescription": "Dwing de tv-indeling af op apparaten zonder automatische detectie. Herstart vereist.",
     "startInFullscreen": "Starten in volledig scherm",
     "startInFullscreenDescription": "Open Satra bij het starten in volledig scherm",
     "exitFullscreenOnPlayerClose": "Volledig scherm verlaten bij sluiten van speler",
@@ -561,12 +563,52 @@
     "previewSwitch": "Automatisch afspelen",
     "previewMutedText": "Secundaire tekst ziet er zo uit"
   },
-  "search": {
-    "hint": "Zoek films, series, muziek...",
-    "tryDifferentTerm": "Probeer een andere zoekterm",
-    "searchYourMedia": "Zoek in je media",
-    "enterTitleActorOrKeyword": "Voer een titel, acteur of trefwoord in",
-    "people": "Personen"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Stel sneltoets in voor ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Verwijderd uit 'Doorgaan met kijken'",
     "errorLoading": "Fout: ${error}",
-    "searchPartialResults": "Sommige mediaservers konden niet worden doorzocht. Beschikbare resultaten worden getoond.",
     "streamInterrupted": "De stream is onderbroken. Druk op afspelen of spoel om het opnieuw te proberen.",
     "liveStreamInterrupted": "De livestream is onderbroken. Druk op afspelen om het opnieuw te proberen.",
     "fileInfoNotAvailable": "Bestandsinformatie niet beschikbaar",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Geen afleveringen gevonden in eerste seizoen",
     "noEpisodesFoundGeneral": "Geen afleveringen gevonden",
     "episodesLoadFailed": "Kan afleveringen niet laden",
-    "noResultsFound": "Geen resultaten gevonden",
     "sleepTimerSet": "Slaaptimer ingesteld op ${label}",
     "noItemsAvailable": "Geen items beschikbaar",
     "failedToCreatePlayQueueNoItems": "Afspeelwachtrij maken mislukt — geen items",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "De server bleef weigeren dit bestand te streamen (HTTP 503). Mogelijk wordt de server opnieuw opgestart, is deze bezet of is de opslag van het bestand offline. Probeer het over een moment opnieuw — als dit blijft gebeuren, vraag dan de servereigenaar om de server en de opslag van het bestand te controleren.",
     "playbackNotAllowedTitle": "Afspelen niet toegestaan",
     "playbackNotAllowedBody": "De server weigerde dit item te streamen (HTTP 403). Je account heeft mogelijk geen toestemming om het af te spelen, of de server staat afspelen alleen toe op het eigen lokale netwerk.",
-
-
     "burnedSubtitlesUseMenu": "De ondertitels zijn in deze stream ingebrand. Wijzig ze via het ondertitelmenu.",
     "noVideoUrl": "Geen video-URL beschikbaar",
     "playbackNoMediaSources": "De server heeft geen afspeelbare mediabronnen geretourneerd",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Zoeken mislukt: ${error}",
-    "searchUnavailable": "Zoeken kon geen enkele mediaserver bereiken.",
     "connectionTimeout": "Time-out van verbinding tijdens het laden van ${context}",
     "connectionFailed": "Kan geen verbinding maken met mediaserver",
     "unableToLoad": "Kan ${context} niet laden. Probeer het opnieuw.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Kon bibliotheek niet analyseren: ${error}",
     "noLibrariesFound": "Geen bibliotheken gevonden",
     "allLibrariesHidden": "Alle bibliotheken zijn verborgen",
-    "hiddenLibrariesCount": "Verborgen bibliotheken (${count})",
     "thisLibraryIsEmpty": "Deze bibliotheek is leeg",
     "noItemsMatchFilters": "Geen items komen overeen met de actieve filters",
     "resetFilters": "Filters opnieuw instellen",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Logbestanden wissen",
     "copyLogs": "Logbestanden kopiëren"
-
   },
   "startup": {
     "failedTitle": "Satra kon niet starten",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Details verbergen",
     "copyDetails": "Details kopiëren",
     "detailsCopied": "Details naar het klembord gekopieerd",
-
     "repairStorage": "Opslag repareren",
     "repairTitle": "Opgeslagen gegevens repareren?",
     "repairBodyCommon": "Het instellingenbestand van Satra is beschadigd en kan niet worden gelezen. Door te repareren worden alle instellingen teruggezet naar hun standaardwaarde.",
@@ -1778,7 +1812,6 @@
       "one": "${n} nummer",
       "other": "${n} nummers"
     },
-    "nowPlaying": "Nu afspelen",
     "playingFrom": "Afspelen vanaf ${title}",
     "queue": "Wachtrij",
     "clearQueue": "Wachtrij wissen",

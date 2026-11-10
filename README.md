@@ -9,7 +9,7 @@ Satra is a redesigned fork of [Plezy](https://github.com/edde746/plezy)
 
 - **Full-Bleed Spotlight & Browse Rail**: Uses the cinematic spotlight backdrop and horizontal hub rails as the default layout, paired with full desktop mouse wheel scrolling, click-and-drag scrolling, and cross-row hover selection.
 - **OLED Canvas & Frosted Surfaces**: True black `#000000` canvas, monochrome white ribbon branding (`assets/satra.svg`), translucent glass chrome, and artwork-driven ambient backgrounds.
-- **Unified Desktop & D-Pad Navigation**: Expand-on-hover left navigation rail docked cleanly beneath the top toolbar, alongside full keyboard shortcut, mouse, and controller/D-pad support.
+- **Sidebar-Free Top Bar & Universal Spotlight**: Full-viewport browsing with library tabs and utility controls (`Downloads`, `Settings`, `Fullscreen`, `Profile`) consolidated in the floating top toolbar, paired with a global `Ctrl + Space` Universal Spotlight bubble for searching movies, shows, episodes, music, libraries, people, quick actions, and settings.
 
 See [docs/visual-redesign.md](docs/visual-redesign.md) for architecture and redesign details.
 

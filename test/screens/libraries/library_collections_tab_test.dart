@@ -289,12 +289,11 @@ void main() {
       expect(backCalls, 1);
     });
 
-    testWidgets('LEFT and RIGHT move within a row; first column LEFT reaches the sidebar', (tester) async {
+    testWidgets('LEFT and RIGHT move within a row; first column LEFT stays at edge', (tester) async {
       final harness = _CollectionHarness.plexMovies(collectionCount: 60);
       addTearDown(harness.dispose);
-      var sidebarCalls = 0;
 
-      await _pumpTab(tester, harness: harness, library: _movieLibrary, focusSidebar: () => sidebarCalls++);
+      await _pumpTab(tester, harness: harness, library: _movieLibrary);
       await _enterGridAndFocusFirstCard(tester);
 
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowRight);
@@ -307,7 +306,7 @@ void main() {
 
       await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
       await tester.pumpAndSettle();
-      expect(sidebarCalls, 1);
+      expect(_cardFor(tester, 'Collection 0').focusNode!.hasPrimaryFocus, isTrue);
     });
   });
 }
@@ -317,7 +316,6 @@ Future<void> _pumpTab(
   required _CollectionHarness harness,
   required MediaLibrary library,
   VoidCallback? onBack,
-  VoidCallback? focusSidebar,
   bool isActive = false,
   ProfileStack? profileStack,
 }) async {
@@ -343,7 +341,6 @@ Future<void> _pumpTab(
             ),
           ),
     size: const Size(800, 600),
-    focusSidebar: focusSidebar,
   );
   await tester.pumpAndSettle();
 }

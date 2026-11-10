@@ -23,8 +23,12 @@ void main() {
         NavigationTabId.liveTv,
       );
       expect(
-        NavigationTab.resolveDefaultTab(isOffline: false, hasLiveTv: false, preferredStartup: NavigationTabId.search),
-        NavigationTabId.search,
+        NavigationTab.resolveDefaultTab(
+          isOffline: false,
+          hasLiveTv: false,
+          preferredStartup: NavigationTabId.downloads,
+        ),
+        NavigationTabId.downloads,
       );
     });
 
@@ -67,9 +71,9 @@ void main() {
       final with_ = NavigationTab.getVisibleTabs(isOffline: false, hasExplore: true, hasLiveTv: true);
       final ids = with_.map((tab) => tab.id).toList();
       expect(ids, contains(NavigationTabId.explore));
-      // Explore sits after Live TV, directly before Search.
+      // Explore sits after Live TV, directly before Downloads.
       expect(ids.indexOf(NavigationTabId.explore), ids.indexOf(NavigationTabId.liveTv) + 1);
-      expect(ids.indexOf(NavigationTabId.explore), ids.indexOf(NavigationTabId.search) - 1);
+      expect(ids.indexOf(NavigationTabId.explore), ids.indexOf(NavigationTabId.downloads) - 1);
     });
 
     test('Explore is online-only', () {

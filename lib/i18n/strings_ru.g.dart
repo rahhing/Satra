@@ -48,7 +48,6 @@ class TranslationsRu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$ru supporter = _Translations$supporter$ru._(_root);
 	@override late final _Translations$settings$ru settings = _Translations$settings$ru._(_root);
 	@override late final _Translations$themeEditor$ru themeEditor = _Translations$themeEditor$ru._(_root);
-	@override late final _Translations$search$ru search = _Translations$search$ru._(_root);
 	@override late final _Translations$hotkeys$ru hotkeys = _Translations$hotkeys$ru._(_root);
 	@override late final _Translations$fileInfo$ru fileInfo = _Translations$fileInfo$ru._(_root);
 	@override late final _Translations$mediaMenu$ru mediaMenu = _Translations$mediaMenu$ru._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Всегда показывать имена серверов в заголовках разделов.';
 	@override String get groupLibrariesByServer => 'Группировать библиотеки по серверам';
 	@override String get groupLibrariesByServerDescription => 'Группировать библиотеки боковой панели по медиасерверам.';
-	@override String get alwaysKeepSidebarOpen => 'Всегда держать боковую панель открытой';
-	@override String get alwaysKeepSidebarOpenDescription => 'Боковая панель остаётся развёрнутой, область контента подстраивается';
 	@override String get showUnwatchedCount => 'Показывать количество непросмотренных';
 	@override String get showUnwatchedCountDescription => 'Отображать количество непросмотренных эпизодов для сериалов и сезонов';
 	@override String get showWatchedIndicators => 'Показывать индикаторы просмотра';
@@ -553,8 +550,6 @@ class _Translations$settings$ru extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Восстанавливать исходные кадры фильмов и анимации, преобразованных телесином в 29,97 кадр/с (часто встречается на DVD формата NTSC). Видео, снятое для ТВ, будет дёргаться. В прямом эфире используется режим «Видео»';
 	@override String get requireProfileSelectionOnOpen => 'Запрашивать профиль при запуске';
 	@override String get requireProfileSelectionOnOpenDescription => 'Показывать выбор профиля при каждом открытии приложения';
-	@override String get forceTvMode => 'Принудительный режим ТВ';
-	@override String get forceTvModeDescription => 'Принудительно включить ТВ-интерфейс. Для устройств без автоопределения. Требуется перезапуск.';
 	@override String get startInFullscreen => 'Запускать в полноэкранном режиме';
 	@override String get startInFullscreenDescription => 'Открывать Satra в полноэкранном режиме при запуске';
 	@override String get exitFullscreenOnPlayerClose => 'Выходить из полноэкранного режима при закрытии плеера';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$ru extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => 'Осталось ${minutes} мин';
 	@override String get previewSwitch => 'Автовоспроизведение';
 	@override String get previewMutedText => 'Так выглядит второстепенный текст';
-}
-
-// Path: search
-class _Translations$search$ru extends Translations$search$en {
-	_Translations$search$ru._(TranslationsRu root) : this._root = root, super.internal(root);
-
-	final TranslationsRu _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Поиск фильмов, сериалов, музыки...';
-	@override String get tryDifferentTerm => 'Попробуйте другой запрос';
-	@override String get searchYourMedia => 'Поиск в вашей медиатеке';
-	@override String get enterTitleActorOrKeyword => 'Введите название, актёра или ключевое слово';
-	@override String get people => 'Люди';
 }
 
 // Path: hotkeys
@@ -1045,7 +1026,6 @@ class _Translations$messages$ru extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Удалено из «Продолжить просмотр»';
 	@override String errorLoading({required Object error}) => 'Ошибка: ${error}';
-	@override String get searchPartialResults => 'Поиск по некоторым медиасерверам не удался. Показываем доступные результаты.';
 	@override String get streamInterrupted => 'Поток прервался. Нажмите «Воспроизвести» или перемотайте, чтобы повторить попытку.';
 	@override String get liveStreamInterrupted => 'Прямая трансляция прервалась. Нажмите «Воспроизвести», чтобы повторить попытку.';
 	@override String get fileInfoNotAvailable => 'Информация о файле недоступна';
@@ -1079,7 +1059,6 @@ class _Translations$messages$ru extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Эпизоды в первом сезоне не найдены';
 	@override String get noEpisodesFoundGeneral => 'Эпизоды не найдены';
 	@override String get episodesLoadFailed => 'Не удалось загрузить эпизоды';
-	@override String get noResultsFound => 'Результаты не найдены';
 	@override String sleepTimerSet({required Object label}) => 'Таймер сна установлен на ${label}';
 	@override String get noItemsAvailable => 'Нет доступных элементов';
 	@override String get failedToCreatePlayQueueNoItems => 'Не удалось создать очередь воспроизведения — нет элементов';
@@ -1359,7 +1338,6 @@ class _Translations$errors$ru extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Ошибка поиска: ${error}';
-	@override String get searchUnavailable => 'Поиску не удалось связаться ни с одним медиасервером.';
 	@override String connectionTimeout({required Object context}) => 'Таймаут подключения при загрузке ${context}';
 	@override String get connectionFailed => 'Не удалось подключиться к медиасерверу';
 	@override String unableToLoad({required Object context}) => 'Не удалось загрузить ${context}. Повторите попытку.';
@@ -1402,7 +1380,6 @@ class _Translations$libraries$ru extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Не удалось проанализировать библиотеку: ${error}';
 	@override String get noLibrariesFound => 'Библиотеки не найдены';
 	@override String get allLibrariesHidden => 'Все библиотеки скрыты';
-	@override String hiddenLibrariesCount({required Object count}) => 'Скрытые библиотеки (${count})';
 	@override String get thisLibraryIsEmpty => 'Эта библиотека пуста';
 	@override String get noItemsMatchFilters => 'Нет элементов, соответствующих активным фильтрам';
 	@override String get resetFilters => 'Сбросить фильтры';
@@ -1784,7 +1761,6 @@ class _Translations$music$ru extends Translations$music$en {
 		many: '${n} треков',
 		other: '${n} трека',
 	);
-	@override String get nowPlaying => 'Сейчас играет';
 	@override String playingFrom({required Object title}) => 'Воспроизведение из ${title}';
 	@override String get queue => 'Очередь';
 	@override String get clearQueue => 'Очистить очередь';
@@ -3627,8 +3603,6 @@ extension on TranslationsRu {
 			'settings.showServerNameOnHubsDescription' => 'Всегда показывать имена серверов в заголовках разделов.',
 			'settings.groupLibrariesByServer' => 'Группировать библиотеки по серверам',
 			'settings.groupLibrariesByServerDescription' => 'Группировать библиотеки боковой панели по медиасерверам.',
-			'settings.alwaysKeepSidebarOpen' => 'Всегда держать боковую панель открытой',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Боковая панель остаётся развёрнутой, область контента подстраивается',
 			'settings.showUnwatchedCount' => 'Показывать количество непросмотренных',
 			'settings.showUnwatchedCountDescription' => 'Отображать количество непросмотренных эпизодов для сериалов и сезонов',
 			'settings.showWatchedIndicators' => 'Показывать индикаторы просмотра',
@@ -3853,8 +3827,6 @@ extension on TranslationsRu {
 			'settings.deinterlaceFilmDescription' => 'Восстанавливать исходные кадры фильмов и анимации, преобразованных телесином в 29,97 кадр/с (часто встречается на DVD формата NTSC). Видео, снятое для ТВ, будет дёргаться. В прямом эфире используется режим «Видео»',
 			'settings.requireProfileSelectionOnOpen' => 'Запрашивать профиль при запуске',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Показывать выбор профиля при каждом открытии приложения',
-			'settings.forceTvMode' => 'Принудительный режим ТВ',
-			'settings.forceTvModeDescription' => 'Принудительно включить ТВ-интерфейс. Для устройств без автоопределения. Требуется перезапуск.',
 			'settings.startInFullscreen' => 'Запускать в полноэкранном режиме',
 			'settings.startInFullscreenDescription' => 'Открывать Satra в полноэкранном режиме при запуске',
 			'settings.exitFullscreenOnPlayerClose' => 'Выходить из полноэкранного режима при закрытии плеера',
@@ -3927,12 +3899,12 @@ extension on TranslationsRu {
 			'themeEditor.slots.textMuted' => 'Второстепенный текст',
 			'themeEditor.slots.accent' => 'Акцент',
 			'themeEditor.opacity' => 'Непрозрачность',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB или #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Из других тем',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} темы «${theme}»',
 			'themeEditor.contrast.textOnBg' => 'Текст на фоне',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Текст на поверхности',
 			'themeEditor.contrast.textMutedOnBg' => 'Второстепенный текст на фоне',
 			'themeEditor.contrast.textMutedOnSurface' => 'Второстепенный текст на поверхности',
@@ -3947,11 +3919,6 @@ extension on TranslationsRu {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => 'Осталось ${minutes} мин',
 			'themeEditor.previewSwitch' => 'Автовоспроизведение',
 			'themeEditor.previewMutedText' => 'Так выглядит второстепенный текст',
-			'search.hint' => 'Поиск фильмов, сериалов, музыки...',
-			'search.tryDifferentTerm' => 'Попробуйте другой запрос',
-			'search.searchYourMedia' => 'Поиск в вашей медиатеке',
-			'search.enterTitleActorOrKeyword' => 'Введите название, актёра или ключевое слово',
-			'search.people' => 'Люди',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Назначить клавишу для ${actionName}',
 			'hotkeys.clearShortcut' => 'Очистить клавишу',
 			'hotkeys.noShortcutSet' => 'Сочетание не задано',
@@ -4270,7 +4237,6 @@ extension on TranslationsRu {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n, one: 'Автоматически удалена ${n} просмотренная загрузка', few: 'Автоматически удалены ${n} просмотренные загрузки', many: 'Автоматически удалено ${n} просмотренных загрузок', other: 'Автоматически удалено ${n} просмотренной загрузки', ), 
 			'messages.removedFromContinueWatching' => 'Удалено из «Продолжить просмотр»',
 			'messages.errorLoading' => ({required Object error}) => 'Ошибка: ${error}',
-			'messages.searchPartialResults' => 'Поиск по некоторым медиасерверам не удался. Показываем доступные результаты.',
 			'messages.streamInterrupted' => 'Поток прервался. Нажмите «Воспроизвести» или перемотайте, чтобы повторить попытку.',
 			'messages.liveStreamInterrupted' => 'Прямая трансляция прервалась. Нажмите «Воспроизвести», чтобы повторить попытку.',
 			'messages.fileInfoNotAvailable' => 'Информация о файле недоступна',
@@ -4304,7 +4270,6 @@ extension on TranslationsRu {
 			'messages.noEpisodesFound' => 'Эпизоды в первом сезоне не найдены',
 			'messages.noEpisodesFoundGeneral' => 'Эпизоды не найдены',
 			'messages.episodesLoadFailed' => 'Не удалось загрузить эпизоды',
-			'messages.noResultsFound' => 'Результаты не найдены',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Таймер сна установлен на ${label}',
 			'messages.noItemsAvailable' => 'Нет доступных элементов',
 			'messages.failedToCreatePlayQueueNoItems' => 'Не удалось создать очередь воспроизведения — нет элементов',
@@ -4441,8 +4406,6 @@ extension on TranslationsRu {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Добавить к ${displayName}: Plex, Jellyfin, Emby или подключение другого профиля',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Сессия истекла для ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Сессия истекла для ${count} серверов',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} отказал в доступе этой учётной записи',
 			'connections.accessDeniedMany' => ({required Object count}) => 'Доступ для этой учётной записи запрещён на ${count} серверах',
 			'connections.signInAgain' => 'Войти снова',
@@ -4454,6 +4417,8 @@ extension on TranslationsRu {
 			'accountPreferences.pickAccount' => 'Каждый аккаунт хранит собственные настройки. Выберите, какой редактировать.',
 			'accountPreferences.storedOnAccount' => 'Эти параметры сохраняются на самом аккаунте, поэтому их используют все приложения, вошедшие в него, — включая Satra на ваших других устройствах.',
 			'accountPreferences.noAccounts' => 'Нет аккаунтов для настройки',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Войдите в Plex или подключите сервер Jellyfin или Emby — и настройки, сохранённые на этом аккаунте, появятся здесь.',
 			'accountPreferences.unavailable' => 'Не удаётся получить доступ к этому аккаунту',
 			'accountPreferences.loadFailed' => 'Не удалось загрузить эти настройки',
@@ -4536,7 +4501,6 @@ extension on TranslationsRu {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (возраст: ${age})',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (в возрасте ${age})',
 			'errors.searchFailed' => ({required Object error}) => 'Ошибка поиска: ${error}',
-			'errors.searchUnavailable' => 'Поиску не удалось связаться ни с одним медиасервером.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Таймаут подключения при загрузке ${context}',
 			'errors.connectionFailed' => 'Не удалось подключиться к медиасерверу',
 			'errors.unableToLoad' => ({required Object context}) => 'Не удалось загрузить ${context}. Повторите попытку.',
@@ -4570,7 +4534,6 @@ extension on TranslationsRu {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Не удалось проанализировать библиотеку: ${error}',
 			'libraries.noLibrariesFound' => 'Библиотеки не найдены',
 			'libraries.allLibrariesHidden' => 'Все библиотеки скрыты',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Скрытые библиотеки (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Эта библиотека пуста',
 			'libraries.noItemsMatchFilters' => 'Нет элементов, соответствующих активным фильтрам',
 			'libraries.resetFilters' => 'Сбросить фильтры',
@@ -4955,8 +4918,6 @@ extension on TranslationsRu {
 			'liveTv.failedToStartChannel' => 'Не удалось запустить канал в прямом эфире',
 			'liveTv.failedToBuildStreamUrl' => 'Не удалось сформировать URL потока',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Не удалось запустить канал: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Не удалось переключить канал: ${reason}',
 			'collections.title' => 'Коллекции',
 			'collections.collection' => 'Коллекция',
@@ -4970,6 +4931,8 @@ extension on TranslationsRu {
 			'collections.collectionName' => 'Название коллекции',
 			'collections.enterCollectionName' => 'Введите название коллекции',
 			'collections.addedToCollection' => 'Добавлено в коллекцию',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Не удалось добавить в коллекцию',
 			'collections.created' => 'Коллекция создана',
 			'collections.removeFromCollection' => 'Удалить из коллекции',
@@ -5011,7 +4974,6 @@ extension on TranslationsRu {
 			'music.addToQueue' => 'Добавить в очередь',
 			'music.discNumber' => ({required Object n}) => 'Диск ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ru'))(n, one: '${n} трек', few: '${n} трека', many: '${n} треков', other: '${n} трека', ), 
-			'music.nowPlaying' => 'Сейчас играет',
 			'music.playingFrom' => ({required Object title}) => 'Воспроизведение из ${title}',
 			'music.queue' => 'Очередь',
 			'music.clearQueue' => 'Очистить очередь',
@@ -5469,8 +5431,6 @@ extension on TranslationsRu {
 			'externalPlayer.useExternalPlayer' => 'Использовать внешний плеер',
 			'externalPlayer.useExternalPlayerDescription' => 'Открывать видео в другом приложении',
 			'externalPlayer.selectPlayer' => 'Выбрать плеер',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Свои плееры',
 			'externalPlayer.systemDefault' => 'Системный по умолчанию',
 			'externalPlayer.addCustomPlayer' => 'Добавить свой плеер',
@@ -5485,6 +5445,8 @@ extension on TranslationsRu {
 			'externalPlayer.playInExternalPlayer' => 'Воспроизвести во внешнем плеере',
 			'metadataEdit.editMetadata' => 'Редактировать...',
 			'metadataEdit.screenTitle' => 'Редактировать метаданные',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Основная информация',
 			'metadataEdit.artwork' => 'Обложка',
 			'metadataEdit.advancedSettings' => 'Дополнительные настройки',

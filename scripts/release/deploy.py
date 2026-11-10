@@ -506,9 +506,9 @@ def phase_preflight(ctx: Context) -> None:
         if not (env.get("SUPPLY_JSON_KEY_DATA") or env.get("SUPPLY_JSON_KEY")):
             raise DeployError("play: set SUPPLY_JSON_KEY_DATA or SUPPLY_JSON_KEY in .env")
         require_env(env, ["SUPPLY_PACKAGE_NAME"], "play")
-        if env["SUPPLY_PACKAGE_NAME"] != "com.edde746.satra":
+        if env["SUPPLY_PACKAGE_NAME"] != "com.rahhing.satra":
             raise DeployError(
-                "play: SUPPLY_PACKAGE_NAME must be com.edde746.satra; "
+                "play: SUPPLY_PACKAGE_NAME must be com.rahhing.satra; "
                 f"got {env['SUPPLY_PACKAGE_NAME']!r}"
             )
     if "amazon" in pending:
@@ -522,9 +522,9 @@ def phase_preflight(ctx: Context) -> None:
             ],
             "amazon",
         )
-        if env["AMAZON_APPSTORE_PACKAGE_NAME"] != "com.edde746.satra3":
+        if env["AMAZON_APPSTORE_PACKAGE_NAME"] != "com.rahhing.satra3":
             raise DeployError(
-                "amazon: AMAZON_APPSTORE_PACKAGE_NAME must be com.edde746.satra3; "
+                "amazon: AMAZON_APPSTORE_PACKAGE_NAME must be com.rahhing.satra3; "
                 f"got {env['AMAZON_APPSTORE_PACKAGE_NAME']!r}"
             )
         if not env["AMAZON_APPSTORE_APP_ID"].startswith("amzn1.devportal.mobileapp."):
@@ -540,9 +540,9 @@ def phase_preflight(ctx: Context) -> None:
             "app store connect",
         )
         require_env(env, ["DELIVER_APP_IDENTIFIER"], "app store connect")
-        if env["DELIVER_APP_IDENTIFIER"] != "com.edde746.satra":
+        if env["DELIVER_APP_IDENTIFIER"] != "com.rahhing.satra":
             raise DeployError(
-                "app store connect: DELIVER_APP_IDENTIFIER must be com.edde746.satra; "
+                "app store connect: DELIVER_APP_IDENTIFIER must be com.rahhing.satra; "
                 f"got {env['DELIVER_APP_IDENTIFIER']!r}"
             )
         key_path = Path(env["ASC_KEY_PATH"]).expanduser()

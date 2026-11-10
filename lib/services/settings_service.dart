@@ -109,8 +109,6 @@ enum ContinueWatchingAction { play, details }
 
 enum EpisodeAction { play, details }
 
-enum DockSide { left, right }
-
 double _normalizeCornerRadius(double value) => value.isFinite ? value.clamp(0.0, 32.0) : 32.0;
 
 /// How Specials (season 0) are placed in the episode watch order — the
@@ -670,6 +668,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
   static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: false);
   static const focusGlow = BoolPref('focus_glow', defaultValue: true);
+  static const liquidGlass = BoolPref('liquid_glass', defaultValue: false);
   static const useGlobalHubs = BoolPref('use_global_hubs', defaultValue: true);
   static const showServerNameOnHubs = BoolPref('show_server_name_on_hubs');
   static const groupLibrariesByServer = BoolPref('group_libraries_by_server', defaultValue: true);
@@ -889,13 +888,7 @@ class SettingsService extends BaseSharedPreferencesService {
   /// at all. UI-only: catalog sources stay connected so watchlist surfaces
   /// keep working while the tab is hidden.
   static const showExploreTab = BoolPref('show_explore_tab', defaultValue: true);
-  static const alwaysKeepSidebarOpen = BoolPref('always_keep_sidebar_open');
-  static const dockSide = EnumPref<DockSide>('dock_side', values: DockSide.values, defaultValue: DockSide.left);
   static const pillCornerRadius = DoublePref('pill_corner_radius', defaultValue: 32, transform: _normalizeCornerRadius);
-
-  /// Sidebar Libraries section expansion. Persisted so a collapsed section
-  /// stays collapsed across launches instead of springing back open (#1896).
-  static const librariesSectionExpanded = BoolPref('libraries_section_expanded', defaultValue: false);
   static const showUnwatchedCount = BoolPref('show_unwatched_count', defaultValue: true);
 
   /// The corner checkmark on watched posters/thumbnails (#1998). Progress bars
@@ -1557,10 +1550,7 @@ class SettingsService extends BaseSharedPreferencesService {
     useExoPlayer,
     startupSection,
     showExploreTab,
-    alwaysKeepSidebarOpen,
-    dockSide,
     pillCornerRadius,
-    librariesSectionExpanded,
     showUnwatchedCount,
     showWatchedIndicators,
     showEpisodeNumberOnCards,
@@ -1572,6 +1562,7 @@ class SettingsService extends BaseSharedPreferencesService {
     useExternalPlayer,
     forceTvMode,
     visualEffects,
+    liquidGlass,
     ambientLighting,
     audioPassthrough,
     audioNormalization,

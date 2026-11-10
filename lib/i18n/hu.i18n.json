@@ -210,6 +210,8 @@
     "paperTheme": "Papír",
     "libraryDensity": "Könyvtársűrűség",
     "displayScale": "Kijelző méretezése",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Kompakt",
     "comfortable": "Kényelmes",
     "gridSpacing": "Rácstávolság",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Mindig jelenjen meg a szerver neve a blokkok címében.",
     "groupLibrariesByServer": "Könyvtárak csoportosítása szerver szerint",
     "groupLibrariesByServerDescription": "Az oldalsáv könyvtárainak csoportosítása a médiaszerverek alatt.",
-    "alwaysKeepSidebarOpen": "Oldalsáv mindig nyitva",
-    "alwaysKeepSidebarOpenDescription": "Az oldalsáv kibontva marad, a tartalom területe igazodik hozzá",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Nem látott elemek számának megjelenítése",
     "showUnwatchedCountDescription": "Megjeleníti a még nem látott epizódok számát a sorozatoknál és évadoknál",
     "showWatchedIndicators": "Megtekintésjelölők megjelenítése",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Teljes",
     "visualEffectsReduced": "Csökkentett",
     "visualEffectsReducedDescription": "Kevesebb animáció és alacsonyabb felbontású képek",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Spoilerek elrejtése a nem látott epizódoknál",
     "hideSpoilersDescription": "Bélyegképek és leírások elhomályosítása a még meg nem nézett epizódoknál",
     "playerBackend": "Lejátszómotor",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Nyilvános Open Watch Party-relék, hacsak nem adsz meg sajátot",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Adj meg egy érvényes HTTP- vagy HTTPS-alapú relészerver-URL-t.",
-
-
     "debugLogging": "Hibakeresési naplózás",
     "debugLoggingDescription": "Részletes naplózás engedélyezése a hibaelhárításhoz",
     "viewLogs": "Naplók megtekintése",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "A 29,97 fps-re telecine-eljárással átalakított filmek és animációk eredeti képkockáinak helyreállítása, ami gyakori az NTSC DVD-ken. A TV-re rögzített felvételek akadoznak. Az Élő TV a Videó módot használja",
     "requireProfileSelectionOnOpen": "Profil kérése az alkalmazás megnyitásakor",
     "requireProfileSelectionOnOpenDescription": "Profilválasztó megjelenítése minden alkalommal, amikor az alkalmazást megnyitod",
-    "forceTvMode": "TV-mód kényszerítése",
-    "forceTvModeDescription": "TV-elrendezés kényszerítése az automatikus felismeréssel nem rendelkező eszközökön. Újraindítást igényel.",
     "startInFullscreen": "Indítás teljes képernyőn",
     "startInFullscreenDescription": "A Satra megnyitása teljes képernyős módban indításkor",
     "exitFullscreenOnPlayerClose": "Kilépés a teljes képernyőből a lejátszó bezárásakor",
@@ -561,12 +563,52 @@
     "previewSwitch": "Automatikus lejátszás",
     "previewMutedText": "Így néz ki a másodlagos szöveg"
   },
-  "search": {
-    "hint": "Keresés filmek, sorozatok és zenék között...",
-    "tryDifferentTerm": "Próbálj másik keresési kifejezést",
-    "searchYourMedia": "Keresés a saját médiatartalmak között",
-    "enterTitleActorOrKeyword": "Adj meg egy címet, színészt vagy kulcsszót",
-    "people": "Személyek"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Billentyűparancs beállítása ehhez: ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Eltávolítva a folytatásból",
     "errorLoading": "Hiba: ${error}",
-    "searchPartialResults": "Néhány médiaszervert nem sikerült keresni. Az elérhető találatok megjelenítése.",
     "streamInterrupted": "Az adatfolyam megszakadt. Az újrapróbálkozáshoz indítsd el a lejátszást, vagy tekerj másik pozícióra.",
     "liveStreamInterrupted": "Az élő adás megszakadt. Nyomd meg a lejátszást az újrapróbálkozáshoz.",
     "fileInfoNotAvailable": "A fájlinformáció nem érhető el",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Nem találhatók epizódok az első évadban",
     "noEpisodesFoundGeneral": "Nem találhatók epizódok",
     "episodesLoadFailed": "Nem sikerült az epizódok betöltése",
-    "noResultsFound": "Nincs találat",
     "sleepTimerSet": "Elalvási időzítő beállítva: ${label}",
     "noItemsAvailable": "Nincsenek elérhető elemek",
     "failedToCreatePlayQueueNoItems": "Nem sikerült létrehozni a lejátszási sort — nincsenek elemek",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "A szerver ismételten megtagadta ennek a fájlnak a streamelését (HTTP 503). Lehet, hogy újraindul, túlterhelt, vagy a fájl tárhelye nem érhető el. Próbáld újra egy kis idő múlva – ha a probléma továbbra is fennáll, kérd meg a szerver tulajdonosát, hogy ellenőrizze a szervert és a fájl tárhelyét.",
     "playbackNotAllowedTitle": "A lejátszás nem engedélyezett",
     "playbackNotAllowedBody": "A szerver megtagadta ennek az elemnek a streamelését (HTTP 403). Lehet, hogy a fiókodnak nincs engedélye a lejátszására, vagy a szerver csak a helyi hálózatán engedélyezi a lejátszást.",
-
-
     "burnedSubtitlesUseMenu": "A feliratok bele vannak égetve ebbe a streambe. A feliratmenüben módosíthatod őket.",
     "noVideoUrl": "Nem érhető el videó-URL",
     "playbackNoMediaSources": "A szerver nem adott vissza lejátszható médiaforrást",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Keresés sikertelen: ${error}",
-    "searchUnavailable": "A keresés egyetlen médiaszervert sem tudott elérni.",
     "connectionTimeout": "Hálózati időtúllépés a következő betöltésekor: ${context}",
     "connectionFailed": "Nem sikerült csatlakozni a médiaszerverhez",
     "unableToLoad": "Nem sikerült betölteni a következőt: ${context}. Próbáld újra.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Nem sikerült a könyvtár elemzése: ${error}",
     "noLibrariesFound": "Nem találhatók könyvtárak",
     "allLibrariesHidden": "Minden könyvtár el van rejtve",
-    "hiddenLibrariesCount": "Rejtett könyvtárak (${count})",
     "thisLibraryIsEmpty": "Ez a könyvtár üres",
     "noItemsMatchFilters": "Nincs az aktív szűrőknek megfelelő elem",
     "resetFilters": "Szűrők visszaállítása",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Naplók törlése",
     "copyLogs": "Naplók másolása"
-
   },
   "startup": {
     "failedTitle": "A Satra nem tudott elindulni",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Részletek elrejtése",
     "copyDetails": "Részletek másolása",
     "detailsCopied": "A részletek a vágólapra kerültek",
-
     "repairStorage": "Tárhely javítása",
     "repairTitle": "Javítsuk a tárolt adatokat?",
     "repairBodyCommon": "A Satra beállításfájlja sérült, és nem olvasható. A javítás minden beállítást visszaállít az alapértelmezettre.",
@@ -1778,7 +1812,6 @@
       "one": "${n} zeneszám",
       "other": "${n} zeneszám"
     },
-    "nowPlaying": "Most szól",
     "playingFrom": "Lejátszás innen: ${title}",
     "queue": "Lejátszási sor",
     "clearQueue": "Sor törlése",

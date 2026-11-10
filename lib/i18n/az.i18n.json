@@ -210,6 +210,8 @@
     "paperTheme": "Kağız",
     "libraryDensity": "Kitabxana sıxlığı",
     "displayScale": "Ekran miqyası",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Sıx",
     "comfortable": "Rəhat",
     "gridSpacing": "Tor aralığı",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Bölmə başlıqlarında həmişə server adlarını göstər.",
     "groupLibrariesByServer": "Kitabxanaları serverə görə qrupla",
     "groupLibrariesByServerDescription": "Yan menyu kitabxanalarını hər media serverinin altında qruplaşdır.",
-    "alwaysKeepSidebarOpen": "Yan menyunu həmişə açıq saxla",
-    "alwaysKeepSidebarOpenDescription": "Yan menyu genişlənmiş qalır və məzmun sahəsi buna uyğunlaşır",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Baxılmamış sayını göstər",
     "showUnwatchedCountDescription": "Seriallarda və mövsümlərdə baxılmamış seriya sayını göstər",
     "showWatchedIndicators": "Baxılmış göstəriciləri göstər",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Tam",
     "visualEffectsReduced": "Azaldılmış",
     "visualEffectsReducedDescription": "Daha az animasiya və daha aşağı keyfiyyətli şəkillər",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Baxılmamış seriyalar üçün spoylerləri gizlə",
     "hideSpoilersDescription": "Baxılmamış seriyalar üçün miniatürləri və təsvirləri bulanıqlaşdır",
     "playerBackend": "Oynadıcı infrastrukturu",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Öz relenizi təyin etməsəniz, ictimai Open Watch Party releləri istifadə olunur",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Düzgün HTTP və ya HTTPS rele ünvanı daxil edin.",
-
-
     "debugLogging": "Xəta saxlama jurnalı",
     "debugLoggingDescription": "Problemləri həll etmək üçün ətraflı jurnal qeydiyyatını aktivləşdirin",
     "viewLogs": "Jurnallara bax",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "29.97 fps-ə telesine edilmiş film və animasiyaların orijinal kadrlarını bərpa et (NTSC DVD-lərdə geniş yayılıb). TV üçün çəkilmiş video ilişir. Canlı TV Video rejimindən istifadə edir",
     "requireProfileSelectionOnOpen": "Açılışda profil soruş",
     "requireProfileSelectionOnOpenDescription": "Tətbiq hər dəfə açıldıqda profil seçimini göstər",
-    "forceTvMode": "TV rejimini məcburi et",
-    "forceTvModeDescription": "TV interfeysini məcburi et. Avtomatik təyin etməyən cihazlar üçündür. Yenidən başlatma tələb olunur.",
     "startInFullscreen": "Tam ekranda başlat",
     "startInFullscreenDescription": "Satra-ni açılışda tam ekran rejimində aç",
     "exitFullscreenOnPlayerClose": "Oynadıcı bağlandıqda tam ekrandan çıx",
@@ -561,12 +563,52 @@
     "previewSwitch": "Avtomatik oynatma",
     "previewMutedText": "Köməkçi mətn belə görünür"
   },
-  "search": {
-    "hint": "Kino, serial, musiqi axtar...",
-    "tryDifferentTerm": "Fərqli axtarış sözü cəhd edin",
-    "searchYourMedia": "Mediyanızda axtarın",
-    "enterTitleActorOrKeyword": "Ad, aktyor və ya açar söz daxil edin",
-    "people": "Şəxslər"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "${actionName} üçün qısayol təyin et",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "İzləməyə davam et-dən silindi",
     "errorLoading": "Xəta: ${error}",
-    "searchPartialResults": "Bəzi media serverlərində axtarış aparıla bilmədi. Mövcud nəticələr göstərilir.",
     "streamInterrupted": "Yayım kəsildi. Yenidən cəhd etmək üçün oynat düyməsinə basın və ya irəli-geri çəkin.",
     "liveStreamInterrupted": "Canlı yayım kəsildi. Təzədən cəhd etmək üçün oynat düyməsinə basın.",
     "fileInfoNotAvailable": "Fayl məlumatı əlçatan deyil",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Birinci mövsümdə seriya tapılmadı",
     "noEpisodesFoundGeneral": "Seriya tapılmadı",
     "episodesLoadFailed": "Seriyalar yüklənə bilmədi",
-    "noResultsFound": "Nəticə tapılmadı",
     "sleepTimerSet": "Yuxu taymeri ${label} üçün təyin edildi",
     "noItemsAvailable": "Element yoxdur",
     "failedToCreatePlayQueueNoItems": "Oynatma növbəsi yaradıla bilmədi — element yoxdur",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Server bu faylı yayımlamaqdan dəfələrlə imtina etdi (HTTP 503). Server yenidən başladılır və ya məşğul ola bilər, yaxud faylın yerləşdiyi yaddaş oflayn ola bilər. Bir az sonra təzədən cəhd edin — problem davam edərsə, server sahibindən serveri və faylın yerləşdiyi yaddaşı yoxlamasını istəyin.",
     "playbackNotAllowedTitle": "Oynatmaya icazə verilmir",
     "playbackNotAllowedBody": "Server bu elementi yayımlamaqdan imtina etdi (HTTP 403). Hesabınızın onu oynatmaq icazəsi olmaya bilər, yaxud server oynatmaya yalnız öz yerli şəbəkəsində icazə verə bilər.",
-
-
     "burnedSubtitlesUseMenu": "Altyazılar bu yayıma həkk edilib. Onları altyazı menyusundan dəyişin.",
     "noVideoUrl": "Video URL-i mövcud deyil",
     "playbackNoMediaSources": "Server oynadıla bilən media mənbəyi qaytarmadı",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Axtarış uğursuz oldu: ${error}",
-    "searchUnavailable": "Axtarış heç bir media serverinə çata bilmədi.",
     "connectionTimeout": "${context} yüklənərkən vaxt bitdi",
     "connectionFailed": "Media serverinə qoşulmaq olmur",
     "unableToLoad": "${context} yüklənə bilmədi. Lütfən təzədən cəhd edin.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Kitabxana analiz edilə bilmədi: ${error}",
     "noLibrariesFound": "Kitabxana tapılmadı",
     "allLibrariesHidden": "Bütün kitabxanalar gizlədilib",
-    "hiddenLibrariesCount": "Gizli kitabxanalar (${count})",
     "thisLibraryIsEmpty": "Bu kitabxana boşdur",
     "noItemsMatchFilters": "Filtrlərə uyğun element tapılmadı",
     "resetFilters": "Filtrləri sıfırla",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Jurnalları təmizlə",
     "copyLogs": "Jurnalları kopyala"
-
   },
   "startup": {
     "failedTitle": "Satra başlaya bilmədi",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Təfərrüatları gizlət",
     "copyDetails": "Təfərrüatları kopyala",
     "detailsCopied": "Təfərrüatlar buferə kopyalandı",
-
     "repairStorage": "Yaddaşı təmir et",
     "repairTitle": "Saxlanmış məlumatlar təmir edilsin?",
     "repairBodyCommon": "Satra-nin tənzimləmə faylı zədələnib və oxuna bilmir. Təmir bütün tənzimləmələri defolt vəziyyətinə sıfırlayır.",
@@ -1778,7 +1812,6 @@
       "one": "${n} mahnı",
       "other": "${n} mahnı"
     },
-    "nowPlaying": "İndi oynadılır",
     "playingFrom": "${title} mənbəsindən oynadılır",
     "queue": "Növbə",
     "clearQueue": "Növbəni təmizlə",

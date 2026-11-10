@@ -3,7 +3,6 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -13,7 +12,6 @@ import '../../focus/focus_memory_tracker.dart';
 import '../../focus/focusable_text_field.dart';
 import '../../focus/input_mode_tracker.dart';
 import '../../i18n/strings.g.dart';
-import '../main_screen.dart';
 import '../../mixins/mounted_set_state_mixin.dart';
 import '../../mixins/refreshable.dart';
 import '../../providers/account_preferences_controller.dart';
@@ -163,18 +161,6 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
       ? _kDonate
       : _kGeneral;
 
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
-  }
-
-  KeyEventResult _handleKeyEvent(FocusNode _, KeyEvent event) {
-    if (event is KeyDownEvent && event.logicalKey == LogicalKeyboardKey.arrowLeft) {
-      _navigateToSidebar();
-      return KeyEventResult.handled;
-    }
-    return KeyEventResult.ignored;
-  }
-
   settings.SettingsService get _settingsService => settings.SettingsService.instance;
 
   @override
@@ -198,84 +184,81 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
   Widget _buildContent(BuildContext sheetContext, {required bool hasLibraries}) {
     final inPanel = UtilityPanelScope.isPresent(sheetContext);
     return Scaffold(
-      body: Focus(
-        onKeyEvent: _handleKeyEvent,
-        // Horizontal-only SafeArea: the groups clear a landscape notch or
-        // iPhone Duo's portrait sensor column.
-        child: SafeArea(
-          top: false,
-          bottom: false,
-          child: Column(
-            children: [
-              if (inPanel)
-                SizedBox(
-                  height: kToolbarHeight,
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(t.settings.title, style: Theme.of(sheetContext).appBarTheme.titleTextStyle),
-                    ),
+      // Horizontal-only SafeArea: the groups clear a landscape notch or
+      // iPhone Duo's portrait sensor column.
+      body: SafeArea(
+        top: false,
+        bottom: false,
+        child: Column(
+          children: [
+            if (inPanel)
+              SizedBox(
+                height: kToolbarHeight,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Text(t.settings.title, style: Theme.of(sheetContext).appBarTheme.titleTextStyle),
                   ),
                 ),
-              Expanded(
-                child: CustomScrollView(
-                  primary: false,
-                  slivers: [
-                    if (!inPanel) ExcludeFocus(child: CustomAppBar(title: Text(t.settings.title), pinned: true)),
-                    SliverList(
-                      delegate: SliverChildListDelegate([
-                        const SizedBox(height: 8),
-                        SettingsGroup(
-                          children: [
-                            if (supporterBuildMode == SupporterMode.iap)
-                              SupporterSettingsTile(focusNode: _focusTracker.get(_kSupporter))
-                            else if (DonationService.isEnabled)
-                              _buildDonateTile(),
-                            _buildGeneralTile(),
-                            _buildAppearanceTile(),
-                            _buildPlaybackTile(),
-                            if (hasLibraries) _buildManageLibrariesTile(sheetContext),
-                            _buildServicesTile(),
-                          ],
-                        ),
-
-                        _buildConnectionsSection(sheetContext),
-
-                        if (!PlatformDetector.isAppleTV()) _buildDownloadsSection(),
-
-                        if (_keyboardShortcutsSupported || PlatformDetector.shouldActAsRemoteHost(sheetContext))
-                          _buildControlsSection(sheetContext),
-
-                        _buildAdvancedSection(),
-
-                        if (UpdateService.isUpdateCheckAvailable) ...[_buildUpdateSection()],
-
-                        // Hidden on Android TV / tvOS (no document picker); desktop in
-                        // force-TV mode keeps it — FilePickerService works there.
-                        if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS()) _buildBackupSection(),
-
-                        const SizedBox(height: 24),
-                        SettingsGroup(
-                          children: [
-                            SettingNavigationTile(
-                              focusNode: _focusTracker.get(_kAbout),
-                              icon: Symbols.info_rounded,
-                              title: t.settings.about,
-                              subtitle: t.settings.aboutDescription,
-                              destinationBuilder: (context) => const AboutScreen(),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                      ]),
-                    ),
-                    const SliverSystemBottomInset(),
-                  ],
-                ),
               ),
-            ],
-          ),
+            Expanded(
+              child: CustomScrollView(
+                primary: false,
+                slivers: [
+                  if (!inPanel) ExcludeFocus(child: CustomAppBar(title: Text(t.settings.title), pinned: true)),
+                  SliverList(
+                    delegate: SliverChildListDelegate([
+                      const SizedBox(height: 8),
+                      SettingsGroup(
+                        children: [
+                          if (supporterBuildMode == SupporterMode.iap)
+                            SupporterSettingsTile(focusNode: _focusTracker.get(_kSupporter))
+                          else if (DonationService.isEnabled)
+                            _buildDonateTile(),
+                          _buildGeneralTile(),
+                          _buildAppearanceTile(),
+                          _buildPlaybackTile(),
+                          if (hasLibraries) _buildManageLibrariesTile(sheetContext),
+                          _buildServicesTile(),
+                        ],
+                      ),
+
+                      _buildConnectionsSection(sheetContext),
+
+                      if (!PlatformDetector.isAppleTV()) _buildDownloadsSection(),
+
+                      if (_keyboardShortcutsSupported || PlatformDetector.shouldActAsRemoteHost(sheetContext))
+                        _buildControlsSection(sheetContext),
+
+                      _buildAdvancedSection(),
+
+                      if (UpdateService.isUpdateCheckAvailable) ...[_buildUpdateSection()],
+
+                      // Hidden on Android TV / tvOS (no document picker); desktop in
+                      // force-TV mode keeps it — FilePickerService works there.
+                      if (!PlatformDetector.isTV() || PlatformDetector.isDesktopOS()) _buildBackupSection(),
+
+                      const SizedBox(height: 24),
+                      SettingsGroup(
+                        children: [
+                          SettingNavigationTile(
+                            focusNode: _focusTracker.get(_kAbout),
+                            icon: Symbols.info_rounded,
+                            title: t.settings.about,
+                            subtitle: t.settings.aboutDescription,
+                            destinationBuilder: (context) => const AboutScreen(),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 24),
+                    ]),
+                  ),
+                  const SliverSystemBottomInset(),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -20,7 +20,7 @@ import 'multi_server_provider.dart';
 enum LibrariesLoadState { initial, loading, loaded, error }
 
 /// Provider that serves as the single source of truth for library data.
-/// Both SideNavigationRail and LibrariesScreen consume this provider
+/// DiscoverScreen, LibrariesScreen, and Universal Spotlight consume this provider
 /// instead of independently fetching library data.
 class LibrariesProvider extends ChangeNotifier with DisposableChangeNotifierMixin {
   LibrariesProvider({this._storageService, this._multiServer, bool Function()? isProfileBinding})

@@ -48,7 +48,6 @@ class TranslationsNb extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$nb supporter = _Translations$supporter$nb._(_root);
 	@override late final _Translations$settings$nb settings = _Translations$settings$nb._(_root);
 	@override late final _Translations$themeEditor$nb themeEditor = _Translations$themeEditor$nb._(_root);
-	@override late final _Translations$search$nb search = _Translations$search$nb._(_root);
 	@override late final _Translations$hotkeys$nb hotkeys = _Translations$hotkeys$nb._(_root);
 	@override late final _Translations$fileInfo$nb fileInfo = _Translations$fileInfo$nb._(_root);
 	@override late final _Translations$mediaMenu$nb mediaMenu = _Translations$mediaMenu$nb._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$nb extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Vis alltid servernavn i hubtitler.';
 	@override String get groupLibrariesByServer => 'Grupper biblioteker etter server';
 	@override String get groupLibrariesByServerDescription => 'Grupper sidepanelbiblioteker under hver medieserver.';
-	@override String get alwaysKeepSidebarOpen => 'Hold sidefeltet alltid åpent';
-	@override String get alwaysKeepSidebarOpenDescription => 'Sidefeltet forblir utvidet og innholdsområdet tilpasser seg';
 	@override String get showUnwatchedCount => 'Vis antall usette';
 	@override String get showUnwatchedCountDescription => 'Vis antall usette episoder på serier og sesonger';
 	@override String get showWatchedIndicators => 'Vis sett-indikatorer';
@@ -553,8 +550,6 @@ class _Translations$settings$nb extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Gjenopprett de opprinnelige bildene i film og animasjon som er konvertert med telecine til 29,97 fps, vanlig på NTSC-DVD-er. Video spilt inn for TV vil hakke. Direkte-TV bruker Video';
 	@override String get requireProfileSelectionOnOpen => 'Spør om profil ved appåpning';
 	@override String get requireProfileSelectionOnOpenDescription => 'Vis profilvalg hver gang appen åpnes';
-	@override String get forceTvMode => 'Tving TV-modus';
-	@override String get forceTvModeDescription => 'Tving TV-oppsett. For enheter som ikke oppdages automatisk. Krever omstart.';
 	@override String get startInFullscreen => 'Start i fullskjerm';
 	@override String get startInFullscreenDescription => 'Åpne Satra i fullskjermmodus ved oppstart';
 	@override String get exitFullscreenOnPlayerClose => 'Avslutt fullskjerm ved lukking av avspiller';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$nb extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} min igjen';
 	@override String get previewSwitch => 'Autospill';
 	@override String get previewMutedText => 'Sekundærtekst ser slik ut';
-}
-
-// Path: search
-class _Translations$search$nb extends Translations$search$en {
-	_Translations$search$nb._(TranslationsNb root) : this._root = root, super.internal(root);
-
-	final TranslationsNb _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Søk i filmer, serier, musikk...';
-	@override String get tryDifferentTerm => 'Prøv et annet søkeord';
-	@override String get searchYourMedia => 'Søk i mediene dine';
-	@override String get enterTitleActorOrKeyword => 'Skriv inn tittel, skuespiller eller nøkkelord';
-	@override String get people => 'Personer';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$nb extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Fjernet fra Fortsett å se';
 	@override String errorLoading({required Object error}) => 'Feil: ${error}';
-	@override String get searchPartialResults => 'Noen medieservere kunne ikke søkes i. Viser tilgjengelige resultater.';
 	@override String get streamInterrupted => 'Avspillingen ble avbrutt. Trykk på Spill av eller spol for å prøve på nytt.';
 	@override String get liveStreamInterrupted => 'Direktesendingen ble avbrutt. Trykk på Spill av for å prøve på nytt.';
 	@override String get fileInfoNotAvailable => 'Filinformasjon ikke tilgjengelig';
@@ -1071,7 +1051,6 @@ class _Translations$messages$nb extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Ingen episoder funnet i første sesong';
 	@override String get noEpisodesFoundGeneral => 'Ingen episoder funnet';
 	@override String get episodesLoadFailed => 'Kunne ikke laste episoder';
-	@override String get noResultsFound => 'Ingen resultater funnet';
 	@override String sleepTimerSet({required Object label}) => 'Innsovningstimer satt til ${label}';
 	@override String get noItemsAvailable => 'Ingen elementer tilgjengelig';
 	@override String get failedToCreatePlayQueueNoItems => 'Kunne ikke opprette avspillingskø – ingen elementer';
@@ -1349,7 +1328,6 @@ class _Translations$errors$nb extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Søk mislyktes: ${error}';
-	@override String get searchUnavailable => 'Søket kunne ikke nå noen medieserver.';
 	@override String connectionTimeout({required Object context}) => 'Tidsavbrudd ved lasting av ${context}';
 	@override String get connectionFailed => 'Kan ikke koble til medieserver';
 	@override String unableToLoad({required Object context}) => 'Kunne ikke laste ${context}. Prøv igjen.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$nb extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Kunne ikke analysere bibliotek: ${error}';
 	@override String get noLibrariesFound => 'Ingen biblioteker funnet';
 	@override String get allLibrariesHidden => 'Alle biblioteker er skjult';
-	@override String hiddenLibrariesCount({required Object count}) => 'Skjulte biblioteker (${count})';
 	@override String get thisLibraryIsEmpty => 'Dette biblioteket er tomt';
 	@override String get noItemsMatchFilters => 'Ingen elementer samsvarer med de aktive filtrene';
 	@override String get resetFilters => 'Tilbakestill filtre';
@@ -1766,7 +1743,6 @@ class _Translations$music$nb extends Translations$music$en {
 		one: '${n} spor',
 		other: '${n} spor',
 	);
-	@override String get nowPlaying => 'Spilles nå';
 	@override String playingFrom({required Object title}) => 'Spiller fra ${title}';
 	@override String get queue => 'Kø';
 	@override String get clearQueue => 'Tøm kø';
@@ -3603,8 +3579,6 @@ extension on TranslationsNb {
 			'settings.showServerNameOnHubsDescription' => 'Vis alltid servernavn i hubtitler.',
 			'settings.groupLibrariesByServer' => 'Grupper biblioteker etter server',
 			'settings.groupLibrariesByServerDescription' => 'Grupper sidepanelbiblioteker under hver medieserver.',
-			'settings.alwaysKeepSidebarOpen' => 'Hold sidefeltet alltid åpent',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Sidefeltet forblir utvidet og innholdsområdet tilpasser seg',
 			'settings.showUnwatchedCount' => 'Vis antall usette',
 			'settings.showUnwatchedCountDescription' => 'Vis antall usette episoder på serier og sesonger',
 			'settings.showWatchedIndicators' => 'Vis sett-indikatorer',
@@ -3829,8 +3803,6 @@ extension on TranslationsNb {
 			'settings.deinterlaceFilmDescription' => 'Gjenopprett de opprinnelige bildene i film og animasjon som er konvertert med telecine til 29,97 fps, vanlig på NTSC-DVD-er. Video spilt inn for TV vil hakke. Direkte-TV bruker Video',
 			'settings.requireProfileSelectionOnOpen' => 'Spør om profil ved appåpning',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Vis profilvalg hver gang appen åpnes',
-			'settings.forceTvMode' => 'Tving TV-modus',
-			'settings.forceTvModeDescription' => 'Tving TV-oppsett. For enheter som ikke oppdages automatisk. Krever omstart.',
 			'settings.startInFullscreen' => 'Start i fullskjerm',
 			'settings.startInFullscreenDescription' => 'Åpne Satra i fullskjermmodus ved oppstart',
 			'settings.exitFullscreenOnPlayerClose' => 'Avslutt fullskjerm ved lukking av avspiller',
@@ -3903,12 +3875,12 @@ extension on TranslationsNb {
 			'themeEditor.slots.textMuted' => 'Sekundærtekst',
 			'themeEditor.slots.accent' => 'Aksent',
 			'themeEditor.opacity' => 'Opasitet',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Fra andre temaer',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Tekst på bakgrunn',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Tekst på overflate',
 			'themeEditor.contrast.textMutedOnBg' => 'Sekundærtekst på bakgrunn',
 			'themeEditor.contrast.textMutedOnSurface' => 'Sekundærtekst på overflate',
@@ -3923,11 +3895,6 @@ extension on TranslationsNb {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} min igjen',
 			'themeEditor.previewSwitch' => 'Autospill',
 			'themeEditor.previewMutedText' => 'Sekundærtekst ser slik ut',
-			'search.hint' => 'Søk i filmer, serier, musikk...',
-			'search.tryDifferentTerm' => 'Prøv et annet søkeord',
-			'search.searchYourMedia' => 'Søk i mediene dine',
-			'search.enterTitleActorOrKeyword' => 'Skriv inn tittel, skuespiller eller nøkkelord',
-			'search.people' => 'Personer',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Angi snarvei for ${actionName}',
 			'hotkeys.clearShortcut' => 'Fjern snarvei',
 			'hotkeys.noShortcutSet' => 'Ingen snarvei satt',
@@ -4246,7 +4213,6 @@ extension on TranslationsNb {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nb'))(n, one: 'Fjernet automatisk ${n} avspilt nedlasting', other: 'Fjernet automatisk ${n} avspilte nedlastinger', ), 
 			'messages.removedFromContinueWatching' => 'Fjernet fra Fortsett å se',
 			'messages.errorLoading' => ({required Object error}) => 'Feil: ${error}',
-			'messages.searchPartialResults' => 'Noen medieservere kunne ikke søkes i. Viser tilgjengelige resultater.',
 			'messages.streamInterrupted' => 'Avspillingen ble avbrutt. Trykk på Spill av eller spol for å prøve på nytt.',
 			'messages.liveStreamInterrupted' => 'Direktesendingen ble avbrutt. Trykk på Spill av for å prøve på nytt.',
 			'messages.fileInfoNotAvailable' => 'Filinformasjon ikke tilgjengelig',
@@ -4280,7 +4246,6 @@ extension on TranslationsNb {
 			'messages.noEpisodesFound' => 'Ingen episoder funnet i første sesong',
 			'messages.noEpisodesFoundGeneral' => 'Ingen episoder funnet',
 			'messages.episodesLoadFailed' => 'Kunne ikke laste episoder',
-			'messages.noResultsFound' => 'Ingen resultater funnet',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Innsovningstimer satt til ${label}',
 			'messages.noItemsAvailable' => 'Ingen elementer tilgjengelig',
 			'messages.failedToCreatePlayQueueNoItems' => 'Kunne ikke opprette avspillingskø – ingen elementer',
@@ -4417,8 +4382,6 @@ extension on TranslationsNb {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Legg til for ${displayName}: Plex, Jellyfin, Emby eller en annen profiltilkobling',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Økten er utløpt for ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Økten er utløpt for ${count} servere',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} nektet tilgang for denne kontoen',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servere nektet tilgang for denne kontoen',
 			'connections.signInAgain' => 'Logg inn igjen',
@@ -4430,6 +4393,8 @@ extension on TranslationsNb {
 			'accountPreferences.pickAccount' => 'Hver konto lagrer sine egne innstillinger. Velg hvilken du vil redigere.',
 			'accountPreferences.storedOnAccount' => 'Disse alternativene lagres på selve kontoen, så alle apper som er logget på den, bruker dem — inkludert Satra på de andre enhetene dine.',
 			'accountPreferences.noAccounts' => 'Ingen kontoer å konfigurere',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Logg inn på Plex, eller koble til en Jellyfin- eller Emby-server, så vises innstillingene som er lagret på den kontoen, her.',
 			'accountPreferences.unavailable' => 'Kan ikke nå denne kontoen',
 			'accountPreferences.loadFailed' => 'Kunne ikke laste inn disse innstillingene',
@@ -4512,7 +4477,6 @@ extension on TranslationsNb {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} år)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (${age} år gammel)',
 			'errors.searchFailed' => ({required Object error}) => 'Søk mislyktes: ${error}',
-			'errors.searchUnavailable' => 'Søket kunne ikke nå noen medieserver.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Tidsavbrudd ved lasting av ${context}',
 			'errors.connectionFailed' => 'Kan ikke koble til medieserver',
 			'errors.unableToLoad' => ({required Object context}) => 'Kunne ikke laste ${context}. Prøv igjen.',
@@ -4546,7 +4510,6 @@ extension on TranslationsNb {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Kunne ikke analysere bibliotek: ${error}',
 			'libraries.noLibrariesFound' => 'Ingen biblioteker funnet',
 			'libraries.allLibrariesHidden' => 'Alle biblioteker er skjult',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Skjulte biblioteker (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Dette biblioteket er tomt',
 			'libraries.noItemsMatchFilters' => 'Ingen elementer samsvarer med de aktive filtrene',
 			'libraries.resetFilters' => 'Tilbakestill filtre',
@@ -4931,8 +4894,6 @@ extension on TranslationsNb {
 			'liveTv.failedToStartChannel' => 'Kunne ikke starte direktekanalen',
 			'liveTv.failedToBuildStreamUrl' => 'Kunne ikke opprette strømme-URL-en',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kunne ikke starte kanalen: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kunne ikke bytte kanal: ${reason}',
 			'collections.title' => 'Samlinger',
 			'collections.collection' => 'Samling',
@@ -4946,6 +4907,8 @@ extension on TranslationsNb {
 			'collections.collectionName' => 'Samlingsnavn',
 			'collections.enterCollectionName' => 'Skriv inn samlingsnavn',
 			'collections.addedToCollection' => 'Lagt til i samling',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Kunne ikke legge til i samling',
 			'collections.created' => 'Samling opprettet',
 			'collections.removeFromCollection' => 'Fjern fra samling',
@@ -4987,7 +4950,6 @@ extension on TranslationsNb {
 			'music.addToQueue' => 'Legg til i kø',
 			'music.discNumber' => ({required Object n}) => 'Plate ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('nb'))(n, one: '${n} spor', other: '${n} spor', ), 
-			'music.nowPlaying' => 'Spilles nå',
 			'music.playingFrom' => ({required Object title}) => 'Spiller fra ${title}',
 			'music.queue' => 'Kø',
 			'music.clearQueue' => 'Tøm kø',
@@ -5445,8 +5407,6 @@ extension on TranslationsNb {
 			'externalPlayer.useExternalPlayer' => 'Bruk ekstern spiller',
 			'externalPlayer.useExternalPlayerDescription' => 'Åpne videoer i en annen app',
 			'externalPlayer.selectPlayer' => 'Velg spiller',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Egendefinerte spillere',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Legg til egendefinert spiller',
@@ -5461,6 +5421,8 @@ extension on TranslationsNb {
 			'externalPlayer.playInExternalPlayer' => 'Spill av i ekstern spiller',
 			'metadataEdit.editMetadata' => 'Rediger...',
 			'metadataEdit.screenTitle' => 'Rediger metadata',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Grunnleggende informasjon',
 			'metadataEdit.artwork' => 'Grafikk',
 			'metadataEdit.advancedSettings' => 'Avanserte innstillinger',

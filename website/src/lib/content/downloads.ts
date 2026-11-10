@@ -13,7 +13,7 @@ export type StoreOption = {
 };
 
 export const APP_STORE_ID = '6754315964';
-export const ANDROID_PACKAGE = 'com.edde746.satra';
+export const ANDROID_PACKAGE = 'com.rahhing.satra';
 export const AMAZON_URL = 'https://www.amazon.com/gp/product/B0GK65CVS1';
 
 // Structured data uses canonical URLs; clicked links carry campaign tags.

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
+import '../i18n/strings.g.dart';
 import '../theme/app_motion.dart';
 import '../utils/desktop_window_padding.dart';
+import 'app_icon.dart';
 import 'glass_surface.dart';
 
 class UtilityPanelScope extends InheritedWidget {
@@ -50,11 +53,11 @@ class _PanelPageTransitionsBuilder extends PageTransitionsBuilder {
 
 /// A desktop utility stays above the current page while its own navigation
 /// stack keeps settings subpages and download actions inside the panel.
-Route<void> utilityPanelRoute({required Widget child, String? name, bool search = false}) => PageRouteBuilder<void>(
+Route<void> utilityPanelRoute({required Widget child, String? name}) => PageRouteBuilder<void>(
   settings: RouteSettings(name: name),
   opaque: false,
   barrierDismissible: true,
-  barrierLabel: 'Close',
+  barrierLabel: t.common.close,
   barrierColor: Colors.black.withValues(alpha: 0.48),
   transitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 320)),
   reverseTransitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 220)),
@@ -74,13 +77,13 @@ Route<void> utilityPanelRoute({required Widget child, String? name, bool search 
     );
     return SafeArea(
       child: Align(
-        alignment: search ? const Alignment(0, -0.7) : Alignment.center,
+        alignment: Alignment.center,
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: FractionallySizedBox(
-            heightFactor: search ? 0.68 : 0.82,
+            heightFactor: 0.82,
             child: SizedBox(
-              width: search ? 680 : 680,
+              width: 680,
               child: GlassSurface(
                 tint: theme.scaffoldBackgroundColor,
                 opacity: 0.84,
@@ -102,7 +105,7 @@ Route<void> utilityPanelRoute({required Widget child, String? name, bool search 
                             top: 2,
                             child: IconButton(
                               tooltip: MaterialLocalizations.of(context).closeButtonTooltip,
-                              icon: const Icon(Icons.close_rounded, size: 18),
+                              icon: const AppIcon(Symbols.close_rounded, size: 18),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                           ),
@@ -125,7 +128,7 @@ Route<void> utilityPanelRoute({required Widget child, String? name, bool search 
     return GlassTransitionScope(
       animation: curved,
       child: SlideTransition(
-        position: Tween(begin: Offset(0, search ? -0.025 : 0.035), end: Offset.zero).animate(curved),
+        position: Tween(begin: const Offset(0, 0.035), end: Offset.zero).animate(curved),
         child: ScaleTransition(scale: Tween(begin: 0.97, end: 1.0).animate(curved), child: child),
       ),
     );

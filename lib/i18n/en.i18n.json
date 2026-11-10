@@ -235,9 +235,11 @@
     "showServerNameOnHubs": "Show Server Name on Hubs",
     "showServerNameOnHubsDescription": "Always show server names in hub titles.",
     "groupLibrariesByServer": "Group Libraries by Server",
-    "groupLibrariesByServerDescription": "Group sidebar libraries under each media server.",
-    "alwaysKeepSidebarOpen": "Always Keep Sidebar Open",
-    "alwaysKeepSidebarOpenDescription": "Sidebar stays expanded and content area adjusts to fit",
+    "groupLibrariesByServerDescription": "Group libraries under each media server.",
+    "cornerRounding": "Corner Rounding",
+    "cornerRoundingDescription": "Shape cards, Continue Watching, and navigation pills.",
+    "cornerSquare": "Square",
+    "cornerRounded": "Rounded",
     "showUnwatchedCount": "Show Unwatched Count",
     "showUnwatchedCountDescription": "Display unwatched episode count on shows and seasons",
     "showWatchedIndicators": "Show Watched Indicators",
@@ -256,6 +258,8 @@
     "visualEffectsFull": "Full",
     "visualEffectsReduced": "Reduced",
     "visualEffectsReducedDescription": "Fewer animations and lower-resolution artwork",
+    "liquidGlass": "Liquid Glass",
+    "liquidGlassDescription": "Apply optical lens distortion and specular refraction to blurred surfaces",
     "hideSpoilers": "Hide Spoilers for Unwatched Episodes",
     "hideSpoilersDescription": "Blur thumbnails and descriptions for unwatched episodes",
     "playerBackend": "Player Backend",
@@ -310,8 +314,6 @@
     "watchTogetherRelayDescription": "Public Open Watch Party relays unless you set your own",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Enter a valid HTTP or HTTPS relay base URL.",
-
-
     "debugLogging": "Debug Logging",
     "debugLoggingDescription": "Enable detailed logging for troubleshooting",
     "viewLogs": "View Logs",
@@ -464,8 +466,6 @@
     "deinterlaceFilmDescription": "Restore the original frames of film and animation telecined to 29.97 fps, common on NTSC DVDs. Video shot for TV stutters. Live TV uses Video",
     "requireProfileSelectionOnOpen": "Ask for profile on app open",
     "requireProfileSelectionOnOpenDescription": "Show profile selection every time the app is opened",
-    "forceTvMode": "Force TV mode",
-    "forceTvModeDescription": "Force TV layout. For devices that don't auto-detect. Requires restart.",
     "startInFullscreen": "Start in fullscreen",
     "startInFullscreenDescription": "Open Satra in fullscreen mode at launch",
     "exitFullscreenOnPlayerClose": "Exit fullscreen on player close",
@@ -563,12 +563,52 @@
     "previewSwitch": "Autoplay",
     "previewMutedText": "Secondary text reads like this"
   },
-  "search": {
-    "hint": "Search movies, shows, music...",
-    "tryDifferentTerm": "Try a different search term",
-    "searchYourMedia": "Search your media",
-    "enterTitleActorOrKeyword": "Enter a title, actor, or keyword",
-    "people": "People"
+  "spotlight": {
+    "title": "Spotlight",
+    "placeholder": "Search movies, shows, libraries, settings, actions...",
+    "shortcutHint": "Ctrl+Space",
+    "emptyPromptTitle": "Search everything in Satra",
+    "emptyPromptSubtitle": "Find shows, movies, libraries, settings, or quick actions",
+    "noResultsTitle": "No matches for \"${query}\"",
+    "noResultsSubtitle": "Try a title, library name, setting, or action",
+    "categories": {
+      "all": "All",
+      "movies": "Movies",
+      "shows": "Shows",
+      "episodes": "Episodes",
+      "music": "Music",
+      "libraries": "Libraries",
+      "settings": "Settings",
+      "actions": "Actions",
+      "people": "People"
+    },
+    "sections": {
+      "quickActions": "Quick Actions",
+      "libraries": "Libraries",
+      "settings": "Settings",
+      "downloads": "Downloaded"
+    },
+    "hints": {
+      "navigate": "Navigate",
+      "open": "Open",
+      "filter": "Filter",
+      "close": "Close"
+    },
+    "actions": {
+      "goHome": "Go to Home",
+      "openDownloads": "Open Downloads",
+      "openSettings": "Open Settings",
+      "openExplore": "Open Explore",
+      "openLiveTv": "Open Live TV",
+      "toggleFullscreen": "Toggle Fullscreen",
+      "switchProfile": "Switch Profile",
+      "watchTogether": "Watch Together",
+      "companionRemote": "Companion Remote",
+      "manageLibraries": "Manage Libraries",
+      "refreshLibrary": "Refresh Current View",
+      "addServer": "Add Server Connection",
+      "reconnectServers": "Reconnect to Servers"
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Set Shortcut for ${actionName}",
@@ -924,7 +964,6 @@
     },
     "removedFromContinueWatching": "Removed from Continue Watching",
     "errorLoading": "Error: ${error}",
-    "searchPartialResults": "Some media servers could not be searched. Showing available results.",
     "streamInterrupted": "The stream was interrupted. Press play or seek to retry.",
     "liveStreamInterrupted": "The live stream was interrupted. Press play to retry.",
     "fileInfoNotAvailable": "File information not available",
@@ -958,7 +997,6 @@
     "noEpisodesFound": "No episodes found in first season",
     "noEpisodesFoundGeneral": "No episodes found",
     "episodesLoadFailed": "Couldn't load episodes",
-    "noResultsFound": "No results found",
     "sleepTimerSet": "Sleep timer set for ${label}",
     "noItemsAvailable": "No items available",
     "failedToCreatePlayQueueNoItems": "Failed to create a play queue — no items",
@@ -973,8 +1011,6 @@
     "serverBusyBody": "The server kept refusing to stream this file (HTTP 503). It may be restarting, busy, or the file's storage may be offline. Try again in a moment — if it keeps happening, ask the server owner to check the server and the file's storage.",
     "playbackNotAllowedTitle": "Playback not allowed",
     "playbackNotAllowedBody": "The server refused to stream this item (HTTP 403). Your account may not have permission to play it, or the server may only allow playback on its local network.",
-
-
     "burnedSubtitlesUseMenu": "Subtitles are burned into this stream. Change them from the subtitle menu.",
     "noVideoUrl": "No video URL available",
     "playbackNoMediaSources": "The server returned no playable media sources",
@@ -1225,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Search failed: ${error}",
-    "searchUnavailable": "Search could not reach any media server.",
     "connectionTimeout": "Connection timeout while loading ${context}",
     "connectionFailed": "Unable to connect to media server",
     "unableToLoad": "Unable to load ${context}. Please try again.",
@@ -1261,7 +1296,6 @@
     "failedToAnalyze": "Failed to analyze library: ${error}",
     "noLibrariesFound": "No libraries found",
     "allLibrariesHidden": "All libraries are hidden",
-    "hiddenLibrariesCount": "Hidden libraries (${count})",
     "thisLibraryIsEmpty": "This library is empty",
     "noItemsMatchFilters": "No items match the active filters",
     "resetFilters": "Reset filters",
@@ -1393,7 +1427,6 @@
   "logs": {
     "clearLogs": "Clear Logs",
     "copyLogs": "Copy Logs"
-
   },
   "startup": {
     "failedTitle": "Satra could not start",
@@ -1404,7 +1437,6 @@
     "hideDetails": "Hide details",
     "copyDetails": "Copy details",
     "detailsCopied": "Details copied to clipboard",
-
     "repairStorage": "Repair storage",
     "repairTitle": "Repair stored data?",
     "repairBodyCommon": "Satra's settings file is damaged and cannot be read. Repairing resets every setting to its default.",
@@ -1780,7 +1812,6 @@
       "one": "${n} track",
       "other": "${n} tracks"
     },
-    "nowPlaying": "Now Playing",
     "playingFrom": "Playing from ${title}",
     "queue": "Queue",
     "clearQueue": "Clear queue",

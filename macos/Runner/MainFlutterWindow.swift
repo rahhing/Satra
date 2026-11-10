@@ -45,7 +45,7 @@ class MainFlutterWindow: NSWindow {
 
     RegisterGeneratedPlugins(registry: flutterViewController)
 
-    self.setFrameAutosaveName("com.edde746.satra.MainWindow")
+    self.setFrameAutosaveName("com.rahhing.satra.MainWindow")
     WindowUtilsPlugin.syncWindowChrome()
 
     super.awakeFromNib()

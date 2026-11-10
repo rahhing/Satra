@@ -36,13 +36,13 @@ def main():
     scalable_apps = hicolor / "scalable/apps"
     png_apps.mkdir(parents=True, exist_ok=True)
     scalable_apps.mkdir(parents=True, exist_ok=True)
-    for icon_name in ("satra", "satra", "com.edde746.satra"):
+    for icon_name in ("satra", "satra", "com.rahhing.satra"):
         shutil.copy2(icon, png_apps / f"{icon_name}.png")
         if svg_icon.is_file():
             shutil.copy2(svg_icon, scalable_apps / f"{icon_name}.svg")
     installed_icon = png_apps / "satra.png"
 
-    desktop = applications / "com.edde746.satra.desktop"
+    desktop = applications / "com.rahhing.satra.desktop"
     # Back up a pre-existing user customization once; never alter system files.
     backup = desktop.with_suffix(".desktop.before-satra")
     if desktop.exists() and not backup.exists() and "X-Satra-Local=true" not in desktop.read_text():
@@ -61,7 +61,7 @@ def main():
         f'Exec="{value(quoted)}"\nIcon={value(installed_icon)}\n'
         "Terminal=false\nCategories=AudioVideo;Video;Player;\n"
         "Keywords=plex;jellyfin;emby;media;streaming;video;\n"
-        "StartupWMClass=com.edde746.satra\nX-Satra-Local=true\n",
+        "StartupWMClass=com.rahhing.satra\nX-Satra-Local=true\n",
         encoding="utf-8",
     )
     updater = shutil.which("update-desktop-database")

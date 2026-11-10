@@ -53,9 +53,7 @@ class ContextMenuItem {
 /// otherwise). Reorder and hide/unhide are provider-backed, so any screen can
 /// open it.
 ///
-/// [onOrderChanged] runs after the new order is written to
-/// [LibrariesProvider] (the libraries screen uses it to poke MainScreen's
-/// side nav). [onToggleVisibility] overrides the default plain hide/unhide
+/// [onToggleVisibility] overrides the default plain hide/unhide
 /// (the libraries screen adds "re-select first visible library" logic).
 ///
 /// A library's admin actions (scan, refresh metadata, ...) are offered only
@@ -63,7 +61,6 @@ class ContextMenuItem {
 /// replaces that check in tests.
 Future<void> showLibraryManagementSheet(
   BuildContext context, {
-  VoidCallback? onOrderChanged,
   Future<void> Function(MediaLibrary library)? onToggleVisibility,
   @visibleForTesting bool Function(MediaLibrary library)? canAdministerLibrary,
 }) {
@@ -101,7 +98,6 @@ Future<void> showLibraryManagementSheet(
     hiddenLibraryKeys: hiddenLibrariesProvider.hiddenLibraryKeys,
     onReorder: (reorderedLibraries) {
       librariesProvider.updateLibraryOrder(reconcileLibraryOrder(reorderedLibraries, librariesProvider.libraries));
-      onOrderChanged?.call();
     },
     onToggleVisibility: onToggleVisibility ?? defaultToggleVisibility,
     getLibraryMenuItems: (library) => canAdminister(library) ? _getLibraryMenuItems(library) : const [],

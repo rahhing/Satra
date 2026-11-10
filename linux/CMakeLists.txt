@@ -8,7 +8,7 @@ include(CTest)
 set(BINARY_NAME "satra")
 # The unique GTK application identifier for this application. See:
 # https://wiki.gnome.org/HowDoI/ChooseApplicationID
-set(APPLICATION_ID "com.edde746.satra")
+set(APPLICATION_ID "com.rahhing.satra")
 
 # Explicitly opt in to modern CMake behaviors to avoid warnings with recent
 # versions of CMake.

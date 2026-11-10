@@ -48,7 +48,6 @@ class TranslationsAz extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$az supporter = _Translations$supporter$az._(_root);
 	@override late final _Translations$settings$az settings = _Translations$settings$az._(_root);
 	@override late final _Translations$themeEditor$az themeEditor = _Translations$themeEditor$az._(_root);
-	@override late final _Translations$search$az search = _Translations$search$az._(_root);
 	@override late final _Translations$hotkeys$az hotkeys = _Translations$hotkeys$az._(_root);
 	@override late final _Translations$fileInfo$az fileInfo = _Translations$fileInfo$az._(_root);
 	@override late final _Translations$mediaMenu$az mediaMenu = _Translations$mediaMenu$az._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$az extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Bölmə başlıqlarında həmişə server adlarını göstər.';
 	@override String get groupLibrariesByServer => 'Kitabxanaları serverə görə qrupla';
 	@override String get groupLibrariesByServerDescription => 'Yan menyu kitabxanalarını hər media serverinin altında qruplaşdır.';
-	@override String get alwaysKeepSidebarOpen => 'Yan menyunu həmişə açıq saxla';
-	@override String get alwaysKeepSidebarOpenDescription => 'Yan menyu genişlənmiş qalır və məzmun sahəsi buna uyğunlaşır';
 	@override String get showUnwatchedCount => 'Baxılmamış sayını göstər';
 	@override String get showUnwatchedCountDescription => 'Seriallarda və mövsümlərdə baxılmamış seriya sayını göstər';
 	@override String get showWatchedIndicators => 'Baxılmış göstəriciləri göstər';
@@ -553,8 +550,6 @@ class _Translations$settings$az extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => '29.97 fps-ə telesine edilmiş film və animasiyaların orijinal kadrlarını bərpa et (NTSC DVD-lərdə geniş yayılıb). TV üçün çəkilmiş video ilişir. Canlı TV Video rejimindən istifadə edir';
 	@override String get requireProfileSelectionOnOpen => 'Açılışda profil soruş';
 	@override String get requireProfileSelectionOnOpenDescription => 'Tətbiq hər dəfə açıldıqda profil seçimini göstər';
-	@override String get forceTvMode => 'TV rejimini məcburi et';
-	@override String get forceTvModeDescription => 'TV interfeysini məcburi et. Avtomatik təyin etməyən cihazlar üçündür. Yenidən başlatma tələb olunur.';
 	@override String get startInFullscreen => 'Tam ekranda başlat';
 	@override String get startInFullscreenDescription => 'Satra-ni açılışda tam ekran rejimində aç';
 	@override String get exitFullscreenOnPlayerClose => 'Oynadıcı bağlandıqda tam ekrandan çıx';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$az extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} dəq qaldı';
 	@override String get previewSwitch => 'Avtomatik oynatma';
 	@override String get previewMutedText => 'Köməkçi mətn belə görünür';
-}
-
-// Path: search
-class _Translations$search$az extends Translations$search$en {
-	_Translations$search$az._(TranslationsAz root) : this._root = root, super.internal(root);
-
-	final TranslationsAz _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Kino, serial, musiqi axtar...';
-	@override String get tryDifferentTerm => 'Fərqli axtarış sözü cəhd edin';
-	@override String get searchYourMedia => 'Mediyanızda axtarın';
-	@override String get enterTitleActorOrKeyword => 'Ad, aktyor və ya açar söz daxil edin';
-	@override String get people => 'Şəxslər';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$az extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'İzləməyə davam et-dən silindi';
 	@override String errorLoading({required Object error}) => 'Xəta: ${error}';
-	@override String get searchPartialResults => 'Bəzi media serverlərində axtarış aparıla bilmədi. Mövcud nəticələr göstərilir.';
 	@override String get streamInterrupted => 'Yayım kəsildi. Yenidən cəhd etmək üçün oynat düyməsinə basın və ya irəli-geri çəkin.';
 	@override String get liveStreamInterrupted => 'Canlı yayım kəsildi. Təzədən cəhd etmək üçün oynat düyməsinə basın.';
 	@override String get fileInfoNotAvailable => 'Fayl məlumatı əlçatan deyil';
@@ -1071,7 +1051,6 @@ class _Translations$messages$az extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Birinci mövsümdə seriya tapılmadı';
 	@override String get noEpisodesFoundGeneral => 'Seriya tapılmadı';
 	@override String get episodesLoadFailed => 'Seriyalar yüklənə bilmədi';
-	@override String get noResultsFound => 'Nəticə tapılmadı';
 	@override String sleepTimerSet({required Object label}) => 'Yuxu taymeri ${label} üçün təyin edildi';
 	@override String get noItemsAvailable => 'Element yoxdur';
 	@override String get failedToCreatePlayQueueNoItems => 'Oynatma növbəsi yaradıla bilmədi — element yoxdur';
@@ -1349,7 +1328,6 @@ class _Translations$errors$az extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Axtarış uğursuz oldu: ${error}';
-	@override String get searchUnavailable => 'Axtarış heç bir media serverinə çata bilmədi.';
 	@override String connectionTimeout({required Object context}) => '${context} yüklənərkən vaxt bitdi';
 	@override String get connectionFailed => 'Media serverinə qoşulmaq olmur';
 	@override String unableToLoad({required Object context}) => '${context} yüklənə bilmədi. Lütfən təzədən cəhd edin.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$az extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Kitabxana analiz edilə bilmədi: ${error}';
 	@override String get noLibrariesFound => 'Kitabxana tapılmadı';
 	@override String get allLibrariesHidden => 'Bütün kitabxanalar gizlədilib';
-	@override String hiddenLibrariesCount({required Object count}) => 'Gizli kitabxanalar (${count})';
 	@override String get thisLibraryIsEmpty => 'Bu kitabxana boşdur';
 	@override String get noItemsMatchFilters => 'Filtrlərə uyğun element tapılmadı';
 	@override String get resetFilters => 'Filtrləri sıfırla';
@@ -1766,7 +1743,6 @@ class _Translations$music$az extends Translations$music$en {
 		one: '${n} mahnı',
 		other: '${n} mahnı',
 	);
-	@override String get nowPlaying => 'İndi oynadılır';
 	@override String playingFrom({required Object title}) => '${title} mənbəsindən oynadılır';
 	@override String get queue => 'Növbə';
 	@override String get clearQueue => 'Növbəni təmizlə';
@@ -3603,8 +3579,6 @@ extension on TranslationsAz {
 			'settings.showServerNameOnHubsDescription' => 'Bölmə başlıqlarında həmişə server adlarını göstər.',
 			'settings.groupLibrariesByServer' => 'Kitabxanaları serverə görə qrupla',
 			'settings.groupLibrariesByServerDescription' => 'Yan menyu kitabxanalarını hər media serverinin altında qruplaşdır.',
-			'settings.alwaysKeepSidebarOpen' => 'Yan menyunu həmişə açıq saxla',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Yan menyu genişlənmiş qalır və məzmun sahəsi buna uyğunlaşır',
 			'settings.showUnwatchedCount' => 'Baxılmamış sayını göstər',
 			'settings.showUnwatchedCountDescription' => 'Seriallarda və mövsümlərdə baxılmamış seriya sayını göstər',
 			'settings.showWatchedIndicators' => 'Baxılmış göstəriciləri göstər',
@@ -3829,8 +3803,6 @@ extension on TranslationsAz {
 			'settings.deinterlaceFilmDescription' => '29.97 fps-ə telesine edilmiş film və animasiyaların orijinal kadrlarını bərpa et (NTSC DVD-lərdə geniş yayılıb). TV üçün çəkilmiş video ilişir. Canlı TV Video rejimindən istifadə edir',
 			'settings.requireProfileSelectionOnOpen' => 'Açılışda profil soruş',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Tətbiq hər dəfə açıldıqda profil seçimini göstər',
-			'settings.forceTvMode' => 'TV rejimini məcburi et',
-			'settings.forceTvModeDescription' => 'TV interfeysini məcburi et. Avtomatik təyin etməyən cihazlar üçündür. Yenidən başlatma tələb olunur.',
 			'settings.startInFullscreen' => 'Tam ekranda başlat',
 			'settings.startInFullscreenDescription' => 'Satra-ni açılışda tam ekran rejimində aç',
 			'settings.exitFullscreenOnPlayerClose' => 'Oynadıcı bağlandıqda tam ekrandan çıx',
@@ -3903,12 +3875,12 @@ extension on TranslationsAz {
 			'themeEditor.slots.textMuted' => 'Köməkçi mətn',
 			'themeEditor.slots.accent' => 'Vurğu',
 			'themeEditor.opacity' => 'Şəffaflıq',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB və ya #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Digər mövzulardan',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme}: ${color}',
 			'themeEditor.contrast.textOnBg' => 'Arxa fonda mətn',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Səthdə mətn',
 			'themeEditor.contrast.textMutedOnBg' => 'Arxa fonda köməkçi mətn',
 			'themeEditor.contrast.textMutedOnSurface' => 'Səthdə köməkçi mətn',
@@ -3923,11 +3895,6 @@ extension on TranslationsAz {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} dəq qaldı',
 			'themeEditor.previewSwitch' => 'Avtomatik oynatma',
 			'themeEditor.previewMutedText' => 'Köməkçi mətn belə görünür',
-			'search.hint' => 'Kino, serial, musiqi axtar...',
-			'search.tryDifferentTerm' => 'Fərqli axtarış sözü cəhd edin',
-			'search.searchYourMedia' => 'Mediyanızda axtarın',
-			'search.enterTitleActorOrKeyword' => 'Ad, aktyor və ya açar söz daxil edin',
-			'search.people' => 'Şəxslər',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => '${actionName} üçün qısayol təyin et',
 			'hotkeys.clearShortcut' => 'Qısayolu təmizlə',
 			'hotkeys.noShortcutSet' => 'Qısayol təyin edilməyib',
@@ -4246,7 +4213,6 @@ extension on TranslationsAz {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('az'))(n, one: 'Baxılmış ${n} yükləmə avtomatik silindi', other: 'Baxılmış ${n} yükləmə avtomatik silindi', ), 
 			'messages.removedFromContinueWatching' => 'İzləməyə davam et-dən silindi',
 			'messages.errorLoading' => ({required Object error}) => 'Xəta: ${error}',
-			'messages.searchPartialResults' => 'Bəzi media serverlərində axtarış aparıla bilmədi. Mövcud nəticələr göstərilir.',
 			'messages.streamInterrupted' => 'Yayım kəsildi. Yenidən cəhd etmək üçün oynat düyməsinə basın və ya irəli-geri çəkin.',
 			'messages.liveStreamInterrupted' => 'Canlı yayım kəsildi. Təzədən cəhd etmək üçün oynat düyməsinə basın.',
 			'messages.fileInfoNotAvailable' => 'Fayl məlumatı əlçatan deyil',
@@ -4280,7 +4246,6 @@ extension on TranslationsAz {
 			'messages.noEpisodesFound' => 'Birinci mövsümdə seriya tapılmadı',
 			'messages.noEpisodesFoundGeneral' => 'Seriya tapılmadı',
 			'messages.episodesLoadFailed' => 'Seriyalar yüklənə bilmədi',
-			'messages.noResultsFound' => 'Nəticə tapılmadı',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Yuxu taymeri ${label} üçün təyin edildi',
 			'messages.noItemsAvailable' => 'Element yoxdur',
 			'messages.failedToCreatePlayQueueNoItems' => 'Oynatma növbəsi yaradıla bilmədi — element yoxdur',
@@ -4417,8 +4382,6 @@ extension on TranslationsAz {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName} profilinə əlavə et: Plex, Jellyfin, Emby və ya başqa profil qoşulması',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} üçün seansın vaxtı bitdi',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} server üçün seansın vaxtı bitdi',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} bu hesaba girişi rədd etdi',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} server bu hesaba girişi rədd etdi',
 			'connections.signInAgain' => 'Yenidən daxil ol',
@@ -4430,6 +4393,8 @@ extension on TranslationsAz {
 			'accountPreferences.pickAccount' => 'Hər hesab öz tərcihlərini saxlayır. Düzəliş etmək üçün birini seçin.',
 			'accountPreferences.storedOnAccount' => 'Bu seçimlər hesabın özündə saxlanılır, ona görə də ona daxil olan hər tətbiq onlardan istifadə edir — digər cihazlarınızdakı Satra də daxil olmaqla.',
 			'accountPreferences.noAccounts' => 'Konfiqurasiya ediləcək hesab yoxdur',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Plex-ə daxil olun və ya Jellyfin və ya Emby serverinə qoşulun; o hesabda saxlanılan tərcihlər burada görünəcək.',
 			'accountPreferences.unavailable' => 'Bu hesaba çatmaq olmur',
 			'accountPreferences.loadFailed' => 'Bu tərcihlər yüklənə bilmədi',
@@ -4512,7 +4477,6 @@ extension on TranslationsAz {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} yaş)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (${age} yaşında)',
 			'errors.searchFailed' => ({required Object error}) => 'Axtarış uğursuz oldu: ${error}',
-			'errors.searchUnavailable' => 'Axtarış heç bir media serverinə çata bilmədi.',
 			'errors.connectionTimeout' => ({required Object context}) => '${context} yüklənərkən vaxt bitdi',
 			'errors.connectionFailed' => 'Media serverinə qoşulmaq olmur',
 			'errors.unableToLoad' => ({required Object context}) => '${context} yüklənə bilmədi. Lütfən təzədən cəhd edin.',
@@ -4546,7 +4510,6 @@ extension on TranslationsAz {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Kitabxana analiz edilə bilmədi: ${error}',
 			'libraries.noLibrariesFound' => 'Kitabxana tapılmadı',
 			'libraries.allLibrariesHidden' => 'Bütün kitabxanalar gizlədilib',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Gizli kitabxanalar (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Bu kitabxana boşdur',
 			'libraries.noItemsMatchFilters' => 'Filtrlərə uyğun element tapılmadı',
 			'libraries.resetFilters' => 'Filtrləri sıfırla',
@@ -4931,8 +4894,6 @@ extension on TranslationsAz {
 			'liveTv.failedToStartChannel' => 'Canlı kanalı başlatmaq olmadı',
 			'liveTv.failedToBuildStreamUrl' => 'Yayım URL-i yaratmaq olmadı',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kanal başladıla bilmədi: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kanal dəyişdirilə bilmədi: ${reason}',
 			'collections.title' => 'Kolleksiyalar',
 			'collections.collection' => 'Kolleksiya',
@@ -4946,6 +4907,8 @@ extension on TranslationsAz {
 			'collections.collectionName' => 'Kolleksiya adı',
 			'collections.enterCollectionName' => 'Kolleksiya adını daxil edin',
 			'collections.addedToCollection' => 'Kolleksiyaya əlavə edildi',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Kolleksiyaya əlavə edilə bilmədi',
 			'collections.created' => 'Kolleksiya yaradıldı',
 			'collections.removeFromCollection' => 'Kolleksiyadan sil',
@@ -4987,7 +4950,6 @@ extension on TranslationsAz {
 			'music.addToQueue' => 'Növbəyə əlavə et',
 			'music.discNumber' => ({required Object n}) => 'Disk ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('az'))(n, one: '${n} mahnı', other: '${n} mahnı', ), 
-			'music.nowPlaying' => 'İndi oynadılır',
 			'music.playingFrom' => ({required Object title}) => '${title} mənbəsindən oynadılır',
 			'music.queue' => 'Növbə',
 			'music.clearQueue' => 'Növbəni təmizlə',
@@ -5445,8 +5407,6 @@ extension on TranslationsAz {
 			'externalPlayer.useExternalPlayer' => 'Xarici oynadıcı istifadə et',
 			'externalPlayer.useExternalPlayerDescription' => 'Videoları başqa tətbiqdə açın',
 			'externalPlayer.selectPlayer' => 'Oynadıcı seç',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Xüsusi oynadıcılar',
 			'externalPlayer.systemDefault' => 'Sistem defoltu',
 			'externalPlayer.addCustomPlayer' => 'Xüsusi oynadıcı əlavə et',
@@ -5461,6 +5421,8 @@ extension on TranslationsAz {
 			'externalPlayer.playInExternalPlayer' => 'Xarici oynadıcıda oynat',
 			'metadataEdit.editMetadata' => 'Düzəliş et...',
 			'metadataEdit.screenTitle' => 'Meta-məlumatlara düzəliş et',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Əsas məlumatlar',
 			'metadataEdit.artwork' => 'Şəkillər/Posterlər',
 			'metadataEdit.advancedSettings' => 'Təkmilləşdirilmiş tənzimləmələr',

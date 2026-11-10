@@ -144,16 +144,7 @@ void main() {
     await SettingsService.instance.write(SettingsService.viewMode, ViewMode.grid);
     _seedDownloadedMovies(downloadProvider, 4);
     final screenKey = GlobalKey<DownloadsScreenState>();
-    var sidebarCalls = 0;
-
-    await _pumpScreen(
-      tester,
-      db,
-      downloadProvider,
-      multiServerProvider,
-      screenKey: screenKey,
-      onSidebar: () => sidebarCalls++,
-    );
+    await _pumpScreen(tester, db, downloadProvider, multiServerProvider, screenKey: screenKey);
     screenKey.currentState!.tabController.index = 2;
     await tester.pumpAndSettle();
 
@@ -174,11 +165,9 @@ void main() {
     final second = _movieCard(cards, 1);
     expect(first.focusNode, isNotNull);
     expect(first.onBack, isNotNull);
-    expect(first.onNavigateLeft, isNotNull);
+    expect(first.onNavigateLeft, isNull);
     expect(second.onNavigateLeft, isNull);
 
-    first.onNavigateLeft!();
-    expect(sidebarCalls, 1);
     first.onBack!();
     await tester.pump();
     expect(screenKey.currentState!.getTabChipFocusNode(2).hasFocus, isTrue);
@@ -189,16 +178,8 @@ void main() {
     await SettingsService.instance.write(SettingsService.viewMode, ViewMode.list);
     _seedDownloadedMovies(downloadProvider, 3);
     final screenKey = GlobalKey<DownloadsScreenState>();
-    var sidebarCalls = 0;
 
-    await _pumpScreen(
-      tester,
-      db,
-      downloadProvider,
-      multiServerProvider,
-      screenKey: screenKey,
-      onSidebar: () => sidebarCalls++,
-    );
+    await _pumpScreen(tester, db, downloadProvider, multiServerProvider, screenKey: screenKey);
     screenKey.currentState!.tabController.index = 2;
     await tester.pumpAndSettle();
 
@@ -219,11 +200,9 @@ void main() {
     final second = _movieCard(cards, 1);
     expect(first.focusNode, isNotNull);
     expect(first.onBack, isNotNull);
-    expect(first.onNavigateLeft, isNotNull);
-    expect(second.onNavigateLeft, isNotNull);
+    expect(first.onNavigateLeft, isNull);
+    expect(second.onNavigateLeft, isNull);
 
-    second.onNavigateLeft!();
-    expect(sidebarCalls, 1);
     first.onBack!();
     await tester.pump();
     expect(screenKey.currentState!.getTabChipFocusNode(2).hasFocus, isTrue);
@@ -340,7 +319,6 @@ Future<void> _pumpScreen(
   DownloadProvider downloadProvider,
   MultiServerProvider multiServerProvider, {
   required GlobalKey<DownloadsScreenState> screenKey,
-  VoidCallback? onSidebar,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = const Size(1200, 800);
@@ -360,11 +338,7 @@ Future<void> _pumpScreen(
         ],
         child: MaterialApp(
           theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.macOS),
-          home: MainScreenFocusScope(
-            focusSidebar: onSidebar ?? () {},
-            sideNavigationWidth: 0,
-            child: DownloadsScreen(key: screenKey),
-          ),
+          home: MainScreenFocusScope(sideNavigationWidth: 0, child: DownloadsScreen(key: screenKey)),
         ),
       ),
     ),

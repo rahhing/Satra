@@ -210,6 +210,8 @@
     "paperTheme": "Papir",
     "libraryDensity": "Innholdstetthet i biblioteket",
     "displayScale": "Skalering",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Kompakt",
     "comfortable": "Komfortabel",
     "gridSpacing": "Rutenettavstand",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Vis alltid servernavn i hubtitler.",
     "groupLibrariesByServer": "Grupper biblioteker etter server",
     "groupLibrariesByServerDescription": "Grupper sidepanelbiblioteker under hver medieserver.",
-    "alwaysKeepSidebarOpen": "Hold sidefeltet alltid åpent",
-    "alwaysKeepSidebarOpenDescription": "Sidefeltet forblir utvidet og innholdsområdet tilpasser seg",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Vis antall usette",
     "showUnwatchedCountDescription": "Vis antall usette episoder på serier og sesonger",
     "showWatchedIndicators": "Vis sett-indikatorer",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Full",
     "visualEffectsReduced": "Redusert",
     "visualEffectsReducedDescription": "Færre animasjoner og grafikk med lavere oppløsning",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Skjul spoilere for usette episoder",
     "hideSpoilersDescription": "Slør miniatyrbilder og beskrivelser for usette episoder",
     "playerBackend": "Avspillingsmotor",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Offentlige Open Watch Party-reléservere, med mindre du angir din egen",
     "watchTogetherRelayHint": "https://min-relay.eksempel.no",
     "watchTogetherRelayInvalid": "Angi en gyldig HTTP- eller HTTPS-adresse til reléserveren.",
-
-
     "debugLogging": "Feilsøkingslogging",
     "debugLoggingDescription": "Aktiver detaljert logging for feilsøking",
     "viewLogs": "Vis logger",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Gjenopprett de opprinnelige bildene i film og animasjon som er konvertert med telecine til 29,97 fps, vanlig på NTSC-DVD-er. Video spilt inn for TV vil hakke. Direkte-TV bruker Video",
     "requireProfileSelectionOnOpen": "Spør om profil ved appåpning",
     "requireProfileSelectionOnOpenDescription": "Vis profilvalg hver gang appen åpnes",
-    "forceTvMode": "Tving TV-modus",
-    "forceTvModeDescription": "Tving TV-oppsett. For enheter som ikke oppdages automatisk. Krever omstart.",
     "startInFullscreen": "Start i fullskjerm",
     "startInFullscreenDescription": "Åpne Satra i fullskjermmodus ved oppstart",
     "exitFullscreenOnPlayerClose": "Avslutt fullskjerm ved lukking av avspiller",
@@ -561,12 +563,52 @@
     "previewSwitch": "Autospill",
     "previewMutedText": "Sekundærtekst ser slik ut"
   },
-  "search": {
-    "hint": "Søk i filmer, serier, musikk...",
-    "tryDifferentTerm": "Prøv et annet søkeord",
-    "searchYourMedia": "Søk i mediene dine",
-    "enterTitleActorOrKeyword": "Skriv inn tittel, skuespiller eller nøkkelord",
-    "people": "Personer"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Angi snarvei for ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Fjernet fra Fortsett å se",
     "errorLoading": "Feil: ${error}",
-    "searchPartialResults": "Noen medieservere kunne ikke søkes i. Viser tilgjengelige resultater.",
     "streamInterrupted": "Avspillingen ble avbrutt. Trykk på Spill av eller spol for å prøve på nytt.",
     "liveStreamInterrupted": "Direktesendingen ble avbrutt. Trykk på Spill av for å prøve på nytt.",
     "fileInfoNotAvailable": "Filinformasjon ikke tilgjengelig",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Ingen episoder funnet i første sesong",
     "noEpisodesFoundGeneral": "Ingen episoder funnet",
     "episodesLoadFailed": "Kunne ikke laste episoder",
-    "noResultsFound": "Ingen resultater funnet",
     "sleepTimerSet": "Innsovningstimer satt til ${label}",
     "noItemsAvailable": "Ingen elementer tilgjengelig",
     "failedToCreatePlayQueueNoItems": "Kunne ikke opprette avspillingskø – ingen elementer",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Serveren fortsatte å nekte å strømme denne filen (HTTP 503). Den kan være i ferd med å starte på nytt eller være opptatt, eller lagringsstedet til filen kan være frakoblet. Prøv igjen om litt – hvis det fortsetter å skje, kan du be eieren av serveren om å kontrollere serveren og lagringsstedet til filen.",
     "playbackNotAllowedTitle": "Avspilling er ikke tillatt",
     "playbackNotAllowedBody": "Serveren nektet å strømme dette elementet (HTTP 403). Kontoen din har kanskje ikke tillatelse til å spille det av, eller serveren tillater kanskje bare avspilling på sitt lokale nettverk.",
-
-
     "burnedSubtitlesUseMenu": "Undertekstene er brent inn i denne strømmen. Endre dem fra undertekstmenyen.",
     "noVideoUrl": "Ingen video-URL er tilgjengelig",
     "playbackNoMediaSources": "Serveren returnerte ingen avspillbare mediekilder",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Søk mislyktes: ${error}",
-    "searchUnavailable": "Søket kunne ikke nå noen medieserver.",
     "connectionTimeout": "Tidsavbrudd ved lasting av ${context}",
     "connectionFailed": "Kan ikke koble til medieserver",
     "unableToLoad": "Kunne ikke laste ${context}. Prøv igjen.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Kunne ikke analysere bibliotek: ${error}",
     "noLibrariesFound": "Ingen biblioteker funnet",
     "allLibrariesHidden": "Alle biblioteker er skjult",
-    "hiddenLibrariesCount": "Skjulte biblioteker (${count})",
     "thisLibraryIsEmpty": "Dette biblioteket er tomt",
     "noItemsMatchFilters": "Ingen elementer samsvarer med de aktive filtrene",
     "resetFilters": "Tilbakestill filtre",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Tøm logger",
     "copyLogs": "Kopier logger"
-
   },
   "startup": {
     "failedTitle": "Satra kunne ikke starte",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Skjul detaljer",
     "copyDetails": "Kopier detaljer",
     "detailsCopied": "Detaljer kopiert til utklippstavlen",
-
     "repairStorage": "Reparer lagring",
     "repairTitle": "Reparere lagrede data?",
     "repairBodyCommon": "Satra's innstillingsfil er skadet og kan ikke leses. Reparasjon tilbakestiller alle innstillinger til standard.",
@@ -1778,7 +1812,6 @@
       "one": "${n} spor",
       "other": "${n} spor"
     },
-    "nowPlaying": "Spilles nå",
     "playingFrom": "Spiller fra ${title}",
     "queue": "Kø",
     "clearQueue": "Tøm kø",

@@ -28,7 +28,6 @@ import '../../../widgets/nested_tab_scrollbar.dart';
 import '../../../widgets/settings_builder.dart';
 import '../../../widgets/tv_browse_rail.dart';
 import '../../../widgets/tv_spotlight_scaffold.dart';
-import '../../main_screen.dart';
 import 'base_library_tab.dart';
 
 /// Recommended tab for library screen
@@ -304,10 +303,6 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
     }
   }
 
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
-  }
-
   // Extra top padding for focus decoration (scale + border extends beyond item bounds)
   static const double _focusDecorationPadding = 8.0;
 
@@ -353,7 +348,6 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
                   onVerticalNavigation: (isUp) => _handleVerticalNavigation(hubKeys, index, isUp),
                   onBack: widget.onBack,
                   onNavigateUp: index == 0 ? widget.onBack : null,
-                  onNavigateToSidebar: _navigateToSidebar,
                 );
               },
             ),
@@ -384,7 +378,6 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
               isContinueWatchingHub: _isContinueWatchingHub,
               usesContinueWatchingAction: _usesContinueWatchingAction,
               onNavigateUp: widget.onNavigateToChrome ?? widget.onBack,
-              onNavigateToSidebar: _navigateToSidebar,
               onBack: widget.onBack,
               tallPosterScale: TvBrowseRailLayout.compactTallPosterScale,
               widePosterScale: TvBrowseRailLayout.compactEpisodeThumbnailScale,

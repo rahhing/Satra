@@ -414,10 +414,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     );
   }
 
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
-  }
-
   @override
   void initState() {
     super.initState();
@@ -506,7 +502,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
   /// Handle key events for the hero section.
   KeyEventResult _handleHeroKeyEvent(FocusNode node, KeyEvent event) {
-    final backResult = handleBackKeyAction(event, _navigateToSidebar);
+    final backResult = handleBackKeyAction(event, _focusTopActions);
     if (backResult != KeyEventResult.ignored) return backResult;
 
     return dpadKeyHandler(
@@ -518,8 +514,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       onLeft: () {
         if (_heroIndex.value > 0) {
           _heroController.previousPage(duration: AppMotion.duration(context, AppMotion.slow), curve: AppMotion.curve);
-        } else {
-          _navigateToSidebar();
         }
       },
       onRight: () {
@@ -740,7 +734,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                   isSelected: true,
                   focusNode: _homeChipFocusNode,
                   onSelect: () => _selectHomeSection(LibraryTabType.recommended),
-                  onNavigateLeft: _navigateToSidebar,
                   onNavigateRight: mainServerLibraries.isNotEmpty
                       ? () => _focusNodeForLibraryChip(mainServerLibraries.first.globalKey).requestFocus()
                       : showSections
@@ -748,7 +741,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       : () => _actionBarKey.currentState?.requestFocusOnFirst(),
                   onNavigateDown: _focusContentFromAppBar,
                   onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                  onBack: _navigateToSidebar,
                 ),
                 for (int i = 0; i < mainServerLibraries.length; i++) ...[
                   const SizedBox(width: 8),
@@ -770,7 +762,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                         : () => _actionBarKey.currentState?.requestFocusOnFirst(),
                     onNavigateDown: _focusContentFromAppBar,
                     onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                    onBack: _navigateToSidebar,
                   ),
                 ],
                 if (showSections) ...[
@@ -802,7 +793,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                           : () => _actionBarKey.currentState?.requestFocusOnFirst(),
                       onNavigateDown: _focusContentFromAppBar,
                       onNavigateUp: () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                      onBack: _navigateToSidebar,
                     ),
                   ],
                 ],
@@ -839,8 +829,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           }
           if (_homeChipFocusNode.context != null) {
             _homeChipFocusNode.requestFocus();
-          } else {
-            _navigateToSidebar();
           }
         },
         onNavigateDown: _focusContentFromAppBar,
@@ -947,7 +935,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       loadMoreItems: _discover.loadAllContinueWatching,
                       onVerticalNavigation: (isUp) => _handleVerticalNavigation(0, isUp),
                       onNavigateUp: _focusTopBoundary,
-                      onNavigateToSidebar: _navigateToSidebar,
                     ),
                   ),
 
@@ -964,7 +951,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       // Hub index is i + 1 if continue watching exists, otherwise i
                       onVerticalNavigation: (isUp) => _handleVerticalNavigation(_onDeck.isNotEmpty ? i + 1 : i, isUp),
                       onNavigateUp: (i == 0 && _onDeck.isEmpty) ? _focusTopBoundary : null,
-                      onNavigateToSidebar: _navigateToSidebar,
                     ),
                   ),
 
@@ -1057,7 +1043,6 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       // it the preview items only showed that preview again.
       loadMoreItems: (hub) => hub.id == 'continue_watching' ? _discover.loadAllContinueWatching : null,
       onNavigateUp: _focusTopActions,
-      onNavigateToSidebar: _navigateToSidebar,
       tallPosterScale: TvBrowseRailLayout.compactTallPosterScale,
       widePosterScale: TvBrowseRailLayout.compactEpisodeThumbnailScale,
     );

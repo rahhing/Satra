@@ -1521,9 +1521,9 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
                         TvBrowseRailLayout.railBottomPaddingForScale(scale),
                       ),
                       child: ClipRect(
-                        // Media scrolls behind the shelf's leading margin,
-                        // rather than leaking into the space beside the dock.
-                        clipper: const _RailClipper(rightOverflow: 0),
+                        // Keep a tight vertical clip so scrolling hubs stay below
+                        // the spotlight while allowing hover lift & bleed on the left.
+                        clipper: _RailClipper(leftOverflow: horizontalInset, rightOverflow: 0),
                         child: ExcludeSemantics(
                           // Both axes animate during D-pad navigation. Keeping
                           // the individual headers/cards in the semantics tree
@@ -1864,7 +1864,7 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
         height: metrics.height,
         child: ClipRect(
           clipper: _RailClipper(
-            leftOverflow: leftOverflow,
+            leftOverflow: math.max(leftOverflow, hoverOutsets.left + FocusTheme.focusBorderWidth),
             rightOverflow: rightOverflow,
             topOverflow: math.max(metrics.focusExtra, hoverOutsets.top + FocusTheme.focusBorderWidth),
             bottomOverflow: math.max(metrics.focusExtra, hoverOutsets.bottom + FocusTheme.focusBorderWidth),

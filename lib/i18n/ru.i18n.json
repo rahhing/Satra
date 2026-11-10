@@ -210,6 +210,8 @@
     "paperTheme": "Бумага",
     "libraryDensity": "Плотность библиотеки",
     "displayScale": "Масштаб отображения",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Компактный",
     "comfortable": "Комфортный",
     "gridSpacing": "Отступы сетки",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Всегда показывать имена серверов в заголовках разделов.",
     "groupLibrariesByServer": "Группировать библиотеки по серверам",
     "groupLibrariesByServerDescription": "Группировать библиотеки боковой панели по медиасерверам.",
-    "alwaysKeepSidebarOpen": "Всегда держать боковую панель открытой",
-    "alwaysKeepSidebarOpenDescription": "Боковая панель остаётся развёрнутой, область контента подстраивается",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Показывать количество непросмотренных",
     "showUnwatchedCountDescription": "Отображать количество непросмотренных эпизодов для сериалов и сезонов",
     "showWatchedIndicators": "Показывать индикаторы просмотра",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Полные",
     "visualEffectsReduced": "Уменьшенные",
     "visualEffectsReducedDescription": "Меньше анимаций и графика с более низким разрешением",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Скрыть спойлеры непросмотренных эпизодов",
     "hideSpoilersDescription": "Размывать миниатюры и описания непросмотренных серий",
     "playerBackend": "Бэкенд плеера",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Публичные серверы ретрансляции Open Watch Party, если не указан свой",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Введите допустимый базовый HTTP- или HTTPS-адрес сервера ретрансляции.",
-
-
     "debugLogging": "Журнал отладки",
     "debugLoggingDescription": "Включить подробное журналирование для устранения неполадок",
     "viewLogs": "Просмотр логов",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Восстанавливать исходные кадры фильмов и анимации, преобразованных телесином в 29,97 кадр/с (часто встречается на DVD формата NTSC). Видео, снятое для ТВ, будет дёргаться. В прямом эфире используется режим «Видео»",
     "requireProfileSelectionOnOpen": "Запрашивать профиль при запуске",
     "requireProfileSelectionOnOpenDescription": "Показывать выбор профиля при каждом открытии приложения",
-    "forceTvMode": "Принудительный режим ТВ",
-    "forceTvModeDescription": "Принудительно включить ТВ-интерфейс. Для устройств без автоопределения. Требуется перезапуск.",
     "startInFullscreen": "Запускать в полноэкранном режиме",
     "startInFullscreenDescription": "Открывать Satra в полноэкранном режиме при запуске",
     "exitFullscreenOnPlayerClose": "Выходить из полноэкранного режима при закрытии плеера",
@@ -561,12 +563,52 @@
     "previewSwitch": "Автовоспроизведение",
     "previewMutedText": "Так выглядит второстепенный текст"
   },
-  "search": {
-    "hint": "Поиск фильмов, сериалов, музыки...",
-    "tryDifferentTerm": "Попробуйте другой запрос",
-    "searchYourMedia": "Поиск в вашей медиатеке",
-    "enterTitleActorOrKeyword": "Введите название, актёра или ключевое слово",
-    "people": "Люди"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Назначить клавишу для ${actionName}",
@@ -930,7 +972,6 @@
     },
     "removedFromContinueWatching": "Удалено из «Продолжить просмотр»",
     "errorLoading": "Ошибка: ${error}",
-    "searchPartialResults": "Поиск по некоторым медиасерверам не удался. Показываем доступные результаты.",
     "streamInterrupted": "Поток прервался. Нажмите «Воспроизвести» или перемотайте, чтобы повторить попытку.",
     "liveStreamInterrupted": "Прямая трансляция прервалась. Нажмите «Воспроизвести», чтобы повторить попытку.",
     "fileInfoNotAvailable": "Информация о файле недоступна",
@@ -964,7 +1005,6 @@
     "noEpisodesFound": "Эпизоды в первом сезоне не найдены",
     "noEpisodesFoundGeneral": "Эпизоды не найдены",
     "episodesLoadFailed": "Не удалось загрузить эпизоды",
-    "noResultsFound": "Результаты не найдены",
     "sleepTimerSet": "Таймер сна установлен на ${label}",
     "noItemsAvailable": "Нет доступных элементов",
     "failedToCreatePlayQueueNoItems": "Не удалось создать очередь воспроизведения — нет элементов",
@@ -979,8 +1019,6 @@
     "serverBusyBody": "Сервер продолжает отклонять запросы на потоковую передачу этого файла (HTTP 503). Возможно, он перезапускается, перегружен или хранилище с файлом недоступно. Повторите попытку через некоторое время. Если это продолжает происходить, попросите владельца сервера проверить сервер и хранилище с файлом.",
     "playbackNotAllowedTitle": "Воспроизведение запрещено",
     "playbackNotAllowedBody": "Сервер отказал в потоковой передаче этого элемента (HTTP 403). Возможно, у вашей учётной записи нет разрешения на его воспроизведение или сервер разрешает воспроизведение только в своей локальной сети.",
-
-
     "burnedSubtitlesUseMenu": "Субтитры встроены в этот поток. Изменить их можно в меню субтитров.",
     "noVideoUrl": "URL видео недоступен",
     "playbackNoMediaSources": "Сервер не вернул пригодных для воспроизведения медиаисточников",
@@ -1233,7 +1271,6 @@
   },
   "errors": {
     "searchFailed": "Ошибка поиска: ${error}",
-    "searchUnavailable": "Поиску не удалось связаться ни с одним медиасервером.",
     "connectionTimeout": "Таймаут подключения при загрузке ${context}",
     "connectionFailed": "Не удалось подключиться к медиасерверу",
     "unableToLoad": "Не удалось загрузить ${context}. Повторите попытку.",
@@ -1269,7 +1306,6 @@
     "failedToAnalyze": "Не удалось проанализировать библиотеку: ${error}",
     "noLibrariesFound": "Библиотеки не найдены",
     "allLibrariesHidden": "Все библиотеки скрыты",
-    "hiddenLibrariesCount": "Скрытые библиотеки (${count})",
     "thisLibraryIsEmpty": "Эта библиотека пуста",
     "noItemsMatchFilters": "Нет элементов, соответствующих активным фильтрам",
     "resetFilters": "Сбросить фильтры",
@@ -1401,7 +1437,6 @@
   "logs": {
     "clearLogs": "Очистить логи",
     "copyLogs": "Скопировать логи"
-
   },
   "startup": {
     "failedTitle": "Satra не удалось запустить",
@@ -1412,7 +1447,6 @@
     "hideDetails": "Скрыть сведения",
     "copyDetails": "Копировать сведения",
     "detailsCopied": "Сведения скопированы в буфер обмена",
-
     "repairStorage": "Восстановить хранилище",
     "repairTitle": "Восстановить сохранённые данные?",
     "repairBodyCommon": "Файл настроек Satra повреждён и не может быть прочитан. Восстановление сбросит все настройки к значениям по умолчанию.",
@@ -1800,7 +1834,6 @@
       "many": "${n} треков",
       "other": "${n} трека"
     },
-    "nowPlaying": "Сейчас играет",
     "playingFrom": "Воспроизведение из ${title}",
     "queue": "Очередь",
     "clearQueue": "Очистить очередь",

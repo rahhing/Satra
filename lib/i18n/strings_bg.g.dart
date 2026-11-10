@@ -48,7 +48,6 @@ class TranslationsBg extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$bg supporter = _Translations$supporter$bg._(_root);
 	@override late final _Translations$settings$bg settings = _Translations$settings$bg._(_root);
 	@override late final _Translations$themeEditor$bg themeEditor = _Translations$themeEditor$bg._(_root);
-	@override late final _Translations$search$bg search = _Translations$search$bg._(_root);
 	@override late final _Translations$hotkeys$bg hotkeys = _Translations$hotkeys$bg._(_root);
 	@override late final _Translations$fileInfo$bg fileInfo = _Translations$fileInfo$bg._(_root);
 	@override late final _Translations$mediaMenu$bg mediaMenu = _Translations$mediaMenu$bg._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$bg extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Винаги показвай имената на сървърите в заглавията на хъбовете.';
 	@override String get groupLibrariesByServer => 'Групирай библиотеките по сървър';
 	@override String get groupLibrariesByServerDescription => 'Групирай библиотеките в страничната лента под всеки медиен сървър.';
-	@override String get alwaysKeepSidebarOpen => 'Винаги дръж страничната лента отворена';
-	@override String get alwaysKeepSidebarOpenDescription => 'Страничната лента остава разгъната и зоната със съдържание се наглася да пасне';
 	@override String get showUnwatchedCount => 'Показвай броя негледани';
 	@override String get showUnwatchedCountDescription => 'Показвай броя негледани епизоди при сериали и сезони';
 	@override String get showWatchedIndicators => 'Показвай индикатори за гледано';
@@ -553,8 +550,6 @@ class _Translations$settings$bg extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Възстановява оригиналните кадри на филми и анимация, преобразувани чрез телесине до 29,97 кадъра/с, което е често при NTSC DVD дисковете. Видео, заснето за телевизия, ще насича. Телевизията на живо използва „Видео“';
 	@override String get requireProfileSelectionOnOpen => 'Питай за профил при отваряне на приложението';
 	@override String get requireProfileSelectionOnOpenDescription => 'Показвай избор на профил всеки път при отваряне на приложението';
-	@override String get forceTvMode => 'Принуди TV режим';
-	@override String get forceTvModeDescription => 'Принуди ТВ оформление. За устройства, които не се разпознават автоматично. Изисква рестарт.';
 	@override String get startInFullscreen => 'Стартирай на цял екран';
 	@override String get startInFullscreenDescription => 'Отваряй Satra в режим цял екран при стартиране';
 	@override String get exitFullscreenOnPlayerClose => 'Изход от цял екран при затваряне на плейъра';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$bg extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => 'Остават ${minutes} мин';
 	@override String get previewSwitch => 'Автоматично пускане';
 	@override String get previewMutedText => 'Вторичният текст изглежда така';
-}
-
-// Path: search
-class _Translations$search$bg extends Translations$search$en {
-	_Translations$search$bg._(TranslationsBg root) : this._root = root, super.internal(root);
-
-	final TranslationsBg _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Търсене на филми, сериали, музика...';
-	@override String get tryDifferentTerm => 'Опитайте с различна дума за търсене';
-	@override String get searchYourMedia => 'Търсете в медийното си съдържание';
-	@override String get enterTitleActorOrKeyword => 'Въведете заглавие, актьор или ключова дума';
-	@override String get people => 'Хора';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$bg extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Премахнато от продължаване на гледането';
 	@override String errorLoading({required Object error}) => 'Грешка: ${error}';
-	@override String get searchPartialResults => 'Някои медийни сървъри не можаха да бъдат претърсени. Показват се наличните резултати.';
 	@override String get streamInterrupted => 'Потокът прекъсна. Натиснете „Пусни“ или превъртете, за да опитате отново.';
 	@override String get liveStreamInterrupted => 'Потокът на живо прекъсна. Натиснете „Пусни“, за да опитате отново.';
 	@override String get fileInfoNotAvailable => 'Информацията за файла не е налична';
@@ -1071,7 +1051,6 @@ class _Translations$messages$bg extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Не са намерени епизоди в първия сезон';
 	@override String get noEpisodesFoundGeneral => 'Не са намерени епизоди';
 	@override String get episodesLoadFailed => 'Неуспешно зареждане на епизоди';
-	@override String get noResultsFound => 'Няма намерени резултати';
 	@override String sleepTimerSet({required Object label}) => 'Таймерът за заспиване е зададен за ${label}';
 	@override String get noItemsAvailable => 'Няма налични елементи';
 	@override String get failedToCreatePlayQueueNoItems => 'Неуспешно създаване на опашка за възпроизвеждане - няма елементи';
@@ -1349,7 +1328,6 @@ class _Translations$errors$bg extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Търсенето е неуспешно: ${error}';
-	@override String get searchUnavailable => 'Търсенето не можа да достигне до нито един медиен сървър.';
 	@override String connectionTimeout({required Object context}) => 'Изтече времето за връзка при зареждане на ${context}';
 	@override String get connectionFailed => 'Не може да се осъществи връзка с медиен сървър';
 	@override String unableToLoad({required Object context}) => 'Не може да се зареди ${context}. Опитайте отново.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$bg extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Неуспешен анализ на библиотеката: ${error}';
 	@override String get noLibrariesFound => 'Не са намерени библиотеки';
 	@override String get allLibrariesHidden => 'Всички библиотеки са скрити';
-	@override String hiddenLibrariesCount({required Object count}) => 'Скрити библиотеки (${count})';
 	@override String get thisLibraryIsEmpty => 'Тази библиотека е празна';
 	@override String get noItemsMatchFilters => 'Няма елементи, съответстващи на активните филтри';
 	@override String get resetFilters => 'Нулирай филтрите';
@@ -1766,7 +1743,6 @@ class _Translations$music$bg extends Translations$music$en {
 		one: '${n} песен',
 		other: '${n} песни',
 	);
-	@override String get nowPlaying => 'Сега се възпроизвежда';
 	@override String playingFrom({required Object title}) => 'Възпроизвеждане от ${title}';
 	@override String get queue => 'Опашка';
 	@override String get clearQueue => 'Изчисти опашката';
@@ -3603,8 +3579,6 @@ extension on TranslationsBg {
 			'settings.showServerNameOnHubsDescription' => 'Винаги показвай имената на сървърите в заглавията на хъбовете.',
 			'settings.groupLibrariesByServer' => 'Групирай библиотеките по сървър',
 			'settings.groupLibrariesByServerDescription' => 'Групирай библиотеките в страничната лента под всеки медиен сървър.',
-			'settings.alwaysKeepSidebarOpen' => 'Винаги дръж страничната лента отворена',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Страничната лента остава разгъната и зоната със съдържание се наглася да пасне',
 			'settings.showUnwatchedCount' => 'Показвай броя негледани',
 			'settings.showUnwatchedCountDescription' => 'Показвай броя негледани епизоди при сериали и сезони',
 			'settings.showWatchedIndicators' => 'Показвай индикатори за гледано',
@@ -3829,8 +3803,6 @@ extension on TranslationsBg {
 			'settings.deinterlaceFilmDescription' => 'Възстановява оригиналните кадри на филми и анимация, преобразувани чрез телесине до 29,97 кадъра/с, което е често при NTSC DVD дисковете. Видео, заснето за телевизия, ще насича. Телевизията на живо използва „Видео“',
 			'settings.requireProfileSelectionOnOpen' => 'Питай за профил при отваряне на приложението',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Показвай избор на профил всеки път при отваряне на приложението',
-			'settings.forceTvMode' => 'Принуди TV режим',
-			'settings.forceTvModeDescription' => 'Принуди ТВ оформление. За устройства, които не се разпознават автоматично. Изисква рестарт.',
 			'settings.startInFullscreen' => 'Стартирай на цял екран',
 			'settings.startInFullscreenDescription' => 'Отваряй Satra в режим цял екран при стартиране',
 			'settings.exitFullscreenOnPlayerClose' => 'Изход от цял екран при затваряне на плейъра',
@@ -3903,12 +3875,12 @@ extension on TranslationsBg {
 			'themeEditor.slots.textMuted' => 'Вторичен текст',
 			'themeEditor.slots.accent' => 'Акцент',
 			'themeEditor.opacity' => 'Непрозрачност',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB или #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'От други теми',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Текст върху фона',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Текст върху повърхността',
 			'themeEditor.contrast.textMutedOnBg' => 'Вторичен текст върху фона',
 			'themeEditor.contrast.textMutedOnSurface' => 'Вторичен текст върху повърхността',
@@ -3923,11 +3895,6 @@ extension on TranslationsBg {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => 'Остават ${minutes} мин',
 			'themeEditor.previewSwitch' => 'Автоматично пускане',
 			'themeEditor.previewMutedText' => 'Вторичният текст изглежда така',
-			'search.hint' => 'Търсене на филми, сериали, музика...',
-			'search.tryDifferentTerm' => 'Опитайте с различна дума за търсене',
-			'search.searchYourMedia' => 'Търсете в медийното си съдържание',
-			'search.enterTitleActorOrKeyword' => 'Въведете заглавие, актьор или ключова дума',
-			'search.people' => 'Хора',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Задай клавишна комбинация за ${actionName}',
 			'hotkeys.clearShortcut' => 'Изчисти клавишната комбинация',
 			'hotkeys.noShortcutSet' => 'Няма зададена клавишна комбинация',
@@ -4246,7 +4213,6 @@ extension on TranslationsBg {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('bg'))(n, one: 'Автоматично премахнато ${n} гледано изтегляне', other: 'Автоматично премахнати ${n} гледани изтегляния', ), 
 			'messages.removedFromContinueWatching' => 'Премахнато от продължаване на гледането',
 			'messages.errorLoading' => ({required Object error}) => 'Грешка: ${error}',
-			'messages.searchPartialResults' => 'Някои медийни сървъри не можаха да бъдат претърсени. Показват се наличните резултати.',
 			'messages.streamInterrupted' => 'Потокът прекъсна. Натиснете „Пусни“ или превъртете, за да опитате отново.',
 			'messages.liveStreamInterrupted' => 'Потокът на живо прекъсна. Натиснете „Пусни“, за да опитате отново.',
 			'messages.fileInfoNotAvailable' => 'Информацията за файла не е налична',
@@ -4280,7 +4246,6 @@ extension on TranslationsBg {
 			'messages.noEpisodesFound' => 'Не са намерени епизоди в първия сезон',
 			'messages.noEpisodesFoundGeneral' => 'Не са намерени епизоди',
 			'messages.episodesLoadFailed' => 'Неуспешно зареждане на епизоди',
-			'messages.noResultsFound' => 'Няма намерени резултати',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Таймерът за заспиване е зададен за ${label}',
 			'messages.noItemsAvailable' => 'Няма налични елементи',
 			'messages.failedToCreatePlayQueueNoItems' => 'Неуспешно създаване на опашка за възпроизвеждане - няма елементи',
@@ -4417,8 +4382,6 @@ extension on TranslationsBg {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Добави към ${displayName}: Plex, Jellyfin, Emby или връзка от друг профил',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Сесията за ${name} е изтекла',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Сесиите за ${count} сървъра са изтекли',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} отказа достъп за този профил',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} сървъра отказаха достъп за този профил',
 			'connections.signInAgain' => 'Влез отново',
@@ -4430,6 +4393,8 @@ extension on TranslationsBg {
 			'accountPreferences.pickAccount' => 'Всеки акаунт съхранява собствени предпочитания. Изберете кой да редактирате.',
 			'accountPreferences.storedOnAccount' => 'Тези опции се запазват на самия акаунт, така че всяко приложение, вписано в него, ги използва — включително Satra на другите ви устройства.',
 			'accountPreferences.noAccounts' => 'Няма акаунти за настройка',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Влезте в Plex или свържете Jellyfin или Emby сървър и предпочитанията, запазени на този акаунт, ще се появят тук.',
 			'accountPreferences.unavailable' => 'Акаунтът не може да бъде достигнат',
 			'accountPreferences.loadFailed' => 'Предпочитанията не можаха да бъдат заредени',
@@ -4512,7 +4477,6 @@ extension on TranslationsBg {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (на ${age} г.)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (на ${age} г.)',
 			'errors.searchFailed' => ({required Object error}) => 'Търсенето е неуспешно: ${error}',
-			'errors.searchUnavailable' => 'Търсенето не можа да достигне до нито един медиен сървър.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Изтече времето за връзка при зареждане на ${context}',
 			'errors.connectionFailed' => 'Не може да се осъществи връзка с медиен сървър',
 			'errors.unableToLoad' => ({required Object context}) => 'Не може да се зареди ${context}. Опитайте отново.',
@@ -4546,7 +4510,6 @@ extension on TranslationsBg {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Неуспешен анализ на библиотеката: ${error}',
 			'libraries.noLibrariesFound' => 'Не са намерени библиотеки',
 			'libraries.allLibrariesHidden' => 'Всички библиотеки са скрити',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Скрити библиотеки (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Тази библиотека е празна',
 			'libraries.noItemsMatchFilters' => 'Няма елементи, съответстващи на активните филтри',
 			'libraries.resetFilters' => 'Нулирай филтрите',
@@ -4931,8 +4894,6 @@ extension on TranslationsBg {
 			'liveTv.failedToStartChannel' => 'Каналът на живо не можа да бъде пуснат',
 			'liveTv.failedToBuildStreamUrl' => 'URL за потока не можа да бъде създаден',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Каналът не можа да бъде стартиран: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Каналът не можа да бъде сменен: ${reason}',
 			'collections.title' => 'Колекции',
 			'collections.collection' => 'Колекция',
@@ -4946,6 +4907,8 @@ extension on TranslationsBg {
 			'collections.collectionName' => 'Име на колекция',
 			'collections.enterCollectionName' => 'Въведете име на колекция',
 			'collections.addedToCollection' => 'Добавено към колекция',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Неуспешно добавяне към колекция',
 			'collections.created' => 'Колекцията е създадена',
 			'collections.removeFromCollection' => 'Премахни от колекция',
@@ -4987,7 +4950,6 @@ extension on TranslationsBg {
 			'music.addToQueue' => 'Добави към опашката',
 			'music.discNumber' => ({required Object n}) => 'Диск ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('bg'))(n, one: '${n} песен', other: '${n} песни', ), 
-			'music.nowPlaying' => 'Сега се възпроизвежда',
 			'music.playingFrom' => ({required Object title}) => 'Възпроизвеждане от ${title}',
 			'music.queue' => 'Опашка',
 			'music.clearQueue' => 'Изчисти опашката',
@@ -5445,8 +5407,6 @@ extension on TranslationsBg {
 			'externalPlayer.useExternalPlayer' => 'Използвай външен плеър',
 			'externalPlayer.useExternalPlayerDescription' => 'Отваряй видеата в друго приложение',
 			'externalPlayer.selectPlayer' => 'Избери плейър',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Потребителски плейъри',
 			'externalPlayer.systemDefault' => 'Системен по подразбиране',
 			'externalPlayer.addCustomPlayer' => 'Добави потребителски плейър',
@@ -5461,6 +5421,8 @@ extension on TranslationsBg {
 			'externalPlayer.playInExternalPlayer' => 'Пусни във външен плеър',
 			'metadataEdit.editMetadata' => 'Редактирай...',
 			'metadataEdit.screenTitle' => 'Редактиране на метаданни',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Основна информация',
 			'metadataEdit.artwork' => 'Обложка',
 			'metadataEdit.advancedSettings' => 'Разширени настройки',

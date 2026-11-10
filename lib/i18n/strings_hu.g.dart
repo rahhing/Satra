@@ -48,7 +48,6 @@ class TranslationsHu extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$hu supporter = _Translations$supporter$hu._(_root);
 	@override late final _Translations$settings$hu settings = _Translations$settings$hu._(_root);
 	@override late final _Translations$themeEditor$hu themeEditor = _Translations$themeEditor$hu._(_root);
-	@override late final _Translations$search$hu search = _Translations$search$hu._(_root);
 	@override late final _Translations$hotkeys$hu hotkeys = _Translations$hotkeys$hu._(_root);
 	@override late final _Translations$fileInfo$hu fileInfo = _Translations$fileInfo$hu._(_root);
 	@override late final _Translations$mediaMenu$hu mediaMenu = _Translations$mediaMenu$hu._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$hu extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Mindig jelenjen meg a szerver neve a blokkok címében.';
 	@override String get groupLibrariesByServer => 'Könyvtárak csoportosítása szerver szerint';
 	@override String get groupLibrariesByServerDescription => 'Az oldalsáv könyvtárainak csoportosítása a médiaszerverek alatt.';
-	@override String get alwaysKeepSidebarOpen => 'Oldalsáv mindig nyitva';
-	@override String get alwaysKeepSidebarOpenDescription => 'Az oldalsáv kibontva marad, a tartalom területe igazodik hozzá';
 	@override String get showUnwatchedCount => 'Nem látott elemek számának megjelenítése';
 	@override String get showUnwatchedCountDescription => 'Megjeleníti a még nem látott epizódok számát a sorozatoknál és évadoknál';
 	@override String get showWatchedIndicators => 'Megtekintésjelölők megjelenítése';
@@ -553,8 +550,6 @@ class _Translations$settings$hu extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'A 29,97 fps-re telecine-eljárással átalakított filmek és animációk eredeti képkockáinak helyreállítása, ami gyakori az NTSC DVD-ken. A TV-re rögzített felvételek akadoznak. Az Élő TV a Videó módot használja';
 	@override String get requireProfileSelectionOnOpen => 'Profil kérése az alkalmazás megnyitásakor';
 	@override String get requireProfileSelectionOnOpenDescription => 'Profilválasztó megjelenítése minden alkalommal, amikor az alkalmazást megnyitod';
-	@override String get forceTvMode => 'TV-mód kényszerítése';
-	@override String get forceTvModeDescription => 'TV-elrendezés kényszerítése az automatikus felismeréssel nem rendelkező eszközökön. Újraindítást igényel.';
 	@override String get startInFullscreen => 'Indítás teljes képernyőn';
 	@override String get startInFullscreenDescription => 'A Satra megnyitása teljes képernyős módban indításkor';
 	@override String get exitFullscreenOnPlayerClose => 'Kilépés a teljes képernyőből a lejátszó bezárásakor';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$hu extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} perc van hátra';
 	@override String get previewSwitch => 'Automatikus lejátszás';
 	@override String get previewMutedText => 'Így néz ki a másodlagos szöveg';
-}
-
-// Path: search
-class _Translations$search$hu extends Translations$search$en {
-	_Translations$search$hu._(TranslationsHu root) : this._root = root, super.internal(root);
-
-	final TranslationsHu _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Keresés filmek, sorozatok és zenék között...';
-	@override String get tryDifferentTerm => 'Próbálj másik keresési kifejezést';
-	@override String get searchYourMedia => 'Keresés a saját médiatartalmak között';
-	@override String get enterTitleActorOrKeyword => 'Adj meg egy címet, színészt vagy kulcsszót';
-	@override String get people => 'Személyek';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$hu extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Eltávolítva a folytatásból';
 	@override String errorLoading({required Object error}) => 'Hiba: ${error}';
-	@override String get searchPartialResults => 'Néhány médiaszervert nem sikerült keresni. Az elérhető találatok megjelenítése.';
 	@override String get streamInterrupted => 'Az adatfolyam megszakadt. Az újrapróbálkozáshoz indítsd el a lejátszást, vagy tekerj másik pozícióra.';
 	@override String get liveStreamInterrupted => 'Az élő adás megszakadt. Nyomd meg a lejátszást az újrapróbálkozáshoz.';
 	@override String get fileInfoNotAvailable => 'A fájlinformáció nem érhető el';
@@ -1071,7 +1051,6 @@ class _Translations$messages$hu extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Nem találhatók epizódok az első évadban';
 	@override String get noEpisodesFoundGeneral => 'Nem találhatók epizódok';
 	@override String get episodesLoadFailed => 'Nem sikerült az epizódok betöltése';
-	@override String get noResultsFound => 'Nincs találat';
 	@override String sleepTimerSet({required Object label}) => 'Elalvási időzítő beállítva: ${label}';
 	@override String get noItemsAvailable => 'Nincsenek elérhető elemek';
 	@override String get failedToCreatePlayQueueNoItems => 'Nem sikerült létrehozni a lejátszási sort — nincsenek elemek';
@@ -1349,7 +1328,6 @@ class _Translations$errors$hu extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Keresés sikertelen: ${error}';
-	@override String get searchUnavailable => 'A keresés egyetlen médiaszervert sem tudott elérni.';
 	@override String connectionTimeout({required Object context}) => 'Hálózati időtúllépés a következő betöltésekor: ${context}';
 	@override String get connectionFailed => 'Nem sikerült csatlakozni a médiaszerverhez';
 	@override String unableToLoad({required Object context}) => 'Nem sikerült betölteni a következőt: ${context}. Próbáld újra.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$hu extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Nem sikerült a könyvtár elemzése: ${error}';
 	@override String get noLibrariesFound => 'Nem találhatók könyvtárak';
 	@override String get allLibrariesHidden => 'Minden könyvtár el van rejtve';
-	@override String hiddenLibrariesCount({required Object count}) => 'Rejtett könyvtárak (${count})';
 	@override String get thisLibraryIsEmpty => 'Ez a könyvtár üres';
 	@override String get noItemsMatchFilters => 'Nincs az aktív szűrőknek megfelelő elem';
 	@override String get resetFilters => 'Szűrők visszaállítása';
@@ -1766,7 +1743,6 @@ class _Translations$music$hu extends Translations$music$en {
 		one: '${n} zeneszám',
 		other: '${n} zeneszám',
 	);
-	@override String get nowPlaying => 'Most szól';
 	@override String playingFrom({required Object title}) => 'Lejátszás innen: ${title}';
 	@override String get queue => 'Lejátszási sor';
 	@override String get clearQueue => 'Sor törlése';
@@ -3603,8 +3579,6 @@ extension on TranslationsHu {
 			'settings.showServerNameOnHubsDescription' => 'Mindig jelenjen meg a szerver neve a blokkok címében.',
 			'settings.groupLibrariesByServer' => 'Könyvtárak csoportosítása szerver szerint',
 			'settings.groupLibrariesByServerDescription' => 'Az oldalsáv könyvtárainak csoportosítása a médiaszerverek alatt.',
-			'settings.alwaysKeepSidebarOpen' => 'Oldalsáv mindig nyitva',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Az oldalsáv kibontva marad, a tartalom területe igazodik hozzá',
 			'settings.showUnwatchedCount' => 'Nem látott elemek számának megjelenítése',
 			'settings.showUnwatchedCountDescription' => 'Megjeleníti a még nem látott epizódok számát a sorozatoknál és évadoknál',
 			'settings.showWatchedIndicators' => 'Megtekintésjelölők megjelenítése',
@@ -3829,8 +3803,6 @@ extension on TranslationsHu {
 			'settings.deinterlaceFilmDescription' => 'A 29,97 fps-re telecine-eljárással átalakított filmek és animációk eredeti képkockáinak helyreállítása, ami gyakori az NTSC DVD-ken. A TV-re rögzített felvételek akadoznak. Az Élő TV a Videó módot használja',
 			'settings.requireProfileSelectionOnOpen' => 'Profil kérése az alkalmazás megnyitásakor',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Profilválasztó megjelenítése minden alkalommal, amikor az alkalmazást megnyitod',
-			'settings.forceTvMode' => 'TV-mód kényszerítése',
-			'settings.forceTvModeDescription' => 'TV-elrendezés kényszerítése az automatikus felismeréssel nem rendelkező eszközökön. Újraindítást igényel.',
 			'settings.startInFullscreen' => 'Indítás teljes képernyőn',
 			'settings.startInFullscreenDescription' => 'A Satra megnyitása teljes képernyős módban indításkor',
 			'settings.exitFullscreenOnPlayerClose' => 'Kilépés a teljes képernyőből a lejátszó bezárásakor',
@@ -3903,12 +3875,12 @@ extension on TranslationsHu {
 			'themeEditor.slots.textMuted' => 'Másodlagos szöveg',
 			'themeEditor.slots.accent' => 'Kiemelőszín',
 			'themeEditor.opacity' => 'Átlátszatlanság',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB vagy #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Más témákból',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} – ${color}',
 			'themeEditor.contrast.textOnBg' => 'Szöveg a háttéren',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Szöveg a felületen',
 			'themeEditor.contrast.textMutedOnBg' => 'Másodlagos szöveg a háttéren',
 			'themeEditor.contrast.textMutedOnSurface' => 'Másodlagos szöveg a felületen',
@@ -3923,11 +3895,6 @@ extension on TranslationsHu {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} perc van hátra',
 			'themeEditor.previewSwitch' => 'Automatikus lejátszás',
 			'themeEditor.previewMutedText' => 'Így néz ki a másodlagos szöveg',
-			'search.hint' => 'Keresés filmek, sorozatok és zenék között...',
-			'search.tryDifferentTerm' => 'Próbálj másik keresési kifejezést',
-			'search.searchYourMedia' => 'Keresés a saját médiatartalmak között',
-			'search.enterTitleActorOrKeyword' => 'Adj meg egy címet, színészt vagy kulcsszót',
-			'search.people' => 'Személyek',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Billentyűparancs beállítása ehhez: ${actionName}',
 			'hotkeys.clearShortcut' => 'Billentyűparancs törlése',
 			'hotkeys.noShortcutSet' => 'Nincs billentyűparancs beállítva',
@@ -4246,7 +4213,6 @@ extension on TranslationsHu {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('hu'))(n, one: '${n} megtekintett letöltés automatikusan eltávolítva', other: '${n} megtekintett letöltés automatikusan eltávolítva', ), 
 			'messages.removedFromContinueWatching' => 'Eltávolítva a folytatásból',
 			'messages.errorLoading' => ({required Object error}) => 'Hiba: ${error}',
-			'messages.searchPartialResults' => 'Néhány médiaszervert nem sikerült keresni. Az elérhető találatok megjelenítése.',
 			'messages.streamInterrupted' => 'Az adatfolyam megszakadt. Az újrapróbálkozáshoz indítsd el a lejátszást, vagy tekerj másik pozícióra.',
 			'messages.liveStreamInterrupted' => 'Az élő adás megszakadt. Nyomd meg a lejátszást az újrapróbálkozáshoz.',
 			'messages.fileInfoNotAvailable' => 'A fájlinformáció nem érhető el',
@@ -4280,7 +4246,6 @@ extension on TranslationsHu {
 			'messages.noEpisodesFound' => 'Nem találhatók epizódok az első évadban',
 			'messages.noEpisodesFoundGeneral' => 'Nem találhatók epizódok',
 			'messages.episodesLoadFailed' => 'Nem sikerült az epizódok betöltése',
-			'messages.noResultsFound' => 'Nincs találat',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Elalvási időzítő beállítva: ${label}',
 			'messages.noItemsAvailable' => 'Nincsenek elérhető elemek',
 			'messages.failedToCreatePlayQueueNoItems' => 'Nem sikerült létrehozni a lejátszási sort — nincsenek elemek',
@@ -4417,8 +4382,6 @@ extension on TranslationsHu {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Hozzáadás a következőhöz (${displayName}): Plex, Jellyfin, Emby vagy más profilkapcsolat',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'A(z) ${name} munkamenete lejárt',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} szerver munkamenete lejárt',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => 'A(z) ${name} megtagadta a hozzáférést ettől a fióktól',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} szerver megtagadta a hozzáférést ettől a fióktól',
 			'connections.signInAgain' => 'Bejelentkezés újra',
@@ -4430,6 +4393,8 @@ extension on TranslationsHu {
 			'accountPreferences.pickAccount' => 'Minden fiók a saját beállításait tárolja. Válaszd ki a szerkesztendőt.',
 			'accountPreferences.storedOnAccount' => 'Ezek a beállítások magán a fiókon tárolódnak, így minden bejelentkezett alkalmazás használja őket — beleértve a Satrat a többi eszközödön.',
 			'accountPreferences.noAccounts' => 'Nincs beállítható fiók',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Jelentkezz be a Plexbe, vagy csatlakoztass egy Jellyfin- vagy Emby-szervert, és az azon a fiókon tárolt beállítások itt jelennek meg.',
 			'accountPreferences.unavailable' => 'Ez a fiók nem érhető el',
 			'accountPreferences.loadFailed' => 'Nem sikerült betölteni ezeket a beállításokat',
@@ -4512,7 +4477,6 @@ extension on TranslationsHu {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} éves)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (${age} évesen)',
 			'errors.searchFailed' => ({required Object error}) => 'Keresés sikertelen: ${error}',
-			'errors.searchUnavailable' => 'A keresés egyetlen médiaszervert sem tudott elérni.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Hálózati időtúllépés a következő betöltésekor: ${context}',
 			'errors.connectionFailed' => 'Nem sikerült csatlakozni a médiaszerverhez',
 			'errors.unableToLoad' => ({required Object context}) => 'Nem sikerült betölteni a következőt: ${context}. Próbáld újra.',
@@ -4546,7 +4510,6 @@ extension on TranslationsHu {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Nem sikerült a könyvtár elemzése: ${error}',
 			'libraries.noLibrariesFound' => 'Nem találhatók könyvtárak',
 			'libraries.allLibrariesHidden' => 'Minden könyvtár el van rejtve',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Rejtett könyvtárak (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Ez a könyvtár üres',
 			'libraries.noItemsMatchFilters' => 'Nincs az aktív szűrőknek megfelelő elem',
 			'libraries.resetFilters' => 'Szűrők visszaállítása',
@@ -4931,8 +4894,6 @@ extension on TranslationsHu {
 			'liveTv.failedToStartChannel' => 'Nem sikerült elindítani az élő csatornát',
 			'liveTv.failedToBuildStreamUrl' => 'Nem sikerült összeállítani a stream URL-címét',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Nem sikerült elindítani a csatornát: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Nem sikerült csatornát váltani: ${reason}',
 			'collections.title' => 'Gyűjtemények',
 			'collections.collection' => 'Gyűjtemény',
@@ -4946,6 +4907,8 @@ extension on TranslationsHu {
 			'collections.collectionName' => 'Gyűjtemény neve',
 			'collections.enterCollectionName' => 'Add meg a gyűjtemény nevét',
 			'collections.addedToCollection' => 'Hozzáadva a gyűjteményhez',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Nem sikerült a gyűjteményhez adni',
 			'collections.created' => 'Gyűjtemény létrehozva',
 			'collections.removeFromCollection' => 'Eltávolítás a gyűjteményből',
@@ -4987,7 +4950,6 @@ extension on TranslationsHu {
 			'music.addToQueue' => 'Hozzáadás a lejátszási sorhoz',
 			'music.discNumber' => ({required Object n}) => '${n}. lemez',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('hu'))(n, one: '${n} zeneszám', other: '${n} zeneszám', ), 
-			'music.nowPlaying' => 'Most szól',
 			'music.playingFrom' => ({required Object title}) => 'Lejátszás innen: ${title}',
 			'music.queue' => 'Lejátszási sor',
 			'music.clearQueue' => 'Sor törlése',
@@ -5445,8 +5407,6 @@ extension on TranslationsHu {
 			'externalPlayer.useExternalPlayer' => 'Külső lejátszó használata',
 			'externalPlayer.useExternalPlayerDescription' => 'Videók megnyitása egy másik alkalmazásban',
 			'externalPlayer.selectPlayer' => 'Lejátszó kiválasztása',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Egyéni lejátszók',
 			'externalPlayer.systemDefault' => 'Rendszer alapértelmezése',
 			'externalPlayer.addCustomPlayer' => 'Egyéni lejátszó hozzáadása',
@@ -5461,6 +5421,8 @@ extension on TranslationsHu {
 			'externalPlayer.playInExternalPlayer' => 'Lejátszás külső lejátszóban',
 			'metadataEdit.editMetadata' => 'Szerkesztés...',
 			'metadataEdit.screenTitle' => 'Metaadatok szerkesztése',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Alapinformációk',
 			'metadataEdit.artwork' => 'Borítók és képek',
 			'metadataEdit.advancedSettings' => 'Haladó beállítások',

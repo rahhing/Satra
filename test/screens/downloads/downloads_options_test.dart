@@ -122,7 +122,6 @@ void main() {
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.android),
             home: MainScreenFocusScope(
-              focusSidebar: () {},
               sideNavigationWidth: 0,
               child: OverlaySheetHost(child: DownloadsScreen(key: screenKey)),
             ),

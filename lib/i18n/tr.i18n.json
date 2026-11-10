@@ -210,6 +210,8 @@
     "paperTheme": "Kâğıt",
     "libraryDensity": "Kitaplık Yoğunluğu",
     "displayScale": "Ekran ölçeği",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Sıkışık",
     "comfortable": "Rahat",
     "gridSpacing": "Izgara Aralığı",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Bölüm başlıklarında her zaman sunucu adlarını göster.",
     "groupLibrariesByServer": "Kitaplıkları Sunucuya Göre Grupla",
     "groupLibrariesByServerDescription": "Yan menü kitaplıklarını her medya sunucusunun altında grupla.",
-    "alwaysKeepSidebarOpen": "Yan Menüyü Her Zaman Açık Tut",
-    "alwaysKeepSidebarOpenDescription": "Yan menü genişletilmiş kalır ve içerik alanı buna göre ayarlanır",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "İzlenmemiş Sayısını Göster",
     "showUnwatchedCountDescription": "Dizilerde ve sezonlarda izlenmemiş bölüm sayısını göster",
     "showWatchedIndicators": "İzlendi İşaretlerini Göster",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Tam",
     "visualEffectsReduced": "Azaltılmış",
     "visualEffectsReducedDescription": "Daha az animasyon ve daha düşük çözünürlüklü görseller",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "İzlenmeyen Bölümler İçin Sürpriz Bozanları Gizle",
     "hideSpoilersDescription": "İzlenmeyen bölümler için küçük resimleri ve açıklamaları bulanıklaştır",
     "playerBackend": "Oynatıcı Altyapısı",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Kendi aktarıcınızı ayarlamadığınız sürece herkese açık Open Watch Party aktarıcıları kullanılır",
     "watchTogetherRelayHint": "https://ornek-aktarici.com",
     "watchTogetherRelayInvalid": "Geçerli bir HTTP veya HTTPS aktarıcı adresi girin.",
-
-
     "debugLogging": "Hata Ayıklama Günlüğü",
     "debugLoggingDescription": "Sorun giderme için ayrıntılı günlük kaydını etkinleştir",
     "viewLogs": "Günlükleri Görüntüle",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "NTSC DVD'lerde yaygın olan, 29,97 fps'ye telesine uygulanmış film ve animasyonların orijinal karelerini geri getirir. TV için çekilmiş videolar takılır. Canlı TV, Video modunu kullanır",
     "requireProfileSelectionOnOpen": "Uygulama açılışında profil sor",
     "requireProfileSelectionOnOpenDescription": "Uygulama her açıldığında profil seçimini göster",
-    "forceTvMode": "TV modunu zorla",
-    "forceTvModeDescription": "TV düzenini zorla. Otomatik algılamayan cihazlar içindir. Yeniden başlatma gerektirir.",
     "startInFullscreen": "Tam ekranda başlat",
     "startInFullscreenDescription": "Satra'yi açılışta tam ekran modunda aç",
     "exitFullscreenOnPlayerClose": "Oynatıcı kapandığında tam ekrandan çık",
@@ -561,12 +563,52 @@
     "previewSwitch": "Otomatik oynatma",
     "previewMutedText": "İkincil metin böyle görünür"
   },
-  "search": {
-    "hint": "Film, dizi, müzik ara...",
-    "tryDifferentTerm": "Farklı bir arama terimi deneyin",
-    "searchYourMedia": "Medyanızda arayın",
-    "enterTitleActorOrKeyword": "Başlık, oyuncu veya anahtar kelime girin",
-    "people": "Kişiler"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "${actionName} için Kısayol Ayarla",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "İzlemeye Devam Et'ten kaldırıldı",
     "errorLoading": "Hata: ${error}",
-    "searchPartialResults": "Bazı medya sunucularında arama yapılamadı. Kullanılabilir sonuçlar gösteriliyor.",
     "streamInterrupted": "Akış kesintiye uğradı. Tekrar denemek için oynatın veya sarın.",
     "liveStreamInterrupted": "Canlı akış kesintiye uğradı. Tekrar denemek için oynatın.",
     "fileInfoNotAvailable": "Dosya bilgisi mevcut değil",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "İlk sezonda bölüm bulunamadı",
     "noEpisodesFoundGeneral": "Bölüm bulunamadı",
     "episodesLoadFailed": "Bölümler yüklenemedi",
-    "noResultsFound": "Sonuç bulunamadı",
     "sleepTimerSet": "Uyku zamanlayıcısı ${label} için ayarlandı",
     "noItemsAvailable": "Öge bulunmuyor",
     "failedToCreatePlayQueueNoItems": "Oynatma kuyruğu oluşturulamadı — öge yok",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Sunucu bu dosyayı yayınlamayı sürekli reddetti (HTTP 503). Sunucu yeniden başlatılıyor veya meşgul olabilir ya da dosyanın bulunduğu depolama birimi çevrim dışı olabilir. Kısa süre sonra tekrar deneyin — sorun devam ederse sunucu sahibinden sunucuyu ve dosyanın bulunduğu depolama birimini kontrol etmesini isteyin.",
     "playbackNotAllowedTitle": "Oynatmaya izin verilmiyor",
     "playbackNotAllowedBody": "Sunucu bu ögeyi yayınlamayı reddetti (HTTP 403). Hesabınızın bunu oynatma izni olmayabilir veya sunucu oynatmaya yalnızca kendi yerel ağında izin veriyor olabilir.",
-
-
     "burnedSubtitlesUseMenu": "Altyazılar bu akışın görüntüsüne gömülü. Bunları altyazı menüsünden değiştirin.",
     "noVideoUrl": "Kullanılabilir video URL'si yok",
     "playbackNoMediaSources": "Sunucu oynatılabilir medya kaynağı döndürmedi",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Arama başarısız: ${error}",
-    "searchUnavailable": "Arama hiçbir medya sunucusuna ulaşamadı.",
     "connectionTimeout": "${context} yüklenirken bağlantı zaman aşımına uğradı",
     "connectionFailed": "Medya sunucusuna bağlanılamıyor",
     "unableToLoad": "${context} yüklenemedi. Lütfen tekrar deneyin.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Kitaplık analiz edilemedi: ${error}",
     "noLibrariesFound": "Kitaplık bulunamadı",
     "allLibrariesHidden": "Tüm kitaplıklar gizli",
-    "hiddenLibrariesCount": "Gizli kitaplıklar (${count})",
     "thisLibraryIsEmpty": "Bu kitaplık boş",
     "noItemsMatchFilters": "Etkin filtrelerle eşleşen öge yok",
     "resetFilters": "Filtreleri sıfırla",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Günlükleri Temizle",
     "copyLogs": "Günlükleri Kopyala"
-
   },
   "startup": {
     "failedTitle": "Satra başlatılamadı",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Ayrıntıları gizle",
     "copyDetails": "Ayrıntıları kopyala",
     "detailsCopied": "Ayrıntılar panoya kopyalandı",
-
     "repairStorage": "Depolama Alanını Onar",
     "repairTitle": "Kayıtlı veriler onarılsın mı?",
     "repairBodyCommon": "Satra'nin ayar dosyası hasarlı ve okunamıyor. Onarım, her ayarı varsayılanına sıfırlar.",
@@ -1778,7 +1812,6 @@
       "one": "${n} parça",
       "other": "${n} parça"
     },
-    "nowPlaying": "Şimdi Oynatılıyor",
     "playingFrom": "${title} kaynağından oynatılıyor",
     "queue": "Kuyruk",
     "clearQueue": "Kuyruğu temizle",

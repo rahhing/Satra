@@ -174,7 +174,7 @@ def get_file_mappings() -> list[str]:
     """Get file mappings for fpm."""
     mappings = [
         f"{BUILD_DIR}/=/opt/satra/",
-        f"{SCRIPT_DIR}/com.edde746.satra.desktop=/usr/share/applications/com.edde746.satra.desktop",
+        f"{SCRIPT_DIR}/com.rahhing.satra.desktop=/usr/share/applications/com.rahhing.satra.desktop",
         f"{SCRIPT_DIR}/satra.sh=/usr/bin/satra",
     ]
 

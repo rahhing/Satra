@@ -23,7 +23,7 @@ PROJECT_ROOT = SCRIPT_DIR.parent.parent
 sys.path.insert(0, str(PROJECT_ROOT / "scripts"))
 from pubspec_version import parse_pubspec_version
 
-APP_ID = "com.edde746.satra"
+APP_ID = "com.rahhing.satra"
 ARCHITECTURES = {"x64": ("x86_64", 62), "arm64": ("aarch64", 183)}
 
 

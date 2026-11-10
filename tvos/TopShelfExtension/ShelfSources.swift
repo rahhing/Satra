@@ -83,9 +83,9 @@ enum ShelfSourceStore {
   /// SystemShelfPlugin.schemaVersion (duplicated here so this file compiles
   /// into RunnerTests without TopShelfProvider.swift).
   static let schemaVersion = 3
-  static let appGroupIdentifier = "group.com.edde746.satra"
+  static let appGroupIdentifier = "group.com.rahhing.satra"
   static let sourcesKey = "SatraSystemShelfSources"
-  static let tokenKeychainService = "com.edde746.satra.systemshelf.tokens"
+  static let tokenKeychainService = "com.rahhing.satra.systemshelf.tokens"
   static let defaultMaxItems = 20
   static let maxItemsLimit = 20
 

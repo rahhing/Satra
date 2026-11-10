@@ -210,6 +210,8 @@
     "paperTheme": "Қағаз",
     "libraryDensity": "Кітапхана тығыздығы",
     "displayScale": "Дисплей масштабы",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Тығыз",
     "comfortable": "Ыңғайлы",
     "gridSpacing": "Тор аралығы",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Бөлім тақырыптарында әрдайым сервер атын көрсету.",
     "groupLibrariesByServer": "Кітапханаларды сервер бойынша топтау",
     "groupLibrariesByServerDescription": "Мүйістік мәзірдегі кітапханаларды серверлер бойынша топтау.",
-    "alwaysKeepSidebarOpen": "Сүйістік мәзірді әрдайым ашық ұстау",
-    "alwaysKeepSidebarOpenDescription": "Бүйірлік мәзір ашық күйінде қалады, мазмұн аймағы соған бейімделеді",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Көрілмегендер санын көрсету",
     "showUnwatchedCountDescription": "Сериалдар мен маусымдарда көрілмеген бөлімдер санын көрсету",
     "showWatchedIndicators": "Көрілген белгілерді көрсету",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Толық",
     "visualEffectsReduced": "Азайтылған",
     "visualEffectsReducedDescription": "Аз анимация және төмен сапалы суреттер",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Көрілмеген бөлімдер үшін спойлерлерді жасыру",
     "hideSpoilersDescription": "Көрілмеген бөлімдердің суреттері мен сипаттамаларын бұлдырату",
     "playerBackend": "Ойнатқыш инфрақұрылымы",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Өз релеңізді көрсетпесеңіз, жалпыға ортақ Open Watch Party релелері пайдаланылады",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Дұрыс HTTP немесе HTTPS реле мекенжайын енгізіңіз.",
-
-
     "debugLogging": "Жөндеу журналы",
     "debugLoggingDescription": "Мәселелерді шешу үшін толық журнал жүргізуді қосу",
     "viewLogs": "Журналдарды көру",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "NTSC DVD-лерде жиі кездесетін, 29.97 fps-ке телекинмен түрлендірілген фильмдер мен анимацияның бастапқы кадрларын қалпына келтіру. Теледидар үшін түсірілген видео бірқалыпсыз ойнатылады. Тікелей TV «Видео» режимін пайдаланады",
     "requireProfileSelectionOnOpen": "Ашқанда профильді сұрау",
     "requireProfileSelectionOnOpenDescription": "Қолданба ашылған сайын профильді таңдауды көрсету",
-    "forceTvMode": "TV режимін мәжбүрлеу",
-    "forceTvModeDescription": "TV интерфейсін мәжбүрлеу. Автоматты түрде анықталмайтын құрылғылар үшін. Қайта іске қосу қажет.",
     "startInFullscreen": "Толық экранда бастау",
     "startInFullscreenDescription": "Satra-ді ашқанда толық экран режимінде ашу",
     "exitFullscreenOnPlayerClose": "Ойнатқыш жабылғанда толық экраннан шығу",
@@ -561,12 +563,52 @@
     "previewSwitch": "Автоойнату",
     "previewMutedText": "Қосалқы мәтін осылай көрінеді"
   },
-  "search": {
-    "hint": "Фильмдер, сериалдар, музыка іздеу...",
-    "tryDifferentTerm": "Басқа іздеу сөзін байқап көріңіз",
-    "searchYourMedia": "Медиафайлдардан іздеу",
-    "enterTitleActorOrKeyword": "Атауын, актерді немесе кілт сөзді енгізіңіз",
-    "people": "Адамдар"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "${actionName} үшін пернелер тіркесін орнату",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "\"Көруді жалғастыру\" тізімінен өшірілді",
     "errorLoading": "Қате: ${error}",
-    "searchPartialResults": "Кейбір медиа серверлерінде іздеу орындалмады. Қолжетімді нәтижелер көрсетілуде.",
     "streamInterrupted": "Ағын үзілді. Қайталау үшін ойнату түймесін басыңыз немесе басқа орынға өтіңіз.",
     "liveStreamInterrupted": "Тікелей ағын үзілді. Қайталау үшін ойнату түймесін басыңыз.",
     "fileInfoNotAvailable": "Файл туралы ақпарат қолжетімсіз",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Бірінші маусымда бөлімдер табылмады",
     "noEpisodesFoundGeneral": "Бөлімдер табылмады",
     "episodesLoadFailed": "Бөлімдерді жүктеу мүмкін болмады",
-    "noResultsFound": "Нәтижелер табылмады",
     "sleepTimerSet": "Ұйқы таймері ${label} уақытына орнатылды",
     "noItemsAvailable": "Элементтер жоқ",
     "failedToCreatePlayQueueNoItems": "Ойнату кезегін жасау мүмкін болмады — элементтер жоқ",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Сервер бұл файлды ағынмен жіберуден қайта-қайта бас тартты (HTTP 503). Ол қайта іске қосылып, бос емес болуы немесе файл сақталған қойма офлайн болуы мүмкін. Сәлден соң қайталап көріңіз — бұл жалғаса берсе, сервер иесінен серверді және файл қоймасын тексеруін сұраңыз.",
     "playbackNotAllowedTitle": "Ойнатуға рұқсат жоқ",
     "playbackNotAllowedBody": "Сервер бұл элементті ағынмен жіберуден бас тартты (HTTP 403). Тіркелгіңізде оны ойнатуға рұқсат болмауы мүмкін немесе сервер ойнатуға тек өзінің жергілікті желісінде рұқсат беруі мүмкін.",
-
-
     "burnedSubtitlesUseMenu": "Субтитрлер бұл ағынға кіріктірілген. Оларды субтитр мәзірінен өзгертіңіз.",
     "noVideoUrl": "Бейне URL-і қолжетімді емес",
     "playbackNoMediaSources": "Сервер ойнатуға болатын медиа көздерін қайтармады",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Іздеу қатесі: ${error}",
-    "searchUnavailable": "Іздеу ешбір медиа серверге қосыла алмады.",
     "connectionTimeout": "${context} жүктеу уақыты өтті",
     "connectionFailed": "Медиа серверіне қосылу мүмкін емес",
     "unableToLoad": "${context} жүктеу мүмкін болмады.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Талдау жасау мүмкін болмады: ${error}",
     "noLibrariesFound": "Кітапханалар табылмады",
     "allLibrariesHidden": "Барлық кітапханалар жасырылған",
-    "hiddenLibrariesCount": "Жасырын кітапханалар (${count})",
     "thisLibraryIsEmpty": "Бұл кітапхана бос",
     "noItemsMatchFilters": "Фильтрлерге сәйкес элементтер табылмады",
     "resetFilters": "Фильтрлерді қалпына келтіру",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Журналдарды тазалау",
     "copyLogs": "Журналдарды көшіру"
-
   },
   "startup": {
     "failedTitle": "Satra іске қосылмады",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Мәліметтерді жасыру",
     "copyDetails": "Мәліметтерді көшіру",
     "detailsCopied": "Мәліметтер алмасу буферіне көшірілді",
-
     "repairStorage": "Сақтауды қалпына келтіру",
     "repairTitle": "Сақталған деректер қалпына келтірілсін бе?",
     "repairBodyCommon": "Satra баптаулар файлы зақымдалған және оқылмайды. Қалпына келтіру барлық баптауды әдепкі мәнге қайтарады.",
@@ -1778,7 +1812,6 @@
       "one": "${n} ән",
       "other": "${n} ән"
     },
-    "nowPlaying": "Қазір ойнатылуда",
     "playingFrom": "${title} дереккөзінен",
     "queue": "Кезек",
     "clearQueue": "Кезекті тазалау",

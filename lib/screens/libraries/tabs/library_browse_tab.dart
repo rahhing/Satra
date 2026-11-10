@@ -66,7 +66,6 @@ import '../../../utils/global_key_utils.dart';
 import '../../../utils/watch_state_notifier.dart';
 import '../../../utils/platform_detector.dart';
 import '../../../i18n/strings.g.dart';
-import '../../main_screen.dart';
 import 'base_library_tab.dart';
 
 /// Browse tab for library screen
@@ -1460,10 +1459,6 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
     _groupingChipFocusNode.requestFocus();
   }
 
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
-  }
-
   void _navigateToAlphaJumpBar() {
     _alphaJumpBarFocusNode.requestFocus();
   }
@@ -1974,7 +1969,6 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
       ],
       onNavigateDown: _navigateToGrid,
       onNavigateUp: widget.onBack,
-      onNavigateLeftEdge: _navigateToSidebar,
       onBack: widget.onBack,
     );
   }
@@ -1993,7 +1987,6 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
           onRefresh: updateItem,
           firstItemFocusNode: firstItemFocusNode,
           onNavigateUp: _navigateToChips,
-          onNavigateLeft: _navigateToSidebar,
           onBack: widget.onBack,
         ),
       ];
@@ -2010,7 +2003,6 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
           onRetry: _loadContent,
           actionFocusNode: firstItemFocusNode,
           onActionNavigateUp: _navigateToChips,
-          onActionNavigateLeft: _navigateToSidebar,
           onActionBack: widget.onBack,
         ),
       ];
@@ -2027,7 +2019,6 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
             actionIcon: Symbols.clear_all_rounded,
             actionFocusNode: firstItemFocusNode,
             onActionNavigateUp: _navigateToChips,
-            onActionNavigateLeft: _navigateToSidebar,
             onActionBack: widget.onBack,
           ),
         ];
@@ -2275,9 +2266,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
     }
 
     VoidCallback? navigateLeft;
-    if (isFirstColumn) {
-      navigateLeft = _navigateToSidebar;
-    } else if (index > 0) {
+    if (!isFirstColumn && index > 0) {
       navigateLeft = () => _focusGridItem(index - 1);
     }
 

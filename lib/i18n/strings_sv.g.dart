@@ -48,7 +48,6 @@ class TranslationsSv extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$sv supporter = _Translations$supporter$sv._(_root);
 	@override late final _Translations$settings$sv settings = _Translations$settings$sv._(_root);
 	@override late final _Translations$themeEditor$sv themeEditor = _Translations$themeEditor$sv._(_root);
-	@override late final _Translations$search$sv search = _Translations$search$sv._(_root);
 	@override late final _Translations$hotkeys$sv hotkeys = _Translations$hotkeys$sv._(_root);
 	@override late final _Translations$fileInfo$sv fileInfo = _Translations$fileInfo$sv._(_root);
 	@override late final _Translations$mediaMenu$sv mediaMenu = _Translations$mediaMenu$sv._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$sv extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Visa alltid servernamnet i innehållssektionernas rubriker.';
 	@override String get groupLibrariesByServer => 'Gruppera bibliotek efter server';
 	@override String get groupLibrariesByServerDescription => 'Gruppera biblioteken i sidofältet under respektive medieserver.';
-	@override String get alwaysKeepSidebarOpen => 'Håll alltid sidofältet öppet';
-	@override String get alwaysKeepSidebarOpenDescription => 'Sidofältet förblir utfällt och innehållsytan anpassas efter det';
 	@override String get showUnwatchedCount => 'Visa antal osedda';
 	@override String get showUnwatchedCountDescription => 'Visa antal osedda avsnitt för serier och säsonger';
 	@override String get showWatchedIndicators => 'Visa seddmarkeringar';
@@ -553,8 +550,6 @@ class _Translations$settings$sv extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Återställ originalbildrutorna i film och animation som telecinerats till 29,97 fps, vanligt på NTSC-DVD:er. Video inspelad för TV hackar. Live-TV använder Video';
 	@override String get requireProfileSelectionOnOpen => 'Fråga efter profil vid appstart';
 	@override String get requireProfileSelectionOnOpenDescription => 'Visa profilval varje gång appen öppnas';
-	@override String get forceTvMode => 'Tvinga TV-läge';
-	@override String get forceTvModeDescription => 'Tvinga TV-layout. För enheter som inte upptäcks automatiskt. Kräver omstart.';
 	@override String get startInFullscreen => 'Starta i helskärm';
 	@override String get startInFullscreenDescription => 'Öppna Satra i helskärm vid start';
 	@override String get exitFullscreenOnPlayerClose => 'Avsluta helskärm vid stängning av spelare';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$sv extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} min kvar';
 	@override String get previewSwitch => 'Autouppspelning';
 	@override String get previewMutedText => 'Sekundär text ser ut så här';
-}
-
-// Path: search
-class _Translations$search$sv extends Translations$search$en {
-	_Translations$search$sv._(TranslationsSv root) : this._root = root, super.internal(root);
-
-	final TranslationsSv _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Sök filmer, serier, musik...';
-	@override String get tryDifferentTerm => 'Prova en annan sökterm';
-	@override String get searchYourMedia => 'Sök i dina media';
-	@override String get enterTitleActorOrKeyword => 'Ange en titel, skådespelare eller nyckelord';
-	@override String get people => 'Personer';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$sv extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Borttagen från Fortsätt titta';
 	@override String errorLoading({required Object error}) => 'Fel: ${error}';
-	@override String get searchPartialResults => 'Vissa mediaservrar kunde inte sökas. Visar tillgängliga resultat.';
 	@override String get streamInterrupted => 'Strömmen avbröts. Tryck på uppspelning eller spola för att försöka igen.';
 	@override String get liveStreamInterrupted => 'Liveströmmen avbröts. Tryck på uppspelning för att försöka igen.';
 	@override String get fileInfoNotAvailable => 'Filinformation är inte tillgänglig';
@@ -1071,7 +1051,6 @@ class _Translations$messages$sv extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Inga avsnitt hittades i första säsongen';
 	@override String get noEpisodesFoundGeneral => 'Inga avsnitt hittades';
 	@override String get episodesLoadFailed => 'Det gick inte att läsa in avsnitt';
-	@override String get noResultsFound => 'Inga resultat hittades';
 	@override String sleepTimerSet({required Object label}) => 'Sovtimer inställd för ${label}';
 	@override String get noItemsAvailable => 'Inga objekt tillgängliga';
 	@override String get failedToCreatePlayQueueNoItems => 'Det gick inte att skapa en uppspelningskö – inga objekt';
@@ -1349,7 +1328,6 @@ class _Translations$errors$sv extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Sökningen misslyckades: ${error}';
-	@override String get searchUnavailable => 'Sökningen kunde inte nå någon medieserver.';
 	@override String connectionTimeout({required Object context}) => 'Anslutningen tog för lång tid när ${context} lästes in';
 	@override String get connectionFailed => 'Det gick inte att ansluta till medieservern';
 	@override String unableToLoad({required Object context}) => 'Det gick inte att läsa in ${context}. Försök igen.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$sv extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Det gick inte att analysera biblioteket: ${error}';
 	@override String get noLibrariesFound => 'Inga bibliotek hittades';
 	@override String get allLibrariesHidden => 'Alla bibliotek är dolda';
-	@override String hiddenLibrariesCount({required Object count}) => 'Dolda bibliotek (${count})';
 	@override String get thisLibraryIsEmpty => 'Detta bibliotek är tomt';
 	@override String get noItemsMatchFilters => 'Inga objekt matchar de aktiva filtren';
 	@override String get resetFilters => 'Återställ filter';
@@ -1766,7 +1743,6 @@ class _Translations$music$sv extends Translations$music$en {
 		one: '${n} låt',
 		other: '${n} låtar',
 	);
-	@override String get nowPlaying => 'Spelas nu';
 	@override String playingFrom({required Object title}) => 'Spelar från ${title}';
 	@override String get queue => 'Kö';
 	@override String get clearQueue => 'Rensa kön';
@@ -3603,8 +3579,6 @@ extension on TranslationsSv {
 			'settings.showServerNameOnHubsDescription' => 'Visa alltid servernamnet i innehållssektionernas rubriker.',
 			'settings.groupLibrariesByServer' => 'Gruppera bibliotek efter server',
 			'settings.groupLibrariesByServerDescription' => 'Gruppera biblioteken i sidofältet under respektive medieserver.',
-			'settings.alwaysKeepSidebarOpen' => 'Håll alltid sidofältet öppet',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Sidofältet förblir utfällt och innehållsytan anpassas efter det',
 			'settings.showUnwatchedCount' => 'Visa antal osedda',
 			'settings.showUnwatchedCountDescription' => 'Visa antal osedda avsnitt för serier och säsonger',
 			'settings.showWatchedIndicators' => 'Visa seddmarkeringar',
@@ -3829,8 +3803,6 @@ extension on TranslationsSv {
 			'settings.deinterlaceFilmDescription' => 'Återställ originalbildrutorna i film och animation som telecinerats till 29,97 fps, vanligt på NTSC-DVD:er. Video inspelad för TV hackar. Live-TV använder Video',
 			'settings.requireProfileSelectionOnOpen' => 'Fråga efter profil vid appstart',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Visa profilval varje gång appen öppnas',
-			'settings.forceTvMode' => 'Tvinga TV-läge',
-			'settings.forceTvModeDescription' => 'Tvinga TV-layout. För enheter som inte upptäcks automatiskt. Kräver omstart.',
 			'settings.startInFullscreen' => 'Starta i helskärm',
 			'settings.startInFullscreenDescription' => 'Öppna Satra i helskärm vid start',
 			'settings.exitFullscreenOnPlayerClose' => 'Avsluta helskärm vid stängning av spelare',
@@ -3903,12 +3875,12 @@ extension on TranslationsSv {
 			'themeEditor.slots.textMuted' => 'Sekundär text',
 			'themeEditor.slots.accent' => 'Accentfärg',
 			'themeEditor.opacity' => 'Opacitet',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Från andra teman',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Text på bakgrund',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Text på yta',
 			'themeEditor.contrast.textMutedOnBg' => 'Sekundär text på bakgrund',
 			'themeEditor.contrast.textMutedOnSurface' => 'Sekundär text på yta',
@@ -3923,11 +3895,6 @@ extension on TranslationsSv {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} min kvar',
 			'themeEditor.previewSwitch' => 'Autouppspelning',
 			'themeEditor.previewMutedText' => 'Sekundär text ser ut så här',
-			'search.hint' => 'Sök filmer, serier, musik...',
-			'search.tryDifferentTerm' => 'Prova en annan sökterm',
-			'search.searchYourMedia' => 'Sök i dina media',
-			'search.enterTitleActorOrKeyword' => 'Ange en titel, skådespelare eller nyckelord',
-			'search.people' => 'Personer',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Sätt genväg för ${actionName}',
 			'hotkeys.clearShortcut' => 'Rensa genväg',
 			'hotkeys.noShortcutSet' => 'Ingen genväg angiven',
@@ -4246,7 +4213,6 @@ extension on TranslationsSv {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('sv'))(n, one: 'Tog automatiskt bort ${n} sedd nedladdning', other: 'Tog automatiskt bort ${n} sedda nedladdningar', ), 
 			'messages.removedFromContinueWatching' => 'Borttagen från Fortsätt titta',
 			'messages.errorLoading' => ({required Object error}) => 'Fel: ${error}',
-			'messages.searchPartialResults' => 'Vissa mediaservrar kunde inte sökas. Visar tillgängliga resultat.',
 			'messages.streamInterrupted' => 'Strömmen avbröts. Tryck på uppspelning eller spola för att försöka igen.',
 			'messages.liveStreamInterrupted' => 'Liveströmmen avbröts. Tryck på uppspelning för att försöka igen.',
 			'messages.fileInfoNotAvailable' => 'Filinformation är inte tillgänglig',
@@ -4280,7 +4246,6 @@ extension on TranslationsSv {
 			'messages.noEpisodesFound' => 'Inga avsnitt hittades i första säsongen',
 			'messages.noEpisodesFoundGeneral' => 'Inga avsnitt hittades',
 			'messages.episodesLoadFailed' => 'Det gick inte att läsa in avsnitt',
-			'messages.noResultsFound' => 'Inga resultat hittades',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Sovtimer inställd för ${label}',
 			'messages.noItemsAvailable' => 'Inga objekt tillgängliga',
 			'messages.failedToCreatePlayQueueNoItems' => 'Det gick inte att skapa en uppspelningskö – inga objekt',
@@ -4417,8 +4382,6 @@ extension on TranslationsSv {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Lägg till för ${displayName}: Plex, Jellyfin, Emby eller en annan profilanslutning',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessionen har gått ut för ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessionen har gått ut för ${count} servrar',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} nekade åtkomst för det här kontot',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servrar nekade åtkomst för det här kontot',
 			'connections.signInAgain' => 'Logga in igen',
@@ -4430,6 +4393,8 @@ extension on TranslationsSv {
 			'accountPreferences.pickAccount' => 'Varje konto lagrar sina egna inställningar. Välj det du vill redigera.',
 			'accountPreferences.storedOnAccount' => 'Dessa alternativ sparas på själva kontot, så alla appar som är inloggade på det använder dem — inklusive Satra på dina andra enheter.',
 			'accountPreferences.noAccounts' => 'Inga konton att konfigurera',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Logga in på Plex, eller anslut en Jellyfin- eller Emby-server, så visas de inställningar som lagras på det kontot här.',
 			'accountPreferences.unavailable' => 'Det går inte att nå detta konto',
 			'accountPreferences.loadFailed' => 'Det gick inte att läsa in dessa inställningar',
@@ -4512,7 +4477,6 @@ extension on TranslationsSv {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} år)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (blev ${age} år)',
 			'errors.searchFailed' => ({required Object error}) => 'Sökningen misslyckades: ${error}',
-			'errors.searchUnavailable' => 'Sökningen kunde inte nå någon medieserver.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Anslutningen tog för lång tid när ${context} lästes in',
 			'errors.connectionFailed' => 'Det gick inte att ansluta till medieservern',
 			'errors.unableToLoad' => ({required Object context}) => 'Det gick inte att läsa in ${context}. Försök igen.',
@@ -4546,7 +4510,6 @@ extension on TranslationsSv {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Det gick inte att analysera biblioteket: ${error}',
 			'libraries.noLibrariesFound' => 'Inga bibliotek hittades',
 			'libraries.allLibrariesHidden' => 'Alla bibliotek är dolda',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Dolda bibliotek (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Detta bibliotek är tomt',
 			'libraries.noItemsMatchFilters' => 'Inga objekt matchar de aktiva filtren',
 			'libraries.resetFilters' => 'Återställ filter',
@@ -4931,8 +4894,6 @@ extension on TranslationsSv {
 			'liveTv.failedToStartChannel' => 'Kunde inte starta livekanalen',
 			'liveTv.failedToBuildStreamUrl' => 'Kunde inte skapa strömmens URL',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Det gick inte att starta kanalen: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Det gick inte att byta kanal: ${reason}',
 			'collections.title' => 'Samlingar',
 			'collections.collection' => 'Samling',
@@ -4946,6 +4907,8 @@ extension on TranslationsSv {
 			'collections.collectionName' => 'Samlingsnamn',
 			'collections.enterCollectionName' => 'Ange samlingsnamn',
 			'collections.addedToCollection' => 'Objektet har lagts till i samlingen',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Det gick inte att lägga till objektet i samlingen',
 			'collections.created' => 'Samlingen har skapats',
 			'collections.removeFromCollection' => 'Ta bort från samlingen',
@@ -4987,7 +4950,6 @@ extension on TranslationsSv {
 			'music.addToQueue' => 'Lägg till i kö',
 			'music.discNumber' => ({required Object n}) => 'Skiva ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('sv'))(n, one: '${n} låt', other: '${n} låtar', ), 
-			'music.nowPlaying' => 'Spelas nu',
 			'music.playingFrom' => ({required Object title}) => 'Spelar från ${title}',
 			'music.queue' => 'Kö',
 			'music.clearQueue' => 'Rensa kön',
@@ -5445,8 +5407,6 @@ extension on TranslationsSv {
 			'externalPlayer.useExternalPlayer' => 'Använd extern spelare',
 			'externalPlayer.useExternalPlayerDescription' => 'Öppna videor i en annan app',
 			'externalPlayer.selectPlayer' => 'Välj spelare',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Anpassade spelare',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Lägg till anpassad spelare',
@@ -5461,6 +5421,8 @@ extension on TranslationsSv {
 			'externalPlayer.playInExternalPlayer' => 'Spela i extern spelare',
 			'metadataEdit.editMetadata' => 'Redigera...',
 			'metadataEdit.screenTitle' => 'Redigera metadata',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Grundläggande information',
 			'metadataEdit.artwork' => 'Bildmaterial',
 			'metadataEdit.advancedSettings' => 'Avancerade inställningar',

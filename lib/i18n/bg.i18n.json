@@ -210,6 +210,8 @@
     "paperTheme": "Хартия",
     "libraryDensity": "Плътност на библиотеката",
     "displayScale": "Мащаб на дисплея",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Компактна",
     "comfortable": "Удобна",
     "gridSpacing": "Разстояние на мрежата",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Винаги показвай имената на сървърите в заглавията на хъбовете.",
     "groupLibrariesByServer": "Групирай библиотеките по сървър",
     "groupLibrariesByServerDescription": "Групирай библиотеките в страничната лента под всеки медиен сървър.",
-    "alwaysKeepSidebarOpen": "Винаги дръж страничната лента отворена",
-    "alwaysKeepSidebarOpenDescription": "Страничната лента остава разгъната и зоната със съдържание се наглася да пасне",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Показвай броя негледани",
     "showUnwatchedCountDescription": "Показвай броя негледани епизоди при сериали и сезони",
     "showWatchedIndicators": "Показвай индикатори за гледано",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Всички",
     "visualEffectsReduced": "Намалени",
     "visualEffectsReducedDescription": "По-малко анимации и изображения с по-ниска резолюция",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Скривай спойлери за негледани епизоди",
     "hideSpoilersDescription": "Замазвай миниатюри и описания за негледани епизоди",
     "playerBackend": "Система за възпроизвеждане",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Публичните релейни сървъри на Open Watch Party, освен ако не зададете свой",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "Въведете валиден основен HTTP или HTTPS URL адрес на релейния сървър.",
-
-
     "debugLogging": "Логове за отстраняване на грешки",
     "debugLoggingDescription": "Включи подробни логове за диагностика",
     "viewLogs": "Виж логовете",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Възстановява оригиналните кадри на филми и анимация, преобразувани чрез телесине до 29,97 кадъра/с, което е често при NTSC DVD дисковете. Видео, заснето за телевизия, ще насича. Телевизията на живо използва „Видео“",
     "requireProfileSelectionOnOpen": "Питай за профил при отваряне на приложението",
     "requireProfileSelectionOnOpenDescription": "Показвай избор на профил всеки път при отваряне на приложението",
-    "forceTvMode": "Принуди TV режим",
-    "forceTvModeDescription": "Принуди ТВ оформление. За устройства, които не се разпознават автоматично. Изисква рестарт.",
     "startInFullscreen": "Стартирай на цял екран",
     "startInFullscreenDescription": "Отваряй Satra в режим цял екран при стартиране",
     "exitFullscreenOnPlayerClose": "Изход от цял екран при затваряне на плейъра",
@@ -561,12 +563,52 @@
     "previewSwitch": "Автоматично пускане",
     "previewMutedText": "Вторичният текст изглежда така"
   },
-  "search": {
-    "hint": "Търсене на филми, сериали, музика...",
-    "tryDifferentTerm": "Опитайте с различна дума за търсене",
-    "searchYourMedia": "Търсете в медийното си съдържание",
-    "enterTitleActorOrKeyword": "Въведете заглавие, актьор или ключова дума",
-    "people": "Хора"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Задай клавишна комбинация за ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Премахнато от продължаване на гледането",
     "errorLoading": "Грешка: ${error}",
-    "searchPartialResults": "Някои медийни сървъри не можаха да бъдат претърсени. Показват се наличните резултати.",
     "streamInterrupted": "Потокът прекъсна. Натиснете „Пусни“ или превъртете, за да опитате отново.",
     "liveStreamInterrupted": "Потокът на живо прекъсна. Натиснете „Пусни“, за да опитате отново.",
     "fileInfoNotAvailable": "Информацията за файла не е налична",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Не са намерени епизоди в първия сезон",
     "noEpisodesFoundGeneral": "Не са намерени епизоди",
     "episodesLoadFailed": "Неуспешно зареждане на епизоди",
-    "noResultsFound": "Няма намерени резултати",
     "sleepTimerSet": "Таймерът за заспиване е зададен за ${label}",
     "noItemsAvailable": "Няма налични елементи",
     "failedToCreatePlayQueueNoItems": "Неуспешно създаване на опашка за възпроизвеждане - няма елементи",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Сървърът многократно отказа да предава този файл поточно (HTTP 503). Възможно е да се рестартира, да е зает или хранилището на файла да е офлайн. Опитайте отново след малко — ако проблемът продължи, помолете собственика на сървъра да провери сървъра и хранилището на файла.",
     "playbackNotAllowedTitle": "Възпроизвеждането не е разрешено",
     "playbackNotAllowedBody": "Сървърът отказа да предава този елемент поточно (HTTP 403). Възможно е профилът ви да няма разрешение да го възпроизвежда или сървърът да позволява възпроизвеждане само в локалната си мрежа.",
-
-
     "burnedSubtitlesUseMenu": "Субтитрите са вградени в този поток. Променете ги от менюто за субтитри.",
     "noVideoUrl": "Няма наличен URL за видеото",
     "playbackNoMediaSources": "Сървърът не върна медийни източници, годни за възпроизвеждане",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Търсенето е неуспешно: ${error}",
-    "searchUnavailable": "Търсенето не можа да достигне до нито един медиен сървър.",
     "connectionTimeout": "Изтече времето за връзка при зареждане на ${context}",
     "connectionFailed": "Не може да се осъществи връзка с медиен сървър",
     "unableToLoad": "Не може да се зареди ${context}. Опитайте отново.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Неуспешен анализ на библиотеката: ${error}",
     "noLibrariesFound": "Не са намерени библиотеки",
     "allLibrariesHidden": "Всички библиотеки са скрити",
-    "hiddenLibrariesCount": "Скрити библиотеки (${count})",
     "thisLibraryIsEmpty": "Тази библиотека е празна",
     "noItemsMatchFilters": "Няма елементи, съответстващи на активните филтри",
     "resetFilters": "Нулирай филтрите",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Изчисти логовете",
     "copyLogs": "Копирай логовете"
-
   },
   "startup": {
     "failedTitle": "Satra не можа да стартира",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Скрий детайлите",
     "copyDetails": "Копирай детайлите",
     "detailsCopied": "Детайлите са копирани в клипборда",
-
     "repairStorage": "Ремонт на хранилището",
     "repairTitle": "Да ремонтирам ли съхранените данни?",
     "repairBodyCommon": "Файлът с настройки на Satra е повреден и не може да бъде прочетен. Ремонтът връща всяка настройка към стойността ѝ по подразбиране.",
@@ -1778,7 +1812,6 @@
       "one": "${n} песен",
       "other": "${n} песни"
     },
-    "nowPlaying": "Сега се възпроизвежда",
     "playingFrom": "Възпроизвеждане от ${title}",
     "queue": "Опашка",
     "clearQueue": "Изчисти опашката",

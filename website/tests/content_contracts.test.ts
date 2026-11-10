@@ -130,7 +130,7 @@ describe('software application offers', () => {
 		});
 		expect(offers.find(({ category }) => category === 'Google Play')).toEqual({
 			'@type': 'Offer',
-			url: 'https://play.google.com/store/apps/details?id=com.edde746.satra',
+			url: 'https://play.google.com/store/apps/details?id=com.rahhing.satra',
 			category: 'Google Play'
 		});
 		expect(offers.filter(({ price }) => price === '0').map(({ category }) => category)).toEqual([

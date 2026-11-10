@@ -48,7 +48,6 @@ class TranslationsIt extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$it supporter = _Translations$supporter$it._(_root);
 	@override late final _Translations$settings$it settings = _Translations$settings$it._(_root);
 	@override late final _Translations$themeEditor$it themeEditor = _Translations$themeEditor$it._(_root);
-	@override late final _Translations$search$it search = _Translations$search$it._(_root);
 	@override late final _Translations$hotkeys$it hotkeys = _Translations$hotkeys$it._(_root);
 	@override late final _Translations$fileInfo$it fileInfo = _Translations$fileInfo$it._(_root);
 	@override late final _Translations$mediaMenu$it mediaMenu = _Translations$mediaMenu$it._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$it extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Mostra sempre i nomi dei server nei titoli delle sezioni.';
 	@override String get groupLibrariesByServer => 'Raggruppa le librerie per server';
 	@override String get groupLibrariesByServerDescription => 'Raggruppa le librerie della barra laterale sotto ciascun server multimediale.';
-	@override String get alwaysKeepSidebarOpen => 'Mantieni sempre aperta la barra laterale';
-	@override String get alwaysKeepSidebarOpenDescription => 'La barra laterale rimane espansa e l\'area del contenuto si adatta';
 	@override String get showUnwatchedCount => 'Mostra il numero di episodi non visti';
 	@override String get showUnwatchedCountDescription => 'Mostra il numero di episodi non visti per serie e stagioni';
 	@override String get showWatchedIndicators => 'Mostra indicatori di visione';
@@ -553,8 +550,6 @@ class _Translations$settings$it extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Ripristina i fotogrammi originali di film e animazioni sottoposti a telecine a 29,97 fps, frequenti nei DVD NTSC. I video girati per la TV scattano. La TV in diretta usa Video';
 	@override String get requireProfileSelectionOnOpen => 'Chiedi di scegliere il profilo all\'apertura';
 	@override String get requireProfileSelectionOnOpenDescription => 'Mostra la selezione del profilo ogni volta che l\'app viene aperta';
-	@override String get forceTvMode => 'Forza modalità TV';
-	@override String get forceTvModeDescription => 'Forza il layout TV sui dispositivi che non vengono rilevati automaticamente. Richiede il riavvio.';
 	@override String get startInFullscreen => 'Avvia a schermo intero';
 	@override String get startInFullscreenDescription => 'Apri Satra a schermo intero all\'avvio';
 	@override String get exitFullscreenOnPlayerClose => 'Esci dalla modalità a schermo intero alla chiusura del lettore';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$it extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} min rimanenti';
 	@override String get previewSwitch => 'Riproduzione automatica';
 	@override String get previewMutedText => 'Così appare il testo secondario';
-}
-
-// Path: search
-class _Translations$search$it extends Translations$search$en {
-	_Translations$search$it._(TranslationsIt root) : this._root = root, super.internal(root);
-
-	final TranslationsIt _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Cerca film, serie TV e musica...';
-	@override String get tryDifferentTerm => 'Prova altri termini di ricerca';
-	@override String get searchYourMedia => 'Cerca nei tuoi media';
-	@override String get enterTitleActorOrKeyword => 'Inserisci un titolo, attore o parola chiave';
-	@override String get people => 'Persone';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$it extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Rimosso da Continua a guardare';
 	@override String errorLoading({required Object error}) => 'Errore: ${error}';
-	@override String get searchPartialResults => 'Non è stato possibile cercare in alcuni server multimediali. Vengono mostrati i risultati disponibili.';
 	@override String get streamInterrupted => 'La riproduzione si è interrotta. Premi Riproduci o vai a un altro punto per riprovare.';
 	@override String get liveStreamInterrupted => 'La diretta si è interrotta. Premi Riproduci per riprovare.';
 	@override String get fileInfoNotAvailable => 'Informazioni sul file non disponibili';
@@ -1071,7 +1051,6 @@ class _Translations$messages$it extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Nessun episodio trovato nella prima stagione';
 	@override String get noEpisodesFoundGeneral => 'Nessun episodio trovato';
 	@override String get episodesLoadFailed => 'Impossibile caricare gli episodi';
-	@override String get noResultsFound => 'Nessun risultato';
 	@override String sleepTimerSet({required Object label}) => 'Timer di spegnimento impostato su ${label}';
 	@override String get noItemsAvailable => 'Nessun elemento disponibile';
 	@override String get failedToCreatePlayQueueNoItems => 'Impossibile creare una coda di riproduzione: nessun elemento';
@@ -1349,7 +1328,6 @@ class _Translations$errors$it extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Ricerca non riuscita: ${error}';
-	@override String get searchUnavailable => 'La ricerca non ha potuto raggiungere alcun server multimediale.';
 	@override String connectionTimeout({required Object context}) => 'Tempo scaduto per la connessione durante il caricamento di ${context}';
 	@override String get connectionFailed => 'Impossibile connettersi al server multimediale';
 	@override String unableToLoad({required Object context}) => 'Impossibile caricare ${context}. Riprova.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$it extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Impossibile analizzare la libreria: ${error}';
 	@override String get noLibrariesFound => 'Nessuna libreria trovata';
 	@override String get allLibrariesHidden => 'Tutte le librerie sono nascoste';
-	@override String hiddenLibrariesCount({required Object count}) => 'Librerie nascoste (${count})';
 	@override String get thisLibraryIsEmpty => 'Questa libreria è vuota';
 	@override String get noItemsMatchFilters => 'Nessun elemento corrisponde ai filtri attivi';
 	@override String get resetFilters => 'Reimposta filtri';
@@ -1766,7 +1743,6 @@ class _Translations$music$it extends Translations$music$en {
 		one: '${n} brano',
 		other: '${n} brani',
 	);
-	@override String get nowPlaying => 'In riproduzione';
 	@override String playingFrom({required Object title}) => 'Riproduzione da ${title}';
 	@override String get queue => 'Coda';
 	@override String get clearQueue => 'Svuota la coda';
@@ -3603,8 +3579,6 @@ extension on TranslationsIt {
 			'settings.showServerNameOnHubsDescription' => 'Mostra sempre i nomi dei server nei titoli delle sezioni.',
 			'settings.groupLibrariesByServer' => 'Raggruppa le librerie per server',
 			'settings.groupLibrariesByServerDescription' => 'Raggruppa le librerie della barra laterale sotto ciascun server multimediale.',
-			'settings.alwaysKeepSidebarOpen' => 'Mantieni sempre aperta la barra laterale',
-			'settings.alwaysKeepSidebarOpenDescription' => 'La barra laterale rimane espansa e l\'area del contenuto si adatta',
 			'settings.showUnwatchedCount' => 'Mostra il numero di episodi non visti',
 			'settings.showUnwatchedCountDescription' => 'Mostra il numero di episodi non visti per serie e stagioni',
 			'settings.showWatchedIndicators' => 'Mostra indicatori di visione',
@@ -3829,8 +3803,6 @@ extension on TranslationsIt {
 			'settings.deinterlaceFilmDescription' => 'Ripristina i fotogrammi originali di film e animazioni sottoposti a telecine a 29,97 fps, frequenti nei DVD NTSC. I video girati per la TV scattano. La TV in diretta usa Video',
 			'settings.requireProfileSelectionOnOpen' => 'Chiedi di scegliere il profilo all\'apertura',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Mostra la selezione del profilo ogni volta che l\'app viene aperta',
-			'settings.forceTvMode' => 'Forza modalità TV',
-			'settings.forceTvModeDescription' => 'Forza il layout TV sui dispositivi che non vengono rilevati automaticamente. Richiede il riavvio.',
 			'settings.startInFullscreen' => 'Avvia a schermo intero',
 			'settings.startInFullscreenDescription' => 'Apri Satra a schermo intero all\'avvio',
 			'settings.exitFullscreenOnPlayerClose' => 'Esci dalla modalità a schermo intero alla chiusura del lettore',
@@ -3903,12 +3875,12 @@ extension on TranslationsIt {
 			'themeEditor.slots.textMuted' => 'Testo secondario',
 			'themeEditor.slots.accent' => 'Accento',
 			'themeEditor.opacity' => 'Opacità',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB o #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Da altri temi',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} ${theme}',
 			'themeEditor.contrast.textOnBg' => 'Testo sullo sfondo',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Testo sulla superficie',
 			'themeEditor.contrast.textMutedOnBg' => 'Testo secondario sullo sfondo',
 			'themeEditor.contrast.textMutedOnSurface' => 'Testo secondario sulla superficie',
@@ -3923,11 +3895,6 @@ extension on TranslationsIt {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} min rimanenti',
 			'themeEditor.previewSwitch' => 'Riproduzione automatica',
 			'themeEditor.previewMutedText' => 'Così appare il testo secondario',
-			'search.hint' => 'Cerca film, serie TV e musica...',
-			'search.tryDifferentTerm' => 'Prova altri termini di ricerca',
-			'search.searchYourMedia' => 'Cerca nei tuoi media',
-			'search.enterTitleActorOrKeyword' => 'Inserisci un titolo, attore o parola chiave',
-			'search.people' => 'Persone',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Imposta una scorciatoia per ${actionName}',
 			'hotkeys.clearShortcut' => 'Elimina scorciatoia',
 			'hotkeys.noShortcutSet' => 'Nessuna scorciatoia impostata',
@@ -4246,7 +4213,6 @@ extension on TranslationsIt {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, one: 'Rimosso automaticamente ${n} download già visto', other: 'Rimossi automaticamente ${n} download già visti', ), 
 			'messages.removedFromContinueWatching' => 'Rimosso da Continua a guardare',
 			'messages.errorLoading' => ({required Object error}) => 'Errore: ${error}',
-			'messages.searchPartialResults' => 'Non è stato possibile cercare in alcuni server multimediali. Vengono mostrati i risultati disponibili.',
 			'messages.streamInterrupted' => 'La riproduzione si è interrotta. Premi Riproduci o vai a un altro punto per riprovare.',
 			'messages.liveStreamInterrupted' => 'La diretta si è interrotta. Premi Riproduci per riprovare.',
 			'messages.fileInfoNotAvailable' => 'Informazioni sul file non disponibili',
@@ -4280,7 +4246,6 @@ extension on TranslationsIt {
 			'messages.noEpisodesFound' => 'Nessun episodio trovato nella prima stagione',
 			'messages.noEpisodesFoundGeneral' => 'Nessun episodio trovato',
 			'messages.episodesLoadFailed' => 'Impossibile caricare gli episodi',
-			'messages.noResultsFound' => 'Nessun risultato',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Timer di spegnimento impostato su ${label}',
 			'messages.noItemsAvailable' => 'Nessun elemento disponibile',
 			'messages.failedToCreatePlayQueueNoItems' => 'Impossibile creare una coda di riproduzione: nessun elemento',
@@ -4417,8 +4382,6 @@ extension on TranslationsIt {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Aggiungi a ${displayName}: Plex, Jellyfin, Emby o la connessione di un altro profilo',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessione scaduta per ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessione scaduta per ${count} server',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} ha negato l\'accesso a questo account',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} server hanno negato l\'accesso a questo account',
 			'connections.signInAgain' => 'Accedi di nuovo',
@@ -4430,6 +4393,8 @@ extension on TranslationsIt {
 			'accountPreferences.pickAccount' => 'Ogni account conserva le proprie preferenze. Scegli quale modificare.',
 			'accountPreferences.storedOnAccount' => 'Queste opzioni vengono salvate sull\'account stesso, quindi ogni app che vi accede le usa — inclusa Satra sugli altri tuoi dispositivi.',
 			'accountPreferences.noAccounts' => 'Nessun account da configurare',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Accedi a Plex oppure connetti un server Jellyfin o Emby: le preferenze salvate su quell\'account appariranno qui.',
 			'accountPreferences.unavailable' => 'Impossibile raggiungere questo account',
 			'accountPreferences.loadFailed' => 'Impossibile caricare queste preferenze',
@@ -4512,7 +4477,6 @@ extension on TranslationsIt {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} anni)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (a ${age} anni)',
 			'errors.searchFailed' => ({required Object error}) => 'Ricerca non riuscita: ${error}',
-			'errors.searchUnavailable' => 'La ricerca non ha potuto raggiungere alcun server multimediale.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Tempo scaduto per la connessione durante il caricamento di ${context}',
 			'errors.connectionFailed' => 'Impossibile connettersi al server multimediale',
 			'errors.unableToLoad' => ({required Object context}) => 'Impossibile caricare ${context}. Riprova.',
@@ -4546,7 +4510,6 @@ extension on TranslationsIt {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Impossibile analizzare la libreria: ${error}',
 			'libraries.noLibrariesFound' => 'Nessuna libreria trovata',
 			'libraries.allLibrariesHidden' => 'Tutte le librerie sono nascoste',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Librerie nascoste (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Questa libreria è vuota',
 			'libraries.noItemsMatchFilters' => 'Nessun elemento corrisponde ai filtri attivi',
 			'libraries.resetFilters' => 'Reimposta filtri',
@@ -4931,8 +4894,6 @@ extension on TranslationsIt {
 			'liveTv.failedToStartChannel' => 'Impossibile avviare il canale in diretta',
 			'liveTv.failedToBuildStreamUrl' => 'Impossibile creare l\'URL dello stream',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Impossibile avviare il canale: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Impossibile cambiare canale: ${reason}',
 			'collections.title' => 'Raccolte',
 			'collections.collection' => 'Raccolta',
@@ -4946,6 +4907,8 @@ extension on TranslationsIt {
 			'collections.collectionName' => 'Nome raccolta',
 			'collections.enterCollectionName' => 'Inserisci nome raccolta',
 			'collections.addedToCollection' => 'Elemento aggiunto alla raccolta',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Impossibile aggiungere l\'elemento alla raccolta',
 			'collections.created' => 'Raccolta creata',
 			'collections.removeFromCollection' => 'Rimuovi dalla raccolta',
@@ -4987,7 +4950,6 @@ extension on TranslationsIt {
 			'music.addToQueue' => 'Aggiungi alla coda',
 			'music.discNumber' => ({required Object n}) => 'Disco ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('it'))(n, one: '${n} brano', other: '${n} brani', ), 
-			'music.nowPlaying' => 'In riproduzione',
 			'music.playingFrom' => ({required Object title}) => 'Riproduzione da ${title}',
 			'music.queue' => 'Coda',
 			'music.clearQueue' => 'Svuota la coda',
@@ -5445,8 +5407,6 @@ extension on TranslationsIt {
 			'externalPlayer.useExternalPlayer' => 'Usa un lettore esterno',
 			'externalPlayer.useExternalPlayerDescription' => 'Apri i video in un\'altra app',
 			'externalPlayer.selectPlayer' => 'Seleziona il lettore',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Lettori personalizzati',
 			'externalPlayer.systemDefault' => 'Predefinito di sistema',
 			'externalPlayer.addCustomPlayer' => 'Aggiungi lettore personalizzato',
@@ -5461,6 +5421,8 @@ extension on TranslationsIt {
 			'externalPlayer.playInExternalPlayer' => 'Riproduci nel lettore esterno',
 			'metadataEdit.editMetadata' => 'Modifica...',
 			'metadataEdit.screenTitle' => 'Modifica metadati',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Informazioni di base',
 			'metadataEdit.artwork' => 'Immagini',
 			'metadataEdit.advancedSettings' => 'Impostazioni avanzate',

@@ -48,7 +48,6 @@ class TranslationsKo extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$ko supporter = _Translations$supporter$ko._(_root);
 	@override late final _Translations$settings$ko settings = _Translations$settings$ko._(_root);
 	@override late final _Translations$themeEditor$ko themeEditor = _Translations$themeEditor$ko._(_root);
-	@override late final _Translations$search$ko search = _Translations$search$ko._(_root);
 	@override late final _Translations$hotkeys$ko hotkeys = _Translations$hotkeys$ko._(_root);
 	@override late final _Translations$fileInfo$ko fileInfo = _Translations$fileInfo$ko._(_root);
 	@override late final _Translations$mediaMenu$ko mediaMenu = _Translations$mediaMenu$ko._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$ko extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => '허브 제목에 항상 서버 이름을 표시합니다.';
 	@override String get groupLibrariesByServer => '서버별로 라이브러리 그룹화';
 	@override String get groupLibrariesByServerDescription => '사이드바 라이브러리를 미디어 서버별로 그룹화합니다.';
-	@override String get alwaysKeepSidebarOpen => '사이드바 항상 열어두기';
-	@override String get alwaysKeepSidebarOpenDescription => '사이드바가 확장된 상태로 유지되고 콘텐츠 영역이 맞춰집니다';
 	@override String get showUnwatchedCount => '미시청 수 표시';
 	@override String get showUnwatchedCountDescription => '시리즈 및 시즌에 미시청 에피소드 수 표시';
 	@override String get showWatchedIndicators => '시청 표시 보이기';
@@ -553,8 +550,6 @@ class _Translations$settings$ko extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'NTSC DVD에서 흔한, 29.97fps로 텔레시네된 영화와 애니메이션의 원본 프레임을 복원합니다. TV용으로 촬영된 영상은 끊겨 보입니다. 라이브 TV에는 비디오 모드가 사용됩니다';
 	@override String get requireProfileSelectionOnOpen => '앱 실행 시 프로필 선택';
 	@override String get requireProfileSelectionOnOpenDescription => '앱을 열 때마다 프로필 선택 화면을 표시합니다';
-	@override String get forceTvMode => 'TV 모드 강제 사용';
-	@override String get forceTvModeDescription => 'TV 레이아웃을 강제합니다. 자동 감지되지 않는 기기용입니다. 재시작이 필요합니다.';
 	@override String get startInFullscreen => '전체 화면으로 시작';
 	@override String get startInFullscreenDescription => '실행 시 Satra를 전체 화면 모드로 엽니다';
 	@override String get exitFullscreenOnPlayerClose => '플레이어를 닫을 때 전체 화면 종료';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$ko extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes}분 남음';
 	@override String get previewSwitch => '자동 재생';
 	@override String get previewMutedText => '보조 텍스트는 이렇게 표시됩니다';
-}
-
-// Path: search
-class _Translations$search$ko extends Translations$search$en {
-	_Translations$search$ko._(TranslationsKo root) : this._root = root, super.internal(root);
-
-	final TranslationsKo _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => '영화, 시리즈, 음악 등을 검색하세요...';
-	@override String get tryDifferentTerm => '다른 검색어를 시도해 보세요';
-	@override String get searchYourMedia => '미디어 검색';
-	@override String get enterTitleActorOrKeyword => '제목, 배우 또는 키워드를 입력하세요';
-	@override String get people => '인물';
 }
 
 // Path: hotkeys
@@ -1033,7 +1014,6 @@ class _Translations$messages$ko extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => '계속 시청 목록에서 제거됨';
 	@override String errorLoading({required Object error}) => '오류: ${error}';
-	@override String get searchPartialResults => '일부 미디어 서버를 검색하지 못했습니다. 사용 가능한 결과만 표시합니다.';
 	@override String get streamInterrupted => '스트림이 중단되었습니다. 재생을 누르거나 탐색하여 다시 시도하세요.';
 	@override String get liveStreamInterrupted => '라이브 스트림이 중단되었습니다. 재생을 눌러 다시 시도하세요.';
 	@override String get fileInfoNotAvailable => '파일 정보가 없습니다';
@@ -1067,7 +1047,6 @@ class _Translations$messages$ko extends Translations$messages$en {
 	@override String get noEpisodesFound => '시즌 1에서 에피소드를 찾을 수 없습니다';
 	@override String get noEpisodesFoundGeneral => '에피소드를 찾을 수 없습니다';
 	@override String get episodesLoadFailed => '에피소드를 불러오지 못했습니다';
-	@override String get noResultsFound => '결과를 찾을 수 없습니다';
 	@override String sleepTimerSet({required Object label}) => '취침 타이머가 ${label}(으)로 설정되었습니다';
 	@override String get noItemsAvailable => '사용 가능한 항목이 없습니다';
 	@override String get failedToCreatePlayQueueNoItems => '재생 대기열을 만들지 못했습니다 — 항목이 없습니다';
@@ -1344,7 +1323,6 @@ class _Translations$errors$ko extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => '검색 실패: ${error}';
-	@override String get searchUnavailable => '검색이 어떤 미디어 서버에도 연결할 수 없습니다.';
 	@override String connectionTimeout({required Object context}) => '${context} 로드 중 연결 시간 초과';
 	@override String get connectionFailed => '미디어 서버에 연결할 수 없습니다';
 	@override String unableToLoad({required Object context}) => '${context}을(를) 불러올 수 없습니다. 다시 시도하세요.';
@@ -1387,7 +1365,6 @@ class _Translations$libraries$ko extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => '미디어 라이브러리 분석 실패: ${error}';
 	@override String get noLibrariesFound => '미디어 라이브러리 없음';
 	@override String get allLibrariesHidden => '모든 라이브러리가 숨겨졌습니다';
-	@override String hiddenLibrariesCount({required Object count}) => '숨겨진 라이브러리 (${count})';
 	@override String get thisLibraryIsEmpty => '이 미디어 라이브러리는 비어 있습니다';
 	@override String get noItemsMatchFilters => '활성화된 필터와 일치하는 항목이 없습니다';
 	@override String get resetFilters => '필터 초기화';
@@ -1757,7 +1734,6 @@ class _Translations$music$ko extends Translations$music$en {
 	@override String trackCount({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n,
 		other: '${n}곡',
 	);
-	@override String get nowPlaying => '재생 중';
 	@override String playingFrom({required Object title}) => '${title}에서 재생 중';
 	@override String get queue => '재생 대기열';
 	@override String get clearQueue => '대기열 비우기';
@@ -3591,8 +3567,6 @@ extension on TranslationsKo {
 			'settings.showServerNameOnHubsDescription' => '허브 제목에 항상 서버 이름을 표시합니다.',
 			'settings.groupLibrariesByServer' => '서버별로 라이브러리 그룹화',
 			'settings.groupLibrariesByServerDescription' => '사이드바 라이브러리를 미디어 서버별로 그룹화합니다.',
-			'settings.alwaysKeepSidebarOpen' => '사이드바 항상 열어두기',
-			'settings.alwaysKeepSidebarOpenDescription' => '사이드바가 확장된 상태로 유지되고 콘텐츠 영역이 맞춰집니다',
 			'settings.showUnwatchedCount' => '미시청 수 표시',
 			'settings.showUnwatchedCountDescription' => '시리즈 및 시즌에 미시청 에피소드 수 표시',
 			'settings.showWatchedIndicators' => '시청 표시 보이기',
@@ -3817,8 +3791,6 @@ extension on TranslationsKo {
 			'settings.deinterlaceFilmDescription' => 'NTSC DVD에서 흔한, 29.97fps로 텔레시네된 영화와 애니메이션의 원본 프레임을 복원합니다. TV용으로 촬영된 영상은 끊겨 보입니다. 라이브 TV에는 비디오 모드가 사용됩니다',
 			'settings.requireProfileSelectionOnOpen' => '앱 실행 시 프로필 선택',
 			'settings.requireProfileSelectionOnOpenDescription' => '앱을 열 때마다 프로필 선택 화면을 표시합니다',
-			'settings.forceTvMode' => 'TV 모드 강제 사용',
-			'settings.forceTvModeDescription' => 'TV 레이아웃을 강제합니다. 자동 감지되지 않는 기기용입니다. 재시작이 필요합니다.',
 			'settings.startInFullscreen' => '전체 화면으로 시작',
 			'settings.startInFullscreenDescription' => '실행 시 Satra를 전체 화면 모드로 엽니다',
 			'settings.exitFullscreenOnPlayerClose' => '플레이어를 닫을 때 전체 화면 종료',
@@ -3891,12 +3863,12 @@ extension on TranslationsKo {
 			'themeEditor.slots.textMuted' => '보조 텍스트',
 			'themeEditor.slots.accent' => '강조색',
 			'themeEditor.opacity' => '불투명도',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB 또는 #AARRGGBB',
 			'themeEditor.fromOtherThemes' => '다른 테마에서',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme} ${color}',
 			'themeEditor.contrast.textOnBg' => '배경 위 텍스트',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => '표면 위 텍스트',
 			'themeEditor.contrast.textMutedOnBg' => '배경 위 보조 텍스트',
 			'themeEditor.contrast.textMutedOnSurface' => '표면 위 보조 텍스트',
@@ -3911,11 +3883,6 @@ extension on TranslationsKo {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes}분 남음',
 			'themeEditor.previewSwitch' => '자동 재생',
 			'themeEditor.previewMutedText' => '보조 텍스트는 이렇게 표시됩니다',
-			'search.hint' => '영화, 시리즈, 음악 등을 검색하세요...',
-			'search.tryDifferentTerm' => '다른 검색어를 시도해 보세요',
-			'search.searchYourMedia' => '미디어 검색',
-			'search.enterTitleActorOrKeyword' => '제목, 배우 또는 키워드를 입력하세요',
-			'search.people' => '인물',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => '${actionName}에 대한 단축키 설정',
 			'hotkeys.clearShortcut' => '단축키 삭제',
 			'hotkeys.noShortcutSet' => '설정된 단축키 없음',
@@ -4234,7 +4201,6 @@ extension on TranslationsKo {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '시청한 다운로드 ${n}개를 자동 삭제했습니다', ), 
 			'messages.removedFromContinueWatching' => '계속 시청 목록에서 제거됨',
 			'messages.errorLoading' => ({required Object error}) => '오류: ${error}',
-			'messages.searchPartialResults' => '일부 미디어 서버를 검색하지 못했습니다. 사용 가능한 결과만 표시합니다.',
 			'messages.streamInterrupted' => '스트림이 중단되었습니다. 재생을 누르거나 탐색하여 다시 시도하세요.',
 			'messages.liveStreamInterrupted' => '라이브 스트림이 중단되었습니다. 재생을 눌러 다시 시도하세요.',
 			'messages.fileInfoNotAvailable' => '파일 정보가 없습니다',
@@ -4268,7 +4234,6 @@ extension on TranslationsKo {
 			'messages.noEpisodesFound' => '시즌 1에서 에피소드를 찾을 수 없습니다',
 			'messages.noEpisodesFoundGeneral' => '에피소드를 찾을 수 없습니다',
 			'messages.episodesLoadFailed' => '에피소드를 불러오지 못했습니다',
-			'messages.noResultsFound' => '결과를 찾을 수 없습니다',
 			'messages.sleepTimerSet' => ({required Object label}) => '취침 타이머가 ${label}(으)로 설정되었습니다',
 			'messages.noItemsAvailable' => '사용 가능한 항목이 없습니다',
 			'messages.failedToCreatePlayQueueNoItems' => '재생 대기열을 만들지 못했습니다 — 항목이 없습니다',
@@ -4405,8 +4370,6 @@ extension on TranslationsKo {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName}에 추가: Plex, Jellyfin, Emby 또는 다른 프로필 연결',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name}의 세션이 만료되었습니다',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count}개 서버의 세션이 만료되었습니다',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name}에서 이 계정의 접근을 거부했습니다',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count}개 서버에서 이 계정의 접근을 거부했습니다',
 			'connections.signInAgain' => '다시 로그인',
@@ -4418,6 +4381,8 @@ extension on TranslationsKo {
 			'accountPreferences.pickAccount' => '각 계정은 고유한 기본 설정을 저장합니다. 편집할 계정을 선택하세요.',
 			'accountPreferences.storedOnAccount' => '이 옵션은 계정 자체에 저장되므로 해당 계정으로 로그인한 모든 앱에서 사용됩니다 — 다른 기기의 Satra를 포함합니다.',
 			'accountPreferences.noAccounts' => '구성할 계정이 없습니다',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Plex에 로그인하거나 Jellyfin 또는 Emby 서버에 연결하면 해당 계정에 저장된 기본 설정이 여기에 표시됩니다.',
 			'accountPreferences.unavailable' => '이 계정에 연결할 수 없습니다',
 			'accountPreferences.loadFailed' => '이 기본 설정을 불러올 수 없습니다',
@@ -4500,7 +4465,6 @@ extension on TranslationsKo {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age}세)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (향년 ${age}세)',
 			'errors.searchFailed' => ({required Object error}) => '검색 실패: ${error}',
-			'errors.searchUnavailable' => '검색이 어떤 미디어 서버에도 연결할 수 없습니다.',
 			'errors.connectionTimeout' => ({required Object context}) => '${context} 로드 중 연결 시간 초과',
 			'errors.connectionFailed' => '미디어 서버에 연결할 수 없습니다',
 			'errors.unableToLoad' => ({required Object context}) => '${context}을(를) 불러올 수 없습니다. 다시 시도하세요.',
@@ -4534,7 +4498,6 @@ extension on TranslationsKo {
 			'libraries.failedToAnalyze' => ({required Object error}) => '미디어 라이브러리 분석 실패: ${error}',
 			'libraries.noLibrariesFound' => '미디어 라이브러리 없음',
 			'libraries.allLibrariesHidden' => '모든 라이브러리가 숨겨졌습니다',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => '숨겨진 라이브러리 (${count})',
 			'libraries.thisLibraryIsEmpty' => '이 미디어 라이브러리는 비어 있습니다',
 			'libraries.noItemsMatchFilters' => '활성화된 필터와 일치하는 항목이 없습니다',
 			'libraries.resetFilters' => '필터 초기화',
@@ -4919,8 +4882,6 @@ extension on TranslationsKo {
 			'liveTv.failedToStartChannel' => '실시간 채널을 시작할 수 없습니다',
 			'liveTv.failedToBuildStreamUrl' => '스트림 URL을 생성할 수 없습니다',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => '채널을 시작하지 못했습니다: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => '채널을 전환하지 못했습니다: ${reason}',
 			'collections.title' => '컬렉션',
 			'collections.collection' => '컬렉션',
@@ -4934,6 +4895,8 @@ extension on TranslationsKo {
 			'collections.collectionName' => '컬렉션 이름',
 			'collections.enterCollectionName' => '컬렉션 이름 입력',
 			'collections.addedToCollection' => '컬렉션에 추가됨',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => '컬렉션에 추가 실패',
 			'collections.created' => '컬렉션 생성됨',
 			'collections.removeFromCollection' => '컬렉션에서 제거',
@@ -4975,7 +4938,6 @@ extension on TranslationsKo {
 			'music.addToQueue' => '대기열에 추가',
 			'music.discNumber' => ({required Object n}) => '디스크 ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('ko'))(n, other: '${n}곡', ), 
-			'music.nowPlaying' => '재생 중',
 			'music.playingFrom' => ({required Object title}) => '${title}에서 재생 중',
 			'music.queue' => '재생 대기열',
 			'music.clearQueue' => '대기열 비우기',
@@ -5433,8 +5395,6 @@ extension on TranslationsKo {
 			'externalPlayer.useExternalPlayer' => '외부 플레이어 사용',
 			'externalPlayer.useExternalPlayerDescription' => '동영상을 다른 앱에서 열기',
 			'externalPlayer.selectPlayer' => '플레이어 선택',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => '사용자 정의 플레이어',
 			'externalPlayer.systemDefault' => '시스템 기본값',
 			'externalPlayer.addCustomPlayer' => '사용자 정의 플레이어 추가',
@@ -5449,6 +5409,8 @@ extension on TranslationsKo {
 			'externalPlayer.playInExternalPlayer' => '외부 플레이어에서 재생',
 			'metadataEdit.editMetadata' => '편집...',
 			'metadataEdit.screenTitle' => '메타데이터 편집',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => '기본 정보',
 			'metadataEdit.artwork' => '아트워크',
 			'metadataEdit.advancedSettings' => '고급 설정',

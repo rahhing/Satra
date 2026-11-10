@@ -5,7 +5,7 @@ set -euo pipefail
 
 ADB="$HOME/Library/Android/sdk/platform-tools/adb"
 DEVICE="${SATRA_DEVICE:-192.168.1.7:5555}"
-PKG=com.edde746.satra
+PKG=com.rahhing.satra
 HOST_PORT="${SATRA_VM_PORT:-9223}"
 
 a() { "$ADB" -s "$DEVICE" "$@"; }

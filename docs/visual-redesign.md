@@ -25,8 +25,12 @@ use opaque panes, and reduced motion skips the new motion and wheel smoothing.
 
 ## Navigation and motion
 
-The desktop sidebar floats above the canvas, expands on hover or keyboard focus,
-and keeps Downloads and Settings below the scrollable library groups. Existing
+Desktop and TV browsing run full-bleed without a side rail: primary Home and
+library pills live on the left of the floating top toolbar, while utility
+controls (`Downloads`, `Settings`, `Fullscreen`, `Profile`) sit in the top-right
+action cluster. Pressing `Ctrl + Space` anywhere while the app is focused opens
+the floating glassmorphic Universal Spotlight bubble to search movies, shows,
+episodes, music, libraries, people, quick actions, and settings. Existing
 server grouping, hidden libraries, reconnect, fullscreen, and TV focus hand-offs
 retain their owners and stable identifiers. Mobile navigation floats in a safe
 area and retains its library long-press picker, portrait/landscape layouts, and
@@ -66,7 +70,7 @@ python3 linux/packaging/install-local-launcher.py build/linux/x64/release/bundle
 
 This installs a user-level override for the existing GTK application ID and keeps
 profile paths stable. System files are untouched; existing user customizations
-are backed up as `com.edde746.satra.desktop.before-satra`. Removing the user
+are backed up as `com.rahhing.satra.desktop.before-satra`. Removing the user
 override (or restoring that backup) returns to the previous launcher. Keep the
 referenced bundle directory in place after installation.
 

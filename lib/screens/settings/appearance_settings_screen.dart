@@ -52,6 +52,12 @@ class AppearanceSettingsScreen extends StatelessWidget {
                 !PlatformDetector.isAutomotive())
               _desktopScaleSelector(),
             if (Platform.isAndroid) _visualEffectsSelector(context),
+            SettingSwitchTile(
+              pref: SettingsService.liquidGlass,
+              icon: Symbols.water_drop_rounded,
+              title: t.settings.liquidGlass,
+              subtitle: t.settings.liquidGlassDescription,
+            ),
           ],
         ),
 
@@ -142,8 +148,6 @@ class AppearanceSettingsScreen extends StatelessWidget {
         SettingsGroup(
           title: t.settings.navigation,
           children: [
-            if (PlatformDetector.shouldUseSideNavigation(context) && !PlatformDetector.isTVDevice())
-              _dockSideSelector(),
             if (hasExplore)
               SettingSwitchTile(
                 pref: SettingsService.showExploreTab,
@@ -151,14 +155,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
                 title: t.settings.showExploreTab,
                 subtitle: t.settings.showExploreTabDescription,
               ),
-            if (PlatformDetector.shouldUseSideNavigation(context))
-              SettingSwitchTile(
-                pref: SettingsService.alwaysKeepSidebarOpen,
-                icon: Symbols.dock_to_left_rounded,
-                title: t.settings.alwaysKeepSidebarOpen,
-                subtitle: t.settings.alwaysKeepSidebarOpenDescription,
-              ),
-            if (PlatformDetector.shouldUseSideNavigation(context))
+            if (!PlatformDetector.shouldUseSideNavigation(context))
               SettingSwitchTile(
                 pref: SettingsService.groupLibrariesByServer,
                 icon: Symbols.dns_rounded,
@@ -313,16 +310,6 @@ class AppearanceSettingsScreen extends StatelessWidget {
     ],
   );
 
-  Widget _dockSideSelector() => SettingSegmentedTile<DockSide>(
-    pref: SettingsService.dockSide,
-    icon: Symbols.dock_to_left_rounded,
-    title: 'Dock position',
-    segments: const [
-      ButtonSegment(value: DockSide.left, label: Text('Left')),
-      ButtonSegment(value: DockSide.right, label: Text('Right')),
-    ],
-  );
-
   Widget _cornerRadiusSelector() => SettingValueBuilder<double>(
     pref: SettingsService.pillCornerRadius,
     builder: (context, radius, _) => Padding(
@@ -334,13 +321,13 @@ class AppearanceSettingsScreen extends StatelessWidget {
             children: [
               const AppIcon(Symbols.rounded_corner_rounded),
               const SizedBox(width: 16),
-              Text('Corner rounding', style: settingsOptionTitleStyle(context)),
+              Text(t.settings.cornerRounding, style: settingsOptionTitleStyle(context)),
               const Spacer(),
               Text('${radius.round()}'),
             ],
           ),
           const SizedBox(height: 8),
-          const Text('Shape cards, Continue Watching, the dock, and navigation pills.'),
+          Text(t.settings.cornerRoundingDescription),
           FocusableSlider(
             key: const ValueKey('pill_corner_radius'),
             value: radius,
@@ -349,7 +336,10 @@ class AppearanceSettingsScreen extends StatelessWidget {
             divisions: 32,
             onChanged: (value) => SettingsService.instance.write(SettingsService.pillCornerRadius, value),
           ),
-          Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: const [Text('Square'), Text('Rounded')]),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [Text(t.settings.cornerSquare), Text(t.settings.cornerRounded)],
+          ),
         ],
       ),
     ),

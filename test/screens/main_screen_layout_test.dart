@@ -13,70 +13,16 @@ import 'package:satra/profiles/profile_connection_registry.dart';
 import 'package:satra/profiles/profile_registry.dart';
 import 'package:satra/screens/main_screen.dart';
 import 'package:satra/services/storage_service.dart';
-import 'package:satra/widgets/side_navigation_rail.dart';
 
 import '../test_helpers/prefs.dart';
 
 void main() {
-  test('side navigation pushes stable foreground off-screen while temporarily expanded', () {
-    const viewportWidth = 1280.0;
-    const reservedWidth = SideNavigationRailState.tvCollapsedWidth;
-
-    final collapsed = mainScreenSideNavigationContentLayout(
-      viewportWidth: viewportWidth,
-      currentSideNavigationWidth: SideNavigationRailState.tvCollapsedWidth,
-      reservedSideNavigationWidth: reservedWidth,
-    );
-    final expanded = mainScreenSideNavigationContentLayout(
-      viewportWidth: viewportWidth,
-      currentSideNavigationWidth: SideNavigationRailState.expandedWidth,
-      reservedSideNavigationWidth: reservedWidth,
-    );
-
-    expect(collapsed.width, viewportWidth - SideNavigationRailState.tvCollapsedWidth);
-    expect(expanded.width, collapsed.width);
-    expect(collapsed.left, SideNavigationRailState.tvCollapsedWidth);
-    expect(expanded.left, SideNavigationRailState.expandedWidth);
-    expect(collapsed.left + collapsed.width, viewportWidth);
-    expect(expanded.left + expanded.width, viewportWidth + SideNavigationRailState.expandedWidth - reservedWidth);
-  });
-
-  test('side navigation reserves expanded width when always open', () {
-    const viewportWidth = 1280.0;
-
-    final expanded = mainScreenSideNavigationContentLayout(
-      viewportWidth: viewportWidth,
-      currentSideNavigationWidth: SideNavigationRailState.expandedWidth,
-      reservedSideNavigationWidth: SideNavigationRailState.expandedWidth,
-    );
-
-    expect(expanded.left, SideNavigationRailState.expandedWidth);
-    expect(expanded.width, viewportWidth - SideNavigationRailState.expandedWidth);
-    expect(expanded.left + expanded.width, viewportWidth);
-  });
-
-  test('an open dock leaves space on the opposite edge on either side', () {
-    for (final onRight in [false, true]) {
-      final layout = mainScreenSideNavigationContentLayout(
-        viewportWidth: 1280,
-        currentSideNavigationWidth: 220,
-        reservedSideNavigationWidth: 220,
-        dockOnRight: onRight,
-        oppositeInset: 24,
-      );
-      expect(layout.width, 1036);
-      expect(layout.left, onRight ? 24 : 220);
-      expect(1280 - layout.left - layout.width, onRight ? 220 : 24);
-    }
-  });
-
-  test('tvOS Menu pass-through only enables at root with sidebar focus', () {
+  test('tvOS Menu pass-through only enables at root with visible tabs and no overlays', () {
     bool shouldPass({
       bool isAppleTV = true,
       bool isShowingProfileSelection = false,
       bool isOverlaySheetOpen = false,
       bool isRouteCurrent = true,
-      bool isSidebarFocused = true,
       bool hasVisibleTabs = true,
       bool isCurrentTabRoot = true,
     }) {
@@ -85,14 +31,12 @@ void main() {
         isShowingProfileSelection: isShowingProfileSelection,
         isOverlaySheetOpen: isOverlaySheetOpen,
         isRouteCurrent: isRouteCurrent,
-        isSidebarFocused: isSidebarFocused,
         hasVisibleTabs: hasVisibleTabs,
         isCurrentTabRoot: isCurrentTabRoot,
       );
     }
 
     expect(shouldPass(), isTrue);
-    expect(shouldPass(isSidebarFocused: false), isFalse);
     expect(shouldPass(isCurrentTabRoot: false), isFalse);
     expect(shouldPass(isOverlaySheetOpen: true), isFalse);
     expect(shouldPass(isRouteCurrent: false), isFalse);
@@ -351,18 +295,21 @@ void main() {
 
     double left() => tester.widget<Positioned>(find.byKey(const ValueKey('bleed-position'))).left!;
 
-    await tester.pumpWidget(build(SideNavigationRailState.tvCollapsedWidth));
-    expect(left(), -SideNavigationRailState.tvCollapsedWidth);
+    const collapsedBleed = 64.0;
+    const expandedBleed = 220.0;
 
-    await tester.pumpWidget(build(SideNavigationRailState.expandedWidth));
-    expect(left(), closeTo(-SideNavigationRailState.tvCollapsedWidth, 0.001));
+    await tester.pumpWidget(build(collapsedBleed));
+    expect(left(), -collapsedBleed);
+
+    await tester.pumpWidget(build(expandedBleed));
+    expect(left(), closeTo(-collapsedBleed, 0.001));
 
     await tester.pump(const Duration(milliseconds: 100));
-    expect(left(), lessThan(-SideNavigationRailState.tvCollapsedWidth));
-    expect(left(), greaterThan(-SideNavigationRailState.expandedWidth));
+    expect(left(), lessThan(-collapsedBleed));
+    expect(left(), greaterThan(-expandedBleed));
 
     await tester.pumpAndSettle();
-    expect(left(), closeTo(-SideNavigationRailState.expandedWidth, 0.001));
+    expect(left(), closeTo(-expandedBleed, 0.001));
   });
 
   group('runInitialProfilePrompt', () {

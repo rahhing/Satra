@@ -48,7 +48,6 @@ class TranslationsDa extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$da supporter = _Translations$supporter$da._(_root);
 	@override late final _Translations$settings$da settings = _Translations$settings$da._(_root);
 	@override late final _Translations$themeEditor$da themeEditor = _Translations$themeEditor$da._(_root);
-	@override late final _Translations$search$da search = _Translations$search$da._(_root);
 	@override late final _Translations$hotkeys$da hotkeys = _Translations$hotkeys$da._(_root);
 	@override late final _Translations$fileInfo$da fileInfo = _Translations$fileInfo$da._(_root);
 	@override late final _Translations$mediaMenu$da mediaMenu = _Translations$mediaMenu$da._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$da extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Vis altid servernavne i titler på hubber.';
 	@override String get groupLibrariesByServer => 'Grupper biblioteker efter server';
 	@override String get groupLibrariesByServerDescription => 'Gruppér bibliotekerne i sidepanelet under hver medieserver.';
-	@override String get alwaysKeepSidebarOpen => 'Hold altid sidepanelet åbent';
-	@override String get alwaysKeepSidebarOpenDescription => 'Sidepanelet forbliver udvidet, og indholdsområdet tilpasser sig';
 	@override String get showUnwatchedCount => 'Vis antal usete';
 	@override String get showUnwatchedCountDescription => 'Vis antal usete episoder på serier og sæsoner';
 	@override String get showWatchedIndicators => 'Vis set-markeringer';
@@ -553,8 +550,6 @@ class _Translations$settings$da extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'Gendan de oprindelige billeder i film og animation, der er telecinet til 29,97 fps, som det er almindeligt på NTSC-DVD\'er. Video optaget til tv hakker. Live TV bruger Video';
 	@override String get requireProfileSelectionOnOpen => 'Spørg om profil ved åbning';
 	@override String get requireProfileSelectionOnOpenDescription => 'Vis profilvalg hver gang appen åbnes';
-	@override String get forceTvMode => 'Gennemtving TV-tilstand';
-	@override String get forceTvModeDescription => 'Tving TV-layout. Til enheder, der ikke registreres automatisk. Kræver genstart.';
 	@override String get startInFullscreen => 'Start i fuldskærm';
 	@override String get startInFullscreenDescription => 'Åbn Satra i fuldskærmstilstand ved opstart';
 	@override String get exitFullscreenOnPlayerClose => 'Forlad fuldskærm ved lukning af afspiller';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$da extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} min tilbage';
 	@override String get previewSwitch => 'Autoafspilning';
 	@override String get previewMutedText => 'Sådan ser sekundær tekst ud';
-}
-
-// Path: search
-class _Translations$search$da extends Translations$search$en {
-	_Translations$search$da._(TranslationsDa root) : this._root = root, super.internal(root);
-
-	final TranslationsDa _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Søg film, serier, musik...';
-	@override String get tryDifferentTerm => 'Prøv en anden søgning';
-	@override String get searchYourMedia => 'Søg i dine medier';
-	@override String get enterTitleActorOrKeyword => 'Indtast titel, skuespiller eller nøgleord';
-	@override String get people => 'Personer';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$da extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => 'Fjernet fra Fortsæt med at se';
 	@override String errorLoading({required Object error}) => 'Fejl: ${error}';
-	@override String get searchPartialResults => 'Nogle medieservere kunne ikke søges i. Viser tilgængelige resultater.';
 	@override String get streamInterrupted => 'Streamen blev afbrudt. Tryk på afspil, eller spol for at prøve igen.';
 	@override String get liveStreamInterrupted => 'Livestreamen blev afbrudt. Tryk på afspil for at prøve igen.';
 	@override String get fileInfoNotAvailable => 'Filinfo ikke tilgængelig';
@@ -1071,7 +1051,6 @@ class _Translations$messages$da extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Ingen episoder fundet i første sæson';
 	@override String get noEpisodesFoundGeneral => 'Ingen episoder fundet';
 	@override String get episodesLoadFailed => 'Kunne ikke indlæse episoder';
-	@override String get noResultsFound => 'Ingen resultater fundet';
 	@override String sleepTimerSet({required Object label}) => 'Sove-timer indstillet til ${label}';
 	@override String get noItemsAvailable => 'Ingen elementer tilgængelige';
 	@override String get failedToCreatePlayQueueNoItems => 'Kunne ikke oprette en afspilningskø — ingen elementer';
@@ -1349,7 +1328,6 @@ class _Translations$errors$da extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Søgning mislykkedes: ${error}';
-	@override String get searchUnavailable => 'Søgningen kunne ikke nå nogen medieserver.';
 	@override String connectionTimeout({required Object context}) => 'Forbindelsen fik timeout under indlæsning af ${context}';
 	@override String get connectionFailed => 'Kan ikke oprette forbindelse til medieserver';
 	@override String unableToLoad({required Object context}) => 'Kunne ikke indlæse ${context}. Prøv igen.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$da extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Kunne ikke analysere bibliotek: ${error}';
 	@override String get noLibrariesFound => 'Ingen biblioteker fundet';
 	@override String get allLibrariesHidden => 'Alle biblioteker er skjult';
-	@override String hiddenLibrariesCount({required Object count}) => 'Skjulte biblioteker (${count})';
 	@override String get thisLibraryIsEmpty => 'Dette bibliotek er tomt';
 	@override String get noItemsMatchFilters => 'Ingen elementer matcher de aktive filtre';
 	@override String get resetFilters => 'Nulstil filtre';
@@ -1766,7 +1743,6 @@ class _Translations$music$da extends Translations$music$en {
 		one: '${n} nummer',
 		other: '${n} numre',
 	);
-	@override String get nowPlaying => 'Afspiller nu';
 	@override String playingFrom({required Object title}) => 'Afspiller fra ${title}';
 	@override String get queue => 'Kø';
 	@override String get clearQueue => 'Ryd kø';
@@ -3603,8 +3579,6 @@ extension on TranslationsDa {
 			'settings.showServerNameOnHubsDescription' => 'Vis altid servernavne i titler på hubber.',
 			'settings.groupLibrariesByServer' => 'Grupper biblioteker efter server',
 			'settings.groupLibrariesByServerDescription' => 'Gruppér bibliotekerne i sidepanelet under hver medieserver.',
-			'settings.alwaysKeepSidebarOpen' => 'Hold altid sidepanelet åbent',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Sidepanelet forbliver udvidet, og indholdsområdet tilpasser sig',
 			'settings.showUnwatchedCount' => 'Vis antal usete',
 			'settings.showUnwatchedCountDescription' => 'Vis antal usete episoder på serier og sæsoner',
 			'settings.showWatchedIndicators' => 'Vis set-markeringer',
@@ -3829,8 +3803,6 @@ extension on TranslationsDa {
 			'settings.deinterlaceFilmDescription' => 'Gendan de oprindelige billeder i film og animation, der er telecinet til 29,97 fps, som det er almindeligt på NTSC-DVD\'er. Video optaget til tv hakker. Live TV bruger Video',
 			'settings.requireProfileSelectionOnOpen' => 'Spørg om profil ved åbning',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Vis profilvalg hver gang appen åbnes',
-			'settings.forceTvMode' => 'Gennemtving TV-tilstand',
-			'settings.forceTvModeDescription' => 'Tving TV-layout. Til enheder, der ikke registreres automatisk. Kræver genstart.',
 			'settings.startInFullscreen' => 'Start i fuldskærm',
 			'settings.startInFullscreenDescription' => 'Åbn Satra i fuldskærmstilstand ved opstart',
 			'settings.exitFullscreenOnPlayerClose' => 'Forlad fuldskærm ved lukning af afspiller',
@@ -3903,12 +3875,12 @@ extension on TranslationsDa {
 			'themeEditor.slots.textMuted' => 'Sekundær tekst',
 			'themeEditor.slots.accent' => 'Accentfarve',
 			'themeEditor.opacity' => 'Opacitet',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB eller #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Fra andre temaer',
 			'themeEditor.swatchLabel' => ({required Object color, required Object theme}) => '${color} (${theme})',
 			'themeEditor.contrast.textOnBg' => 'Tekst på baggrund',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Tekst på overflade',
 			'themeEditor.contrast.textMutedOnBg' => 'Sekundær tekst på baggrund',
 			'themeEditor.contrast.textMutedOnSurface' => 'Sekundær tekst på overflade',
@@ -3923,11 +3895,6 @@ extension on TranslationsDa {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} min tilbage',
 			'themeEditor.previewSwitch' => 'Autoafspilning',
 			'themeEditor.previewMutedText' => 'Sådan ser sekundær tekst ud',
-			'search.hint' => 'Søg film, serier, musik...',
-			'search.tryDifferentTerm' => 'Prøv en anden søgning',
-			'search.searchYourMedia' => 'Søg i dine medier',
-			'search.enterTitleActorOrKeyword' => 'Indtast titel, skuespiller eller nøgleord',
-			'search.people' => 'Personer',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => 'Indstil genvej for ${actionName}',
 			'hotkeys.clearShortcut' => 'Ryd genvej',
 			'hotkeys.noShortcutSet' => 'Ingen genvej angivet',
@@ -4246,7 +4213,6 @@ extension on TranslationsDa {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('da'))(n, one: 'Fjernede automatisk ${n} set download', other: 'Fjernede automatisk ${n} sete downloads', ), 
 			'messages.removedFromContinueWatching' => 'Fjernet fra Fortsæt med at se',
 			'messages.errorLoading' => ({required Object error}) => 'Fejl: ${error}',
-			'messages.searchPartialResults' => 'Nogle medieservere kunne ikke søges i. Viser tilgængelige resultater.',
 			'messages.streamInterrupted' => 'Streamen blev afbrudt. Tryk på afspil, eller spol for at prøve igen.',
 			'messages.liveStreamInterrupted' => 'Livestreamen blev afbrudt. Tryk på afspil for at prøve igen.',
 			'messages.fileInfoNotAvailable' => 'Filinfo ikke tilgængelig',
@@ -4280,7 +4246,6 @@ extension on TranslationsDa {
 			'messages.noEpisodesFound' => 'Ingen episoder fundet i første sæson',
 			'messages.noEpisodesFoundGeneral' => 'Ingen episoder fundet',
 			'messages.episodesLoadFailed' => 'Kunne ikke indlæse episoder',
-			'messages.noResultsFound' => 'Ingen resultater fundet',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Sove-timer indstillet til ${label}',
 			'messages.noItemsAvailable' => 'Ingen elementer tilgængelige',
 			'messages.failedToCreatePlayQueueNoItems' => 'Kunne ikke oprette en afspilningskø — ingen elementer',
@@ -4417,8 +4382,6 @@ extension on TranslationsDa {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => 'Føj til ${displayName}: Plex, Jellyfin, Emby eller en anden profilforbindelse',
 			'connections.sessionExpiredOne' => ({required Object name}) => 'Sessionen er udløbet for ${name}',
 			'connections.sessionExpiredMany' => ({required Object count}) => 'Sessionerne er udløbet for ${count} servere',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} nægtede adgang for denne konto',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} servere nægtede adgang for denne konto',
 			'connections.signInAgain' => 'Log ind igen',
@@ -4430,6 +4393,8 @@ extension on TranslationsDa {
 			'accountPreferences.pickAccount' => 'Hver konto gemmer sine egne præferencer. Vælg den, du vil redigere.',
 			'accountPreferences.storedOnAccount' => 'Disse indstillinger gemmes på selve kontoen, så alle apps, der er logget ind på den, bruger dem — inklusive Satra på dine andre enheder.',
 			'accountPreferences.noAccounts' => 'Ingen konti at konfigurere',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Log ind på Plex, eller forbind en Jellyfin- eller Emby-server, så vises de præferencer, der er gemt på kontoen, her.',
 			'accountPreferences.unavailable' => 'Kan ikke nå denne konto',
 			'accountPreferences.loadFailed' => 'Kunne ikke indlæse disse præferencer',
@@ -4512,7 +4477,6 @@ extension on TranslationsDa {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} år)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (${age} år)',
 			'errors.searchFailed' => ({required Object error}) => 'Søgning mislykkedes: ${error}',
-			'errors.searchUnavailable' => 'Søgningen kunne ikke nå nogen medieserver.',
 			'errors.connectionTimeout' => ({required Object context}) => 'Forbindelsen fik timeout under indlæsning af ${context}',
 			'errors.connectionFailed' => 'Kan ikke oprette forbindelse til medieserver',
 			'errors.unableToLoad' => ({required Object context}) => 'Kunne ikke indlæse ${context}. Prøv igen.',
@@ -4546,7 +4510,6 @@ extension on TranslationsDa {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Kunne ikke analysere bibliotek: ${error}',
 			'libraries.noLibrariesFound' => 'Ingen biblioteker fundet',
 			'libraries.allLibrariesHidden' => 'Alle biblioteker er skjult',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Skjulte biblioteker (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Dette bibliotek er tomt',
 			'libraries.noItemsMatchFilters' => 'Ingen elementer matcher de aktive filtre',
 			'libraries.resetFilters' => 'Nulstil filtre',
@@ -4931,8 +4894,6 @@ extension on TranslationsDa {
 			'liveTv.failedToStartChannel' => 'Kunne ikke starte livekanalen',
 			'liveTv.failedToBuildStreamUrl' => 'Kunne ikke oprette stream-URL\'en',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Kunne ikke starte kanalen: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Kunne ikke skifte kanal: ${reason}',
 			'collections.title' => 'Samlinger',
 			'collections.collection' => 'Samling',
@@ -4946,6 +4907,8 @@ extension on TranslationsDa {
 			'collections.collectionName' => 'Samlingsnavn',
 			'collections.enterCollectionName' => 'Indtast samlingsnavn',
 			'collections.addedToCollection' => 'Tilføjet til samling',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Kunne ikke tilføje til samling',
 			'collections.created' => 'Samling oprettet',
 			'collections.removeFromCollection' => 'Fjern fra samling',
@@ -4987,7 +4950,6 @@ extension on TranslationsDa {
 			'music.addToQueue' => 'Føj til kø',
 			'music.discNumber' => ({required Object n}) => 'Disk ${n}',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('da'))(n, one: '${n} nummer', other: '${n} numre', ), 
-			'music.nowPlaying' => 'Afspiller nu',
 			'music.playingFrom' => ({required Object title}) => 'Afspiller fra ${title}',
 			'music.queue' => 'Kø',
 			'music.clearQueue' => 'Ryd kø',
@@ -5445,8 +5407,6 @@ extension on TranslationsDa {
 			'externalPlayer.useExternalPlayer' => 'Brug ekstern afspiller',
 			'externalPlayer.useExternalPlayerDescription' => 'Åbn videoer i en anden app',
 			'externalPlayer.selectPlayer' => 'Vælg afspiller',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Brugerdefinerede afspillere',
 			'externalPlayer.systemDefault' => 'Systemstandard',
 			'externalPlayer.addCustomPlayer' => 'Tilføj brugerdefineret afspiller',
@@ -5461,6 +5421,8 @@ extension on TranslationsDa {
 			'externalPlayer.playInExternalPlayer' => 'Afspil i ekstern afspiller',
 			'metadataEdit.editMetadata' => 'Rediger...',
 			'metadataEdit.screenTitle' => 'Rediger metadata',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Grundlæggende oplysninger',
 			'metadataEdit.artwork' => 'Grafik',
 			'metadataEdit.advancedSettings' => 'Avancerede indstillinger',

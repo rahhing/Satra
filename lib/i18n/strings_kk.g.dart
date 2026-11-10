@@ -48,7 +48,6 @@ class TranslationsKk extends Translations with BaseTranslations<AppLocale, Trans
 	@override late final _Translations$supporter$kk supporter = _Translations$supporter$kk._(_root);
 	@override late final _Translations$settings$kk settings = _Translations$settings$kk._(_root);
 	@override late final _Translations$themeEditor$kk themeEditor = _Translations$themeEditor$kk._(_root);
-	@override late final _Translations$search$kk search = _Translations$search$kk._(_root);
 	@override late final _Translations$hotkeys$kk hotkeys = _Translations$hotkeys$kk._(_root);
 	@override late final _Translations$fileInfo$kk fileInfo = _Translations$fileInfo$kk._(_root);
 	@override late final _Translations$mediaMenu$kk mediaMenu = _Translations$mediaMenu$kk._(_root);
@@ -327,8 +326,6 @@ class _Translations$settings$kk extends Translations$settings$en {
 	@override String get showServerNameOnHubsDescription => 'Бөлім тақырыптарында әрдайым сервер атын көрсету.';
 	@override String get groupLibrariesByServer => 'Кітапханаларды сервер бойынша топтау';
 	@override String get groupLibrariesByServerDescription => 'Мүйістік мәзірдегі кітапханаларды серверлер бойынша топтау.';
-	@override String get alwaysKeepSidebarOpen => 'Сүйістік мәзірді әрдайым ашық ұстау';
-	@override String get alwaysKeepSidebarOpenDescription => 'Бүйірлік мәзір ашық күйінде қалады, мазмұн аймағы соған бейімделеді';
 	@override String get showUnwatchedCount => 'Көрілмегендер санын көрсету';
 	@override String get showUnwatchedCountDescription => 'Сериалдар мен маусымдарда көрілмеген бөлімдер санын көрсету';
 	@override String get showWatchedIndicators => 'Көрілген белгілерді көрсету';
@@ -553,8 +550,6 @@ class _Translations$settings$kk extends Translations$settings$en {
 	@override String get deinterlaceFilmDescription => 'NTSC DVD-лерде жиі кездесетін, 29.97 fps-ке телекинмен түрлендірілген фильмдер мен анимацияның бастапқы кадрларын қалпына келтіру. Теледидар үшін түсірілген видео бірқалыпсыз ойнатылады. Тікелей TV «Видео» режимін пайдаланады';
 	@override String get requireProfileSelectionOnOpen => 'Ашқанда профильді сұрау';
 	@override String get requireProfileSelectionOnOpenDescription => 'Қолданба ашылған сайын профильді таңдауды көрсету';
-	@override String get forceTvMode => 'TV режимін мәжбүрлеу';
-	@override String get forceTvModeDescription => 'TV интерфейсін мәжбүрлеу. Автоматты түрде анықталмайтын құрылғылар үшін. Қайта іске қосу қажет.';
 	@override String get startInFullscreen => 'Толық экранда бастау';
 	@override String get startInFullscreenDescription => 'Satra-ді ашқанда толық экран режимінде ашу';
 	@override String get exitFullscreenOnPlayerClose => 'Ойнатқыш жабылғанда толық экраннан шығу';
@@ -643,20 +638,6 @@ class _Translations$themeEditor$kk extends Translations$themeEditor$en {
 	@override String previewCardSubtitle({required Object minutes}) => '${minutes} мин қалды';
 	@override String get previewSwitch => 'Автоойнату';
 	@override String get previewMutedText => 'Қосалқы мәтін осылай көрінеді';
-}
-
-// Path: search
-class _Translations$search$kk extends Translations$search$en {
-	_Translations$search$kk._(TranslationsKk root) : this._root = root, super.internal(root);
-
-	final TranslationsKk _root; // ignore: unused_field
-
-	// Translations
-	@override String get hint => 'Фильмдер, сериалдар, музыка іздеу...';
-	@override String get tryDifferentTerm => 'Басқа іздеу сөзін байқап көріңіз';
-	@override String get searchYourMedia => 'Медиафайлдардан іздеу';
-	@override String get enterTitleActorOrKeyword => 'Атауын, актерді немесе кілт сөзді енгізіңіз';
-	@override String get people => 'Адамдар';
 }
 
 // Path: hotkeys
@@ -1037,7 +1018,6 @@ class _Translations$messages$kk extends Translations$messages$en {
 	);
 	@override String get removedFromContinueWatching => '"Көруді жалғастыру" тізімінен өшірілді';
 	@override String errorLoading({required Object error}) => 'Қате: ${error}';
-	@override String get searchPartialResults => 'Кейбір медиа серверлерінде іздеу орындалмады. Қолжетімді нәтижелер көрсетілуде.';
 	@override String get streamInterrupted => 'Ағын үзілді. Қайталау үшін ойнату түймесін басыңыз немесе басқа орынға өтіңіз.';
 	@override String get liveStreamInterrupted => 'Тікелей ағын үзілді. Қайталау үшін ойнату түймесін басыңыз.';
 	@override String get fileInfoNotAvailable => 'Файл туралы ақпарат қолжетімсіз';
@@ -1071,7 +1051,6 @@ class _Translations$messages$kk extends Translations$messages$en {
 	@override String get noEpisodesFound => 'Бірінші маусымда бөлімдер табылмады';
 	@override String get noEpisodesFoundGeneral => 'Бөлімдер табылмады';
 	@override String get episodesLoadFailed => 'Бөлімдерді жүктеу мүмкін болмады';
-	@override String get noResultsFound => 'Нәтижелер табылмады';
 	@override String sleepTimerSet({required Object label}) => 'Ұйқы таймері ${label} уақытына орнатылды';
 	@override String get noItemsAvailable => 'Элементтер жоқ';
 	@override String get failedToCreatePlayQueueNoItems => 'Ойнату кезегін жасау мүмкін болмады — элементтер жоқ';
@@ -1349,7 +1328,6 @@ class _Translations$errors$kk extends Translations$errors$en {
 
 	// Translations
 	@override String searchFailed({required Object error}) => 'Іздеу қатесі: ${error}';
-	@override String get searchUnavailable => 'Іздеу ешбір медиа серверге қосыла алмады.';
 	@override String connectionTimeout({required Object context}) => '${context} жүктеу уақыты өтті';
 	@override String get connectionFailed => 'Медиа серверіне қосылу мүмкін емес';
 	@override String unableToLoad({required Object context}) => '${context} жүктеу мүмкін болмады.';
@@ -1392,7 +1370,6 @@ class _Translations$libraries$kk extends Translations$libraries$en {
 	@override String failedToAnalyze({required Object error}) => 'Талдау жасау мүмкін болмады: ${error}';
 	@override String get noLibrariesFound => 'Кітапханалар табылмады';
 	@override String get allLibrariesHidden => 'Барлық кітапханалар жасырылған';
-	@override String hiddenLibrariesCount({required Object count}) => 'Жасырын кітапханалар (${count})';
 	@override String get thisLibraryIsEmpty => 'Бұл кітапхана бос';
 	@override String get noItemsMatchFilters => 'Фильтрлерге сәйкес элементтер табылмады';
 	@override String get resetFilters => 'Фильтрлерді қалпына келтіру';
@@ -1766,7 +1743,6 @@ class _Translations$music$kk extends Translations$music$en {
 		one: '${n} ән',
 		other: '${n} ән',
 	);
-	@override String get nowPlaying => 'Қазір ойнатылуда';
 	@override String playingFrom({required Object title}) => '${title} дереккөзінен';
 	@override String get queue => 'Кезек';
 	@override String get clearQueue => 'Кезекті тазалау';
@@ -3603,8 +3579,6 @@ extension on TranslationsKk {
 			'settings.showServerNameOnHubsDescription' => 'Бөлім тақырыптарында әрдайым сервер атын көрсету.',
 			'settings.groupLibrariesByServer' => 'Кітапханаларды сервер бойынша топтау',
 			'settings.groupLibrariesByServerDescription' => 'Мүйістік мәзірдегі кітапханаларды серверлер бойынша топтау.',
-			'settings.alwaysKeepSidebarOpen' => 'Сүйістік мәзірді әрдайым ашық ұстау',
-			'settings.alwaysKeepSidebarOpenDescription' => 'Бүйірлік мәзір ашық күйінде қалады, мазмұн аймағы соған бейімделеді',
 			'settings.showUnwatchedCount' => 'Көрілмегендер санын көрсету',
 			'settings.showUnwatchedCountDescription' => 'Сериалдар мен маусымдарда көрілмеген бөлімдер санын көрсету',
 			'settings.showWatchedIndicators' => 'Көрілген белгілерді көрсету',
@@ -3829,8 +3803,6 @@ extension on TranslationsKk {
 			'settings.deinterlaceFilmDescription' => 'NTSC DVD-лерде жиі кездесетін, 29.97 fps-ке телекинмен түрлендірілген фильмдер мен анимацияның бастапқы кадрларын қалпына келтіру. Теледидар үшін түсірілген видео бірқалыпсыз ойнатылады. Тікелей TV «Видео» режимін пайдаланады',
 			'settings.requireProfileSelectionOnOpen' => 'Ашқанда профильді сұрау',
 			'settings.requireProfileSelectionOnOpenDescription' => 'Қолданба ашылған сайын профильді таңдауды көрсету',
-			'settings.forceTvMode' => 'TV режимін мәжбүрлеу',
-			'settings.forceTvModeDescription' => 'TV интерфейсін мәжбүрлеу. Автоматты түрде анықталмайтын құрылғылар үшін. Қайта іске қосу қажет.',
 			'settings.startInFullscreen' => 'Толық экранда бастау',
 			'settings.startInFullscreenDescription' => 'Satra-ді ашқанда толық экран режимінде ашу',
 			'settings.exitFullscreenOnPlayerClose' => 'Ойнатқыш жабылғанда толық экраннан шығу',
@@ -3903,12 +3875,12 @@ extension on TranslationsKk {
 			'themeEditor.slots.textMuted' => 'Қосалқы мәтін',
 			'themeEditor.slots.accent' => 'Акцент',
 			'themeEditor.opacity' => 'Мөлдірлік',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.hexHint' => '#RRGGBB немесе #AARRGGBB',
 			'themeEditor.fromOtherThemes' => 'Басқа тақырыптардан',
 			'themeEditor.swatchLabel' => ({required Object theme, required Object color}) => '${theme}: ${color}',
 			'themeEditor.contrast.textOnBg' => 'Фондағы мәтін',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.contrast.textOnSurface' => 'Беткі қабаттағы мәтін',
 			'themeEditor.contrast.textMutedOnBg' => 'Фондағы қосалқы мәтін',
 			'themeEditor.contrast.textMutedOnSurface' => 'Беткі қабаттағы қосалқы мәтін',
@@ -3923,11 +3895,6 @@ extension on TranslationsKk {
 			'themeEditor.previewCardSubtitle' => ({required Object minutes}) => '${minutes} мин қалды',
 			'themeEditor.previewSwitch' => 'Автоойнату',
 			'themeEditor.previewMutedText' => 'Қосалқы мәтін осылай көрінеді',
-			'search.hint' => 'Фильмдер, сериалдар, музыка іздеу...',
-			'search.tryDifferentTerm' => 'Басқа іздеу сөзін байқап көріңіз',
-			'search.searchYourMedia' => 'Медиафайлдардан іздеу',
-			'search.enterTitleActorOrKeyword' => 'Атауын, актерді немесе кілт сөзді енгізіңіз',
-			'search.people' => 'Адамдар',
 			'hotkeys.setShortcutFor' => ({required Object actionName}) => '${actionName} үшін пернелер тіркесін орнату',
 			'hotkeys.clearShortcut' => 'Тіркесті тазалау',
 			'hotkeys.noShortcutSet' => 'Пернелер тіркесі орнатылмаған',
@@ -4246,7 +4213,6 @@ extension on TranslationsKk {
 			'messages.autoRemovedWatchedDownloads' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('kk'))(n, one: 'Көрілген ${n} жүктеу автоматты өшірілді', other: 'Көрілген ${n} жүктеу автоматты өшірілді', ), 
 			'messages.removedFromContinueWatching' => '"Көруді жалғастыру" тізімінен өшірілді',
 			'messages.errorLoading' => ({required Object error}) => 'Қате: ${error}',
-			'messages.searchPartialResults' => 'Кейбір медиа серверлерінде іздеу орындалмады. Қолжетімді нәтижелер көрсетілуде.',
 			'messages.streamInterrupted' => 'Ағын үзілді. Қайталау үшін ойнату түймесін басыңыз немесе басқа орынға өтіңіз.',
 			'messages.liveStreamInterrupted' => 'Тікелей ағын үзілді. Қайталау үшін ойнату түймесін басыңыз.',
 			'messages.fileInfoNotAvailable' => 'Файл туралы ақпарат қолжетімсіз',
@@ -4280,7 +4246,6 @@ extension on TranslationsKk {
 			'messages.noEpisodesFound' => 'Бірінші маусымда бөлімдер табылмады',
 			'messages.noEpisodesFoundGeneral' => 'Бөлімдер табылмады',
 			'messages.episodesLoadFailed' => 'Бөлімдерді жүктеу мүмкін болмады',
-			'messages.noResultsFound' => 'Нәтижелер табылмады',
 			'messages.sleepTimerSet' => ({required Object label}) => 'Ұйқы таймері ${label} уақытына орнатылды',
 			'messages.noItemsAvailable' => 'Элементтер жоқ',
 			'messages.failedToCreatePlayQueueNoItems' => 'Ойнату кезегін жасау мүмкін болмады — элементтер жоқ',
@@ -4417,8 +4382,6 @@ extension on TranslationsKk {
 			'connections.addConnectionSubtitleScoped' => ({required Object displayName}) => '${displayName} профиліне қосу: Plex, Jellyfin, Emby немесе басқа қосылым',
 			'connections.sessionExpiredOne' => ({required Object name}) => '${name} үшін сеанс мерзімі өтті',
 			'connections.sessionExpiredMany' => ({required Object count}) => '${count} сервер үшін сеанс мерзімі өтті',
-			_ => null,
-		} ?? switch (path) {
 			'connections.accessDeniedOne' => ({required Object name}) => '${name} бұл тіркелгіге кіруден бас тартты',
 			'connections.accessDeniedMany' => ({required Object count}) => '${count} сервер бұл тіркелгіге кіруден бас тартты',
 			'connections.signInAgain' => 'Қайтадан кіру',
@@ -4430,6 +4393,8 @@ extension on TranslationsKk {
 			'accountPreferences.pickAccount' => 'Әр тіркелгі өз баптауларын сақтайды. Өңдеу үшін біреуін таңдаңыз.',
 			'accountPreferences.storedOnAccount' => 'Бұл баптаулар тіркелгінің өзінде сақталады, сондықтан оған кірген әрбір қолданба оларды пайдаланады — басқа құрылғыларыңыздағы Satra қоса.',
 			'accountPreferences.noAccounts' => 'Баптауға тіркелгілер жоқ',
+			_ => null,
+		} ?? switch (path) {
 			'accountPreferences.noAccountsHint' => 'Plex-ке кіріңіз немесе Jellyfin не Emby серверін қосыңыз, сонда сол тіркелгіде сақталған баптаулар осында көрсетіледі.',
 			'accountPreferences.unavailable' => 'Бұл тіркелгіге қол жеткізу мүмкін емес',
 			'accountPreferences.loadFailed' => 'Бұл баптауларды жүктеу мүмкін болмады',
@@ -4512,7 +4477,6 @@ extension on TranslationsKk {
 			'discover.person.dateWithAge' => ({required Object date, required Object age}) => '${date} (${age} жаста)',
 			'discover.person.dateWithAgeAtDeath' => ({required Object date, required Object age}) => '${date} (${age} жасында)',
 			'errors.searchFailed' => ({required Object error}) => 'Іздеу қатесі: ${error}',
-			'errors.searchUnavailable' => 'Іздеу ешбір медиа серверге қосыла алмады.',
 			'errors.connectionTimeout' => ({required Object context}) => '${context} жүктеу уақыты өтті',
 			'errors.connectionFailed' => 'Медиа серверіне қосылу мүмкін емес',
 			'errors.unableToLoad' => ({required Object context}) => '${context} жүктеу мүмкін болмады.',
@@ -4546,7 +4510,6 @@ extension on TranslationsKk {
 			'libraries.failedToAnalyze' => ({required Object error}) => 'Талдау жасау мүмкін болмады: ${error}',
 			'libraries.noLibrariesFound' => 'Кітапханалар табылмады',
 			'libraries.allLibrariesHidden' => 'Барлық кітапханалар жасырылған',
-			'libraries.hiddenLibrariesCount' => ({required Object count}) => 'Жасырын кітапханалар (${count})',
 			'libraries.thisLibraryIsEmpty' => 'Бұл кітапхана бос',
 			'libraries.noItemsMatchFilters' => 'Фильтрлерге сәйкес элементтер табылмады',
 			'libraries.resetFilters' => 'Фильтрлерді қалпына келтіру',
@@ -4931,8 +4894,6 @@ extension on TranslationsKk {
 			'liveTv.failedToStartChannel' => 'Тікелей эфир арнасын іске қосу мүмкін болмады',
 			'liveTv.failedToBuildStreamUrl' => 'Ағын URL-ін құру мүмкін болмады',
 			'liveTv.playbackStartFailed' => ({required Object reason}) => 'Арнаны іске қосу мүмкін болмады: ${reason}',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.channelSwitchFailed' => ({required Object reason}) => 'Арнаны ауыстыру мүмкін болмады: ${reason}',
 			'collections.title' => 'Топтамалар',
 			'collections.collection' => 'Топтама',
@@ -4946,6 +4907,8 @@ extension on TranslationsKk {
 			'collections.collectionName' => 'Топтама атауы',
 			'collections.enterCollectionName' => 'Топтама атауын енгізіңіз',
 			'collections.addedToCollection' => 'Топтамаға қосылды',
+			_ => null,
+		} ?? switch (path) {
 			'collections.errorAddingToCollection' => 'Топтамаға қосу мүмкін болмады',
 			'collections.created' => 'Топтама жасалды',
 			'collections.removeFromCollection' => 'Топтамадан өшіру',
@@ -4987,7 +4950,6 @@ extension on TranslationsKk {
 			'music.addToQueue' => 'Кезекке қосу',
 			'music.discNumber' => ({required Object n}) => '${n}-диск',
 			'music.trackCount' => ({required num n}) => (_root.$meta.cardinalResolver ?? PluralResolvers.cardinal('kk'))(n, one: '${n} ән', other: '${n} ән', ), 
-			'music.nowPlaying' => 'Қазір ойнатылуда',
 			'music.playingFrom' => ({required Object title}) => '${title} дереккөзінен',
 			'music.queue' => 'Кезек',
 			'music.clearQueue' => 'Кезекті тазалау',
@@ -5445,8 +5407,6 @@ extension on TranslationsKk {
 			'externalPlayer.useExternalPlayer' => 'Сыртқы ойнатқышты пайдалану',
 			'externalPlayer.useExternalPlayerDescription' => 'Видеоларды басқа қолданбада ашу',
 			'externalPlayer.selectPlayer' => 'Ойнатқышты таңдау',
-			_ => null,
-		} ?? switch (path) {
 			'externalPlayer.customPlayers' => 'Арнайы ойнатқыштар',
 			'externalPlayer.systemDefault' => 'Жүйелік әдепкі',
 			'externalPlayer.addCustomPlayer' => 'Арнайы ойнатқыш қосу',
@@ -5461,6 +5421,8 @@ extension on TranslationsKk {
 			'externalPlayer.playInExternalPlayer' => 'Сыртқы ойнатқышта ойнату',
 			'metadataEdit.editMetadata' => 'Өңдеу...',
 			'metadataEdit.screenTitle' => 'Метадеректерді өңдеу',
+			_ => null,
+		} ?? switch (path) {
 			'metadataEdit.basicInfo' => 'Негізгі ақпарат',
 			'metadataEdit.artwork' => 'Суреттер/Постерлер',
 			'metadataEdit.advancedSettings' => 'Кеңейтілген баптаулар',

@@ -197,7 +197,6 @@ TextRange expandToGraphemeRange(String text, TextRange range) {
 ///   onKeyEvent: dpadKeyHandler(
 ///     onUp: () => _focusAppBar(),
 ///     onDown: () => _focusContent(),
-///     onLeft: () => _navigateToSidebar(),
 ///     onSelect: () => _play(),
 ///   ),
 ///   child: ...

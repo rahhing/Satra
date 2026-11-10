@@ -33,6 +33,7 @@ import '../services/agent_control_service.dart';
 import '../services/catalog/catalog_library_matcher.dart';
 import '../services/music/music_playback_service.dart';
 import '../services/music/music_playback_service_impl.dart';
+import '../spotlight/spotlight_shortcut.dart';
 import '../services/music/music_session_store.dart';
 import '../services/offline_watch_sync_service.dart';
 import '../services/storage_service.dart';
@@ -345,6 +346,8 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
   final _musicRouteObserver = MusicUiRouteObserver();
   final _miniPlayerInsets = MiniPlayerInsetController();
   final _settingsRouteTracker = SettingsRouteTracker();
+  final _spotlightRouteTracker = SpotlightRouteTracker();
+  final _spotlightController = SpotlightController();
 
   @override
   void initState() {
@@ -391,25 +394,31 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
             ],
             // The mini-player mounts ABOVE the nested navigator so it persists
             // across content routes (but inside the profile provider scope so
-            // it dies with the session). SettingsShortcut wraps both so the
-            // desktop open-settings chord also works with mini-player focus.
-            child: SettingsShortcut(
+            // it dies with the session). SpotlightShortcut and SettingsShortcut
+            // wrap both so Ctrl+Space and the open-settings chord work anywhere.
+            child: SpotlightShortcut(
               navigatorKey: _navigatorKey,
-              settingsRoutes: _settingsRouteTracker,
-              child: Stack(
-                children: [
-                  Navigator(
-                    key: _navigatorKey,
-                    observers: [
-                      _routeObserver,
-                      _musicRouteObserver,
-                      _settingsRouteTracker,
-                      BackKeySuppressorObserver(),
-                    ],
-                    onGenerateRoute: _onGenerateRoute,
-                  ),
-                  const Positioned.fill(child: MusicMiniPlayerOverlay()),
-                ],
+              routeTracker: _spotlightRouteTracker,
+              controller: _spotlightController,
+              child: SettingsShortcut(
+                navigatorKey: _navigatorKey,
+                settingsRoutes: _settingsRouteTracker,
+                child: Stack(
+                  children: [
+                    Navigator(
+                      key: _navigatorKey,
+                      observers: [
+                        _routeObserver,
+                        _musicRouteObserver,
+                        _settingsRouteTracker,
+                        _spotlightRouteTracker,
+                        BackKeySuppressorObserver(),
+                      ],
+                      onGenerateRoute: _onGenerateRoute,
+                    ),
+                    const Positioned.fill(child: MusicMiniPlayerOverlay()),
+                  ],
+                ),
               ),
             ),
           ),

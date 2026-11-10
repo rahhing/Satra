@@ -64,15 +64,8 @@ void main() {
     final harness = _PlaylistHarness();
     addTearDown(harness.dispose);
     var backCalls = 0;
-    var sidebarCalls = 0;
 
-    await _pumpTab(
-      tester,
-      harness: harness,
-      library: _library,
-      onBack: () => backCalls++,
-      onSidebar: () => sidebarCalls++,
-    );
+    await _pumpTab(tester, harness: harness, library: _library, onBack: () => backCalls++);
 
     expect(find.byType(SliverGrid), findsOneWidget);
     final cards = tester.widgetList<FocusableMediaCard>(find.byType(FocusableMediaCard)).toList();
@@ -90,10 +83,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(_cardFor(tester, 0).focusNode!.hasPrimaryFocus, isTrue);
 
-    // First column LEFT reaches the sidebar instead of moving inside the row.
+    // First column LEFT stays at the left edge instead of wrapping inside the row.
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
     await tester.pumpAndSettle();
-    expect(sidebarCalls, 1);
     expect(_cardFor(tester, 0).focusNode!.hasPrimaryFocus, isTrue);
 
     // Below the top row, UP moves focus up a row rather than leaving the grid
@@ -135,15 +127,8 @@ void main() {
     final harness = _PlaylistHarness();
     addTearDown(harness.dispose);
     var backCalls = 0;
-    var sidebarCalls = 0;
 
-    await _pumpTab(
-      tester,
-      harness: harness,
-      library: _library,
-      onBack: () => backCalls++,
-      onSidebar: () => sidebarCalls++,
-    );
+    await _pumpTab(tester, harness: harness, library: _library, onBack: () => backCalls++);
 
     expect(find.byType(SliverList), findsOneWidget);
     final cards = tester.widgetList<FocusableMediaCard>(find.byType(FocusableMediaCard)).toList();
@@ -153,15 +138,13 @@ void main() {
 
     await _focusFirstCard(tester);
 
-    // One card per row: DOWN and UP move between rows, and LEFT always
-    // reaches the sidebar.
+    // One card per row: DOWN and UP move between rows, and LEFT stays on the row.
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowDown);
     await tester.pumpAndSettle();
     expect(_cardFor(tester, 1).focusNode!.hasPrimaryFocus, isTrue);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowLeft);
     await tester.pumpAndSettle();
-    expect(sidebarCalls, 1);
     expect(_cardFor(tester, 1).focusNode!.hasPrimaryFocus, isTrue);
 
     await tester.sendKeyEvent(LogicalKeyboardKey.arrowUp);
@@ -180,7 +163,7 @@ void main() {
     TvDetectionService.debugSetAppleTVOverride(true);
     await SettingsService.instance.write(SettingsService.tvFullCardLayout, true);
 
-    await _pumpTab(tester, harness: harness, library: _musicLibrary, onBack: () {}, onSidebar: () {});
+    await _pumpTab(tester, harness: harness, library: _musicLibrary, onBack: () {});
 
     // Square artwork rather than a poster: a poster cell renders artwork
     // roughly half again as tall as it is wide.
@@ -221,14 +204,12 @@ Future<void> _pumpTab(
   required _PlaylistHarness harness,
   required MediaLibrary library,
   required VoidCallback onBack,
-  required VoidCallback onSidebar,
 }) async {
   await pumpLibraryTab(
     tester,
     provider: harness.provider,
     tab: LibraryPlaylistsTab(library: library, suppressAutoFocus: true, onBack: onBack),
     size: const Size(800, 600),
-    focusSidebar: onSidebar,
   );
   await tester.pumpAndSettle();
 }

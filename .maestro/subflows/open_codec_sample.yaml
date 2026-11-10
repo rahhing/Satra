@@ -1,4 +1,4 @@
-appId: com.edde746.satra
+appId: com.rahhing.satra
 ---
 - runFlow: ensure_onboarded.yaml
 - tapOn: "(?s)^Search.*"

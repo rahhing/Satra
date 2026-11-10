@@ -210,6 +210,8 @@
     "paperTheme": "Papel",
     "libraryDensity": "Densidade da Biblioteca",
     "displayScale": "Escala de exibição",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Compacto",
     "comfortable": "Confortável",
     "gridSpacing": "Espaçamento da grade",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Sempre mostrar nomes dos servidores nos títulos dos hubs.",
     "groupLibrariesByServer": "Agrupar Bibliotecas por Servidor",
     "groupLibrariesByServerDescription": "Agrupar bibliotecas da barra lateral por servidor de mídia.",
-    "alwaysKeepSidebarOpen": "Manter Barra Lateral Sempre Aberta",
-    "alwaysKeepSidebarOpenDescription": "A barra lateral fica expandida e a área de conteúdo se ajusta",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Mostrar Contagem de Não Assistidos",
     "showUnwatchedCountDescription": "Exibir contagem de episódios não assistidos em séries e temporadas",
     "showWatchedIndicators": "Mostrar Indicadores de Assistidos",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Completos",
     "visualEffectsReduced": "Reduzidos",
     "visualEffectsReducedDescription": "Menos animações e imagens em menor resolução",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Ocultar spoilers de episódios não assistidos",
     "hideSpoilersDescription": "Desfocar miniaturas e descrições de episódios não assistidos",
     "playerBackend": "Mecanismo de reprodução",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Servidores de retransmissão públicos do Open Watch Party, a menos que você defina o seu",
     "watchTogetherRelayHint": "https://minha-retransmissao.exemplo.com.br",
     "watchTogetherRelayInvalid": "Insira uma URL base de retransmissão HTTP ou HTTPS válida.",
-
-
     "debugLogging": "Log de Depuração",
     "debugLoggingDescription": "Ativar log detalhado para solução de problemas",
     "viewLogs": "Ver Logs",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Restaurar os quadros originais de filmes e animações convertidos por telecine para 29,97 fps, comum em DVDs NTSC. Vídeos gravados para TV travam. A TV ao vivo usa Vídeo",
     "requireProfileSelectionOnOpen": "Pedir perfil ao abrir o app",
     "requireProfileSelectionOnOpenDescription": "Mostrar a seleção de perfil sempre que o app for aberto",
-    "forceTvMode": "Forçar modo TV",
-    "forceTvModeDescription": "Forçar o layout de TV em dispositivos sem detecção automática. Requer reiniciar o app.",
     "startInFullscreen": "Iniciar em tela cheia",
     "startInFullscreenDescription": "Abrir o Satra em modo de tela cheia ao iniciar",
     "exitFullscreenOnPlayerClose": "Sair da tela cheia ao fechar o reprodutor",
@@ -561,12 +563,52 @@
     "previewSwitch": "Reprodução automática",
     "previewMutedText": "O texto secundário fica assim"
   },
-  "search": {
-    "hint": "Buscar filmes, séries, músicas...",
-    "tryDifferentTerm": "Tente um termo de busca diferente",
-    "searchYourMedia": "Buscar suas mídias",
-    "enterTitleActorOrKeyword": "Insira um título, ator ou palavra-chave",
-    "people": "Pessoas"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Definir Atalho para ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Removido de Continuar assistindo",
     "errorLoading": "Erro: ${error}",
-    "searchPartialResults": "Alguns servidores de mídia não puderam ser pesquisados. Exibindo os resultados disponíveis.",
     "streamInterrupted": "A transmissão foi interrompida. Pressione reproduzir ou avance para tentar novamente.",
     "liveStreamInterrupted": "A transmissão ao vivo foi interrompida. Pressione reproduzir para tentar novamente.",
     "fileInfoNotAvailable": "Informações do arquivo não disponíveis",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Nenhum episódio encontrado na primeira temporada",
     "noEpisodesFoundGeneral": "Nenhum episódio encontrado",
     "episodesLoadFailed": "Não foi possível carregar os episódios",
-    "noResultsFound": "Nenhum resultado encontrado",
     "sleepTimerSet": "Temporizador de suspensão definido como ${label}",
     "noItemsAvailable": "Nenhum item disponível",
     "failedToCreatePlayQueueNoItems": "Falha ao criar a fila de reprodução — nenhum item",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "O servidor continuou se recusando a transmitir este arquivo (HTTP 503). Ele pode estar reiniciando ou ocupado, ou o armazenamento do arquivo pode estar offline. Tente novamente em instantes — se isso continuar acontecendo, peça ao proprietário do servidor para verificar o servidor e o armazenamento do arquivo.",
     "playbackNotAllowedTitle": "Reprodução não permitida",
     "playbackNotAllowedBody": "O servidor se recusou a transmitir este item (HTTP 403). Sua conta pode não ter permissão para reproduzi-lo, ou o servidor pode permitir a reprodução apenas na própria rede local.",
-
-
     "burnedSubtitlesUseMenu": "As legendas estão incorporadas a esta transmissão. Altere-as no menu de legendas.",
     "noVideoUrl": "Nenhuma URL de vídeo disponível",
     "playbackNoMediaSources": "O servidor não retornou nenhuma fonte de mídia reproduzível",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Falha na busca: ${error}",
-    "searchUnavailable": "A busca não conseguiu alcançar nenhum servidor de mídia.",
     "connectionTimeout": "Tempo de conexão esgotado ao carregar ${context}",
     "connectionFailed": "Não foi possível conectar ao servidor de mídia",
     "unableToLoad": "Não foi possível carregar ${context}. Tente novamente.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Falha ao analisar biblioteca: ${error}",
     "noLibrariesFound": "Nenhuma biblioteca encontrada",
     "allLibrariesHidden": "Todas as bibliotecas estão ocultas",
-    "hiddenLibrariesCount": "Bibliotecas ocultas (${count})",
     "thisLibraryIsEmpty": "Esta biblioteca está vazia",
     "noItemsMatchFilters": "Nenhum item corresponde aos filtros ativos",
     "resetFilters": "Redefinir filtros",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Limpar Logs",
     "copyLogs": "Copiar Logs"
-
   },
   "startup": {
     "failedTitle": "O Satra não conseguiu iniciar",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Ocultar detalhes",
     "copyDetails": "Copiar detalhes",
     "detailsCopied": "Detalhes copiados para a área de transferência",
-
     "repairStorage": "Reparar armazenamento",
     "repairTitle": "Reparar dados armazenados?",
     "repairBodyCommon": "O arquivo de configurações do Satra está danificado e não pode ser lido. Reparar redefine todas as configurações para o padrão.",
@@ -1778,7 +1812,6 @@
       "one": "${n} faixa",
       "other": "${n} faixas"
     },
-    "nowPlaying": "Reproduzindo agora",
     "playingFrom": "Reproduzindo de ${title}",
     "queue": "Fila",
     "clearQueue": "Limpar fila",

@@ -210,6 +210,8 @@
     "paperTheme": "紙張",
     "libraryDensity": "媒體庫版面配置密度",
     "displayScale": "介面縮放",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "緊湊",
     "comfortable": "舒適",
     "gridSpacing": "網格間距",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "一律在推薦區標題中顯示伺服器名稱。",
     "groupLibrariesByServer": "依伺服器將媒體庫分組",
     "groupLibrariesByServerDescription": "將側邊欄中的媒體庫依伺服器進行分組。",
-    "alwaysKeepSidebarOpen": "一律保持側邊欄展開",
-    "alwaysKeepSidebarOpenDescription": "側邊欄保持展開狀態，內容區域自動調整",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "顯示未觀看數量",
     "showUnwatchedCountDescription": "在影集和單季上顯示未觀看的集數",
     "showWatchedIndicators": "顯示已觀看指示",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "完整效果",
     "visualEffectsReduced": "簡化效果",
     "visualEffectsReducedDescription": "減少動畫並使用較低解析度的封面圖片",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "隱藏未觀看單集的劇透內容",
     "hideSpoilersDescription": "模糊未觀看單集的縮圖與描述",
     "playerBackend": "播放器引擎",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "除非您自行設定，否則使用公開的 Open Watch Party 中繼伺服器",
     "watchTogetherRelayHint": "https://my-relay.example.com",
     "watchTogetherRelayInvalid": "請輸入有效的 HTTP 或 HTTPS 中繼伺服器根網址。",
-
-
     "debugLogging": "偵錯日誌",
     "debugLoggingDescription": "啟用詳細日誌記錄以便進行疑難排解",
     "viewLogs": "查看日誌",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "還原經 telecine 轉為 29.97 fps 的電影與動畫原始影格，常見於 NTSC DVD。為電視拍攝的影片會出現卡頓。直播電視會使用「視訊」",
     "requireProfileSelectionOnOpen": "開啟應用程式時要求選擇使用者",
     "requireProfileSelectionOnOpenDescription": "每次開啟應用程式時顯示使用者設定檔選擇畫面",
-    "forceTvMode": "強制 TV 模式",
-    "forceTvModeDescription": "強制使用 TV 介面版面。適用於無法自動辨識 TV 的裝置。需要重新啟動。",
     "startInFullscreen": "以全螢幕模式啟動",
     "startInFullscreenDescription": "啟動時直接以全螢幕開啟 Satra",
     "exitFullscreenOnPlayerClose": "關閉播放器時退出全螢幕",
@@ -561,12 +563,52 @@
     "previewSwitch": "自動播放",
     "previewMutedText": "次要文字看起來像這樣"
   },
-  "search": {
-    "hint": "搜尋電影、影集、音樂…",
-    "tryDifferentTerm": "嘗試不同的關鍵字",
-    "searchYourMedia": "搜尋媒體庫",
-    "enterTitleActorOrKeyword": "輸入標題、演員或關鍵字",
-    "people": "人物"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "為 ${actionName} 設定快速鍵",
@@ -918,7 +960,6 @@
     },
     "removedFromContinueWatching": "已從「繼續觀看」中移除",
     "errorLoading": "錯誤：${error}",
-    "searchPartialResults": "部分媒體伺服器無法搜尋。目前顯示可取得的結果。",
     "streamInterrupted": "影片串流中斷。請按播放鍵或拖動進度條重試。",
     "liveStreamInterrupted": "直播串流中斷。請按播放鍵重試。",
     "fileInfoNotAvailable": "無法取得檔案資訊",
@@ -952,7 +993,6 @@
     "noEpisodesFound": "在第一季中找不到單集",
     "noEpisodesFoundGeneral": "找不到單集",
     "episodesLoadFailed": "無法載入單集",
-    "noResultsFound": "找不到結果",
     "sleepTimerSet": "睡眠計時器已設定為 ${label}",
     "noItemsAvailable": "沒有可用的項目",
     "failedToCreatePlayQueueNoItems": "無法建立播放佇列 — 沒有項目",
@@ -967,8 +1007,6 @@
     "serverBusyBody": "伺服器持續拒絕串流此檔案（HTTP 503）。伺服器可能正在重新啟動、忙碌中，或檔案所在的儲存裝置可能已離線。請稍後再試；若問題持續發生，請要求伺服器擁有者檢查伺服器及檔案所在的儲存裝置。",
     "playbackNotAllowedTitle": "不允許播放",
     "playbackNotAllowedBody": "伺服器拒絕串流此項目（HTTP 403）。此帳戶可能沒有播放權限，或伺服器可能只允許在其區域網路內播放。",
-
-
     "burnedSubtitlesUseMenu": "字幕已燒錄至此串流中。請從字幕選單變更字幕。",
     "noVideoUrl": "沒有可用的視訊 URL",
     "playbackNoMediaSources": "伺服器未傳回可播放的媒體來源",
@@ -1218,7 +1256,6 @@
   },
   "errors": {
     "searchFailed": "搜尋失敗：${error}",
-    "searchUnavailable": "搜尋無法連線至任何媒體伺服器。",
     "connectionTimeout": "載入 ${context} 時連線逾時",
     "connectionFailed": "無法連線至媒體伺服器",
     "unableToLoad": "無法載入 ${context}。請重試。",
@@ -1254,7 +1291,6 @@
     "failedToAnalyze": "無法分析媒體庫：${error}",
     "noLibrariesFound": "找不到媒體庫",
     "allLibrariesHidden": "所有媒體庫都已隱藏",
-    "hiddenLibrariesCount": "已隱藏的媒體庫（${count}）",
     "thisLibraryIsEmpty": "此媒體庫為空",
     "noItemsMatchFilters": "沒有符合目前篩選條件的項目",
     "resetFilters": "重設篩選條件",
@@ -1386,7 +1422,6 @@
   "logs": {
     "clearLogs": "清除日誌",
     "copyLogs": "複製日誌"
-
   },
   "startup": {
     "failedTitle": "Satra 無法啟動",
@@ -1397,7 +1432,6 @@
     "hideDetails": "隱藏詳細資料",
     "copyDetails": "複製詳細資料",
     "detailsCopied": "詳細資料已複製到剪貼簿",
-
     "repairStorage": "修復儲存空間",
     "repairTitle": "修復已儲存的資料？",
     "repairBodyCommon": "Satra 的設定檔已損壞且無法讀取。修復會將所有設定重設為預設值。",
@@ -1767,7 +1801,6 @@
     "trackCount": {
       "other": "${n} 首"
     },
-    "nowPlaying": "正在播放",
     "playingFrom": "來自 ${title}",
     "queue": "播放佇列",
     "clearQueue": "清空佇列",

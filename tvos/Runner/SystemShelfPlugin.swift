@@ -266,10 +266,10 @@ import TVServices
 
   final class SystemShelfPlugin: NSObject, FlutterPlugin {
     static let schemaVersion = 3
-    static let appGroupIdentifier = "group.com.edde746.satra"
+    static let appGroupIdentifier = "group.com.rahhing.satra"
     static let cacheDataKey = "SatraSystemShelfCacheData"
     static let sourcesKey = "SatraSystemShelfSources"
-    static let tokenKeychainService = "com.edde746.satra.systemshelf.tokens"
+    static let tokenKeychainService = "com.rahhing.satra.systemshelf.tokens"
     static let artworkDirectoryName = "SystemShelfArtwork"
     private static let maxItems = 20
     /// English fallback for caches written before the localized title existed.

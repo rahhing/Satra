@@ -210,6 +210,8 @@
     "paperTheme": "Papper",
     "libraryDensity": "Biblioteksdensitet",
     "displayScale": "Skalning",
+    "desktopScaleAutomatic": "",
+    "desktopScaleDescription": "",
     "compact": "Kompakt",
     "comfortable": "Luftig",
     "gridSpacing": "Rutnätsavstånd",
@@ -234,8 +236,10 @@
     "showServerNameOnHubsDescription": "Visa alltid servernamnet i innehållssektionernas rubriker.",
     "groupLibrariesByServer": "Gruppera bibliotek efter server",
     "groupLibrariesByServerDescription": "Gruppera biblioteken i sidofältet under respektive medieserver.",
-    "alwaysKeepSidebarOpen": "Håll alltid sidofältet öppet",
-    "alwaysKeepSidebarOpenDescription": "Sidofältet förblir utfällt och innehållsytan anpassas efter det",
+    "cornerRounding": "",
+    "cornerRoundingDescription": "",
+    "cornerSquare": "",
+    "cornerRounded": "",
     "showUnwatchedCount": "Visa antal osedda",
     "showUnwatchedCountDescription": "Visa antal osedda avsnitt för serier och säsonger",
     "showWatchedIndicators": "Visa seddmarkeringar",
@@ -254,6 +258,8 @@
     "visualEffectsFull": "Fullständiga",
     "visualEffectsReduced": "Minskade",
     "visualEffectsReducedDescription": "Färre animationer och grafik med lägre upplösning",
+    "liquidGlass": "",
+    "liquidGlassDescription": "",
     "hideSpoilers": "Dölj spoilers för osedda avsnitt",
     "hideSpoilersDescription": "Gör miniatyrbilder och beskrivningar oskarpa för osedda avsnitt",
     "playerBackend": "Uppspelningsmotor",
@@ -308,8 +314,6 @@
     "watchTogetherRelayDescription": "Offentliga Open Watch Party-reläservrar om du inte anger en egen",
     "watchTogetherRelayHint": "https://mitt-rela.exempel.se",
     "watchTogetherRelayInvalid": "Ange en giltig HTTP- eller HTTPS-bas-URL för reläservern.",
-
-
     "debugLogging": "Felsökningsloggning",
     "debugLoggingDescription": "Aktivera detaljerad loggning för felsökning",
     "viewLogs": "Visa loggar",
@@ -462,8 +466,6 @@
     "deinterlaceFilmDescription": "Återställ originalbildrutorna i film och animation som telecinerats till 29,97 fps, vanligt på NTSC-DVD:er. Video inspelad för TV hackar. Live-TV använder Video",
     "requireProfileSelectionOnOpen": "Fråga efter profil vid appstart",
     "requireProfileSelectionOnOpenDescription": "Visa profilval varje gång appen öppnas",
-    "forceTvMode": "Tvinga TV-läge",
-    "forceTvModeDescription": "Tvinga TV-layout. För enheter som inte upptäcks automatiskt. Kräver omstart.",
     "startInFullscreen": "Starta i helskärm",
     "startInFullscreenDescription": "Öppna Satra i helskärm vid start",
     "exitFullscreenOnPlayerClose": "Avsluta helskärm vid stängning av spelare",
@@ -561,12 +563,52 @@
     "previewSwitch": "Autouppspelning",
     "previewMutedText": "Sekundär text ser ut så här"
   },
-  "search": {
-    "hint": "Sök filmer, serier, musik...",
-    "tryDifferentTerm": "Prova en annan sökterm",
-    "searchYourMedia": "Sök i dina media",
-    "enterTitleActorOrKeyword": "Ange en titel, skådespelare eller nyckelord",
-    "people": "Personer"
+  "spotlight": {
+    "title": "",
+    "placeholder": "",
+    "shortcutHint": "",
+    "emptyPromptTitle": "",
+    "emptyPromptSubtitle": "",
+    "noResultsTitle": "",
+    "noResultsSubtitle": "",
+    "categories": {
+      "all": "",
+      "movies": "",
+      "shows": "",
+      "episodes": "",
+      "music": "",
+      "libraries": "",
+      "settings": "",
+      "actions": "",
+      "people": ""
+    },
+    "sections": {
+      "quickActions": "",
+      "libraries": "",
+      "settings": "",
+      "downloads": ""
+    },
+    "hints": {
+      "navigate": "",
+      "open": "",
+      "filter": "",
+      "close": ""
+    },
+    "actions": {
+      "goHome": "",
+      "openDownloads": "",
+      "openSettings": "",
+      "openExplore": "",
+      "openLiveTv": "",
+      "toggleFullscreen": "",
+      "switchProfile": "",
+      "watchTogether": "",
+      "companionRemote": "",
+      "manageLibraries": "",
+      "refreshLibrary": "",
+      "addServer": "",
+      "reconnectServers": ""
+    }
   },
   "hotkeys": {
     "setShortcutFor": "Sätt genväg för ${actionName}",
@@ -922,7 +964,6 @@
     },
     "removedFromContinueWatching": "Borttagen från Fortsätt titta",
     "errorLoading": "Fel: ${error}",
-    "searchPartialResults": "Vissa mediaservrar kunde inte sökas. Visar tillgängliga resultat.",
     "streamInterrupted": "Strömmen avbröts. Tryck på uppspelning eller spola för att försöka igen.",
     "liveStreamInterrupted": "Liveströmmen avbröts. Tryck på uppspelning för att försöka igen.",
     "fileInfoNotAvailable": "Filinformation är inte tillgänglig",
@@ -956,7 +997,6 @@
     "noEpisodesFound": "Inga avsnitt hittades i första säsongen",
     "noEpisodesFoundGeneral": "Inga avsnitt hittades",
     "episodesLoadFailed": "Det gick inte att läsa in avsnitt",
-    "noResultsFound": "Inga resultat hittades",
     "sleepTimerSet": "Sovtimer inställd för ${label}",
     "noItemsAvailable": "Inga objekt tillgängliga",
     "failedToCreatePlayQueueNoItems": "Det gick inte att skapa en uppspelningskö – inga objekt",
@@ -971,8 +1011,6 @@
     "serverBusyBody": "Servern nekade upprepade gånger att strömma den här filen (HTTP 503). Den kan hålla på att startas om eller vara upptagen, eller så kan lagringen där filen finns vara offline. Försök igen om en stund – om det fortsätter, be serverns ägare att kontrollera servern och lagringen där filen finns.",
     "playbackNotAllowedTitle": "Uppspelning tillåts inte",
     "playbackNotAllowedBody": "Servern vägrade att strömma det här objektet (HTTP 403). Ditt konto kanske inte har behörighet att spela upp det, eller så tillåter servern kanske bara uppspelning i sitt lokala nätverk.",
-
-
     "burnedSubtitlesUseMenu": "Undertexterna är inbrända i den här strömmen. Ändra dem via undertextmenyn.",
     "noVideoUrl": "Ingen video-URL är tillgänglig",
     "playbackNoMediaSources": "Servern returnerade inga spelbara mediekällor",
@@ -1223,7 +1261,6 @@
   },
   "errors": {
     "searchFailed": "Sökningen misslyckades: ${error}",
-    "searchUnavailable": "Sökningen kunde inte nå någon medieserver.",
     "connectionTimeout": "Anslutningen tog för lång tid när ${context} lästes in",
     "connectionFailed": "Det gick inte att ansluta till medieservern",
     "unableToLoad": "Det gick inte att läsa in ${context}. Försök igen.",
@@ -1259,7 +1296,6 @@
     "failedToAnalyze": "Det gick inte att analysera biblioteket: ${error}",
     "noLibrariesFound": "Inga bibliotek hittades",
     "allLibrariesHidden": "Alla bibliotek är dolda",
-    "hiddenLibrariesCount": "Dolda bibliotek (${count})",
     "thisLibraryIsEmpty": "Detta bibliotek är tomt",
     "noItemsMatchFilters": "Inga objekt matchar de aktiva filtren",
     "resetFilters": "Återställ filter",
@@ -1391,7 +1427,6 @@
   "logs": {
     "clearLogs": "Rensa loggar",
     "copyLogs": "Kopiera loggar"
-
   },
   "startup": {
     "failedTitle": "Satra kunde inte starta",
@@ -1402,7 +1437,6 @@
     "hideDetails": "Dölj detaljer",
     "copyDetails": "Kopiera detaljer",
     "detailsCopied": "Detaljer kopierade till urklipp",
-
     "repairStorage": "Reparera lagring",
     "repairTitle": "Reparera lagrade data?",
     "repairBodyCommon": "Satras inställningsfil är skadad och kan inte läsas. Reparationen återställer alla inställningar till standard.",
@@ -1778,7 +1812,6 @@
       "one": "${n} låt",
       "other": "${n} låtar"
     },
-    "nowPlaying": "Spelas nu",
     "playingFrom": "Spelar från ${title}",
     "queue": "Kö",
     "clearQueue": "Rensa kön",

@@ -193,8 +193,8 @@ class ExploreScreenState extends State<ExploreScreen>
     );
   }
 
-  void _navigateToSidebar() {
-    MainScreenFocusScope.focusSidebarOf(context);
+  void _navigateHome() {
+    MainScreenFocusScope.of(context, listen: false)?.selectHome?.call();
   }
 
   static IconData _rowIcon(CatalogRowId? row) => switch (row) {
@@ -249,7 +249,7 @@ class ExploreScreenState extends State<ExploreScreen>
         anchorAlignment: anchorAlignment,
         onSelected: (id) => unawaited(sources.setActiveSource(id)),
         entriesBuilder: (context) => _sourceMenuEntries(sources, active),
-        child: trigger,
+      child: trigger,
       );
     }
     return FocusablePopupMenuButton<CatalogSourceId>(
@@ -268,11 +268,32 @@ class ExploreScreenState extends State<ExploreScreen>
   /// than one source is connected (mirrors the libraries dropdown).
   Widget _buildTitle(CatalogSourcesProvider sources) {
     final active = sources.activeSource;
-    if (active == null) return Text(t.explore.title);
-    if (sources.connectedSources.length < 2) {
-      return Text(active.displayName);
+    final Widget sourceWidget;
+    if (active == null) {
+      sourceWidget = Text(t.explore.title);
+    } else if (sources.connectedSources.length < 2) {
+      sourceWidget = Text(active.displayName);
+    } else {
+      sourceWidget = _buildSourceSwitcher(sources, active);
     }
-    return _buildSourceSwitcher(sources, active);
+
+    final canGoHome =
+        PlatformDetector.shouldUseSideNavigation(context) &&
+        MainScreenFocusScope.of(context, listen: false)?.selectHome != null;
+    if (!canGoHome) return sourceWidget;
+
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton.icon(
+          onPressed: _navigateHome,
+          icon: const AppIcon(Symbols.home_rounded, size: 18),
+          label: Text(t.common.home),
+        ),
+        const SizedBox(width: 8),
+        Flexible(child: sourceWidget),
+      ],
+    );
   }
 
   @override
@@ -291,15 +312,6 @@ class ExploreScreenState extends State<ExploreScreen>
       );
     }
 
-    // One header mode for every state. Flipping floating/pinned between the
-    // loading/empty scroll view and the content scroll view swaps the
-    // SliverPersistentHeader variant (a different element type), which
-    // reparents the GlobalKey'd action bar into a header that builds its
-    // children during performLayout — and if a tooltip overlay is showing at
-    // that moment (hover on refresh), its OverlayPortal re-activation
-    // mutates the render tree mid-layout and asserts. Floating behaves
-    // identically to pinned over the non-scrolling state widgets, so nothing
-    // is lost by unifying.
     Widget appBar() => DesktopSliverAppBar(
       title: _buildTitle(sources),
       pinned: false,
@@ -328,16 +340,12 @@ class ExploreScreenState extends State<ExploreScreen>
         focusNode: searchFocusNode,
         debugLabel: searchDebugLabel,
         hintText: t.explore.searchHint(source: sources.activeSource?.displayName ?? ''),
-        onNavigateLeft: _navigateToSidebar,
         onNavigateDown: _searchFieldDownTarget(),
         onEditingComplete: handleSearchSubmit,
       ),
     );
 
     Widget scroll(List<Widget> body) => CustomScrollView(
-      // Android clamping physics won't start a drag on non-filling
-      // content, killing pull-to-refresh in the loading/empty/error
-      // states without this.
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [appBar(), searchField(), ...body],
     );
@@ -379,7 +387,6 @@ class ExploreScreenState extends State<ExploreScreen>
               loadMoreItems: rowHubs[i].hub.more ? () => _explore.loadAllForHub(rowHubs[i]) : null,
               onVerticalNavigation: (isUp) => _handleVerticalNavigation(i, isUp),
               onNavigateUp: i == 0 ? searchFocusNode.requestFocus : null,
-              onNavigateToSidebar: _navigateToSidebar,
             ),
           ),
         const SliverToBoxAdapter(child: SizedBox(height: 16)),
@@ -387,8 +394,6 @@ class ExploreScreenState extends State<ExploreScreen>
     }
 
     return Scaffold(
-      // Horizontal-only SafeArea, as on Search: the field, shelves, and
-      // results clear a landscape notch or iPhone Duo's portrait sensor column.
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
         child: SafeArea(top: false, bottom: false, child: content),
@@ -414,8 +419,6 @@ class ExploreScreenState extends State<ExploreScreen>
         child: StateMessageWidget(message: t.explore.searchFailed, icon: Symbols.error_rounded, iconSize: 80),
       );
     }
-    // The debounce window right after the field goes from empty to typed: no
-    // query has run yet, so there is nothing truthful to show.
     if (!hasSearched) return const SliverToBoxAdapter(child: SizedBox.shrink());
     if (searchResults.isEmpty) {
       return SliverFillRemaining(
@@ -434,7 +437,6 @@ class ExploreScreenState extends State<ExploreScreen>
         viewModeOverride: ViewMode.list,
         disableScale: true,
         focusNode: index == 0 ? firstResultFocusNode : null,
-        onNavigateLeft: _navigateToSidebar,
         onNavigateUp: index == 0 ? searchFocusNode.requestFocus : null,
       );
     });
@@ -451,52 +453,61 @@ class ExploreScreenState extends State<ExploreScreen>
     final active = sources.activeSource;
     final foregroundColor = Theme.of(context).colorScheme.onSurface;
 
-    return Align(
-      alignment: Alignment.topRight,
-      child: ToolbarScrim(
+    return ToolbarScrim.navigation(
+      navigation: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            FocusableActionBar(
-              key: _actionBarKey,
-              onNavigateLeft: _navigateToSidebar,
-              onNavigateDown: _tvBrowseRailKey.currentState?.requestFocus,
-              onBack: _navigateToSidebar,
-              spacing: 4,
-              actions: [
-                if (active != null && sources.connectedSources.length > 1)
-                  FocusableAction(
-                    debugLabel: 'ExploreSourceSwitcher',
-                    onPressed: () => _sourceMenuKey.currentState?.showButtonMenu(focusFirstItem: true),
-                    child: _buildSourceSwitcher(
-                      sources,
-                      active,
-                      textStyle: Theme.of(
-                        context,
-                      ).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w600),
-                      anchorAlignment: AppMenuAnchorAlignment.end,
-                      parentOwnsFocus: true,
-                    ),
-                  ),
-                if (active != null)
-                  FocusableAction(
-                    icon: Symbols.search_rounded,
-                    iconColor: foregroundColor,
-                    tooltip: t.common.search,
-                    onPressed: () => Navigator.of(
-                      context,
-                    ).push(MaterialPageRoute<void>(builder: (_) => CatalogSearchScreen(source: active))),
-                  ),
-                FocusableAction(
-                  icon: Symbols.refresh_rounded,
-                  iconColor: foregroundColor,
-                  tooltip: t.common.refresh,
-                  onPressed: () => unawaited(_explore.load()),
-                ),
-              ],
+            TextButton.icon(
+              onPressed: _navigateHome,
+              icon: AppIcon(Symbols.home_rounded, size: 18, color: foregroundColor),
+              label: Text(t.common.home, style: TextStyle(color: foregroundColor)),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              t.navigation.explore,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
             ),
           ],
         ),
+      ),
+      actions: FocusableActionBar(
+        key: _actionBarKey,
+        onNavigateDown: _tvBrowseRailKey.currentState?.requestFocus,
+        onBack: _navigateHome,
+        spacing: 4,
+        actions: [
+          if (active != null && sources.connectedSources.length > 1)
+            FocusableAction(
+              debugLabel: 'ExploreSourceSwitcher',
+              onPressed: () => _sourceMenuKey.currentState?.showButtonMenu(focusFirstItem: true),
+              child: _buildSourceSwitcher(
+                sources,
+                active,
+                textStyle: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w600),
+                anchorAlignment: AppMenuAnchorAlignment.end,
+                parentOwnsFocus: true,
+              ),
+            ),
+          if (active != null)
+            FocusableAction(
+              icon: Symbols.search_rounded,
+              iconColor: foregroundColor,
+              tooltip: t.common.search,
+              onPressed: () => Navigator.of(
+                context,
+              ).push(MaterialPageRoute<void>(builder: (_) => CatalogSearchScreen(source: active))),
+            ),
+          FocusableAction(
+            icon: Symbols.refresh_rounded,
+            iconColor: foregroundColor,
+            tooltip: t.common.refresh,
+            onPressed: () => unawaited(_explore.load()),
+          ),
+        ],
       ),
     );
   }
@@ -545,8 +556,7 @@ class ExploreScreenState extends State<ExploreScreen>
                   return rowHub == null ? () => Future.value(hub.items) : () => _explore.loadAllForHub(rowHub);
                 },
                 onNavigateUp: _actionBarKey.currentState?.requestFocusOnFirst,
-                onNavigateToSidebar: _navigateToSidebar,
-                onBack: _navigateToSidebar,
+                onBack: _navigateHome,
                 tallPosterScale: TvBrowseRailLayout.compactTallPosterScale,
                 widePosterScale: TvBrowseRailLayout.compactEpisodeThumbnailScale,
               ),

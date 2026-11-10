@@ -22,14 +22,14 @@ cask "satra" do
         sudo: false
   end
 
-  uninstall quit: "com.edde746.satra"
+  uninstall quit: "com.rahhing.satra"
 
   zap trash: [
-    "~/Library/Application Support/com.edde746.satra",
-    "~/Library/Caches/com.edde746.satra",
-    "~/Library/HTTPStorages/com.edde746.satra",
-    "~/Library/Preferences/com.edde746.satra.plist",
-    "~/Library/Saved Application State/com.edde746.satra.savedState",
-    "~/Library/WebKit/com.edde746.satra",
+    "~/Library/Application Support/com.rahhing.satra",
+    "~/Library/Caches/com.rahhing.satra",
+    "~/Library/HTTPStorages/com.rahhing.satra",
+    "~/Library/Preferences/com.rahhing.satra.plist",
+    "~/Library/Saved Application State/com.rahhing.satra.savedState",
+    "~/Library/WebKit/com.rahhing.satra",
   ]
 end
