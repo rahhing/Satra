@@ -10,9 +10,9 @@
       </trusted-artifacts>
    </configuration>
    <components>
-      <component group="edde746" name="mpv-android" version="d633bbc71269">
-         <artifact name="mpv-android-d633bbc71269.aar">
-            <sha256 value="4bf8a9720bfdec00cb854fc73095ee3d322afc3caaa66d6322ad1dd4abc69df7" origin="mpv-build.lock.json"/>
+      <component group="edde746" name="mpv-android" version="5e080c4ade2d">
+         <artifact name="mpv-android-5e080c4ade2d.aar">
+            <sha256 value="0d3d4c749f940cdb1d79722a9c60a65dcba5a023fe26fe0ea58be6f46e0b6f35" origin="mpv-build.lock.json"/>
          </artifact>
       </component>
    </components>

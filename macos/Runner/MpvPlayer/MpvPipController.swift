@@ -29,6 +29,7 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
   private lazy var pip: PIPViewController = {
     let vc = PIPViewController()
     vc.delegate = self
+    vc.userCanResize = true
     return vc
   }()
 
@@ -41,6 +42,9 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
 
   // Keep reference to the window for restore animation
   private weak var sourceWindow: NSWindow?
+  // True when closing should fly back to sourceWindow (Return button or programmatic exit);
+  // false when the user pressed the PiP close ('X') button (`pipActionStop`).
+  private var isReturningToWindow = true
 
   // MARK: - Public API
 
@@ -51,6 +55,7 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
     guard !isActive else { return }
 
     sourceWindow = window
+    isReturningToWindow = true
 
     let videoView = MpvPipVideoView(layers: layers, size: window.contentView?.bounds.size ?? aspectRatio)
     let vc = NSViewController()
@@ -61,6 +66,7 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
 
     pip.playing = delegate?.isPipPlaying ?? false
     pip.aspectRatio = aspectRatio
+    pip.userCanResize = true
     pip.replacementWindow = window
     pip.replacementRect = window.contentView?.frame ?? .zero
 
@@ -73,6 +79,7 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
 
   func stopPip() {
     guard isActive, let pipVideoVC else { return }
+    isReturningToWindow = true
     pip.dismiss(pipVideoVC)
   }
 
@@ -83,6 +90,7 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
 
   /// Update the aspect ratio (e.g., when video track changes)
   func setAspectRatio(_ size: NSSize) {
+    guard size.width > 0, size.height > 0 else { return }
     pip.aspectRatio = size
   }
 
@@ -112,8 +120,10 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
   }
 
   func pipDidClose(_ pip: PIPViewController) {
+    let restored = isReturningToWindow
     isActive = false
-    delegate?.pipDidStop(restored: true)
+    isReturningToWindow = true
+    delegate?.pipDidStop(restored: restored)
   }
 
   func pipActionPlay(_ pip: PIPViewController) {
@@ -125,18 +135,27 @@ class MpvPipController: NSObject, PIPViewControllerDelegate {
   }
 
   func pipActionStop(_ pip: PIPViewController) {
+    // Pressing the 'X' close button stops playback and dismisses PiP in place
+    // without yanking focus back to the main window.
+    isReturningToWindow = false
     delegate?.pipSetPlaying(false)
   }
 
   // MARK: - Private
 
   private func prepareForClose() {
-    guard let window = sourceWindow else { return }
+    guard isReturningToWindow, let window = sourceWindow else {
+      pip.replacementWindow = nil
+      pip.replacementRect = .zero
+      return
+    }
+    if window.isMiniaturized {
+      window.deminiaturize(nil)
+    }
+    NSApp.activate(ignoringOtherApps: true)
+    window.makeKeyAndOrderFront(nil)
     pip.replacementWindow = window
     pip.replacementRect = window.contentView?.frame ?? .zero
-    // Bring the main window forward for the restore animation
-    NSApp.activate(ignoringOtherApps: true)
-    window.deminiaturize(nil)
   }
 }
 

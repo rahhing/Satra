@@ -22,6 +22,8 @@ class MpvPlayerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, MpvPluginS
   private var pipChannel: FlutterMethodChannel?
   private var autoPipEnabled = false
   private var enteredPipViaAuto = false
+  private var observedDisplayWidth: Double?
+  private var observedDisplayHeight: Double?
   private let displayModes = DisplayModeManager()
 
   // MARK: - FlutterPlugin Registration
@@ -136,18 +138,37 @@ class MpvPlayerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, MpvPluginS
     return controller
   }
 
+  private static func validAspectSize(width: Double?, height: Double?) -> NSSize? {
+    guard let width, let height, width > 0, height > 0 else { return nil }
+    return NSSize(width: width, height: height)
+  }
+
   private func handlePipCall(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
     switch call.method {
     case "isSupported":
       result(MpvPipController.isSupported)
     case "enter":
-      enterPip(manual: true, result: result)
+      let args = call.arguments as? [String: Any]
+      let width = (args?["width"] as? NSNumber)?.doubleValue
+      let height = (args?["height"] as? NSNumber)?.doubleValue
+      if let size = Self.validAspectSize(width: width, height: height) {
+        observedDisplayWidth = size.width
+        observedDisplayHeight = size.height
+      }
+      enterPip(manual: true, preferredSize: Self.validAspectSize(width: width, height: height), result: result)
     case "exit":
       pipController?.stopPip()
       result(nil)
     case "setAutoPipReady":
       if let args = call.arguments as? [String: Any], let ready = args["ready"] as? Bool {
         autoPipEnabled = ready
+        if let width = (args["width"] as? NSNumber)?.doubleValue,
+          let height = (args["height"] as? NSNumber)?.doubleValue,
+          width > 0, height > 0
+        {
+          observedDisplayWidth = width
+          observedDisplayHeight = height
+        }
         let pip = ensurePipController()
         pip.setAutoStart(ready)
         if ready {
@@ -176,7 +197,7 @@ class MpvPlayerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, MpvPluginS
 
   /// Enter PiP by lending the player's video layers to a PiP window.
   /// No VO switching — mpv keeps rendering into the same layers.
-  private func enterPip(manual: Bool, result: FlutterResult? = nil) {
+  private func enterPip(manual: Bool, preferredSize: NSSize? = nil, result: FlutterResult? = nil) {
     guard let playerCore = playerCore else {
       result?([
         "success": false, "errorCode": "failed", "errorMessage": "Player not initialized",
@@ -194,9 +215,15 @@ class MpvPlayerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, MpvPluginS
       return
     }
 
-    var aspectRatio = NSSize(width: 16, height: 9)
-    if let videoSize = playerCore.videoSize {
+    let aspectRatio: NSSize
+    if let preferredSize {
+      aspectRatio = preferredSize
+    } else if let observed = Self.validAspectSize(width: observedDisplayWidth, height: observedDisplayHeight) {
+      aspectRatio = observed
+    } else if let videoSize = playerCore.videoSize, videoSize.width > 0, videoSize.height > 0 {
       aspectRatio = NSSize(width: videoSize.width, height: videoSize.height)
+    } else {
+      aspectRatio = NSSize(width: 16, height: 9)
     }
 
     guard let layers = playerCore.lendVideoLayersForPip() else {
@@ -289,6 +316,8 @@ class MpvPlayerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, MpvPluginS
       }
       self.pipController = nil
       self.autoPipEnabled = false
+      self.observedDisplayWidth = nil
+      self.observedDisplayHeight = nil
       NotificationCenter.default.removeObserver(
         self, name: NSApplication.didResignActiveNotification, object: nil)
       NotificationCenter.default.removeObserver(
@@ -304,6 +333,56 @@ class MpvPlayerPlugin: NSObject, FlutterPlugin, FlutterStreamHandler, MpvPluginS
     let isPlaying = value == "no"
     pipController?.setPlaying(isPlaying)
     playerCore?.setPaused(!isPlaying)
+  }
+
+  func onPropertyChange(name: String, value: Any?, sourceId: Int64?) {
+    switch name {
+    case "pause":
+      let isPaused: Bool?
+      if let flag = value as? Bool {
+        isPaused = flag
+      } else if let str = value as? String {
+        isPaused = (str == "yes" || str == "true")
+      } else {
+        isPaused = nil
+      }
+      if let isPaused {
+        pipController?.setPlaying(!isPaused)
+        playerCore?.setPaused(isPaused)
+      }
+    case "dwidth":
+      if let width = (value as? NSNumber)?.doubleValue, width > 0 {
+        observedDisplayWidth = width
+        if let size = Self.validAspectSize(width: observedDisplayWidth, height: observedDisplayHeight),
+          pipController?.isActive == true
+        {
+          pipController?.setAspectRatio(size)
+        }
+      }
+    case "dheight":
+      if let height = (value as? NSNumber)?.doubleValue, height > 0 {
+        observedDisplayHeight = height
+        if let size = Self.validAspectSize(width: observedDisplayWidth, height: observedDisplayHeight),
+          pipController?.isActive == true
+        {
+          pipController?.setAspectRatio(size)
+        }
+      }
+    case "width", "height":
+      if pipController?.isActive == true,
+        Self.validAspectSize(width: observedDisplayWidth, height: observedDisplayHeight) == nil,
+        let videoSize = playerCore?.videoSize,
+        videoSize.width > 0, videoSize.height > 0
+      {
+        pipController?.setAspectRatio(NSSize(width: videoSize.width, height: videoSize.height))
+      }
+    default:
+      break
+    }
+
+    guard let eventSink = eventSink, let propId = nameToId[name] else { return }
+    let message: [Any?] = [propId, value, sourceId]
+    eventSink(message)
   }
 
   private func handleSetDisplayMode(call: FlutterMethodCall, result: @escaping FlutterResult) {

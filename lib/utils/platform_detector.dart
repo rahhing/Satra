@@ -355,10 +355,13 @@ class PlatformDetector {
         (Platform.isAndroid && isTV());
   }
 
+  /// Uses [isTVDevice] rather than [isTV] so Satra's 10-foot desktop layout
+  /// (`forceTv: true`) keeps native Picture-in-Picture available on macOS,
+  /// iOS, and Android while still vetoing actual TV hardware and automotive.
   static bool supportsPictureInPicture() => pictureInPictureAllowed(
     hostSupportsPictureInPicture: Platform.isAndroid || Platform.isIOS || Platform.isMacOS,
     isAppleTv: isAppleTV(),
-    isTv: isTV(),
+    isTv: isTVDevice(),
     isAutomotive: isAutomotive(),
   );
 

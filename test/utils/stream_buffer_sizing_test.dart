@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:satra/utils/stream_buffer_sizing.dart';
 
@@ -10,6 +11,98 @@ void main() {
       expect(nextPowerOfTwo(52 * 1024 * 1024), 64 * 1024 * 1024);
       expect(nextPowerOfTwo(64 * 1024 * 1024), 64 * 1024 * 1024);
       expect(nextPowerOfTwo(64 * 1024 * 1024 + 1), 128 * 1024 * 1024);
+    });
+  });
+
+  group('readsUncachedLocalFile', () {
+    test('is true for a download in the app\'s own data directory on Android and iOS', () {
+      expect(
+        readsUncachedLocalFile(
+          'file:///data/user/0/com.satra.app/app_flutter/downloads/Movie [1a2b3c4d].mkv',
+          platform: TargetPlatform.android,
+        ),
+        isTrue,
+      );
+      expect(
+        readsUncachedLocalFile(
+          'file:///var/mobile/Containers/Data/Application/0B1C/Documents/downloads/Movie [1a2b3c4d].mkv',
+          platform: TargetPlatform.iOS,
+        ),
+        isTrue,
+      );
+      expect(
+        readsUncachedLocalFile(
+          'file:///private/var/mobile/Containers/Data/Application/0B1C/Documents/downloads/Movie.mkv',
+          platform: TargetPlatform.iOS,
+        ),
+        isTrue,
+      );
+    });
+
+    test('is false where mpv puts its cache in front of the file', () {
+      expect(
+        readsUncachedLocalFile('file:///storage/emulated/0/Movies/Movie.mkv', platform: TargetPlatform.android),
+        isFalse,
+      );
+      expect(
+        readsUncachedLocalFile('file:///storage/1A2B-3C4D/Satra/Movie.mkv', platform: TargetPlatform.android),
+        isFalse,
+      );
+      expect(
+        readsUncachedLocalFile(
+          'content://com.android.externalstorage.documents/tree/primary%3ASatra/document/primary%3ASatra%2FMovie.mkv',
+          platform: TargetPlatform.android,
+        ),
+        isFalse,
+      );
+      expect(
+        readsUncachedLocalFile(
+          'file:///private/var/mobile/Library/LiveFiles/smb/Movie.mkv',
+          platform: TargetPlatform.iOS,
+        ),
+        isFalse,
+      );
+      expect(
+        readsUncachedLocalFile(
+          'file:///private/var/mobile/Library/LiveFiles/smb/Containers/Data/Application/0B1C/Movie.mkv',
+          platform: TargetPlatform.iOS,
+        ),
+        isFalse,
+      );
+    });
+
+    test('is false on desktop, where a download folder may be a network mount', () {
+      for (final platform in [TargetPlatform.macOS, TargetPlatform.windows, TargetPlatform.linux]) {
+        expect(
+          readsUncachedLocalFile('file:///home/user/.local/share/satra/downloads/Movie.mkv', platform: platform),
+          isFalse,
+        );
+      }
+    });
+  });
+
+  group('demuxerHysteresisSecs', () {
+    test('gives an uncached local file half a second of hysteresis', () {
+      expect(demuxerHysteresisSecs(uncachedLocalFile: true, customMpvConfig: const {}), '0.5');
+    });
+
+    test('leaves mpv\'s default for anything mpv caches', () {
+      expect(demuxerHysteresisSecs(uncachedLocalFile: false, customMpvConfig: const {}), '0');
+    });
+
+    test('leaves mpv\'s default for a local file a cache=yes line puts behind the cache', () {
+      expect(demuxerHysteresisSecs(uncachedLocalFile: true, customMpvConfig: const {'cache': 'yes'}), '0');
+      expect(demuxerHysteresisSecs(uncachedLocalFile: true, customMpvConfig: const {'cache': 'no'}), '0.5');
+    });
+
+    test('leaves the option to a custom mpv config line that names it', () {
+      const config = {'demuxer-hysteresis-secs': '0', 'sub-font': 'Netflix Sans'};
+      expect(demuxerHysteresisSecs(uncachedLocalFile: true, customMpvConfig: config), isNull);
+      expect(demuxerHysteresisSecs(uncachedLocalFile: false, customMpvConfig: config), isNull);
+      expect(
+        demuxerHysteresisSecs(uncachedLocalFile: true, customMpvConfig: const {'sub-font': 'Netflix Sans'}),
+        '0.5',
+      );
     });
   });
 

@@ -80,7 +80,11 @@ extension _VideoPlayerPipMethods on VideoPlayerScreenState {
 
     final dims = await _getVideoDimensions();
     final result = await PipService.enter(width: dims.$1, height: dims.$2);
-    if (!result.$1) _onPipRequestFailed(result.$2);
+    if (!result.$1) {
+      _onPipRequestFailed(result.$2);
+    } else if (Platform.isMacOS) {
+      unawaited(FullscreenStateManager().exitFullscreenIfActive());
+    }
   }
 
   void _onPipRequestFailed(String? error) {

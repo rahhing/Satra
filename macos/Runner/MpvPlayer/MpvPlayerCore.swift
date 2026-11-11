@@ -267,6 +267,10 @@ class MpvPlayerCore: MpvPlayerCoreBase {
     if let contentView = window?.contentView, let contentLayer = contentView.layer {
       attachContainerLayer(to: contentLayer, frame: contentView.bounds)
     }
+    withoutLayerAnimations {
+      containerLayer.setNeedsLayout()
+      containerLayer.layoutIfNeeded()
+    }
     applyVideoZoom()
     recoverDisplayLayerIfNeeded()
   }

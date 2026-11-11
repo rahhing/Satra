@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import '../../../focus/dpad_navigator.dart';
 import '../../../mpv/mpv.dart';
 import '../../../media/media_source_info.dart';
+import '../../../services/pip_service.dart';
 import '../../../services/sleep_timer_service.dart';
 import '../../../utils/platform_detector.dart';
 import '../../../utils/quality_preset_labels.dart';
@@ -277,13 +278,18 @@ class TrackChapterControls extends StatelessWidget {
         if (state.onTogglePIPMode != null) {
           final currentIndex = buttonIndex;
           buttons.add(
-            _buildTrackButton(
-              buttonIndex: currentIndex,
-              icon: Symbols.picture_in_picture_alt_rounded,
-              tooltip: t.videoControls.pipButton,
-              semanticLabel: t.videoControls.pipButton,
-              buttons: buttons,
-              onPressed: state.onTogglePIPMode,
+            ValueListenableBuilder<bool>(
+              valueListenable: PipService().isPipActive,
+              builder: (context, isPipActive, _) => _buildTrackButton(
+                buttonIndex: currentIndex,
+                icon: Symbols.picture_in_picture_alt_rounded,
+                tooltip: t.videoControls.pipButton,
+                semanticLabel: t.videoControls.pipButton,
+                isActive: isPipActive,
+                checked: isPipActive,
+                buttons: buttons,
+                onPressed: state.onTogglePIPMode,
+              ),
             ),
           );
           buttonIndex++;

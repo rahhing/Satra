@@ -12,6 +12,7 @@
 @property(nonatomic) NSRect replacementRect;
 @property(nonatomic) bool playing;
 @property(nonatomic) NSSize aspectRatio;
+@property(nonatomic) BOOL userCanResize;
 
 - (void)presentViewControllerAsPictureInPicture:(NSViewController*)viewController;
 
