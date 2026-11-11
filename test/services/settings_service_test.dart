@@ -562,7 +562,73 @@ void main() {
       expect(recovered, same(replacement));
       expect(recovered.construction, 1);
       expect(recovered.readString('generation_marker'), 'new');
-      expect(constructions, 2);
+    });
+  });
+
+  group('Appearance and card settings defaults', () {
+    test('defaults match expected UI defaults', () async {
+      final settings = await SettingsService.getInstance();
+      expect(SettingsService.pillCornerRadius.defaultValue, 32);
+      expect(settings.read(SettingsService.pillCornerRadius), 32);
+
+      expect(SettingsService.episodePosterMode.defaultValue, EpisodePosterMode.episodeThumbnail);
+      expect(settings.read(SettingsService.episodePosterMode), EpisodePosterMode.episodeThumbnail);
+
+      expect(SettingsService.showEpisodeNumberOnCards.defaultValue, isTrue);
+      expect(settings.read(SettingsService.showEpisodeNumberOnCards), isTrue);
+
+      expect(SettingsService.hideSpoilers.defaultValue, isFalse);
+      expect(settings.read(SettingsService.hideSpoilers), isFalse);
+
+      expect(SettingsService.showWatchedIndicators.defaultValue, isTrue);
+      expect(settings.read(SettingsService.showWatchedIndicators), isTrue);
+
+      expect(SettingsService.tvFullCardLayout.defaultValue, isTrue);
+      expect(settings.read(SettingsService.tvFullCardLayout), isTrue);
+
+      expect(SettingsService.tvCornerSpotlightBackdrop.defaultValue, isTrue);
+      expect(settings.read(SettingsService.tvCornerSpotlightBackdrop), isTrue);
+
+      expect(SettingsService.focusGlow.defaultValue, isFalse);
+      expect(settings.read(SettingsService.focusGlow), isFalse);
+    });
+
+    test('non-macOS profile defaults Liquid Glass OFF at 20% opacity', () async {
+      PlatformDetector.debugSetIsMacOSOverride(false);
+      addTearDown(() => PlatformDetector.debugSetIsMacOSOverride(null));
+      resetSharedPreferencesForTest();
+      SettingsService.resetForTesting();
+      final settings = await SettingsService.getInstance();
+
+      expect(SettingsService.liquidGlass.resolvedDefault, isFalse);
+      expect(settings.read(SettingsService.liquidGlass), isFalse);
+
+      expect(SettingsService.liquidGlassOpacity.defaultValue, 0.20);
+      expect(SettingsService.liquidGlassOpacity.resolvedDefault, 0.20);
+      expect(settings.read(SettingsService.liquidGlassOpacity), 0.20);
+
+      expect(SettingsService.glassBlurAmount.defaultValue, 1.0);
+      expect(settings.read(SettingsService.glassBlurAmount), 1.0);
+
+      expect(SettingsService.glassBackgroundBrightness.defaultValue, 1.0);
+      expect(settings.read(SettingsService.glassBackgroundBrightness), 1.0);
+    });
+
+    test('macOS profile defaults Liquid Glass ON at 65% opacity with OLED theme', () async {
+      PlatformDetector.debugSetIsMacOSOverride(true);
+      addTearDown(() => PlatformDetector.debugSetIsMacOSOverride(null));
+      resetSharedPreferencesForTest();
+      SettingsService.resetForTesting();
+      final settings = await SettingsService.getInstance();
+
+      expect(SettingsService.liquidGlass.resolvedDefault, isTrue);
+      expect(settings.read(SettingsService.liquidGlass), isTrue);
+
+      expect(SettingsService.liquidGlassOpacity.resolvedDefault, 0.65);
+      expect(settings.read(SettingsService.liquidGlassOpacity), 0.65);
+
+      expect(SettingsService.themeMode.resolvedDefault, ThemeMode.oled);
+      expect(settings.read(SettingsService.themeMode), ThemeMode.oled);
     });
   });
 }

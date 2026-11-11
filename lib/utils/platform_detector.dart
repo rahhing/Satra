@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -285,12 +286,25 @@ class PlatformDetector {
   }
 
   static bool? _debugIsDesktopOSOverride;
+  static bool? _debugIsMacOSOverride;
 
   /// Test-only: override [isDesktopOS] so device simulations (Android TV /
   /// Apple TV) don't inherit the test host's real platform.
   @visibleForTesting
   static void debugSetIsDesktopOSOverride(bool? value) {
     _debugIsDesktopOSOverride = value;
+  }
+
+  /// Test-only: override [isMacOS] so platform default assertions can test
+  /// both macOS and non-macOS default profiles deterministically.
+  @visibleForTesting
+  static void debugSetIsMacOSOverride(bool? value) {
+    _debugIsMacOSOverride = value;
+  }
+
+  /// True on macOS without requiring a BuildContext.
+  static bool isMacOS() {
+    return _debugIsMacOSOverride ?? (!kIsWeb && Platform.isMacOS);
   }
 
   /// Whether an executable path belongs to a packaged (MSIX/Store) install.

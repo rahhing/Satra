@@ -409,7 +409,14 @@ class _MiniPlayerCardState extends State<_MiniPlayerCard> with ContextMenuTapMix
     card = DecoratedBox(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(tk.radiusLg),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.35), blurRadius: 16, offset: const Offset(0, 4))],
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.35),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+            blurStyle: BlurStyle.outer,
+          ),
+        ],
       ),
       child: card,
     );

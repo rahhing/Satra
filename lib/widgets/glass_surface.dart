@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' as io show Platform;
 import 'dart:math' as math;
 import 'dart:ui' as ui;
 
@@ -76,6 +77,19 @@ class GlassSurface extends StatelessWidget {
     this.blurNativeVideo = false,
   });
 
+  /// Overrides native AppKit glass/blur in widget tests (`TestWidgetsFlutterBinding`
+  /// defaults to [blurNativeVideo] so unmocked `RepaintBoundary.toImage()` tests
+  /// continue to rasterize pure-Flutter backdrops unless native glass is under test).
+  @visibleForTesting
+  static bool? debugEnableMacOSNativeGlass;
+
+  static final bool _hostMacOSSupportsLiquidGlass = () {
+    if (kIsWeb || !io.Platform.isMacOS) return true;
+    final match = RegExp(r'(\d+)').firstMatch(io.Platform.operatingSystemVersion);
+    final major = match != null ? int.tryParse(match.group(1)!) : null;
+    return major == null || major >= 26;
+  }();
+
   final Widget child;
   final BorderRadius borderRadius;
   final Color? tint;
@@ -88,27 +102,77 @@ class GlassSurface extends StatelessWidget {
   /// input. macOS uses an AppKit material; Linux blurs the video plane itself.
   final bool blurNativeVideo;
 
+  bool _useMacOSNativeBackdrop() {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.macOS) return false;
+    final override = debugEnableMacOSNativeGlass;
+    if (override != null) return override;
+    return WidgetsBinding.instance is WidgetsFlutterBinding ? true : blurNativeVideo;
+  }
+
+  static const List<Pref<Object?>> _glassPrefs = [
+    SettingsService.liquidGlass,
+    SettingsService.liquidGlassOpacity,
+    SettingsService.glassBlurAmount,
+    SettingsService.glassBackgroundBrightness,
+  ];
+
+  static List<double> _backdropBrightnessMatrix(double scale) => <double>[
+    scale, 0, 0, 0, 0,
+    0, scale, 0, 0, 0,
+    0, 0, scale, 0, 0,
+    0, 0, 0, 1, 0,
+  ];
+
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
-    // Warm up SPIR-V shaders once in the background so opening routes or toggling
-    // Liquid Glass never stalls a transition frame.
-    _LiquidGlassShaders.ensureLoaded();
+    if (!_useMacOSNativeBackdrop() || !_hostMacOSSupportsLiquidGlass) {
+      // Warm up SPIR-V shaders once in the background so opening routes or toggling
+      // Liquid Glass never stalls a transition frame.
+      _LiquidGlassShaders.ensureLoaded();
+    }
     final settings = SettingsService.instanceOrNull;
     if (settings == null) {
-      return _buildGlass(context, liquidGlass: false);
+      return _buildGlass(
+        context,
+        liquidGlass: false,
+        liquidGlassOpacity: SettingsService.liquidGlassOpacity.defaultValue,
+        blurAmount: SettingsService.glassBlurAmount.defaultValue,
+        backgroundBrightness: SettingsService.glassBackgroundBrightness.defaultValue,
+      );
     }
-    return ValueListenableBuilder<bool>(
-      valueListenable: settings.listenable(SettingsService.liquidGlass),
-      builder: (context, liquidGlass, _) => _buildGlass(context, liquidGlass: liquidGlass),
+    return ListenableBuilder(
+      listenable: settings.listenableOfAll(_glassPrefs),
+      builder: (context, _) => _buildGlass(
+        context,
+        liquidGlass: settings.read(SettingsService.liquidGlass),
+        liquidGlassOpacity: settings.read(SettingsService.liquidGlassOpacity),
+        blurAmount: settings.read(SettingsService.glassBlurAmount),
+        backgroundBrightness: settings.read(SettingsService.glassBackgroundBrightness),
+      ),
     );
   }
 
-  Widget _buildGlass(BuildContext context, {required bool liquidGlass}) {
+  Widget _buildGlass(
+    BuildContext context, {
+    required bool liquidGlass,
+    required double liquidGlassOpacity,
+    required double blurAmount,
+    required double backgroundBrightness,
+  }) {
     final scheme = Theme.of(context).colorScheme;
     final isDark = scheme.brightness == Brightness.dark;
     final effects = AppMotion.effectsEnabled(context);
     final useLiquid = effects && liquidGlass;
+
+    final clampedLiquidOpacity = liquidGlassOpacity.clamp(0.0, 1.0);
+    final clampedBlurAmount = blurAmount.clamp(0.0, 2.0);
+    final clampedBgBrightness = backgroundBrightness.clamp(0.0, 2.0);
+
+    final surfaceWeight = blurNativeVideo ? 0.65 : (opacity / 0.84).clamp(0.68, 1.05);
+    final effectiveLiquidOpacity = ui
+        .lerpDouble(clampedLiquidOpacity * surfaceWeight, clampedLiquidOpacity, clampedLiquidOpacity)!
+        .clamp(0.0, 1.0);
 
     final animation = GlassTransitionScope.of(context);
     final rawSurface = tint ?? scheme.surface;
@@ -116,16 +180,19 @@ class GlassSurface extends StatelessWidget {
         ? Color.lerp(rawSurface, const Color(0xFF050609), useLiquid ? 0.48 : 0.28)!
         : rawSurface;
 
-    // Rich smoked dark density so bright artwork behind Spotlight, toolbars, or
-    // panels never washes out the glass, while native-video sheets let blurred
-    // video colors glow richly underneath.
     final double baseOpacity;
-    if (blurNativeVideo && effects) {
-      baseOpacity = isDark ? (useLiquid ? 0.56 : 0.48) : opacity.clamp(0.36, 0.72);
-    } else if (useLiquid) {
-      baseOpacity = isDark ? (opacity + (1.0 - opacity) * 0.24).clamp(0.68, 0.88) : (opacity * 0.94).clamp(0.46, 0.86);
+    if (useLiquid) {
+      baseOpacity = (effectiveLiquidOpacity * (isDark ? 0.92 : 0.88)).clamp(0.0, 0.94);
     } else {
-      baseOpacity = opacity;
+      final rawBaseOpacity = (blurNativeVideo && effects)
+          ? (isDark ? 0.48 : opacity.clamp(0.36, 0.72))
+          : opacity;
+      if (effects && clampedBgBrightness > 1.001 && isDark) {
+        final brighten = (clampedBgBrightness - 1.0).clamp(0.0, 1.0);
+        baseOpacity = rawBaseOpacity * (1.0 - 0.75 * brighten);
+      } else {
+        baseOpacity = rawBaseOpacity;
+      }
     }
 
     if (animation == null) {
@@ -138,6 +205,9 @@ class GlassSurface extends StatelessWidget {
         isDark: isDark,
         effects: effects,
         useLiquid: useLiquid,
+        effectiveLiquidOpacity: effectiveLiquidOpacity,
+        blurAmount: clampedBlurAmount,
+        backgroundBrightness: clampedBgBrightness,
         surface: surface,
         baseOpacity: baseOpacity,
         visibility: 1.0,
@@ -163,6 +233,9 @@ class GlassSurface extends StatelessWidget {
           isDark: isDark,
           effects: effects,
           useLiquid: useLiquid,
+          effectiveLiquidOpacity: effectiveLiquidOpacity,
+          blurAmount: clampedBlurAmount,
+          backgroundBrightness: clampedBgBrightness,
           surface: surface,
           baseOpacity: baseOpacity,
           visibility: visibility,
@@ -181,13 +254,123 @@ class GlassSurface extends StatelessWidget {
     required bool isDark,
     required bool effects,
     required bool useLiquid,
+    required double effectiveLiquidOpacity,
+    required double blurAmount,
+    required double backgroundBrightness,
     required Color surface,
     required double baseOpacity,
     required double visibility,
     required Widget content,
   }) {
+    if (effects && _useMacOSNativeBackdrop()) {
+      final resolvedRadius = borderRadius.resolve(Directionality.maybeOf(context) ?? TextDirection.ltr);
+      final nativeLiquid = useLiquid && _hostMacOSSupportsLiquidGlass;
+
+      final double nativeTintStrength;
+      final double macOSOverlayAlpha;
+      if (nativeLiquid) {
+        // NSGlassEffectView(.clear) stays crystal-clear at low opacity while
+        // scaling native tintColor and foreground glaze smoothly up to 100%.
+        nativeTintStrength = (effectiveLiquidOpacity * (isDark ? 0.82 : 0.68)).clamp(0.0, 0.86);
+        macOSOverlayAlpha = (effectiveLiquidOpacity * effectiveLiquidOpacity * (isDark ? 0.68 : 0.52) +
+                effectiveLiquidOpacity * 0.04)
+            .clamp(0.0, 0.72);
+      } else {
+        nativeTintStrength = 0.0;
+        final baseMacOSAlpha = blurNativeVideo
+            ? (isDark ? 0.14 : 0.10)
+            : (isDark ? (opacity * 0.34).clamp(0.16, 0.32) : (opacity * 0.28).clamp(0.12, 0.26));
+        if (backgroundBrightness > 1.001) {
+          final brighten = (backgroundBrightness - 1.0).clamp(0.0, 1.0);
+          macOSOverlayAlpha = baseMacOSAlpha * (1.0 - 0.85 * brighten);
+        } else {
+          macOSOverlayAlpha = baseMacOSAlpha;
+        }
+      }
+
+      final gradedContent = nativeLiquid
+          ? content
+          : DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: resolvedRadius,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          Colors.white.withValues(alpha: 0.016 * visibility),
+                          Colors.black.withValues(alpha: 0.03 * visibility),
+                        ]
+                      : [Colors.white.withValues(alpha: 0.05 * visibility), Colors.transparent],
+                ),
+              ),
+              child: content,
+            );
+
+      Widget macOSPane = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: resolvedRadius,
+          color: surface.withValues(alpha: macOSOverlayAlpha * visibility),
+          border: (border && !nativeLiquid)
+              ? Border.all(
+                  width: 1.0,
+                  color: Colors.white.withValues(
+                    alpha: ((isDark ? 0.10 : 0.65) * visibility).clamp(0.0, 1.0),
+                  ),
+                )
+              : null,
+        ),
+        child: gradedContent,
+      );
+
+      if (!nativeLiquid && backgroundBrightness < 0.999) {
+        final darken = (1.0 - backgroundBrightness).clamp(0.0, 1.0);
+        macOSPane = DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: resolvedRadius,
+            color: Colors.black.withValues(alpha: 0.62 * darken * visibility),
+          ),
+          child: macOSPane,
+        );
+      }
+
+      // Keep AppKitView outside ClipRRect so FlutterCompositor never wraps it
+      // in a FlutterPathClipView (which isolates Core Animation's backdrop
+      // group). Native corner shaping happens inside MacOSGlassSurfaceView.
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: _MacOSNativeGlassBackdrop(
+                liquidGlass: nativeLiquid,
+                isDark: isDark,
+                borderRadius: resolvedRadius,
+                visibility: visibility,
+                tintArgb: surface.toARGB32(),
+                tintStrength: nativeTintStrength,
+                blurScale: nativeLiquid ? 1.0 : blurAmount,
+                backgroundBrightness: nativeLiquid ? 1.0 : backgroundBrightness,
+              ),
+            ),
+          ),
+          if (useLiquid && !nativeLiquid)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: _LiquidSheenLayer(borderRadius: resolvedRadius, visibility: visibility, isDark: isDark),
+              ),
+            ),
+          ClipRRect(borderRadius: resolvedRadius, child: macOSPane),
+        ],
+      );
+    }
+
     final effectiveAlpha = (effects ? baseOpacity : 1.0) * visibility;
     final baseFill = surface.withValues(alpha: effectiveAlpha);
+    final gradientScale = useLiquid
+        ? (effectiveLiquidOpacity * 1.4).clamp(0.0, 1.0)
+        : (backgroundBrightness > 1.001 && isDark
+              ? (1.0 - 0.75 * (backgroundBrightness - 1.0).clamp(0.0, 1.0))
+              : 1.0);
 
     // Keep `color` and `gradient` on separate DecoratedBoxes because Flutter's
     // BoxDecoration replaces `paint.color` RGB when `paint.shader` is non-null.
@@ -200,15 +383,15 @@ class GlassSurface extends StatelessWidget {
                 end: Alignment.bottomRight,
                 colors: isDark
                     ? [
-                        Colors.white.withValues(alpha: 0.016 * visibility),
-                        Colors.black.withValues(alpha: 0.04 * visibility),
-                        Colors.black.withValues(alpha: (useLiquid ? 0.14 : 0.10) * visibility),
+                        Colors.white.withValues(alpha: 0.016 * gradientScale * visibility),
+                        Colors.black.withValues(alpha: 0.04 * gradientScale * visibility),
+                        Colors.black.withValues(alpha: (useLiquid ? 0.14 : 0.10) * gradientScale * visibility),
                       ]
                     : (useLiquid
                           ? [
-                              Colors.white.withValues(alpha: 0.18 * visibility),
+                              Colors.white.withValues(alpha: 0.18 * gradientScale * visibility),
                               Colors.transparent,
-                              Colors.white.withValues(alpha: 0.08 * visibility),
+                              Colors.white.withValues(alpha: 0.08 * gradientScale * visibility),
                             ]
                           : [Colors.white.withValues(alpha: 0.06 * visibility), Colors.transparent]),
               ),
@@ -233,31 +416,9 @@ class GlassSurface extends StatelessWidget {
       child: gradedContent,
     );
 
+    final effectiveSigma = sigma * blurAmount;
     final Widget filteredContent;
-    if (effects && blurNativeVideo && !kIsWeb && defaultTargetPlatform == TargetPlatform.macOS) {
-      filteredContent = Stack(
-        children: [
-          Positioned.fill(
-            child: IgnorePointer(
-              child: AppKitView(
-                key: ValueKey(scheme.brightness),
-                viewType: 'com.satra/video_sheet_blur',
-                hitTestBehavior: PlatformViewHitTestBehavior.transparent,
-                creationParams: {'dark': isDark},
-                creationParamsCodec: const StandardMessageCodec(),
-              ),
-            ),
-          ),
-          if (useLiquid)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: _LiquidSheenLayer(borderRadius: borderRadius, visibility: visibility, isDark: isDark),
-              ),
-            ),
-          pane,
-        ],
-      );
-    } else if (useLiquid) {
+    if (useLiquid) {
       filteredContent = _LiquidGlassBackdrop(
         borderRadius: borderRadius,
         sigma: sigma,
@@ -266,22 +427,127 @@ class GlassSurface extends StatelessWidget {
         child: pane,
       );
     } else {
+      final blurFilter = ui.ImageFilter.blur(
+        sigmaX: effectiveSigma * visibility,
+        sigmaY: effectiveSigma * visibility,
+        tileMode: ui.TileMode.clamp,
+      );
+      final ui.ImageFilter backdropFilter;
+      if (!effects || (backgroundBrightness - 1.0).abs() <= 0.001) {
+        backdropFilter = blurFilter;
+      } else {
+        final targetScale = backgroundBrightness < 1.0
+            ? backgroundBrightness
+            : 1.0 + 0.65 * (backgroundBrightness - 1.0);
+        final scale = 1.0 + (targetScale - 1.0) * visibility;
+        backdropFilter = ui.ImageFilter.compose(
+          outer: ColorFilter.matrix(_backdropBrightnessMatrix(scale)),
+          inner: blurFilter,
+        );
+      }
       filteredContent = BackdropFilter(
         enabled: effects,
-        filter: ui.ImageFilter.blur(
-          sigmaX: sigma * visibility,
-          sigmaY: sigma * visibility,
-          tileMode: ui.TileMode.clamp,
-        ),
+        filter: backdropFilter,
         child: pane,
       );
     }
 
     final glass = ClipRRect(borderRadius: borderRadius, child: filteredContent);
     if (effects && blurNativeVideo && !kIsWeb && defaultTargetPlatform == TargetPlatform.linux) {
-      return LinuxVideoBlur(borderRadius: borderRadius, sigma: sigma, child: glass);
+      return LinuxVideoBlur(borderRadius: borderRadius, sigma: useLiquid ? sigma : effectiveSigma, child: glass);
     }
     return glass;
+  }
+}
+
+class _MacOSNativeGlassBackdrop extends StatefulWidget {
+  const _MacOSNativeGlassBackdrop({
+    required this.liquidGlass,
+    required this.isDark,
+    required this.borderRadius,
+    required this.visibility,
+    required this.tintArgb,
+    required this.tintStrength,
+    required this.blurScale,
+    required this.backgroundBrightness,
+  });
+
+  final bool liquidGlass;
+  final bool isDark;
+  final BorderRadius borderRadius;
+  final double visibility;
+  final int tintArgb;
+  final double tintStrength;
+  final double blurScale;
+  final double backgroundBrightness;
+
+  @override
+  State<_MacOSNativeGlassBackdrop> createState() => _MacOSNativeGlassBackdropState();
+}
+
+class _MacOSNativeGlassBackdropState extends State<_MacOSNativeGlassBackdrop> {
+  static const _channel = MethodChannel('com.satra/macos_glass_surface');
+
+  int? _viewId;
+  late final Map<String, Object> _creationParams = _buildParams();
+  late Map<String, Object> _lastSentParams = _creationParams;
+
+  Map<String, Object> _buildParams() => <String, Object>{
+    'liquidGlass': widget.liquidGlass,
+    'dark': widget.isDark,
+    'tl': widget.borderRadius.topLeft.x,
+    'tr': widget.borderRadius.topRight.x,
+    'bl': widget.borderRadius.bottomLeft.x,
+    'br': widget.borderRadius.bottomRight.x,
+    'visibility': widget.visibility,
+    'tintArgb': widget.tintArgb,
+    'tintStrength': widget.tintStrength,
+    'blurScale': widget.blurScale,
+    'backgroundBrightness': widget.backgroundBrightness,
+  };
+
+  static bool _paramsEqual(Map<String, Object> a, Map<String, Object> b) {
+    if (identical(a, b)) return true;
+    if (a.length != b.length) return false;
+    for (final entry in a.entries) {
+      if (b[entry.key] != entry.value) return false;
+    }
+    return true;
+  }
+
+  void _handlePlatformViewCreated(int id) {
+    _viewId = id;
+    final current = _buildParams();
+    if (!_paramsEqual(current, _lastSentParams)) {
+      _lastSentParams = current;
+      _sendUpdate(id, current);
+    }
+  }
+
+  void _sendUpdate(int id, Map<String, Object> params) {
+    _channel.invokeMethod<void>('update', <String, Object>{'viewId': id, ...params}).ignore();
+  }
+
+  @override
+  void didUpdateWidget(covariant _MacOSNativeGlassBackdrop oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final id = _viewId;
+    if (id == null) return;
+    final next = _buildParams();
+    if (_paramsEqual(next, _lastSentParams)) return;
+    _lastSentParams = next;
+    _sendUpdate(id, next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AppKitView(
+      viewType: 'com.satra/macos_glass_surface',
+      hitTestBehavior: PlatformViewHitTestBehavior.transparent,
+      creationParams: _creationParams,
+      creationParamsCodec: const StandardMessageCodec(),
+      onPlatformViewCreated: _handlePlatformViewCreated,
+    );
   }
 }
 

@@ -205,17 +205,29 @@ class _AnchoredPanel extends StatelessWidget {
     final availableHeight = openBelow ? spaceBelow : anchorRect.top - gap - edgePadding;
     final effectiveMaxHeight = math.max(120.0, math.min(maxHeight, availableHeight));
 
-    final panel = GlassSurface(
-      borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
-      child: Material(
-        elevation: 3,
-        shadowColor: colorScheme.shadow,
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
-        clipBehavior: Clip.antiAlias,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minWidth: panelWidth, maxWidth: panelWidth, maxHeight: effectiveMaxHeight),
-          child: PrimaryScrollController.none(child: builder(context)),
+    final menuRadius = BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18));
+    final panel = DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: menuRadius,
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.24),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+            blurStyle: BlurStyle.outer,
+          ),
+        ],
+      ),
+      child: GlassSurface(
+        borderRadius: menuRadius,
+        child: Material(
+          type: MaterialType.transparency,
+          borderRadius: menuRadius,
+          clipBehavior: Clip.antiAlias,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: panelWidth, maxWidth: panelWidth, maxHeight: effectiveMaxHeight),
+            child: PrimaryScrollController.none(child: builder(context)),
+          ),
         ),
       ),
     );
@@ -828,22 +840,34 @@ class _AppMenuSurface<T> extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    return GlassSurface(
-      borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
-      child: Material(
-        elevation: 3,
-        shadowColor: colorScheme.shadow,
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18)),
-        clipBehavior: Clip.antiAlias,
-        child: ConstrainedBox(
-          constraints: BoxConstraints(minWidth: width, maxWidth: width, maxHeight: maxHeight),
-          child: PrimaryScrollController.none(
-            child: SingleChildScrollView(
-              child: AppMenuList<T>(
-                entries: entries,
-                focusFirstItem: focusFirstItem,
-                onSelected: (value) => Navigator.pop(context, value),
+    final menuRadius = BorderRadius.circular(tokens(context).radiusMd.clamp(0, 18));
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: menuRadius,
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.24),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+            blurStyle: BlurStyle.outer,
+          ),
+        ],
+      ),
+      child: GlassSurface(
+        borderRadius: menuRadius,
+        child: Material(
+          type: MaterialType.transparency,
+          borderRadius: menuRadius,
+          clipBehavior: Clip.antiAlias,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minWidth: width, maxWidth: width, maxHeight: maxHeight),
+            child: PrimaryScrollController.none(
+              child: SingleChildScrollView(
+                child: AppMenuList<T>(
+                  entries: entries,
+                  focusFirstItem: focusFirstItem,
+                  onSelected: (value) => Navigator.pop(context, value),
+                ),
               ),
             ),
           ),

@@ -81,7 +81,7 @@ void main() {
     await tester.pumpAndSettle();
     final comfortable = bottom();
     expect(comfortable, greaterThan(compact));
-    await SettingsService.instance.write(SettingsService.tvFullCardLayout, true);
+    await SettingsService.instance.write(SettingsService.tvFullCardLayout, false);
     await tester.pumpAndSettle();
     expect(bottom(), isNot(comfortable));
   });

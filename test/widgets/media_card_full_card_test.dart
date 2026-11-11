@@ -421,6 +421,7 @@ void main() {
   });
 
   testWidgets('full bleed focusable media card lifts the glow into an overlay above siblings', (tester) async {
+    await SettingsService.instance.write(SettingsService.focusGlow, true);
     TvDetectionService.debugSetAppleTVOverride(true);
     final focusNode = FocusNode(debugLabel: 'full_bleed_card');
     addTearDown(focusNode.dispose);
@@ -459,6 +460,7 @@ void main() {
   });
 
   testWidgets('standard TV cards honor the focus glow setting too', (tester) async {
+    await SettingsService.instance.write(SettingsService.focusGlow, true);
     TvDetectionService.debugSetAppleTVOverride(true);
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);
@@ -473,6 +475,7 @@ void main() {
   });
 
   testWidgets('overlay glow fades out and unmounts when focus is lost', (tester) async {
+    await SettingsService.instance.write(SettingsService.focusGlow, true);
     TvDetectionService.debugSetAppleTVOverride(true);
     final focusNode = FocusNode();
     addTearDown(focusNode.dispose);

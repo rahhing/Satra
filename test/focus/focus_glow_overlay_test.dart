@@ -11,6 +11,11 @@ void main() {
     await SettingsService.getInstance();
   });
 
+  test('focusGlow preference is off by default', () {
+    expect(SettingsService.focusGlow.defaultValue, isFalse);
+    expect(SettingsService.instance.read(SettingsService.focusGlow), isFalse);
+  });
+
   testWidgets('glow switches off and back on without moving focus', (tester) async {
     await tester.pumpWidget(
       const MaterialApp(
@@ -25,8 +30,8 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
-    expect(find.byType(CompositedTransformFollower), findsOneWidget);
-    for (final enabled in [false, true, false, true]) {
+    expect(find.byType(CompositedTransformFollower), findsNothing);
+    for (final enabled in [true, false, true, false]) {
       await SettingsService.instance.write(SettingsService.focusGlow, enabled);
       await tester.pumpAndSettle();
       expect(find.byType(CompositedTransformFollower), enabled ? findsOneWidget : findsNothing);

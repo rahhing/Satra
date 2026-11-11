@@ -461,10 +461,11 @@ class IntPref extends Pref<int> {
 
 class DoublePref extends Pref<double> {
   final double defaultValue;
+  final double Function()? defaultValueProvider;
   final double Function(double)? transform;
-  const DoublePref(super.key, {this.defaultValue = 0.0, this.transform});
+  const DoublePref(super.key, {this.defaultValue = 0.0, this.defaultValueProvider, this.transform});
   @override
-  double get resolvedDefault => defaultValue;
+  double get resolvedDefault => defaultValueProvider?.call() ?? defaultValue;
   @override
   double fromJson(Object? value) {
     if (value is! num || !value.isFinite) throw const FormatException('Expected a finite number');
@@ -473,7 +474,7 @@ class DoublePref extends Pref<double> {
 
   @override
   double readFrom(BaseSharedPreferencesService svc) {
-    final raw = svc.readDouble(key, defaultValue: defaultValue);
+    final raw = svc.readDouble(key, defaultValue: defaultValueProvider?.call() ?? defaultValue);
     return transform == null ? raw : transform!(raw);
   }
 

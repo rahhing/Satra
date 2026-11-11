@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'dart:ui' as ui;
 
 import 'package:flutter/material.dart';
@@ -17,11 +18,14 @@ void main() {
     resetSharedPreferencesForTest();
     SettingsService.resetForTesting();
     await SettingsService.getInstance();
+    await SettingsService.instance.write(SettingsService.liquidGlass, false);
+    await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.20);
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
 
   testWidgets('GlassSurface live-toggles between frosted blur and Liquid Glass optical distortion', (tester) async {
     final settings = SettingsService.instance;
+    await settings.write(SettingsService.liquidGlass, false);
 
     await tester.pumpWidget(
       MaterialApp(
@@ -57,10 +61,11 @@ void main() {
     expect(glassClipPaths, findsNWidgets(baseClipCount));
   });
 
-  testWidgets('Bottom-docked GlassSurface keeps top corners rounded and bottom corners sharp & uniformly filled', (
+  testWidgets('Bottom-docked GlassSurface keeps top corners rounded, defaults translucent, and scales with opacity slider', (
     tester,
   ) async {
     await SettingsService.instance.write(SettingsService.liquidGlass, true);
+    await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.20);
     final boundaryKey = GlobalKey();
 
     await tester.pumpWidget(
@@ -92,8 +97,24 @@ void main() {
     await tester.pump();
 
     final boundary = boundaryKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    final image = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
-    final bytes = await tester.runAsync(() => image!.toByteData(format: ui.ImageByteFormat.rawRgba));
+    final defaultImage = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
+    final defaultBytes = await tester.runAsync(() => defaultImage!.toByteData(format: ui.ImageByteFormat.rawRgba));
+    expect(defaultBytes, isNotNull);
+
+    int channelIn(ByteData data, int x, int y, int c) => data.getUint8((y * 240 + x) * 4 + c);
+
+    // Default Liquid Glass opacity (20%) stays crystal-translucent over #00AAFF.
+    expect(channelIn(defaultBytes!, 120, 80, 2), greaterThan(170));
+    expect((channelIn(defaultBytes, 2, 157, 2) - channelIn(defaultBytes, 2, 105, 2)).abs(), lessThanOrEqualTo(6));
+    expect((channelIn(defaultBytes, 237, 157, 2) - channelIn(defaultBytes, 237, 105, 2)).abs(), lessThanOrEqualTo(6));
+
+    // Raising Liquid Glass Opacity to 90% deepens the smoked tint while keeping
+    // top-left rounded and bottom corners sharp and uniformly filled.
+    await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.90);
+    await tester.pump();
+
+    final denseImage = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
+    final bytes = await tester.runAsync(() => denseImage!.toByteData(format: ui.ImageByteFormat.rawRgba));
     expect(bytes, isNotNull);
 
     int channelAt(int x, int y, int c) => bytes!.getUint8((y * 240 + x) * 4 + c);

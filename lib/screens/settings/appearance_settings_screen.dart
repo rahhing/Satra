@@ -40,25 +40,34 @@ class AppearanceSettingsScreen extends StatelessWidget {
     return SettingsPage(
       title: Text(t.settings.appearance),
       children: [
-        SettingsGroup(
-          title: t.settings.display,
-          children: [
-            _themeSelector(),
-            if (AppIconSetting.isShown(context)) const AppIconSetting(),
-            if (PlatformDetector.isAutomotive()) _displayScaleSelector(),
-            if (PlatformDetector.isDesktopOS() &&
-                DesktopUiScale.isDesktopPlatform(Theme.of(context).platform) &&
-                !PlatformDetector.isTV() &&
-                !PlatformDetector.isAutomotive())
-              _desktopScaleSelector(),
-            if (Platform.isAndroid) _visualEffectsSelector(context),
-            SettingSwitchTile(
-              pref: SettingsService.liquidGlass,
-              icon: Symbols.water_drop_rounded,
-              title: t.settings.liquidGlass,
-              subtitle: t.settings.liquidGlassDescription,
-            ),
-          ],
+        SettingValueBuilder<bool>(
+          pref: SettingsService.liquidGlass,
+          builder: (context, liquidGlass, _) => SettingsGroup(
+            title: t.settings.display,
+            children: [
+              _themeSelector(),
+              if (AppIconSetting.isShown(context)) const AppIconSetting(),
+              if (PlatformDetector.isAutomotive()) _displayScaleSelector(),
+              if (PlatformDetector.isDesktopOS() &&
+                  DesktopUiScale.isDesktopPlatform(Theme.of(context).platform) &&
+                  !PlatformDetector.isTV() &&
+                  !PlatformDetector.isAutomotive())
+                _desktopScaleSelector(),
+              if (Platform.isAndroid) _visualEffectsSelector(context),
+              SettingSwitchTile(
+                pref: SettingsService.liquidGlass,
+                icon: Symbols.water_drop_rounded,
+                title: t.settings.liquidGlass,
+                subtitle: t.settings.liquidGlassDescription,
+              ),
+              if (liquidGlass)
+                _liquidGlassOpacitySlider()
+              else ...[
+                _glassBlurAmountSlider(),
+                _glassBackgroundBrightnessSlider(),
+              ],
+            ],
+          ),
         ),
 
         SettingsGroup(
@@ -231,6 +240,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               FocusableSlider(
+                key: const ValueKey('library_density'),
                 value: density.toDouble(),
                 min: 1,
                 max: 5,
@@ -385,6 +395,86 @@ class AppearanceSettingsScreen extends StatelessWidget {
       ButtonSegment(value: EpisodeAction.play, label: Text(t.settings.episodePlay)),
       ButtonSegment(value: EpisodeAction.details, label: Text(t.settings.episodeDetails)),
     ],
+  );
+
+  Widget _liquidGlassOpacitySlider() => _percentSliderTile(
+    sliderKey: const ValueKey('liquid_glass_opacity'),
+    pref: SettingsService.liquidGlassOpacity,
+    icon: Symbols.opacity_rounded,
+    title: t.settings.liquidGlassOpacity,
+    description: t.settings.liquidGlassOpacityDescription,
+    min: 0.0,
+    max: 1.0,
+    divisions: 20,
+  );
+
+  Widget _glassBlurAmountSlider() => _percentSliderTile(
+    sliderKey: const ValueKey('glass_blur_amount'),
+    pref: SettingsService.glassBlurAmount,
+    icon: Symbols.blur_on_rounded,
+    title: t.settings.glassBlurAmount,
+    description: t.settings.glassBlurAmountDescription,
+    min: 0.0,
+    max: 2.0,
+    divisions: 40,
+  );
+
+  Widget _glassBackgroundBrightnessSlider() => _percentSliderTile(
+    sliderKey: const ValueKey('glass_background_brightness'),
+    pref: SettingsService.glassBackgroundBrightness,
+    icon: Symbols.brightness_6_rounded,
+    title: t.settings.glassBackgroundBrightness,
+    description: t.settings.glassBackgroundBrightnessDescription,
+    min: 0.0,
+    max: 2.0,
+    divisions: 40,
+  );
+
+  Widget _percentSliderTile({
+    required Key sliderKey,
+    required Pref<double> pref,
+    required IconData icon,
+    required String title,
+    required String description,
+    required double min,
+    required double max,
+    required int divisions,
+  }) => SettingValueBuilder<double>(
+    pref: pref,
+    builder: (context, rawValue, _) {
+      final value = rawValue.clamp(min, max);
+      final theme = Theme.of(context);
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                AppIcon(icon, fill: 1),
+                const SizedBox(width: 16),
+                Expanded(child: Text(title, style: settingsOptionTitleStyle(context))),
+                Text('${(value * 100).round()}%', style: theme.textTheme.bodyMedium),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+            ),
+            const SizedBox(height: 6),
+            FocusableSlider(
+              key: sliderKey,
+              value: value,
+              min: min,
+              max: max,
+              divisions: divisions,
+              onChanged: (next) => SettingsService.instance.write(pref, (next * 20).round() / 20.0),
+            ),
+          ],
+        ),
+      );
+    },
   );
 
   String _visualEffectsLabel(VisualEffectsSetting value) => switch (value) {

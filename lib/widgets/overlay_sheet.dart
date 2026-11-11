@@ -913,7 +913,7 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
                   key: _sheetKey,
                   color: _explicitBackgroundColor ?? Colors.transparent,
                   borderRadius: borderRadius,
-                  clipBehavior: Clip.antiAlias,
+                  clipBehavior: _explicitBackgroundColor == null ? Clip.none : Clip.antiAlias,
                   child: GlassTransitionScope(
                     animation: _slideCurve,
                     child: GlassSurface(

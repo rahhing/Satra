@@ -91,11 +91,15 @@ void main() {
       await choose(SettingsService.episodePosterMode, EpisodePosterMode.values);
       await choose(SettingsService.continueWatchingAction, ContinueWatchingAction.values);
       await choose(SettingsService.episodeAction, EpisodeAction.values);
+      final densitySlider = find.descendant(
+        of: find.byKey(const ValueKey('library_density')),
+        matching: find.byType(Slider),
+      );
       for (var density = LibraryDensity.min; density <= LibraryDensity.max; density++) {
-        tester.widget<Slider>(find.byType(Slider).first).onChanged!(density.toDouble());
+        tester.widget<Slider>(densitySlider).onChanged!(density.toDouble());
         await tester.pumpAndSettle();
         expect(SettingsService.instance.prefs.getInt(SettingsService.libraryDensity.key), density);
-        expect(tester.widget<Slider>(find.byType(Slider).first).value, density.toDouble());
+        expect(tester.widget<Slider>(densitySlider).value, density.toDouble());
       }
       if (!tv && platform == TargetPlatform.linux) {
         final scaleRow = find.byWidgetPredicate(
@@ -200,6 +204,108 @@ void main() {
       find.descendant(of: find.byType(AppearanceSettingsScreen), matching: find.text(t.settings.plumTheme)),
       findsOneWidget,
     );
+  });
+
+  testWidgets('Display group swaps Blur Amount & Background Brightness with Liquid Glass Opacity (non-macOS default)', (tester) async {
+    PlatformDetector.debugSetIsMacOSOverride(false);
+    addTearDown(() => PlatformDetector.debugSetIsMacOSOverride(null));
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 3000);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final supporter = SupporterService.forTesting(availability: SupporterAvailability.free);
+    addTearDown(supporter.dispose);
+    final theme = ThemeProvider(supporter: supporter);
+    addTearDown(theme.dispose);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<SupporterService>.value(value: supporter),
+          ChangeNotifierProvider<ThemeProvider>.value(value: theme),
+        ],
+        child: MaterialApp(theme: monoTheme(MonoPalette.dark), home: const AppearanceSettingsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Liquid Glass defaults OFF on non-macOS -> Blur Amount (100%) & Background Brightness (100%) are shown.
+    expect(find.byKey(const ValueKey('glass_blur_amount')), findsOneWidget);
+    expect(find.byKey(const ValueKey('glass_background_brightness')), findsOneWidget);
+    expect(find.byKey(const ValueKey('liquid_glass_opacity')), findsNothing);
+    expect(SettingsService.instance.read(SettingsService.glassBlurAmount), 1.0);
+    expect(SettingsService.instance.read(SettingsService.glassBackgroundBrightness), 1.0);
+
+    final blurSlider = find.descendant(
+      of: find.byKey(const ValueKey('glass_blur_amount')),
+      matching: find.byType(Slider),
+    );
+    tester.widget<Slider>(blurSlider).onChanged!(1.5);
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.glassBlurAmount), 1.5);
+    expect(find.text('150%'), findsOneWidget);
+
+    final brightnessSlider = find.descendant(
+      of: find.byKey(const ValueKey('glass_background_brightness')),
+      matching: find.byType(Slider),
+    );
+    tester.widget<Slider>(brightnessSlider).onChanged!(0.75);
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.glassBackgroundBrightness), 0.75);
+    expect(find.text('75%'), findsOneWidget);
+
+    // Toggle Liquid Glass ON -> Liquid Glass Opacity (20% default on non-macOS) replaces them.
+    await tester.tap(find.text(t.settings.liquidGlass));
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('liquid_glass_opacity')), findsOneWidget);
+    expect(find.byKey(const ValueKey('glass_blur_amount')), findsNothing);
+    expect(find.byKey(const ValueKey('glass_background_brightness')), findsNothing);
+    expect(SettingsService.instance.read(SettingsService.liquidGlassOpacity), 0.20);
+    expect(find.text('20%'), findsOneWidget);
+
+    final opacitySlider = find.descendant(
+      of: find.byKey(const ValueKey('liquid_glass_opacity')),
+      matching: find.byType(Slider),
+    );
+    tester.widget<Slider>(opacitySlider).onChanged!(0.45);
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.liquidGlassOpacity), 0.45);
+    expect(find.text('45%'), findsOneWidget);
+  });
+
+  testWidgets('macOS defaults Liquid Glass ON at 65% opacity in Display group', (tester) async {
+    PlatformDetector.debugSetIsMacOSOverride(true);
+    addTearDown(() => PlatformDetector.debugSetIsMacOSOverride(null));
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(1000, 3000);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final supporter = SupporterService.forTesting(availability: SupporterAvailability.free);
+    addTearDown(supporter.dispose);
+    final theme = ThemeProvider(supporter: supporter);
+    addTearDown(theme.dispose);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<SupporterService>.value(value: supporter),
+          ChangeNotifierProvider<ThemeProvider>.value(value: theme),
+        ],
+        child: MaterialApp(theme: monoTheme(MonoPalette.oled), home: const AppearanceSettingsScreen()),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(SettingsService.instance.read(SettingsService.liquidGlass), isTrue);
+    expect(SettingsService.instance.read(SettingsService.liquidGlassOpacity), 0.65);
+    expect(SettingsService.instance.read(SettingsService.themeMode), settings.ThemeMode.oled);
+    expect(find.byKey(const ValueKey('liquid_glass_opacity')), findsOneWidget);
+    expect(find.text('65%'), findsOneWidget);
+    expect(find.byKey(const ValueKey('glass_blur_amount')), findsNothing);
+    expect(find.byKey(const ValueKey('glass_background_brightness')), findsNothing);
   });
 }
 

@@ -728,6 +728,24 @@ class Translations$settings$en {
 	/// en: 'Apply optical lens distortion and specular refraction to blurred surfaces'
 	String get liquidGlassDescription => 'Apply optical lens distortion and specular refraction to blurred surfaces';
 
+	/// en: 'Liquid Glass Opacity'
+	String get liquidGlassOpacity => 'Liquid Glass Opacity';
+
+	/// en: 'Adjust how much surface tint is applied to Liquid Glass'
+	String get liquidGlassOpacityDescription => 'Adjust how much surface tint is applied to Liquid Glass';
+
+	/// en: 'Blur Amount'
+	String get glassBlurAmount => 'Blur Amount';
+
+	/// en: 'Adjust backdrop blur intensity behind translucent surfaces'
+	String get glassBlurAmountDescription => 'Adjust backdrop blur intensity behind translucent surfaces';
+
+	/// en: 'Background Brightness'
+	String get glassBackgroundBrightness => 'Background Brightness';
+
+	/// en: 'Adjust the brightness of blurred backgrounds behind surfaces'
+	String get glassBackgroundBrightnessDescription => 'Adjust the brightness of blurred backgrounds behind surfaces';
+
 	/// en: 'Hide Spoilers for Unwatched Episodes'
 	String get hideSpoilers => 'Hide Spoilers for Unwatched Episodes';
 
@@ -8470,6 +8488,12 @@ extension on Translations {
 			'settings.visualEffectsReducedDescription' => 'Fewer animations and lower-resolution artwork',
 			'settings.liquidGlass' => 'Liquid Glass',
 			'settings.liquidGlassDescription' => 'Apply optical lens distortion and specular refraction to blurred surfaces',
+			'settings.liquidGlassOpacity' => 'Liquid Glass Opacity',
+			'settings.liquidGlassOpacityDescription' => 'Adjust how much surface tint is applied to Liquid Glass',
+			'settings.glassBlurAmount' => 'Blur Amount',
+			'settings.glassBlurAmountDescription' => 'Adjust backdrop blur intensity behind translucent surfaces',
+			'settings.glassBackgroundBrightness' => 'Background Brightness',
+			'settings.glassBackgroundBrightnessDescription' => 'Adjust the brightness of blurred backgrounds behind surfaces',
 			'settings.hideSpoilers' => 'Hide Spoilers for Unwatched Episodes',
 			'settings.hideSpoilersDescription' => 'Blur thumbnails and descriptions for unwatched episodes',
 			'settings.playerBackend' => 'Player Backend',
@@ -8738,14 +8762,14 @@ extension on Translations {
 			'themeEditor.savedLocked' => 'Saved — unlocks with the Theme & Icon Pack',
 			'themeEditor.title' => 'Custom Theme',
 			'themeEditor.startFrom' => 'Start from',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.startFromDescription' => 'Copy all colors from another theme',
 			'themeEditor.colors' => 'Colors',
 			'themeEditor.preview' => 'Preview',
 			'themeEditor.slots.bg' => 'Background',
 			'themeEditor.slots.surface' => 'Surface',
 			'themeEditor.slots.outline' => 'Outline',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.slots.text' => 'Text',
 			'themeEditor.slots.textMuted' => 'Secondary text',
 			'themeEditor.slots.accent' => 'Accent',
@@ -9252,14 +9276,14 @@ extension on Translations {
 			'profiles.noPinSetEditOnPlex' => 'No PIN set. To require one, edit the home user on plex.tv.',
 			'profiles.setPin' => 'Set PIN',
 			'profiles.setPinTitle' => 'Set PIN',
+			_ => null,
+		} ?? switch (path) {
 			'profiles.confirmPinTitle' => 'Confirm PIN',
 			'profiles.pinSet' => 'PIN set',
 			'profiles.changePin' => 'Change',
 			'profiles.removePin' => 'Remove',
 			'profiles.connectionsLabel' => 'Connections',
 			'profiles.add' => 'Add',
-			_ => null,
-		} ?? switch (path) {
 			'profiles.deleteProfileButton' => 'Delete profile',
 			'profiles.noConnectionsHint' => 'No connections — add one to use this profile.',
 			'profiles.noConnections' => 'No connections',
@@ -9766,14 +9790,14 @@ extension on Translations {
 			'liveTv.record' => 'Record',
 			'liveTv.recordEpisode' => 'Record Episode',
 			'liveTv.recordSeries' => 'Record Series',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.recordOptions' => 'Record Options',
 			'liveTv.saveTo' => 'Save to',
 			'liveTv.recordings' => 'Recordings',
 			'liveTv.scheduledRecordings' => 'Scheduled',
 			'liveTv.recordingRules' => 'Recording Rules',
 			'liveTv.noScheduledRecordings' => 'Nothing scheduled to record',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.manageRecording' => 'Manage recording',
 			'liveTv.cancelRecording' => 'Cancel recording',
 			'liveTv.cancelRecordingTitle' => 'Cancel this recording?',
@@ -10280,14 +10304,14 @@ extension on Translations {
 			'performanceOverlay.rotation' => 'Rotation',
 			'performanceOverlay.dvSource' => 'DV Source',
 			'performanceOverlay.dvPath' => 'DV Path',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.dvRouteDecoder' => 'Dolby Vision decoder',
 			'performanceOverlay.dvRouteDecoderP81' => 'Dolby Vision decoder (P7→8.1)',
 			'performanceOverlay.dvRouteBaseLayer' => 'Base layer',
 			'performanceOverlay.dvRouteBaseLayerHdr10' => 'HDR10 base layer',
 			'performanceOverlay.dvRouteBaseLayerHlg' => 'HLG base layer',
 			'performanceOverlay.dvRouteBaseLayerSdr' => 'SDR base layer',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.dvRouteReshaped' => 'RPU reshaped (gpu-next)',
 			'performanceOverlay.p7Conversion' => 'P7 Conv',
 			'performanceOverlay.sampleRate' => 'Sample Rate',

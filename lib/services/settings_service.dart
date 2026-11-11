@@ -666,9 +666,19 @@ class SettingsService extends BaseSharedPreferencesService {
   static const seekTimeLarge = IntPref('seek_time_large', defaultValue: 30);
   static const rewindOnResume = IntPref('rewind_on_resume');
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
-  static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: false);
-  static const focusGlow = BoolPref('focus_glow', defaultValue: true);
-  static const liquidGlass = BoolPref('liquid_glass', defaultValue: false);
+  static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: true);
+  static const focusGlow = BoolPref('focus_glow', defaultValue: false);
+  static bool _liquidGlassDefault() => PlatformDetector.isMacOS();
+  static double _liquidGlassOpacityDefault() => PlatformDetector.isMacOS() ? 0.65 : 0.20;
+
+  static const liquidGlass = BoolPref('liquid_glass', defaultValueProvider: _liquidGlassDefault);
+  static const liquidGlassOpacity = DoublePref(
+    'liquid_glass_opacity',
+    defaultValue: 0.20,
+    defaultValueProvider: _liquidGlassOpacityDefault,
+  );
+  static const glassBlurAmount = DoublePref('glass_blur_amount', defaultValue: 1.0);
+  static const glassBackgroundBrightness = DoublePref('glass_background_brightness', defaultValue: 1.0);
   static const useGlobalHubs = BoolPref('use_global_hubs', defaultValue: true);
   static const showServerNameOnHubs = BoolPref('show_server_name_on_hubs');
   static const groupLibrariesByServer = BoolPref('group_libraries_by_server', defaultValue: true);
@@ -1563,6 +1573,9 @@ class SettingsService extends BaseSharedPreferencesService {
     forceTvMode,
     visualEffects,
     liquidGlass,
+    liquidGlassOpacity,
+    glassBlurAmount,
+    glassBackgroundBrightness,
     ambientLighting,
     audioPassthrough,
     audioNormalization,
@@ -1697,6 +1710,8 @@ class SettingsService extends BaseSharedPreferencesService {
     'library_density' => (LibraryDensity.min, LibraryDensity.max),
     'automotive_ui_scale' => (AutomotiveUiScale.min, AutomotiveUiScale.max),
     'desktop_ui_scale' => (0, 2.5),
+    'liquid_glass_opacity' => (0.0, 1.0),
+    'glass_blur_amount' || 'glass_background_brightness' => (0.0, 2.0),
     'remembered_brightness_level' => (-1, 1),
     _ => null,
   };
