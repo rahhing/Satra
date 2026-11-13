@@ -18,6 +18,7 @@ import 'widgets/play_pause_stream_builder.dart';
 import 'widgets/live_timeline_bar.dart';
 import 'widgets/video_controls_header.dart';
 import 'widgets/video_timeline_bar.dart';
+import '../glass_surface.dart';
 
 /// Mobile video controls layout for Plex video player
 ///
@@ -393,37 +394,89 @@ class _MobileVideoControlsState extends State<MobileVideoControls> with SingleTi
     );
   }
 
-  Widget _buildBottomBar(BuildContext _) {
+  Widget _buildBottomBar(BuildContext context) {
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
     if (widget.isLive) {
       if (widget.captureBuffer != null) {
         // Live TV with time-shift: show seekable timeline
         return FirstFrameGuard(
           hasFirstFrame: widget.hasFirstFrame,
-          builder: (context) => LiveTimelineBar(
-            player: widget.player,
-            captureBuffer: widget.captureBuffer!,
-            epochForPosition: widget.liveEpochForPosition!,
-            isAtLiveEdge: widget.isAtLiveEdge,
-            onSeekEnd: widget.onLiveSeek,
-            horizontalLayout: false,
-            enabled: widget.canControl,
-          ),
+          builder: (context) {
+            final bar = LiveTimelineBar(
+              player: widget.player,
+              captureBuffer: widget.captureBuffer!,
+              epochForPosition: widget.liveEpochForPosition!,
+              isAtLiveEdge: widget.isAtLiveEdge,
+              onSeekEnd: widget.onLiveSeek,
+              horizontalLayout: false,
+              enabled: widget.canControl,
+            );
+            if (!useIOSLiquidGlass) return bar;
+            return _conditionalSafeArea(
+              context: context,
+              top: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+                child: GlassSurface(
+                  interactive: true,
+                  blurNativeVideo: true,
+                  borderRadius: const BorderRadius.all(Radius.circular(26)),
+                  sigma: 28,
+                  opacity: 0.56,
+                  tint: const Color(0xFF07080C),
+                  child: Padding(padding: const EdgeInsets.symmetric(vertical: 4), child: bar),
+                ),
+              ),
+            );
+          },
         );
       }
       // Fallback: static LIVE badge (no capture buffer)
-      return Padding(
-        padding: const EdgeInsets.all(16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-              decoration: const BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(4))),
-              child: Text(
-                t.liveTv.live,
-                style: const TextStyle(color: Colors.white, fontWeight: .bold, fontSize: 12),
-              ),
-            ),
-          ],
+      return _conditionalSafeArea(
+        context: context,
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              if (useIOSLiquidGlass)
+                GlassSurface(
+                  interactive: true,
+                  blurNativeVideo: true,
+                  borderRadius: const BorderRadius.all(Radius.circular(999)),
+                  sigma: 24,
+                  opacity: 0.56,
+                  tint: const Color(0xFF07080C),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 7,
+                          height: 7,
+                          decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle),
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          t.liveTv.live,
+                          style: const TextStyle(color: Colors.white, fontWeight: .bold, fontSize: 12),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: const BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(4))),
+                  child: Text(
+                    t.liveTv.live,
+                    style: const TextStyle(color: Colors.white, fontWeight: .bold, fontSize: 12),
+                  ),
+                ),
+            ],
+          ),
         ),
       );
     }
@@ -431,26 +484,42 @@ class _MobileVideoControlsState extends State<MobileVideoControls> with SingleTi
   }
 
   Widget _buildBottomBarContent(BuildContext context) {
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
+    final timeline = VideoTimelineBar(
+      player: widget.player,
+      chapters: widget.chapters,
+      chaptersLoaded: widget.chaptersLoaded,
+      showChapterMarkersOnTimeline: widget.showChapterMarkersOnTimeline,
+      onSeek: widget.onSeek,
+      onSeekEnd: widget.onSeekEnd,
+      onScrubStart: widget.onScrubStart,
+      onScrubEnd: widget.onScrubEnd,
+      horizontalLayout: false,
+      enabled: widget.canControl,
+      showFinishTime: true,
+      thumbnailDataBuilder: widget.thumbnailDataBuilder,
+    );
+
     return _conditionalSafeArea(
       context: context,
       top: false, // Only respect bottom safe area when in portrait
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: VideoTimelineBar(
-          player: widget.player,
-          chapters: widget.chapters,
-          chaptersLoaded: widget.chaptersLoaded,
-          showChapterMarkersOnTimeline: widget.showChapterMarkersOnTimeline,
-          onSeek: widget.onSeek,
-          onSeekEnd: widget.onSeekEnd,
-          onScrubStart: widget.onScrubStart,
-          onScrubEnd: widget.onScrubEnd,
-          horizontalLayout: false,
-          enabled: widget.canControl,
-          showFinishTime: true,
-          thumbnailDataBuilder: widget.thumbnailDataBuilder,
-        ),
-      ),
+      child: useIOSLiquidGlass
+          ? Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: GlassSurface(
+                interactive: true,
+                blurNativeVideo: true,
+                borderRadius: const BorderRadius.all(Radius.circular(26)),
+                sigma: 28,
+                opacity: 0.56,
+                tint: const Color(0xFF07080C),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
+                  child: timeline,
+                ),
+              ),
+            )
+          : Padding(padding: const EdgeInsets.all(16), child: timeline),
     );
   }
 

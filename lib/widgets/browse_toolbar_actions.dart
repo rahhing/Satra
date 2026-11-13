@@ -226,6 +226,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
             Consumer2<WatchTogetherProvider, CompanionRemoteProvider>(
               builder: (context, watchTogether, companionRemote, _) {
                 final isDesktop = PlatformDetector.shouldActAsRemoteHost(context);
+                final compactMobile = PlatformDetector.isMobile(context);
                 void openWatchTogether() =>
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const WatchTogetherScreen()));
                 void openCompanionRemote() {
@@ -234,6 +235,144 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                   } else {
                     Navigator.push(context, MaterialPageRoute(builder: (context) => const MobileRemoteScreen()));
                   }
+                }
+
+                Widget buildWatchTogetherButton() => Stack(
+                  children: [
+                    IconButton(
+                      icon: AppIcon(
+                        Symbols.group_rounded,
+                        fill: watchTogether.isInSession ? 1 : 0,
+                        color: watchTogether.isInSession ? colorScheme.primary : foregroundColor,
+                      ),
+                      onPressed: openWatchTogether,
+                      tooltip: t.watchTogether.title,
+                    ),
+                    // Badges sit over the button they label, so they must
+                    // not swallow its hover and clicks (#2846).
+                    if (watchTogether.isInSession && watchTogether.participantCount > 1)
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: IgnorePointer(
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: colorScheme.primary,
+                              borderRadius: const BorderRadius.all(Radius.circular(8)),
+                            ),
+                            child: Text(
+                              '${watchTogether.participantCount}',
+                              style: TextStyle(color: colorScheme.onPrimary, fontSize: 10, fontWeight: .bold),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+
+                Widget buildCompanionRemoteButton() => Stack(
+                  children: [
+                    IconButton(
+                      icon: AppIcon(
+                        Symbols.phone_android_rounded,
+                        fill: companionRemote.isConnected ? 1 : 0,
+                        color: companionRemote.isConnected ? colorScheme.primary : foregroundColor,
+                      ),
+                      onPressed: openCompanionRemote,
+                      tooltip: t.companionRemote.title,
+                    ),
+                    if (companionRemote.isConnected)
+                      Positioned(
+                        top: 6,
+                        right: 6,
+                        child: IgnorePointer(
+                          child: Container(
+                            width: 8,
+                            height: 8,
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              shape: BoxShape.circle,
+                              border: Border.fromBorderSide(BorderSide(color: foregroundColor, width: 1)),
+                            ),
+                          ),
+                        ),
+                      ),
+                  ],
+                );
+
+                if (compactMobile) {
+                  return FocusableActionBar(
+                    key: widget.actionBarKey,
+                    onNavigateLeft: widget.onNavigateLeft,
+                    onNavigateDown: widget.onNavigateDown,
+                    actions: [
+                      ...widget.extraActions,
+                      if (watchTogether.isInSession)
+                        FocusableAction(
+                          debugLabel: 'watch_together',
+                          onPressed: openWatchTogether,
+                          child: buildWatchTogetherButton(),
+                        ),
+                      if (companionRemote.isConnected)
+                        FocusableAction(
+                          debugLabel: 'companion_remote',
+                          onPressed: openCompanionRemote,
+                          child: buildCompanionRemoteButton(),
+                        ),
+                      FocusableAction(
+                        debugLabel: 'mobile_more_actions',
+                        child: AppMenuButton<String>(
+                          tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
+                          adaptiveSheet: true,
+                          anchorAlignment: AppMenuAnchorAlignment.end,
+                          entriesBuilder: (_) => [
+                            AppMenuItem(
+                              value: 'watch_together',
+                              icon: Symbols.group_rounded,
+                              label: t.watchTogether.title,
+                            ),
+                            AppMenuItem(
+                              value: 'companion_remote',
+                              icon: Symbols.phone_android_rounded,
+                              label: t.companionRemote.title,
+                            ),
+                            if (hasLibraries)
+                              AppMenuItem(
+                                value: 'manage_libraries',
+                                icon: Symbols.edit_rounded,
+                                label: t.libraries.manageLibraries,
+                              ),
+                            AppMenuItem(
+                              value: 'refresh',
+                              icon: Symbols.refresh_rounded,
+                              label: t.common.refresh,
+                            ),
+                          ],
+                          onSelected: (action) {
+                            switch (action) {
+                              case 'watch_together':
+                                openWatchTogether();
+                              case 'companion_remote':
+                                openCompanionRemote();
+                              case 'manage_libraries':
+                                (widget.onManageLibraries ?? () => showLibraryManagementSheet(context)).call();
+                              case 'refresh':
+                                widget.onRefresh();
+                            }
+                          },
+                          child: SizedBox(
+                            width: 36,
+                            height: 36,
+                            child: Center(
+                              child: AppIcon(Symbols.more_horiz_rounded, size: 21, color: foregroundColor),
+                            ),
+                          ),
+                        ),
+                      ),
+                      _buildUserMenuAction(context),
+                    ],
+                  );
                 }
 
                 return FocusableActionBar(
@@ -261,73 +400,13 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                     FocusableAction(
                       debugLabel: 'watch_together',
                       onPressed: openWatchTogether,
-                      child: Stack(
-                        children: [
-                          IconButton(
-                            icon: AppIcon(
-                              Symbols.group_rounded,
-                              fill: watchTogether.isInSession ? 1 : 0,
-                              color: watchTogether.isInSession ? colorScheme.primary : foregroundColor,
-                            ),
-                            onPressed: openWatchTogether,
-                            tooltip: t.watchTogether.title,
-                          ),
-                          // Badges sit over the button they label, so they must
-                          // not swallow its hover and clicks (#2846).
-                          if (watchTogether.isInSession && watchTogether.participantCount > 1)
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: IgnorePointer(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
-                                  decoration: BoxDecoration(
-                                    color: colorScheme.primary,
-                                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                                  ),
-                                  child: Text(
-                                    '${watchTogether.participantCount}',
-                                    style: TextStyle(color: colorScheme.onPrimary, fontSize: 10, fontWeight: .bold),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                      child: buildWatchTogetherButton(),
                     ),
                     // Companion Remote
                     FocusableAction(
                       debugLabel: 'companion_remote',
                       onPressed: openCompanionRemote,
-                      child: Stack(
-                        children: [
-                          IconButton(
-                            icon: AppIcon(
-                              Symbols.phone_android_rounded,
-                              fill: companionRemote.isConnected ? 1 : 0,
-                              color: companionRemote.isConnected ? colorScheme.primary : foregroundColor,
-                            ),
-                            onPressed: openCompanionRemote,
-                            tooltip: t.companionRemote.title,
-                          ),
-                          if (companionRemote.isConnected)
-                            Positioned(
-                              top: 6,
-                              right: 6,
-                              child: IgnorePointer(
-                                child: Container(
-                                  width: 8,
-                                  height: 8,
-                                  decoration: BoxDecoration(
-                                    color: Colors.green,
-                                    shape: BoxShape.circle,
-                                    border: Border.fromBorderSide(BorderSide(color: foregroundColor, width: 1)),
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
+                      child: buildCompanionRemoteButton(),
                     ),
                     // Server Tasks — Plex-only (`/activities` API has no
                     // Jellyfin equivalent), hide the button entirely on

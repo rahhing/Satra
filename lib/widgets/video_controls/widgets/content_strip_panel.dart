@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
+import '../../../utils/platform_detector.dart';
 import '../../app_icon.dart';
+import '../../glass_surface.dart';
 
-/// Gradient scrim that hosts the content strip once it is on screen.
+/// Scrim or Liquid Glass sheet that hosts the content strip once it is on screen.
 ///
 /// [chevron] points back at the controls the strip replaced — down for the
 /// mobile swipe, up for D-pad focus. [padding] compensates for the strip's
@@ -16,6 +18,27 @@ class ContentStripPanel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
+    final body = Column(
+      mainAxisSize: .min,
+      children: [
+        AppIcon(chevron, color: Colors.white54, size: 20),
+        const SizedBox(height: 4),
+        child,
+      ],
+    );
+
+    if (useIOSLiquidGlass) {
+      return GlassSurface(
+        blurNativeVideo: true,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        sigma: 30,
+        opacity: 0.78,
+        tint: const Color(0xFF07080C),
+        child: Padding(padding: padding, child: body),
+      );
+    }
+
     return Container(
       padding: padding,
       decoration: BoxDecoration(
@@ -26,14 +49,7 @@ class ContentStripPanel extends StatelessWidget {
           stops: const [0.0, 0.42, 1.0],
         ),
       ),
-      child: Column(
-        mainAxisSize: .min,
-        children: [
-          AppIcon(chevron, color: Colors.white38, size: 20),
-          const SizedBox(height: 4),
-          child,
-        ],
-      ),
+      child: body,
     );
   }
 }
@@ -47,6 +63,6 @@ class ContentStripHint extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Positioned(left: 0, right: 0, bottom: 12, child: AppIcon(chevron, color: Colors.white24, size: 24));
+    return Positioned(left: 0, right: 0, bottom: 2, child: AppIcon(chevron, color: Colors.white38, size: 22));
   }
 }

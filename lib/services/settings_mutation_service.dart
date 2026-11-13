@@ -70,7 +70,7 @@ class SettingsMutationService {
     _SettingsEffect(SettingsService.appLocale, _applyAppLocale, rebuildsRoot: true),
     _SettingsEffect(
       SettingsService.forceTvMode,
-      (_, _, _) async => TvDetectionService.setForceTVSync(true),
+      (_, settings, _) async => TvDetectionService.setForceTVSync(settings.read(SettingsService.forceTvMode)),
       rebuildsRoot: true,
     ),
     _SettingsEffect(

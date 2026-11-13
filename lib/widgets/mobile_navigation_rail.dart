@@ -22,6 +22,7 @@ class MobileNavigationRail extends StatelessWidget {
     required this.showLabels,
     required this.onDestinationSelected,
     this.onLibrariesLongPress,
+    this.onSearchPressed,
     this.isOffline = false,
     this.isReconnecting = false,
     this.onReconnect,
@@ -35,6 +36,7 @@ class MobileNavigationRail extends StatelessWidget {
   final bool showLabels;
   final ValueChanged<NavigationTabId> onDestinationSelected;
   final VoidCallback? onLibrariesLongPress;
+  final VoidCallback? onSearchPressed;
   final bool isOffline;
   final bool isReconnecting;
   final VoidCallback? onReconnect;
@@ -85,13 +87,14 @@ class MobileNavigationRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedIndex = tabs.indexWhere((tab) => tab.id == selectedTab);
+    final hasHeaderAction = isOffline || onSearchPressed != null;
     return LayoutBuilder(
       builder: (context, constraints) {
         final height = constraints.maxHeight;
         // The rail's own SafeArea takes the vertical insets out of the space.
         final usableHeight = height - MediaQuery.paddingOf(context).vertical;
         final labelled =
-            showLabels && labelsFit(destinations: tabs.length, hasLeading: isOffline, height: usableHeight);
+            showLabels && labelsFit(destinations: tabs.length, hasLeading: hasHeaderAction, height: usableHeight);
         Widget rail = NavigationRail(
           selectedIndex: selectedIndex >= 0 ? selectedIndex : null,
           onDestinationSelected: (index) => onDestinationSelected(tabs[index].id),
@@ -99,7 +102,18 @@ class MobileNavigationRail extends StatelessWidget {
           groupAlignment: groupAlignment,
           minWidth: minWidth,
           backgroundColor: backgroundColor,
-          leading: isOffline ? _reconnectAction(context) : null,
+          leading: isOffline
+              ? _reconnectAction(context)
+              : (onSearchPressed != null
+                    ? Padding(
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: IconButton(
+                          tooltip: t.common.search,
+                          onPressed: onSearchPressed,
+                          icon: const AppIcon(Symbols.search_rounded, size: 20),
+                        ),
+                      )
+                    : null),
           destinations: [for (final tab in tabs) _destination(context, tab)],
         );
         if (labelled) {

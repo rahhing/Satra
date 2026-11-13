@@ -486,13 +486,14 @@ class _UseExternalPlayerPref extends Pref<bool> {
 }
 
 class _ForceTvModePref extends BoolPref {
-  const _ForceTvModePref() : super('force_tv_mode', defaultValue: true);
+  const _ForceTvModePref()
+    : super('force_tv_mode', defaultValue: true, defaultValueProvider: PlatformDetector.isDesktopOS);
 
   @override
-  bool readFrom(BaseSharedPreferencesService svc) => true;
-
-  @override
-  Future<void> writeTo(BaseSharedPreferencesService svc, bool value) => super.writeTo(svc, true);
+  bool readFrom(BaseSharedPreferencesService svc) {
+    if (PlatformDetector.isHandheldAppleMobile()) return false;
+    return svc.readNullableBool(key) ?? resolvedDefault;
+  }
 }
 
 /// Native Dolby playback: bitstreaming on Android TV and desktop, Apple's
@@ -668,8 +669,11 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
   static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: true);
   static const focusGlow = BoolPref('focus_glow', defaultValue: false);
-  static bool _liquidGlassDefault() => PlatformDetector.isMacOS();
-  static double _liquidGlassOpacityDefault() => PlatformDetector.isMacOS() ? 0.65 : 0.20;
+  static bool _liquidGlassDefault() => PlatformDetector.defaultsToLiquidGlass();
+  static double _liquidGlassOpacityDefault() {
+    if (PlatformDetector.isMacOS() || PlatformDetector.isHandheldAppleMobile()) return 0.65;
+    return 0.20;
+  }
 
   static const liquidGlass = BoolPref('liquid_glass', defaultValueProvider: _liquidGlassDefault);
   static const liquidGlassOpacity = DoublePref(
@@ -898,7 +902,13 @@ class SettingsService extends BaseSharedPreferencesService {
   /// at all. UI-only: catalog sources stay connected so watchlist surfaces
   /// keep working while the tab is hidden.
   static const showExploreTab = BoolPref('show_explore_tab', defaultValue: true);
-  static const pillCornerRadius = DoublePref('pill_corner_radius', defaultValue: 32, transform: _normalizeCornerRadius);
+  static double _pillCornerRadiusDefault() => PlatformDetector.isHandheldAppleMobile() ? 14 : 32;
+  static const pillCornerRadius = DoublePref(
+    'pill_corner_radius',
+    defaultValue: 32,
+    defaultValueProvider: _pillCornerRadiusDefault,
+    transform: _normalizeCornerRadius,
+  );
   static const showUnwatchedCount = BoolPref('show_unwatched_count', defaultValue: true);
 
   /// The corner checkmark on watched posters/thumbnails (#1998). Progress bars
@@ -1035,7 +1045,8 @@ class SettingsService extends BaseSharedPreferencesService {
     defaultValue: PlaybackBufferTier.auto,
   );
   static const libraryDensity = _LibraryDensityPref();
-  static GridSpacing _tvAwareGridSpacingDefault() => GridSpacing.spacious;
+  static GridSpacing _tvAwareGridSpacingDefault() =>
+      PlatformDetector.isHandheldAppleMobile() ? GridSpacing.normal : GridSpacing.spacious;
   static const gridSpacing = EnumPref<GridSpacing>(
     'grid_spacing',
     values: GridSpacing.values,

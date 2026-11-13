@@ -5,7 +5,9 @@ import 'package:material_symbols_icons/symbols.dart';
 
 import '../focus/focusable_wrapper.dart';
 import '../i18n/strings.g.dart';
+import '../utils/platform_detector.dart';
 import 'app_icon.dart';
+import 'glass_surface.dart';
 
 /// Defines the visual style of the back button
 enum BackButtonStyle {
@@ -91,10 +93,14 @@ class _AppBarBackButtonState extends State<AppBarBackButton> {
   Widget build(BuildContext context) {
     final isDarkTheme = Theme.of(context).brightness == Brightness.dark;
     final onTheme = isDarkTheme ? Colors.white : Colors.black;
+    final handheldIOS = PlatformDetector.isHandheldIOS(context);
+    final useIOSGlassOrb =
+        handheldIOS && (widget.style == BackButtonStyle.circular || widget.style == BackButtonStyle.video);
+    final isVideoGlassOrb = handheldIOS && widget.style == BackButtonStyle.video;
 
     final (Color icon, Color base, Color hover) = switch (widget.style) {
       BackButtonStyle.circular => (
-        widget.color ?? Colors.white,
+        widget.color ?? (useIOSGlassOrb ? onTheme : Colors.white),
         Colors.black.withValues(alpha: 0.3),
         Colors.black.withValues(alpha: 0.5),
       ),
@@ -121,15 +127,39 @@ class _AppBarBackButtonState extends State<AppBarBackButton> {
           child: GestureDetector(
             excludeFromSemantics: true,
             onTap: _handlePressed,
-            child: AnimatedContainer(
-              duration: AppMotion.duration(context, AppMotion.fast),
-              curve: AppMotion.curve,
-              margin: const EdgeInsets.all(8),
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(color: _hovered ? hover : base, shape: BoxShape.circle),
-              child: AppIcon(Symbols.arrow_back_rounded, fill: 1, color: icon, size: 20),
-            ),
+            child: useIOSGlassOrb
+                ? Padding(
+                    padding: EdgeInsets.all(isVideoGlassOrb ? 4 : 8),
+                    child: SizedBox(
+                      width: 42,
+                      height: 42,
+                      child: GlassSurface(
+                        interactive: true,
+                        blurNativeVideo: isVideoGlassOrb,
+                        borderRadius: const BorderRadius.all(Radius.circular(999)),
+                        sigma: 26,
+                        opacity: isVideoGlassOrb ? 0.56 : 0.68,
+                        tint: isVideoGlassOrb || isDarkTheme ? const Color(0xFF07080C) : null,
+                        child: Center(
+                          child: AppIcon(
+                            isVideoGlassOrb ? Symbols.close_rounded : Symbols.arrow_back_ios_new_rounded,
+                            fill: 1,
+                            color: icon,
+                            size: isVideoGlassOrb ? 21 : 18,
+                          ),
+                        ),
+                      ),
+                    ),
+                  )
+                : AnimatedContainer(
+                    duration: AppMotion.duration(context, AppMotion.fast),
+                    curve: AppMotion.curve,
+                    margin: const EdgeInsets.all(8),
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(color: _hovered ? hover : base, shape: BoxShape.circle),
+                    child: AppIcon(Symbols.arrow_back_rounded, fill: 1, color: icon, size: 20),
+                  ),
           ),
         ),
       ),

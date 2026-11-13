@@ -26,6 +26,7 @@
 		B1D51A6A2F0011000000000E /* MpvAudioPlayerPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D51A6A2F0011000000000F /* MpvAudioPlayerPlugin.swift */; };
 		B1D51A6A2F00110000000008 /* ExternalDisplayManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D51A6A2F00110000000007 /* ExternalDisplayManager.swift */; };
 		B1D51A6A2F00110000000020 /* SatraFlutterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D51A6A2F00110000000021 /* SatraFlutterViewController.swift */; };
+		B1D51A6A2F00110000000030 /* IOSGlassSurfacePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D51A6A2F00110000000031 /* IOSGlassSurfacePlugin.swift */; };
 		B1D51A6A2F00110000000010 /* VideoDecodeCapabilitiesPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1D51A6A2F00110000000011 /* VideoDecodeCapabilitiesPlugin.swift */; };
 		A9C0FF1C2F00120000000001 /* AppIconPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A9C0FF1C2F00120000000002 /* AppIconPlugin.swift */; };
 		A9C0FF1C2F00120000000003 /* AlternateAppIcons.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = A9C0FF1C2F00120000000004 /* AlternateAppIcons.xcassets */; };
@@ -87,6 +88,7 @@
 		B1D51A6A2F0011000000000F /* MpvAudioPlayerPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = MpvAudioPlayerPlugin.swift; path = ../shared/apple/MpvPlayer/MpvAudioPlayerPlugin.swift; sourceTree = SOURCE_ROOT; };
 		B1D51A6A2F00110000000007 /* ExternalDisplayManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExternalDisplayManager.swift; sourceTree = "<group>"; };
 		B1D51A6A2F00110000000021 /* SatraFlutterViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SatraFlutterViewController.swift; sourceTree = "<group>"; };
+		B1D51A6A2F00110000000031 /* IOSGlassSurfacePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSGlassSurfacePlugin.swift; sourceTree = "<group>"; };
 		B1D51A6A2F00110000000011 /* VideoDecodeCapabilitiesPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoDecodeCapabilitiesPlugin.swift; sourceTree = "<group>"; };
 		A9C0FF1C2F00120000000002 /* AppIconPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppIconPlugin.swift; path = ../shared/apple/AppIcon/AppIconPlugin.swift; sourceTree = SOURCE_ROOT; };
 		A9C0FF1C2F00120000000004 /* AlternateAppIcons.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = AlternateAppIcons.xcassets; sourceTree = "<group>"; };
@@ -210,6 +212,7 @@
 				1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */,
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				B1D51A6A2F00110000000021 /* SatraFlutterViewController.swift */,
+				B1D51A6A2F00110000000031 /* IOSGlassSurfacePlugin.swift */,
 				B1D51A6A2F00110000000011 /* VideoDecodeCapabilitiesPlugin.swift */,
 				A9C0FF1C2F00120000000002 /* AppIconPlugin.swift */,
 				A9C0FF1C2F00120000000004 /* AlternateAppIcons.xcassets */,
@@ -450,6 +453,7 @@
 				92F969587D0E464D999910F5 /* MpvPipController.swift in Sources */,
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
 				B1D51A6A2F00110000000020 /* SatraFlutterViewController.swift in Sources */,
+				B1D51A6A2F00110000000030 /* IOSGlassSurfacePlugin.swift in Sources */,
 				B1D51A6A2F00110000000010 /* VideoDecodeCapabilitiesPlugin.swift in Sources */,
 				A9C0FF1C2F00120000000001 /* AppIconPlugin.swift in Sources */,
 				1FB1E3FC084653353BC7A05F /* DeepLinkDeliveryCoordinator.swift in Sources */,

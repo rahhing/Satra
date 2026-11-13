@@ -108,7 +108,12 @@ class _LibraryGenresTabState extends BaseLibraryTabState<LibraryGenre, LibraryGe
         slivers: [
           SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(_horizontalInset, _focusDecorationPadding, _horizontalInset, 16),
+            padding: EdgeInsets.fromLTRB(
+              _horizontalInset,
+              _focusDecorationPadding,
+              _horizontalInset,
+              16 + MediaQuery.paddingOf(context).bottom,
+            ),
             sliver: SliverLayoutBuilder(
               builder: (context, constraints) {
                 final width = constraints.crossAxisExtent;

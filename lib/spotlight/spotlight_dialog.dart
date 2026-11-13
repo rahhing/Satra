@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
 
+import '../focus/input_mode_tracker.dart';
 import '../i18n/strings.g.dart';
 import '../media/ids.dart';
 import '../media/media_item.dart';
@@ -27,6 +28,7 @@ import '../utils/desktop_window_padding.dart';
 import '../utils/media_image_helper.dart';
 import '../utils/media_navigation_helper.dart';
 import '../utils/media_server_http_client.dart';
+import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/glass_surface.dart';
@@ -43,41 +45,51 @@ Route<void> buildSpotlightRoute({
   SpotlightShellCallbacks callbacks = const SpotlightShellCallbacks(),
   String? initialQuery,
 }) {
+  final isMobileHost = PlatformDetector.isMobile(hostContext);
   return PageRouteBuilder<void>(
     settings: const RouteSettings(name: spotlightRouteName),
     opaque: false,
     barrierDismissible: true,
     barrierLabel: t.common.close,
-    barrierColor: Colors.black.withValues(alpha: 0.38),
+    barrierColor: Colors.black.withValues(alpha: isMobileHost ? 0.68 : 0.38),
     transitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 200)),
     reverseTransitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 150)),
     pageBuilder: (routeContext, animation, secondaryAnimation) {
-      return SafeArea(
-        child: Align(
-          alignment: const Alignment(0, -0.38),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: SideNavigationScope(
-              child: UniversalSpotlightBubble(
-                hostContext: hostContext,
-                hostNavigator: hostNavigator,
-                callbacks: callbacks,
-                initialQuery: initialQuery,
-                onDismiss: () {
-                  if (routeContext.mounted) {
-                    Navigator.of(routeContext).pop();
-                  }
-                },
-                onActivateDismiss: () {
-                  if (!routeContext.mounted) return;
-                  final route = ModalRoute.of(routeContext);
-                  final nav = Navigator.of(routeContext);
-                  if (route != null && route.isActive) {
-                    nav.removeRoute(route);
-                  } else {
-                    nav.pop();
-                  }
-                },
+      final keyboardBottom = MediaQuery.viewInsetsOf(routeContext).bottom;
+      final isCompact = MediaQuery.sizeOf(routeContext).width < 600;
+      return AnimatedPadding(
+        duration: const Duration(milliseconds: 180),
+        curve: Curves.easeOutCubic,
+        padding: EdgeInsets.only(bottom: keyboardBottom),
+        child: SafeArea(
+          child: Align(
+            alignment: (isCompact || keyboardBottom > 0) ? Alignment.topCenter : const Alignment(0, -0.38),
+            child: Padding(
+              padding: isCompact
+                  ? const EdgeInsets.fromLTRB(14, 8, 14, 14)
+                  : const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+              child: SideNavigationScope(
+                child: UniversalSpotlightBubble(
+                  hostContext: hostContext,
+                  hostNavigator: hostNavigator,
+                  callbacks: callbacks,
+                  initialQuery: initialQuery,
+                  onDismiss: () {
+                    if (routeContext.mounted) {
+                      Navigator.of(routeContext).pop();
+                    }
+                  },
+                  onActivateDismiss: () {
+                    if (!routeContext.mounted) return;
+                    final route = ModalRoute.of(routeContext);
+                    final nav = Navigator.of(routeContext);
+                    if (route != null && route.isActive) {
+                      nav.removeRoute(route);
+                    } else {
+                      nav.pop();
+                    }
+                  },
+                ),
               ),
             ),
           ),
@@ -865,8 +877,17 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     final colorScheme = theme.colorScheme;
     final tk = tokens(context);
     final viewportHeight = MediaQuery.sizeOf(context).height;
-    final maxBubbleHeight = math.min(660.0, viewportHeight * 0.76);
-    final hairlineColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.075 : 0.08);
+    final keyboardBottom = MediaQuery.viewInsetsOf(context).bottom;
+    final safeVertical = MediaQuery.paddingOf(context).vertical;
+    final isMobile = PlatformDetector.isMobile(context);
+    final usableHeight = (viewportHeight - keyboardBottom - safeVertical - (isMobile ? 28.0 : 48.0)).clamp(
+      220.0,
+      660.0,
+    );
+    final maxBubbleHeight = keyboardBottom > 0
+        ? usableHeight
+        : math.min(usableHeight, viewportHeight * (isMobile ? 0.68 : 0.76));
+    final hairlineColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.09 : 0.08);
     final textScale = MediaQuery.textScalerOf(context).scale(1.0);
 
     final display = _ensureDisplay();
@@ -877,6 +898,8 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     if (selectable.isNotEmpty && _selectedIndexNotifier.value >= selectable.length) {
       _selectedIndexNotifier.value = selectable.length - 1;
     }
+
+    final bubbleRadius = isMobile ? const BorderRadius.all(Radius.circular(28)) : _bubbleRadius;
 
     return Semantics(
       label: t.spotlight.title,
@@ -895,17 +918,17 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 820, maxHeight: maxBubbleHeight),
             child: GlassSurface(
-              tint: isDark ? const Color(0xFF06070A) : colorScheme.surface,
-              opacity: isDark ? 0.80 : 0.85,
-              sigma: 28,
-              borderRadius: _bubbleRadius,
+              tint: isDark ? const Color(0xFF06070B) : colorScheme.surface,
+              opacity: isMobile ? (isDark ? 0.90 : 0.93) : (isDark ? 0.80 : 0.85),
+              sigma: isMobile ? 34 : 28,
+              borderRadius: bubbleRadius,
               child: Material(
                 type: MaterialType.transparency,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildSearchHeader(context, colorScheme, tk),
+                    _buildSearchHeader(context, colorScheme, tk, isMobile: isMobile, isDark: isDark),
                     if (categories.length > 1) _buildCategoryStrip(context, categories, colorScheme, tk),
                     Container(height: 1, color: hairlineColor),
                     Flexible(
@@ -940,10 +963,10 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                             addAutomaticKeepAlives: false,
                                             addSemanticIndexes: false,
                                             scrollCacheExtent: const ScrollCacheExtent.pixels(320),
-                                            padding: const EdgeInsets.fromLTRB(
-                                              14,
+                                            padding: EdgeInsets.fromLTRB(
+                                              isMobile ? 10 : 14,
                                               _SpotlightLayoutMetrics.listTopPadding,
-                                              14,
+                                              isMobile ? 10 : 14,
                                               _SpotlightLayoutMetrics.listBottomPadding,
                                             ),
                                             itemCount: display.rows.length,
@@ -967,6 +990,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                                     index: selectableIndex,
                                                     sectioned: sectioned,
                                                     isDark: isDark,
+                                                    isMobile: isMobile,
                                                     colorScheme: colorScheme,
                                                     tk: tk,
                                                   ),
@@ -981,8 +1005,10 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                               },
                             ),
                     ),
-                    Container(height: 1, color: hairlineColor),
-                    _buildFooterHints(context, tk, colorScheme, isDark: isDark),
+                    if (!isMobile) ...[
+                      Container(height: 1, color: hairlineColor),
+                      _buildFooterHints(context, tk, colorScheme, isDark: isDark),
+                    ],
                   ],
                 ),
               ),
@@ -993,40 +1019,53 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     );
   }
 
-  Widget _buildSearchHeader(BuildContext context, ColorScheme colorScheme, MonoTokens tk) {
+  Widget _buildSearchHeader(
+    BuildContext context,
+    ColorScheme colorScheme,
+    MonoTokens tk, {
+    required bool isMobile,
+    required bool isDark,
+  }) {
     final hasQuery = _controller.text.isNotEmpty;
+    final inputFontSize = isMobile ? 17.0 : 21.0;
+
     return Padding(
-      padding: const EdgeInsets.fromLTRB(24, 20, 20, 15),
+      padding: isMobile ? const EdgeInsets.fromLTRB(16, 14, 12, 12) : const EdgeInsets.fromLTRB(24, 20, 20, 15),
       child: Row(
         children: [
           SizedBox(
-            width: 26,
-            height: 26,
+            width: isMobile ? 22 : 26,
+            height: isMobile ? 22 : 26,
             child: Center(
               child: _isLoadingRemote
                   ? SizedBox(
-                      width: 20,
-                      height: 20,
+                      width: 18,
+                      height: 18,
                       child: CircularProgressIndicator(strokeWidth: 2.0, color: colorScheme.primary),
                     )
-                  : AppIcon(Symbols.search_rounded, size: 25, color: tk.textMuted.withValues(alpha: 0.85)),
+                  : AppIcon(
+                      Symbols.search_rounded,
+                      size: isMobile ? 21 : 25,
+                      color: tk.textMuted.withValues(alpha: 0.88),
+                    ),
             ),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: isMobile ? 10 : 14),
           Expanded(
             child: TextField(
               key: const ValueKey('spotlight_search_input'),
               controller: _controller,
               focusNode: _inputFocusNode,
               autofocus: true,
+              textInputAction: TextInputAction.search,
               onChanged: _onQueryChanged,
               cursorColor: colorScheme.primary,
               cursorWidth: 2.0,
               cursorRadius: const Radius.circular(1),
               style: TextStyle(
-                fontSize: 21,
+                fontSize: inputFontSize,
                 fontWeight: FontWeight.w500,
-                letterSpacing: -0.3,
+                letterSpacing: -0.25,
                 color: colorScheme.onSurface,
               ),
               decoration: InputDecoration(
@@ -1040,10 +1079,10 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                 focusedBorder: InputBorder.none,
                 hintText: t.spotlight.placeholder,
                 hintStyle: TextStyle(
-                  fontSize: 21,
+                  fontSize: inputFontSize,
                   fontWeight: FontWeight.w400,
-                  letterSpacing: -0.25,
-                  color: tk.textMuted.withValues(alpha: 0.52),
+                  letterSpacing: -0.2,
+                  color: tk.textMuted.withValues(alpha: 0.56),
                 ),
                 contentPadding: const EdgeInsets.symmetric(vertical: 5),
               ),
@@ -1053,18 +1092,40 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
             IconButton(
               visualDensity: VisualDensity.compact,
               style: const ButtonStyle(
-                padding: WidgetStatePropertyAll(EdgeInsets.all(7)),
-                minimumSize: WidgetStatePropertyAll(Size(34, 34)),
+                padding: WidgetStatePropertyAll(EdgeInsets.all(6)),
+                minimumSize: WidgetStatePropertyAll(Size(32, 32)),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               tooltip: t.common.clear,
-              icon: AppIcon(Symbols.close_rounded, size: 20, color: tk.textMuted),
+              icon: AppIcon(Symbols.cancel_rounded, fill: 1, size: 19, color: tk.textMuted),
               onPressed: () {
                 _controller.clear();
                 _onQueryChanged('');
                 _inputFocusNode.requestFocus();
               },
             ),
+          if (isMobile) ...[
+            const SizedBox(width: 4),
+            Semantics(
+              button: true,
+              label: t.common.close,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: widget.onDismiss,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: colorScheme.onSurface.withValues(alpha: isDark ? 0.11 : 0.08),
+                  ),
+                  child: Center(
+                    child: AppIcon(Symbols.close_rounded, size: 18, color: colorScheme.onSurface.withValues(alpha: 0.78)),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ],
       ),
     );
@@ -1076,10 +1137,11 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     ColorScheme colorScheme,
     MonoTokens tk,
   ) {
+    final isMobile = PlatformDetector.isMobile(context);
     final effectiveCategory = categories.contains(_selectedCategory) ? _selectedCategory : SpotlightCategory.all;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.fromLTRB(20, 0, 20, 15),
+      padding: EdgeInsets.fromLTRB(isMobile ? 14 : 20, 0, isMobile ? 14 : 20, isMobile ? 12 : 15),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -1117,10 +1179,10 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 13,
+            fontSize: 12.5,
             fontWeight: FontWeight.w600,
-            letterSpacing: 0.15,
-            color: tk.textMuted.withValues(alpha: 0.62),
+            letterSpacing: 0.2,
+            color: tk.textMuted.withValues(alpha: 0.68),
           ),
         ),
       ),
@@ -1133,10 +1195,13 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     required int index,
     required bool sectioned,
     required bool isDark,
+    required bool isMobile,
     required ColorScheme colorScheme,
     required MonoTokens tk,
   }) {
     final showBadge = !sectioned && entry.badge != null && entry.badge!.isNotEmpty;
+    final isCompactPhone = isMobile && MediaQuery.sizeOf(context).width < 600;
+    final showKeyboardSelection = !isCompactPhone || InputModeTracker.isKeyboardMode(context);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -1145,73 +1210,92 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           _selectedIndexNotifier.value = index;
         }
       },
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () => _activateEntry(entry),
-        child: ValueListenableBuilder<int>(
-          valueListenable: _selectedIndexNotifier,
-          builder: (context, selectedIndex, _) {
-            final isSelected = selectedIndex == index;
-            return Container(
-              margin: const EdgeInsets.symmetric(vertical: 1.5),
-              padding: const EdgeInsets.symmetric(horizontal: 14),
-              decoration: BoxDecoration(
-                color: isSelected ? colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07) : Colors.transparent,
+      child: ValueListenableBuilder<int>(
+        valueListenable: _selectedIndexNotifier,
+        builder: (context, selectedIndex, _) {
+          final isSelected = showKeyboardSelection && selectedIndex == index;
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 1.5),
+            child: Material(
+              type: MaterialType.transparency,
+              child: InkWell(
                 borderRadius: const BorderRadius.all(Radius.circular(14)),
-              ),
-              child: Row(
-                children: [
-                  _buildLeadingVisual(context, entry, isSelected, colorScheme, tk),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
+                highlightColor: colorScheme.onSurface.withValues(alpha: isDark ? 0.11 : 0.08),
+                splashColor: Colors.transparent,
+                onTap: () => _activateEntry(entry),
+                child: Ink(
+                  padding: EdgeInsets.symmetric(horizontal: isCompactPhone ? 12 : 14),
+                  decoration: BoxDecoration(
+                    color: isSelected
+                        ? colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07)
+                        : Colors.transparent,
+                    borderRadius: const BorderRadius.all(Radius.circular(14)),
+                  ),
+                  child: Row(
+                    children: [
+                      _buildLeadingVisual(context, entry, isSelected, colorScheme, tk),
+                      SizedBox(width: isCompactPhone ? 13 : 15),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              entry.title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontSize: isCompactPhone ? 15.5 : 16,
+                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                letterSpacing: -0.15,
+                                color: colorScheme.onSurface,
+                              ),
+                            ),
+                            if (entry.subtitle != null && entry.subtitle!.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(
+                                entry.subtitle!,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: isCompactPhone ? 13.0 : 13.5,
+                                  color: tk.textMuted.withValues(alpha: 0.74),
+                                ),
+                              ),
+                            ],
+                          ],
+                        ),
+                      ),
+                      if (showBadge) ...[
+                        const SizedBox(width: 10),
                         Text(
-                          entry.title,
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                          entry.badge!,
                           style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                            letterSpacing: -0.15,
-                            color: colorScheme.onSurface,
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                            color: tk.textMuted.withValues(alpha: isSelected ? 0.80 : 0.58),
                           ),
                         ),
-                        if (entry.subtitle != null && entry.subtitle!.isNotEmpty) ...[
-                          const SizedBox(height: 2),
-                          Text(
-                            entry.subtitle!,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(fontSize: 13.5, color: tk.textMuted.withValues(alpha: 0.72)),
-                          ),
-                        ],
                       ],
-                    ),
+                      if (isSelected) ...[
+                        const SizedBox(width: 10),
+                        _KeycapBadge(label: '↵', colorScheme: colorScheme, tk: tk, isDark: isDark),
+                      ] else if (isCompactPhone) ...[
+                        const SizedBox(width: 6),
+                        AppIcon(
+                          Symbols.chevron_right_rounded,
+                          size: 18,
+                          color: tk.textMuted.withValues(alpha: 0.42),
+                        ),
+                      ],
+                    ],
                   ),
-                  if (showBadge) ...[
-                    const SizedBox(width: 12),
-                    Text(
-                      entry.badge!,
-                      style: TextStyle(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: tk.textMuted.withValues(alpha: isSelected ? 0.78 : 0.55),
-                      ),
-                    ),
-                  ],
-                  if (isSelected) ...[
-                    const SizedBox(width: 10),
-                    _KeycapBadge(label: '↵', colorScheme: colorScheme, tk: tk, isDark: isDark),
-                  ],
-                ],
+                ),
               ),
-            );
-          },
-        ),
+            ),
+          );
+        },
       ),
     );
   }

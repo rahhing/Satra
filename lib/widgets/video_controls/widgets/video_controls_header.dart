@@ -4,9 +4,11 @@ import 'package:satra/utils/formatters.dart';
 
 import '../../../media/media_item.dart';
 import '../../../i18n/strings.g.dart';
+import '../../../utils/platform_detector.dart';
 import '../../../watch_together/widgets/watch_together_overlay.dart';
 import '../../../watch_together/providers/watch_together_provider.dart';
 import '../../app_bar_back_button.dart';
+import '../../glass_surface.dart';
 import '../../system_clock.dart';
 
 /// Header layout style for video controls
@@ -21,7 +23,8 @@ enum VideoHeaderStyle {
 /// Shared header widget for video controls with back button and title.
 ///
 /// Displays the video title with optional series/episode information.
-/// Supports both single-line (macOS) and multi-line (other platforms) layouts.
+/// On handheld iOS, groups the trailing Satra player controls into a sleek
+/// floating interactive Liquid Glass capsule matching iOS 26's Files player.
 class VideoControlsHeader extends StatelessWidget {
   final MediaItem metadata;
   final VideoHeaderStyle style;
@@ -53,41 +56,80 @@ class VideoControlsHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final itemTitle = metadata.title ?? t.common.unknown;
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
+
+    final watchTogetherBadge = Selector<WatchTogetherProvider, bool>(
+      selector: (_, p) => p.isInSession,
+      builder: (context, inSession, child) {
+        if (!inSession) return const SizedBox.shrink();
+        return Padding(
+          padding: const EdgeInsets.only(right: 8),
+          child: WatchTogetherSessionIndicator(
+            onCancelAutoHide: onCancelAutoHide,
+            onStartAutoHide: onStartAutoHide,
+          ),
+        );
+      },
+    );
+
+    Widget? trailingCluster;
+    if (useIOSLiquidGlass && trailing != null) {
+      trailingCluster = GlassSurface(
+        interactive: true,
+        blurNativeVideo: true,
+        borderRadius: const BorderRadius.all(Radius.circular(999)),
+        sigma: 26,
+        opacity: 0.56,
+        tint: const Color(0xFF07080C),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (showClock)
+                const Padding(
+                  padding: EdgeInsets.only(left: 8, right: 4),
+                  child: SystemClock(
+                    style: TextStyle(color: Colors.white70, fontSize: 13.5, fontWeight: FontWeight.w600),
+                  ),
+                ),
+              trailing!,
+            ],
+          ),
+        ),
+      );
+    }
+
     return Row(
       children: [
         AppBarBackButton(style: BackButtonStyle.video, onPressed: onBack ?? () => Navigator.of(context).pop(true)),
-        const SizedBox(width: 16),
+        SizedBox(width: useIOSLiquidGlass ? 12 : 16),
         Expanded(
           child: style == VideoHeaderStyle.singleLine
-              ? _buildSingleLineTitle(itemTitle)
-              : _buildMultiLineTitle(itemTitle),
+              ? _buildSingleLineTitle(itemTitle, shadowed: useIOSLiquidGlass)
+              : _buildMultiLineTitle(itemTitle, shadowed: useIOSLiquidGlass),
         ),
-        Selector<WatchTogetherProvider, bool>(
-          selector: (_, p) => p.isInSession,
-          builder: (context, inSession, child) {
-            if (!inSession) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: WatchTogetherSessionIndicator(
-                onCancelAutoHide: onCancelAutoHide,
-                onStartAutoHide: onStartAutoHide,
+        watchTogetherBadge,
+        if (trailingCluster != null) ...[
+          const SizedBox(width: 8),
+          trailingCluster,
+        ] else ...[
+          if (showClock)
+            const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: SystemClock(
+                style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: .w500),
               ),
-            );
-          },
-        ),
-        if (showClock)
-          const Padding(
-            padding: EdgeInsets.only(right: 8),
-            child: SystemClock(
-              style: TextStyle(color: Colors.white70, fontSize: 14, fontWeight: .w500),
             ),
-          ),
-        ?trailing,
+          ?trailing,
+        ],
       ],
     );
   }
 
-  Widget _buildSingleLineTitle(String itemTitle) {
+  static const _iosTitleShadows = [Shadow(color: Color(0x99000000), blurRadius: 12, offset: Offset(0, 1))];
+
+  Widget _buildSingleLineTitle(String itemTitle, {bool shadowed = false}) {
     final seriesName = metadata.grandparentTitle ?? itemTitle;
     final hasEpisodeInfo = metadata.parentIndex != null && metadata.index != null;
 
@@ -100,13 +142,18 @@ class VideoControlsHeader extends StatelessWidget {
 
     return Text(
       toBulletedString(parts),
-      style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: .w500),
+      style: TextStyle(
+        color: Colors.white,
+        fontSize: 15,
+        fontWeight: .w500,
+        shadows: shadowed ? _iosTitleShadows : null,
+      ),
       maxLines: 1,
       overflow: .ellipsis,
     );
   }
 
-  Widget _buildMultiLineTitle(String itemTitle) {
+  Widget _buildMultiLineTitle(String itemTitle, {bool shadowed = false}) {
     final List<String> secondLineParts = [];
 
     if (metadata.parentIndex != null && metadata.index != null) {
@@ -124,14 +171,24 @@ class VideoControlsHeader extends StatelessWidget {
       children: [
         Text(
           metadata.grandparentTitle ?? itemTitle,
-          style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: .bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 16,
+            fontWeight: .bold,
+            letterSpacing: -0.2,
+            shadows: shadowed ? _iosTitleShadows : null,
+          ),
           maxLines: 1,
           overflow: .ellipsis,
         ),
         if (secondLineParts.isNotEmpty)
           Text(
             toBulletedString(secondLineParts),
-            style: const TextStyle(color: Colors.white70, fontSize: 14),
+            style: TextStyle(
+              color: Colors.white.withValues(alpha: 0.80),
+              fontSize: 13.5,
+              shadows: shadowed ? _iosTitleShadows : null,
+            ),
             maxLines: 1,
             overflow: .ellipsis,
           ),

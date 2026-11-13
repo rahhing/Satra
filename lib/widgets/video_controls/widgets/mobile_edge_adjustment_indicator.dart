@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:satra/widgets/app_icon.dart';
 
+import '../../../utils/platform_detector.dart';
+import '../../glass_surface.dart';
 import '../helpers/mobile_edge_adjustment_tracker.dart';
 
 class MobileEdgeAdjustmentIndicator extends StatelessWidget {
@@ -36,39 +38,59 @@ class _FilledPillIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
+    const pillRadius = BorderRadius.all(Radius.circular(27));
+
     return TweenAnimationBuilder<double>(
       tween: Tween<double>(begin: 0.0, end: value),
       duration: const Duration(milliseconds: 90),
       curve: Curves.easeOutCubic,
       builder: (context, animatedValue, _) {
+        final interior = Stack(
+          fit: StackFit.expand,
+          children: [
+            ColoredBox(color: Colors.white.withValues(alpha: useIOSLiquidGlass ? 0.10 : 0.14)),
+            Align(
+              alignment: .bottomCenter,
+              child: FractionallySizedBox(
+                heightFactor: animatedValue,
+                widthFactor: 1,
+                alignment: .bottomCenter,
+                child: ColoredBox(color: Colors.white.withValues(alpha: useIOSLiquidGlass ? 0.82 : 0.74)),
+              ),
+            ),
+            _IndicatorContent(icon: icon, value: animatedValue, color: Colors.white),
+            ClipRect(
+              clipper: _BottomFractionClipper(animatedValue),
+              child: _IndicatorContent(icon: icon, value: animatedValue, color: Colors.black.withValues(alpha: 0.86)),
+            ),
+          ],
+        );
+
+        if (useIOSLiquidGlass) {
+          return SizedBox(
+            width: 54,
+            height: 184,
+            child: GlassSurface(
+              blurNativeVideo: true,
+              borderRadius: pillRadius,
+              sigma: 26,
+              opacity: 0.54,
+              tint: const Color(0xFF07080C),
+              child: interior,
+            ),
+          );
+        }
+
         return Container(
           width: 54,
           height: 184,
           decoration: BoxDecoration(
             color: Colors.black.withValues(alpha: 0.60),
-            borderRadius: const BorderRadius.all(Radius.circular(27)),
+            borderRadius: pillRadius,
           ),
           clipBehavior: Clip.antiAlias,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              ColoredBox(color: Colors.white.withValues(alpha: 0.14)),
-              Align(
-                alignment: .bottomCenter,
-                child: FractionallySizedBox(
-                  heightFactor: animatedValue,
-                  widthFactor: 1,
-                  alignment: .bottomCenter,
-                  child: ColoredBox(color: Colors.white.withValues(alpha: 0.74)),
-                ),
-              ),
-              _IndicatorContent(icon: icon, value: animatedValue, color: Colors.white),
-              ClipRect(
-                clipper: _BottomFractionClipper(animatedValue),
-                child: _IndicatorContent(icon: icon, value: animatedValue, color: Colors.black.withValues(alpha: 0.86)),
-              ),
-            ],
-          ),
+          child: interior,
         );
       },
     );

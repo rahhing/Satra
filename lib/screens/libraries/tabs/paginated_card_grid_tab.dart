@@ -117,6 +117,7 @@ abstract class PaginatedCardGridTabState<T extends Object, W extends BaseLibrary
             slivers: [
               SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
               _buildItemsSliver(viewMode, density, fullCardLayout: fullCardLayout),
+              SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom)),
             ],
           ),
         );

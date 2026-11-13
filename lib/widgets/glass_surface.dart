@@ -75,6 +75,7 @@ class GlassSurface extends StatelessWidget {
     this.border = true,
     this.enabled = true,
     this.blurNativeVideo = false,
+    this.interactive = false,
   });
 
   /// Overrides native AppKit glass/blur in widget tests (`TestWidgetsFlutterBinding`
@@ -83,8 +84,19 @@ class GlassSurface extends StatelessWidget {
   @visibleForTesting
   static bool? debugEnableMacOSNativeGlass;
 
+  /// Overrides native UIKit `UIGlassEffect` / `UIVisualEffectView` in widget tests.
+  @visibleForTesting
+  static bool? debugEnableIOSNativeGlass;
+
   static final bool _hostMacOSSupportsLiquidGlass = () {
     if (kIsWeb || !io.Platform.isMacOS) return true;
+    final match = RegExp(r'(\d+)').firstMatch(io.Platform.operatingSystemVersion);
+    final major = match != null ? int.tryParse(match.group(1)!) : null;
+    return major == null || major >= 26;
+  }();
+
+  static final bool _hostIOSSupportsLiquidGlass = () {
+    if (kIsWeb || !io.Platform.isIOS) return true;
     final match = RegExp(r'(\d+)').firstMatch(io.Platform.operatingSystemVersion);
     final major = match != null ? int.tryParse(match.group(1)!) : null;
     return major == null || major >= 26;
@@ -99,12 +111,23 @@ class GlassSurface extends StatelessWidget {
   final bool enabled;
 
   /// Native video is composited below Flutter, outside a BackdropFilter's
-  /// input. macOS uses an AppKit material; Linux blurs the video plane itself.
+  /// input. macOS/iOS use native AppKit/UIKit materials; Linux blurs the video plane itself.
   final bool blurNativeVideo;
+
+  /// Marks floating controls (top-left pills, bottom navigation bars) so iOS 26+
+  /// `UIGlassEffect` uses Apple's adaptive interactive glass preset.
+  final bool interactive;
 
   bool _useMacOSNativeBackdrop() {
     if (kIsWeb || defaultTargetPlatform != TargetPlatform.macOS) return false;
     final override = debugEnableMacOSNativeGlass;
+    if (override != null) return override;
+    return WidgetsBinding.instance is WidgetsFlutterBinding ? true : blurNativeVideo;
+  }
+
+  bool _useIOSNativeBackdrop() {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return false;
+    final override = debugEnableIOSNativeGlass;
     if (override != null) return override;
     return WidgetsBinding.instance is WidgetsFlutterBinding ? true : blurNativeVideo;
   }
@@ -126,7 +149,10 @@ class GlassSurface extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!enabled) return child;
-    if (!_useMacOSNativeBackdrop() || !_hostMacOSSupportsLiquidGlass) {
+    final hasNativeLiquidGlass =
+        (_useMacOSNativeBackdrop() && _hostMacOSSupportsLiquidGlass) ||
+        (_useIOSNativeBackdrop() && _hostIOSSupportsLiquidGlass);
+    if (!hasNativeLiquidGlass) {
       // Warm up SPIR-V shaders once in the background so opening routes or toggling
       // Liquid Glass never stalls a transition frame.
       _LiquidGlassShaders.ensureLoaded();
@@ -364,6 +390,136 @@ class GlassSurface extends StatelessWidget {
       );
     }
 
+    if (effects && _useIOSNativeBackdrop()) {
+      final resolvedRadius = borderRadius.resolve(Directionality.maybeOf(context) ?? TextDirection.ltr);
+      final nativeLiquid = useLiquid && _hostIOSSupportsLiquidGlass;
+      final effectiveSigma = (sigma * blurAmount).clamp(12.0, 48.0);
+
+      final double nativeTintStrength;
+      final double iosOverlayAlpha;
+      if (nativeLiquid) {
+        if (interactive) {
+          // Match Desktop ToolbarScrim's creamy dark frosted glass while keeping
+          // native iOS 26 UIGlassEffect rim refraction vibrant.
+          final pillTintFactor = blurNativeVideo ? 0.38 : (isDark ? 0.54 : 0.38);
+          nativeTintStrength = (effectiveLiquidOpacity * pillTintFactor).clamp(0.14, 0.68);
+          iosOverlayAlpha = blurNativeVideo
+              ? (effectiveLiquidOpacity * (isDark ? 0.26 : 0.16)).clamp(0.10, 0.36)
+              : (effectiveLiquidOpacity * (isDark ? 0.42 : 0.28)).clamp(0.16, 0.48);
+        } else {
+          // Menus, context sheets, dialogs, and Spotlight prioritize effortless
+          // legibility over busy artwork/text — enforce a rich frosted tint floor.
+          final readabilityFloor = blurNativeVideo ? (isDark ? 0.48 : 0.36) : (isDark ? 0.72 : 0.62);
+          final scaled = effectiveLiquidOpacity * (isDark ? 0.88 : 0.78);
+          nativeTintStrength = math.max(readabilityFloor * 0.82, scaled).clamp(0.32, 0.90);
+          iosOverlayAlpha = math.max(
+            readabilityFloor,
+            effectiveLiquidOpacity * (isDark ? 0.84 : 0.74),
+          ).clamp(0.36, 0.88);
+        }
+      } else {
+        nativeTintStrength = 0.0;
+        final baseIOSAlpha = blurNativeVideo
+            ? (isDark ? 0.36 : 0.24)
+            : (interactive
+                  ? (isDark ? (opacity * 0.56).clamp(0.28, 0.48) : (opacity * 0.38).clamp(0.18, 0.34))
+                  : (isDark ? (opacity * 0.84).clamp(0.68, 0.86) : (opacity * 0.78).clamp(0.60, 0.82)));
+        if (backgroundBrightness > 1.001) {
+          final brighten = (backgroundBrightness - 1.0).clamp(0.0, 1.0);
+          iosOverlayAlpha = baseIOSAlpha * (1.0 - 0.85 * brighten);
+        } else {
+          iosOverlayAlpha = baseIOSAlpha;
+        }
+      }
+
+      final gradedIOSContent = nativeLiquid
+          ? content
+          : DecoratedBox(
+              decoration: BoxDecoration(
+                borderRadius: resolvedRadius,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: isDark
+                      ? [
+                          Colors.white.withValues(alpha: 0.03 * visibility),
+                          Colors.black.withValues(alpha: 0.04 * visibility),
+                        ]
+                      : [Colors.white.withValues(alpha: 0.08 * visibility), Colors.transparent],
+                ),
+              ),
+              child: content,
+            );
+
+      Widget iosPane = DecoratedBox(
+        decoration: BoxDecoration(
+          borderRadius: resolvedRadius,
+          color: surface.withValues(alpha: iosOverlayAlpha * visibility),
+          border: border
+              ? Border.all(
+                  width: 0.75,
+                  color: Colors.white.withValues(
+                    alpha: ((isDark ? (nativeLiquid ? 0.12 : 0.16) : 0.62) * visibility).clamp(0.0, 1.0),
+                  ),
+                )
+              : null,
+        ),
+        child: gradedIOSContent,
+      );
+
+      if (!nativeLiquid && backgroundBrightness < 0.999) {
+        final darken = (1.0 - backgroundBrightness).clamp(0.0, 1.0);
+        iosPane = DecoratedBox(
+          decoration: BoxDecoration(
+            borderRadius: resolvedRadius,
+            color: Colors.black.withValues(alpha: 0.62 * darken * visibility),
+          ),
+          child: iosPane,
+        );
+      }
+
+      if (interactive) {
+        return _InteractiveLiquidGlassFrame(
+          liquidGlass: nativeLiquid,
+          isDark: isDark,
+          borderRadius: resolvedRadius,
+          visibility: visibility,
+          tintArgb: surface.toARGB32(),
+          tintStrength: nativeTintStrength,
+          sigma: effectiveSigma,
+          pane: iosPane,
+        );
+      }
+
+      // Keep UiKitView outside ClipRRect so Flutter never wraps it in an
+      // offscreen ChildClippingView mask that isolates CABackdropLayer.
+      return Stack(
+        children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: _IOSNativeGlassBackdrop(
+                liquidGlass: nativeLiquid,
+                interactive: false,
+                isDark: isDark,
+                borderRadius: resolvedRadius,
+                visibility: visibility,
+                tintArgb: surface.toARGB32(),
+                tintStrength: nativeTintStrength,
+                sigma: effectiveSigma,
+              ),
+            ),
+          ),
+          if (useLiquid && !nativeLiquid)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: _LiquidSheenLayer(borderRadius: resolvedRadius, visibility: visibility, isDark: isDark),
+              ),
+            ),
+          ClipRRect(borderRadius: resolvedRadius, child: iosPane),
+        ],
+      );
+    }
+
     final effectiveAlpha = (effects ? baseOpacity : 1.0) * visibility;
     final baseFill = surface.withValues(alpha: effectiveAlpha);
     final gradientScale = useLiquid
@@ -543,6 +699,252 @@ class _MacOSNativeGlassBackdropState extends State<_MacOSNativeGlassBackdrop> {
   Widget build(BuildContext context) {
     return AppKitView(
       viewType: 'com.satra/macos_glass_surface',
+      hitTestBehavior: PlatformViewHitTestBehavior.transparent,
+      creationParams: _creationParams,
+      creationParamsCodec: const StandardMessageCodec(),
+      onPlatformViewCreated: _handlePlatformViewCreated,
+    );
+  }
+}
+
+/// Implements iOS 26's pressurized interactive Liquid Glass physics when holding
+/// or sliding a finger on floating capsules, orbs, and bottom bars:
+/// - Smoothly inflates the glass lens outward (inversely scaled by surface width
+///   so circular orbs expand ~7.5%, header bubbles ~4.8%, and wide bars ~2.4%).
+/// - Tracks the finger's live local position to render a radial specular bloom
+///   and luminous refractive rim while boosting native `UIGlassEffect` luminosity.
+class _InteractiveLiquidGlassFrame extends StatefulWidget {
+  const _InteractiveLiquidGlassFrame({
+    required this.liquidGlass,
+    required this.isDark,
+    required this.borderRadius,
+    required this.visibility,
+    required this.tintArgb,
+    required this.tintStrength,
+    required this.sigma,
+    required this.pane,
+  });
+
+  final bool liquidGlass;
+  final bool isDark;
+  final BorderRadius borderRadius;
+  final double visibility;
+  final int tintArgb;
+  final double tintStrength;
+  final double sigma;
+  final Widget pane;
+
+  @override
+  State<_InteractiveLiquidGlassFrame> createState() => _InteractiveLiquidGlassFrameState();
+}
+
+class _InteractiveLiquidGlassFrameState extends State<_InteractiveLiquidGlassFrame>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _pressController = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 150),
+    reverseDuration: const Duration(milliseconds: 280),
+  );
+  final ValueNotifier<Alignment> _touchAlignment = ValueNotifier<Alignment>(Alignment.center);
+  int? _activePointer;
+  double _surfaceWidth = 140.0;
+
+  @override
+  void dispose() {
+    _pressController.dispose();
+    _touchAlignment.dispose();
+    super.dispose();
+  }
+
+  void _updateTouchOffset(Offset localPosition) {
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null || !box.hasSize) return;
+    final size = box.size;
+    _surfaceWidth = size.width;
+    if (size.width <= 0 || size.height <= 0) return;
+    final nx = ((localPosition.dx / size.width) * 2.0 - 1.0).clamp(-1.0, 1.0);
+    final ny = ((localPosition.dy / size.height) * 2.0 - 1.0).clamp(-1.0, 1.0);
+    _touchAlignment.value = Alignment(nx, ny);
+  }
+
+  void _handlePointerDown(PointerDownEvent event) {
+    _activePointer = event.pointer;
+    _updateTouchOffset(event.localPosition);
+    _pressController.forward();
+  }
+
+  void _handlePointerMove(PointerMoveEvent event) {
+    if (_activePointer != event.pointer) return;
+    _updateTouchOffset(event.localPosition);
+  }
+
+  void _handlePointerEnd(PointerEvent event) {
+    if (_activePointer != event.pointer) return;
+    _activePointer = null;
+    _pressController.reverse();
+  }
+
+  double get _maxScaleBoost {
+    if (_surfaceWidth <= 72) return 0.075;
+    if (_surfaceWidth <= 210) return 0.048;
+    return 0.024;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      behavior: HitTestBehavior.translucent,
+      onPointerDown: _handlePointerDown,
+      onPointerMove: _handlePointerMove,
+      onPointerUp: _handlePointerEnd,
+      onPointerCancel: _handlePointerEnd,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_pressController, _touchAlignment]),
+        child: ClipRRect(borderRadius: widget.borderRadius, child: widget.pane),
+        builder: (context, clippedPane) {
+          final rawT = _pressController.value;
+          final easedT = Curves.easeOutCubic.transform(rawT);
+          final scale = 1.0 + easedT * _maxScaleBoost;
+          final align = _touchAlignment.value;
+          final pivot = Alignment(align.x * 0.35, align.y * 0.35);
+          final quantizedPress = (easedT * 20).round() / 20.0;
+
+          return Transform.scale(
+            scale: scale,
+            alignment: pivot,
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: IgnorePointer(
+                    child: _IOSNativeGlassBackdrop(
+                      liquidGlass: widget.liquidGlass,
+                      interactive: true,
+                      isDark: widget.isDark,
+                      borderRadius: widget.borderRadius,
+                      visibility: widget.visibility,
+                      tintArgb: widget.tintArgb,
+                      tintStrength: widget.tintStrength,
+                      sigma: widget.sigma,
+                      pressProgress: quantizedPress,
+                    ),
+                  ),
+                ),
+                clippedPane!,
+                if (easedT > 0.005)
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: ClipRRect(
+                        borderRadius: widget.borderRadius,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            borderRadius: widget.borderRadius,
+                            gradient: RadialGradient(
+                              center: align,
+                              radius: 1.05,
+                              colors: [
+                                Colors.white.withValues(alpha: (widget.isDark ? 0.20 : 0.34) * easedT * widget.visibility),
+                                Colors.white.withValues(alpha: (widget.isDark ? 0.06 : 0.12) * easedT * widget.visibility),
+                                Colors.transparent,
+                              ],
+                              stops: const [0.0, 0.45, 1.0],
+                            ),
+                            border: Border.all(
+                              width: 1.0,
+                              color: Colors.white.withValues(
+                                alpha: ((widget.isDark ? 0.24 : 0.55) * easedT * widget.visibility).clamp(0.0, 1.0),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _IOSNativeGlassBackdrop extends StatefulWidget {
+  const _IOSNativeGlassBackdrop({
+    required this.liquidGlass,
+    required this.interactive,
+    required this.isDark,
+    required this.borderRadius,
+    required this.visibility,
+    required this.tintArgb,
+    required this.tintStrength,
+    required this.sigma,
+    this.pressProgress = 0.0,
+  });
+
+  final bool liquidGlass;
+  final bool interactive;
+  final bool isDark;
+  final BorderRadius borderRadius;
+  final double visibility;
+  final int tintArgb;
+  final double tintStrength;
+  final double sigma;
+  final double pressProgress;
+
+  @override
+  State<_IOSNativeGlassBackdrop> createState() => _IOSNativeGlassBackdropState();
+}
+
+class _IOSNativeGlassBackdropState extends State<_IOSNativeGlassBackdrop> {
+  static const _channel = MethodChannel('com.satra/ios_glass_surface');
+
+  int? _viewId;
+  late final Map<String, Object> _creationParams = _buildParams();
+  late Map<String, Object> _lastSentParams = _creationParams;
+
+  Map<String, Object> _buildParams() => <String, Object>{
+    'liquidGlass': widget.liquidGlass,
+    'interactive': widget.interactive,
+    'dark': widget.isDark,
+    'tl': widget.borderRadius.topLeft.x,
+    'tr': widget.borderRadius.topRight.x,
+    'bl': widget.borderRadius.bottomLeft.x,
+    'br': widget.borderRadius.bottomRight.x,
+    'visibility': widget.visibility,
+    'tintArgb': widget.tintArgb,
+    'tintStrength': widget.tintStrength,
+    'sigma': widget.sigma,
+    'pressProgress': widget.pressProgress,
+  };
+
+  void _handlePlatformViewCreated(int id) {
+    _viewId = id;
+    final current = _buildParams();
+    if (!_MacOSNativeGlassBackdropState._paramsEqual(current, _lastSentParams)) {
+      _lastSentParams = current;
+      _sendUpdate(id, current);
+    }
+  }
+
+  void _sendUpdate(int id, Map<String, Object> params) {
+    _channel.invokeMethod<void>('update', <String, Object>{'viewId': id, ...params}).ignore();
+  }
+
+  @override
+  void didUpdateWidget(covariant _IOSNativeGlassBackdrop oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    final id = _viewId;
+    if (id == null) return;
+    final next = _buildParams();
+    if (_MacOSNativeGlassBackdropState._paramsEqual(next, _lastSentParams)) return;
+    _lastSentParams = next;
+    _sendUpdate(id, next);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return UiKitView(
+      viewType: 'com.satra/ios_glass_surface',
       hitTestBehavior: PlatformViewHitTestBehavior.transparent,
       creationParams: _creationParams,
       creationParamsCodec: const StandardMessageCodec(),

@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:satra/widgets/app_icon.dart';
 
-/// A circular semi-transparent button used in the mobile video controls.
+import '../../../utils/platform_detector.dart';
+import '../../glass_surface.dart';
+
+/// A circular transport button used in the mobile video controls.
 ///
-/// Renders an [AppIcon] inside an [IconButton] on a black circle with 50%
-/// opacity. Disabled buttons grey out the icon.
+/// On handheld iOS, renders as a native interactive Liquid Glass orb (`blurNativeVideo: true`)
+/// matching iOS 26's Files / QuickLook video player. On other mobile platforms,
+/// renders on a semi-transparent dark circle.
 class CircularControlButton extends StatelessWidget {
   final String semanticLabel;
   final IconData icon;
@@ -22,6 +27,51 @@ class CircularControlButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isEnabled = onPressed != null;
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
+
+    if (useIOSLiquidGlass) {
+      final isPrimary = iconSize >= 64;
+      final orbDiameter = isPrimary ? 78.0 : 54.0;
+      final glyphSize = isPrimary ? 40.0 : 27.0;
+
+      return Semantics(
+        label: semanticLabel,
+        button: true,
+        enabled: isEnabled,
+        onTap: onPressed,
+        excludeSemantics: true,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: isEnabled
+              ? () {
+                  HapticFeedback.lightImpact();
+                  onPressed!();
+                }
+              : null,
+          child: SizedBox(
+            width: orbDiameter,
+            height: orbDiameter,
+            child: GlassSurface(
+              interactive: isEnabled,
+              blurNativeVideo: true,
+              borderRadius: const BorderRadius.all(Radius.circular(999)),
+              sigma: 26,
+              opacity: isEnabled ? 0.54 : 0.34,
+              tint: const Color(0xFF07080C),
+              child: Center(
+                child: AppIcon(
+                  icon,
+                  fill: 1,
+                  color: isEnabled ? Colors.white : Colors.white.withValues(alpha: 0.34),
+                  size: glyphSize,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
+
     return Container(
       decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.5), shape: BoxShape.circle),
       child: Semantics(

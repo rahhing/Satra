@@ -77,7 +77,7 @@ class TvDetectionService {
   static bool? _debugAppleTVOverride;
   static bool? _debugAutomotiveOverride;
   bool _detected = false;
-  bool _forceTv = true;
+  bool _forceTv = PlatformDetector.isDesktopOS();
   bool _isAppleTV = false;
   bool _isAutomotive = false;
   bool _initialized = false;
@@ -86,9 +86,14 @@ class TvDetectionService {
   TvDetectionService._();
 
   /// Get the singleton instance, initializing if needed.
-  /// Pass [forceTv] to combine a user override with the system-feature check.
-  static Future<TvDetectionService> getInstance({bool forceTv = true}) =>
-      _singleton.getInstance(TvDetectionService._, (instance) => instance._detect(forceTv));
+  /// Pass [forceTv] to combine a user override with the system-feature check;
+  /// defaults to [PlatformDetector.isDesktopOS] so desktop keeps its 10-foot
+  /// layout while iOS/Android handhelds use native touch navigation unless on
+  /// real TV hardware.
+  static Future<TvDetectionService> getInstance({bool? forceTv}) => _singleton.getInstance(
+    TvDetectionService._,
+    (instance) => instance._detect(forceTv ?? PlatformDetector.isDesktopOS()),
+  );
 
   static const bool _tvosBuild = bool.fromEnvironment('TVOS_BUILD');
 
@@ -176,11 +181,11 @@ class TvDetectionService {
     _forceTv = value;
   }
 
-  /// Synchronous access after initialization (returns true if not initialized).
+  /// Synchronous access after initialization (falls back to desktop/tvOS before initialization).
   ///
   /// App code goes through the [PlatformDetector] facade ([PlatformDetector.isTV]
   /// and siblings); these raw accessors exist for the facade and tests.
-  static bool isTVSync() => _debugAppleTVOverride ?? _singleton.instance?.isTV ?? true;
+  static bool isTVSync() => _debugAppleTVOverride ?? _singleton.instance?.isTV ?? _tvosBuild;
 
   /// Synchronous TV-hardware check: [isTVSync] without the user's force-TV
   /// override (false before initialization).
@@ -287,6 +292,7 @@ class PlatformDetector {
 
   static bool? _debugIsDesktopOSOverride;
   static bool? _debugIsMacOSOverride;
+  static bool? _debugIsIOSOverride;
 
   /// Test-only: override [isDesktopOS] so device simulations (Android TV /
   /// Apple TV) don't inherit the test host's real platform.
@@ -302,9 +308,31 @@ class PlatformDetector {
     _debugIsMacOSOverride = value;
   }
 
+  /// Test-only: override [isIOS] so platform default assertions can test
+  /// handheld iOS default profiles deterministically.
+  @visibleForTesting
+  static void debugSetIsIOSOverride(bool? value) {
+    _debugIsIOSOverride = value;
+  }
+
   /// True on macOS without requiring a BuildContext.
   static bool isMacOS() {
     return _debugIsMacOSOverride ?? (!kIsWeb && Platform.isMacOS);
+  }
+
+  /// True on iOS/iPadOS without requiring a BuildContext.
+  static bool isIOS() {
+    return _debugIsIOSOverride ?? (!kIsWeb && Platform.isIOS);
+  }
+
+  /// True on handheld iPhone/iPad (excludes tvOS).
+  static bool isHandheldAppleMobile() {
+    return isIOS() && !isAppleTV();
+  }
+
+  /// True on Apple platforms with native Liquid Glass support (macOS & iPhone/iPad).
+  static bool defaultsToLiquidGlass() {
+    return isMacOS() || isHandheldAppleMobile();
   }
 
   /// Whether an executable path belongs to a packaged (MSIX/Store) install.

@@ -920,7 +920,8 @@ class _OverlaySheetHostState extends State<OverlaySheetHost> with SingleTickerPr
                       enabled: _explicitBackgroundColor == null,
                       tint: colorScheme.surface,
                       borderRadius: borderRadius,
-                      opacity: _blurNativeVideo ? 0.24 : 0.86,
+                      sigma: 34,
+                      opacity: _blurNativeVideo ? 0.62 : 0.90,
                       blurNativeVideo: _blurNativeVideo,
                       child: SafeArea(
                         top: isTop,

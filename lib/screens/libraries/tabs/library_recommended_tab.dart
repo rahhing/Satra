@@ -324,7 +324,7 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
         slivers: [
           SliverOverlapInjector(handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context)),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(0, _focusDecorationPadding, 0, 8),
+            padding: EdgeInsets.fromLTRB(0, _focusDecorationPadding, 0, 8 + MediaQuery.paddingOf(context).bottom),
             sliver: SliverList.builder(
               itemCount: items.length,
               findChildIndexCallback: (key) {

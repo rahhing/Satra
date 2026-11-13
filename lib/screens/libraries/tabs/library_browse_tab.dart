@@ -1800,6 +1800,7 @@ class _LibraryBrowseTabState extends BaseLibraryTabState<MediaItem, LibraryBrows
                 delegate: OptionsChipsBarDelegate(builder: (_) => _buildChipsBar()),
               ),
             ..._buildContentSlivers(),
+            SliverToBoxAdapter(child: SizedBox(height: MediaQuery.paddingOf(context).bottom)),
           ],
         ),
       ),

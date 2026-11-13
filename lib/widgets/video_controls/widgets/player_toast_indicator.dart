@@ -3,9 +3,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:satra/widgets/app_icon.dart';
 
+import '../../../utils/platform_detector.dart';
+import '../../glass_surface.dart';
 import 'transport_feedback_indicator.dart';
 
-/// VLC-style dark pill shown at top-center of the video player.
+/// VLC-style dark or Liquid Glass pill shown at top-center of the video player.
 /// Used for rate changes and other transient in-player notifications.
 class PlayerToastIndicator extends StatelessWidget {
   const PlayerToastIndicator({super.key, required this.icon, required this.text});
@@ -15,6 +17,23 @@ class PlayerToastIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context);
+    final row = Row(
+      mainAxisSize: .min,
+      children: [
+        AppIcon(icon, fill: 1, color: Colors.white, size: 16),
+        const SizedBox(width: 5),
+        Flexible(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: .ellipsis,
+            style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: .bold),
+          ),
+        ),
+      ],
+    );
+
     // Own semantics node: without it the pill's text merges into whatever
     // full-screen control sits behind it (the "show playback controls" tap
     // target), corrupting that button's name and hiding the status. liveRegion
@@ -28,28 +47,25 @@ class PlayerToastIndicator extends StatelessWidget {
         alignment: .topCenter,
         child: ConstrainedBox(
           constraints: BoxConstraints(maxWidth: MediaQuery.sizeOf(context).width * 0.8),
-          child: Container(
-            margin: const EdgeInsets.only(top: 20),
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-            decoration: BoxDecoration(
-              color: Colors.black.withValues(alpha: 0.7),
-              borderRadius: const BorderRadius.all(Radius.circular(20)),
-            ),
-            child: Row(
-              mainAxisSize: .min,
-              children: [
-                AppIcon(icon, fill: 1, color: Colors.white, size: 16),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    text,
-                    maxLines: 1,
-                    overflow: .ellipsis,
-                    style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: .bold),
+          child: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: useIOSLiquidGlass
+                ? GlassSurface(
+                    blurNativeVideo: true,
+                    borderRadius: const BorderRadius.all(Radius.circular(999)),
+                    sigma: 24,
+                    opacity: 0.60,
+                    tint: const Color(0xFF07080C),
+                    child: Padding(padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7), child: row),
+                  )
+                : Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.7),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    ),
+                    child: row,
                   ),
-                ),
-              ],
-            ),
           ),
         ),
       ),

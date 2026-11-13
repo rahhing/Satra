@@ -22,6 +22,7 @@ import '../../widgets/settings_builder.dart';
 import '../../utils/app_logger.dart';
 import '../../utils/library_grouping.dart';
 import '../../utils/platform_detector.dart';
+import '../../utils/scroll_to_top.dart';
 import '../../utils/content_utils.dart';
 import '../../navigation/main_screen_scope.dart';
 import '../../widgets/app_menu.dart';
@@ -86,12 +87,14 @@ class _LibrariesScreenState extends State<LibrariesScreen>
         LibraryLoadable,
         TickerProviderStateMixin,
         TabNavigationMixin,
-        TabVisibilityAware {
+        TabVisibilityAware
+    implements ScrollToTopable {
   final _recommendedTabKey = GlobalKey();
   final _browseTabKey = GlobalKey();
   final _collectionsTabKey = GlobalKey();
   final _genresTabKey = GlobalKey();
   final _playlistsTabKey = GlobalKey();
+  final _nestedScrollKey = GlobalKey<NestedScrollViewState>();
 
   String? _selectedLibraryGlobalKey;
   int _libraryLoadGeneration = 0;
@@ -129,6 +132,15 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   final _actionBarKey = GlobalKey<FocusableActionBarState>();
 
   final ScrollController _outerScrollController = ScrollController();
+
+  @override
+  void scrollToTop() {
+    final inner = _nestedScrollKey.currentState?.innerController;
+    if (inner != null && inner.hasClients) {
+      unawaited(smoothScrollToTop(inner));
+    }
+    unawaited(smoothScrollToTop(_outerScrollController));
+  }
 
   /// Reveal the floating header by jumping the outer NestedScrollView back
   /// to offset 0. The outer position is preserved across content changes
@@ -1137,6 +1149,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
           clipBehavior: Clip.none,
           children: [
             NestedScrollView(
+              key: _nestedScrollKey,
               controller: _outerScrollController,
               floatHeaderSlivers: true,
               clipBehavior: useTvRecommendedBackdrop ? Clip.none : Clip.hardEdge,
@@ -1159,22 +1172,20 @@ class _LibrariesScreenState extends State<LibrariesScreen>
                       child: SafeArea(
                         top: false,
                         bottom: false,
-                        child: SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
-                          child: Row(
-                            children: [
-                              for (int i = 0; i < _visibleTabs.length; i++) ...[
-                                if (i > 0) const SizedBox(width: 8),
-                                buildTabChip(
-                                  _getTabLabel(_visibleTabs[i]),
-                                  i,
-                                  onSelectWhenActive: _focusCurrentTab,
-                                  onNavigateDown: _focusCurrentTabFromTabBar,
-                                  onNavigateToActions: () => _actionBarKey.currentState?.requestFocusOnFirst(),
-                                ),
-                              ],
+                        child: TabChipStrip(
+                          motionId: 'mobile_library_tabs_${selectedLibrary.globalKey}',
+                          children: [
+                            for (int i = 0; i < _visibleTabs.length; i++) ...[
+                              if (i > 0) const SizedBox(width: 8),
+                              buildTabChip(
+                                _getTabLabel(_visibleTabs[i]),
+                                i,
+                                onSelectWhenActive: _focusCurrentTab,
+                                onNavigateDown: _focusCurrentTabFromTabBar,
+                                onNavigateToActions: () => _actionBarKey.currentState?.requestFocusOnFirst(),
+                              ),
                             ],
-                          ),
+                          ],
                         ),
                       ),
                     ),

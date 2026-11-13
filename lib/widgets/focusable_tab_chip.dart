@@ -63,7 +63,7 @@ class _TabChipStripState extends State<TabChipStrip> with TickerProviderStateMix
   void didChangeDependencies() {
     super.didChangeDependencies();
     _controller.duration = AppMotion.duration(context);
-    _indicatorController.duration = AppMotion.duration(context);
+    _indicatorController.duration = AppMotion.duration(context, AppMotion.fast);
     final active = TickerMode.valuesOf(context).enabled;
     final shared = widget.motionId != null && context.getInheritedWidgetOfExactType<_TabChipMotionHistory>() != null;
     if (shared) {

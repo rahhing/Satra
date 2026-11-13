@@ -220,6 +220,8 @@ class _AnchoredPanel extends StatelessWidget {
       ),
       child: GlassSurface(
         borderRadius: menuRadius,
+        sigma: 32,
+        opacity: 0.88,
         child: Material(
           type: MaterialType.transparency,
           borderRadius: menuRadius,
@@ -855,6 +857,8 @@ class _AppMenuSurface<T> extends StatelessWidget {
       ),
       child: GlassSurface(
         borderRadius: menuRadius,
+        sigma: 32,
+        opacity: 0.88,
         child: Material(
           type: MaterialType.transparency,
           borderRadius: menuRadius,

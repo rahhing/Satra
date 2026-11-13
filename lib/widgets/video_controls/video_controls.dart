@@ -1309,16 +1309,18 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                                           // on every in-place episode switch / live-TV zap, and
                                           // a runtimeType change here would re-inflate the whole
                                           // controls subtree and drop its state.
+                                          final handheldIOS = PlatformDetector.isHandheldIOS(context);
+                                          final scrimAlpha = handheldIOS ? 0.24 : 0.7;
                                           return RasterizedGradient(
                                             gradient: hasFrame
                                                 ? LinearGradient(
                                                     begin: Alignment.topCenter,
                                                     end: Alignment.bottomCenter,
                                                     colors: [
-                                                      Colors.black.withValues(alpha: 0.7),
+                                                      Colors.black.withValues(alpha: scrimAlpha),
                                                       Colors.transparent,
                                                       Colors.transparent,
-                                                      Colors.black.withValues(alpha: 0.7),
+                                                      Colors.black.withValues(alpha: scrimAlpha),
                                                     ],
                                                     stops: const [0.0, 0.2, 0.8, 1.0],
                                                   )
@@ -1475,7 +1477,7 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                         if (widget.chromeController.contentStripVisible) {
                           return 180.0;
                         }
-                        return isMobile ? 80.0 : 115.0;
+                        return isMobile ? (PlatformDetector.isHandheldIOS(context) ? 104.0 : 80.0) : 115.0;
                       }(),
                       child: AnimatedOpacity(
                         opacity: 1.0,
@@ -1492,7 +1494,9 @@ class _PlexVideoControlsState extends State<PlexVideoControls>
                       right: 16,
                       // Clear the bottom controls (same clearance as the skip button) so the
                       // overlay can shrink to fit instead of being clipped by the screen edge.
-                      bottom: !_showControls ? 16.0 : (isMobile ? 80.0 : 115.0),
+                      bottom: !_showControls
+                          ? 16.0
+                          : (isMobile ? (PlatformDetector.isHandheldIOS(context) ? 104.0 : 80.0) : 115.0),
                       // Align loosens the tight constraints from the fully-anchored Positioned;
                       // without it the card would stretch to fill the whole region.
                       child: Align(

@@ -27,6 +27,7 @@ import '../widgets/auth_error_banner.dart';
 import '../widgets/app_icon.dart';
 import '../utils/iphone_duo.dart';
 import '../utils/platform_detector.dart';
+import '../utils/scroll_to_top.dart';
 import '../utils/snackbar_helper.dart';
 import '../utils/update_dialog.dart';
 import '../utils/video_player_navigation.dart';
@@ -64,7 +65,7 @@ import '../providers/companion_remote_provider.dart';
 import '../services/deep_links/deep_link_launcher.dart';
 import '../services/deep_links/deep_link_service.dart';
 import '../widgets/music/mini_player.dart';
-import '../widgets/navigation_label_fit.dart';
+import '../widgets/mobile_glass_tab_bar.dart';
 import '../widgets/mobile_navigation_rail.dart';
 import '../widgets/vertical_bar_shell.dart';
 import '../widgets/glass_surface.dart';
@@ -1503,12 +1504,7 @@ class _MainScreenState extends State<MainScreen>
         _ => const SettingsScreen(),
       };
       Navigator.of(context)
-          .push(
-            utilityPanelRoute(
-              child: panel,
-              name: tab == NavigationTabId.settings ? kSettingsRouteName : null,
-            ),
-          )
+          .push(utilityPanelRoute(child: panel, name: tab == NavigationTabId.settings ? kSettingsRouteName : null))
           .whenComplete(() => _utilityPanelOpen = false);
       return;
     }
@@ -1688,62 +1684,14 @@ class _MainScreenState extends State<MainScreen>
   static const _contentTabs = [NavigationTabId.discover, NavigationTabId.libraries];
 
   Widget _buildBottomNavigationBar(BuildContext context, {required bool hideLabels}) {
-    final tabs = _getBottomNavigationTabs(context);
-    final selectedIndex = tabs.indexWhere((tab) => tab.id == _currentTab);
-    final navigationBar = NavigationBar(
-      backgroundColor: Colors.transparent,
-      selectedIndex: selectedIndex >= 0 ? selectedIndex : 0,
-      onDestinationSelected: (i) {
-        if (i >= 0 && i < tabs.length) _selectTab(tabs[i].id);
-      },
-      labelBehavior: hideLabels
-          ? NavigationDestinationLabelBehavior.alwaysHide
-          : NavigationDestinationLabelBehavior.alwaysShow,
-      destinations: tabs.map((tab) => tab.toDestination()).toList(),
-    );
-
-    final librariesIndex = tabs.indexWhere((tab) => tab.id == NavigationTabId.libraries);
-    if (tabs.isEmpty) return navigationBar;
-
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (!constraints.hasBoundedWidth) return navigationBar;
-
-        final itemWidth = constraints.maxWidth / tabs.length;
-        final bar = hideLabels
-            ? navigationBar
-            : NavigationLabelScale(
-                labels: [for (final tab in tabs) tab.getLabel()],
-                labelWidth: itemWidth,
-                style: navigationBarLabelStyle(context),
-                child: navigationBar,
-              );
-        if (librariesIndex < 0) return bar;
-
-        final isRtl = Directionality.of(context) == TextDirection.rtl;
-        final left = isRtl ? constraints.maxWidth - (itemWidth * (librariesIndex + 1)) : itemWidth * librariesIndex;
-
-        return Stack(
-          children: [
-            bar,
-            Positioned(
-              left: left,
-              top: 0,
-              bottom: 0,
-              width: itemWidth,
-              child: GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                excludeFromSemantics: true,
-                onLongPress: () {
-                  Feedback.forLongPress(context);
-                  _showLibraryQuickPicker(context);
-                },
-                child: const SizedBox.expand(),
-              ),
-            ),
-          ],
-        );
-      },
+    return MobileGlassTabBar(
+      tabs: _getBottomNavigationTabs(context),
+      selectedTab: _currentTab,
+      hideLabels: hideLabels,
+      onDestinationSelected: _selectTab,
+      onActiveTabReselected: () => _onScreen<ScrollToTopable>(_currentTab, (screen) => screen.scrollToTop()),
+      onLibrariesLongPress: () => _showLibraryQuickPicker(context),
+      onSearchPressed: _isOffline ? null : () => _openSpotlight(),
     );
   }
 
@@ -1831,13 +1779,22 @@ class _MainScreenState extends State<MainScreen>
         if (BackKeyCoordinator.consumeIfHandled()) return;
         _handleMainBack();
       },
-      child: ScaffoldMessenger(
-        key: ProfileNavigationScope.of(context).mainScaffoldMessengerKey,
-        child: switch (IphoneDuo.verticalBarEdgeOf(context)) {
-          final VerticalBarEdge edge => _buildVerticalBarShell(context, edge),
-          null when PlatformDetector.shouldUseLandscapeNavigationRail(context) => _buildLandscapeShell(context),
-          null => _buildPortraitShell(context),
-        },
+      child: MainScreenFocusScope(
+        selectHome: _isOffline ? null : () => _selectTab(NavigationTabId.discover),
+        selectLibrary: _isOffline ? null : _selectLibrary,
+        selectExplore: !_isOffline && _lastHasExplore ? () => _selectTab(NavigationTabId.explore) : null,
+        selectLiveTv: !_isOffline && _hasLiveTv ? () => _selectTab(NavigationTabId.liveTv) : null,
+        openDownloads: _openDownloads,
+        openSettings: _openSettings,
+        openSpotlight: _openSpotlight,
+        child: ScaffoldMessenger(
+          key: ProfileNavigationScope.of(context).mainScaffoldMessengerKey,
+          child: switch (IphoneDuo.verticalBarEdgeOf(context)) {
+            final VerticalBarEdge edge => _buildVerticalBarShell(context, edge),
+            null when PlatformDetector.shouldUseLandscapeNavigationRail(context) => _buildLandscapeShell(context),
+            null => _buildPortraitShell(context),
+          },
+        ),
       ),
     );
   }
@@ -1859,6 +1816,7 @@ class _MainScreenState extends State<MainScreen>
               showLabels: showNavBarLabels,
               onDestinationSelected: _selectTab,
               onLibrariesLongPress: () => _showLibraryQuickPicker(context),
+              onSearchPressed: _isOffline ? null : () => _openSpotlight(),
               isOffline: _isOffline,
               isReconnecting: _isReconnecting,
               onReconnect: _triggerReconnect,
@@ -1894,6 +1852,7 @@ class _MainScreenState extends State<MainScreen>
                     showLabels: showNavBarLabels,
                     onDestinationSelected: _selectTab,
                     onLibrariesLongPress: () => _showLibraryQuickPicker(context),
+                    onSearchPressed: _isOffline ? null : () => _openSpotlight(),
                     isOffline: _isOffline,
                     isReconnecting: _isReconnecting,
                     onReconnect: _triggerReconnect,
@@ -1925,32 +1884,51 @@ class _MainScreenState extends State<MainScreen>
         mainAxisSize: .min,
         children: [
           if (_isOffline)
-            Material(
-              color: Theme.of(context).colorScheme.surfaceContainerHighest,
-              child: InkWell(
-                onTap: _isReconnecting ? null : _triggerReconnect,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                  child: Row(
-                    mainAxisAlignment: .center,
-                    children: [
-                      if (_isReconnecting)
-                        SizedBox(
-                          width: 16,
-                          height: 16,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Theme.of(context).colorScheme.primary,
-                          ),
-                        )
-                      else
-                        AppIcon(Symbols.wifi_rounded, size: 18, color: Theme.of(context).colorScheme.primary),
-                      const SizedBox(width: 8),
-                      Text(
-                        t.common.reconnect,
-                        style: TextStyle(fontSize: 14, fontWeight: .w500, color: Theme.of(context).colorScheme.primary),
+            SafeArea(
+              top: false,
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+                child: GlassSurface(
+                  interactive: true,
+                  borderRadius: const BorderRadius.all(Radius.circular(999)),
+                  sigma: 24,
+                  opacity: 0.58,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      borderRadius: const BorderRadius.all(Radius.circular(999)),
+                      onTap: _isReconnecting ? null : _triggerReconnect,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: .center,
+                          children: [
+                            if (_isReconnecting)
+                              SizedBox(
+                                width: 15,
+                                height: 15,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              )
+                            else
+                              AppIcon(Symbols.wifi_rounded, size: 17, color: Theme.of(context).colorScheme.primary),
+                            const SizedBox(width: 8),
+                            Text(
+                              t.common.reconnect,
+                              style: TextStyle(
+                                fontSize: 13.5,
+                                fontWeight: .w600,
+                                color: Theme.of(context).colorScheme.primary,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
               ),
@@ -1960,16 +1938,15 @@ class _MainScreenState extends State<MainScreen>
             builder: (context, showNavBarLabels, _) {
               final hideLabels = !showNavBarLabels;
               _scheduleNavBarMeasure(rail: false);
-              return NavigationBarTheme(
-                data: NavigationBarTheme.of(context).copyWith(height: hideLabels ? 56 : null),
-                child: SafeArea(
-                  top: false,
-                  minimum: const EdgeInsets.fromLTRB(12, 0, 12, 12),
-                  child: GlassSurface(
-                    borderRadius: const BorderRadius.all(Radius.circular(30)),
-                    child: _buildBottomNavigationBar(context, hideLabels: hideLabels),
-                  ),
+              return SafeArea(
+                top: false,
+                minimum: EdgeInsets.fromLTRB(
+                  PlatformDetector.isHandheldIOS(context) ? 6 : 16,
+                  0,
+                  PlatformDetector.isHandheldIOS(context) ? 6 : 16,
+                  10,
                 ),
+                child: _buildBottomNavigationBar(context, hideLabels: hideLabels),
               );
             },
           ),

@@ -3,20 +3,22 @@ import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../focus/dpad_navigator.dart';
-import '../../focus/focus_theme.dart';
-import '../../focus/key_event_utils.dart';
-import '../../focus/focusable_button.dart';
 import '../../focus/input_mode_tracker.dart';
+import '../../focus/key_event_utils.dart';
 import '../../i18n/strings.g.dart';
 import '../../mixins/controller_disposer_mixin.dart';
 import '../../profiles/plex_home_switch.dart';
-import '../../utils/platform_detector.dart';
 import '../../utils/dialogs.dart';
+import '../../utils/platform_detector.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/clickable_cursor.dart';
 import '../../widgets/glass_surface.dart';
 
 /// Dialog for entering a 4-digit PIN to access a protected profile.
+///
+/// Renders a unified Liquid Glass passcode pad with clickable 0–9 circular keys
+/// across mobile, tablet, desktop, and TV while also supporting hardware
+/// keyboard entry and D-pad navigation.
 class PinEntryDialog extends StatefulWidget {
   final String userName;
   final String? errorMessage;
@@ -31,25 +33,24 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   final _pinInputKey = GlobalKey<_TvPinInputState>();
-  final _cancelFocusNode = FocusNode(debugLabel: 'PinCancelButton');
   bool _completed = false;
 
   @override
   void initState() {
     super.initState();
 
-    _shakeController = AnimationController(duration: const Duration(milliseconds: 600), vsync: this);
+    _shakeController = AnimationController(duration: const Duration(milliseconds: 520), vsync: this);
     _shakeAnimation = TweenSequence<double>([
-      TweenSequenceItem(tween: Tween(begin: 0.0, end: 10.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: -10.0, end: 10.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: 10.0, end: -10.0), weight: 1),
-      TweenSequenceItem(tween: Tween(begin: -10.0, end: 0.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 0.0, end: 11.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 11.0, end: -11.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -11.0, end: 8.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: 8.0, end: -8.0), weight: 1),
+      TweenSequenceItem(tween: Tween(begin: -8.0, end: 0.0), weight: 1),
     ]).animate(CurvedAnimation(parent: _shakeController, curve: Curves.easeInOut));
 
     if (widget.errorMessage != null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        _shakeController.forward(from: 0);
+        if (mounted) _shakeController.forward(from: 0);
       });
     }
   }
@@ -57,7 +58,6 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
   @override
   void dispose() {
     _shakeController.dispose();
-    _cancelFocusNode.dispose();
     super.dispose();
   }
 
@@ -75,113 +75,117 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
     Navigator.of(context).pop<String>();
   }
 
-  void _focusPinInput() {
-    _pinInputKey.currentState?._requestInputFocus();
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
     final isTV = PlatformDetector.isTV();
     final isMobile = PlatformDetector.isMobile(context) && !isTV;
+    final useGlass = !PlatformDetector.isTVDevice();
+    const cardRadius = BorderRadius.all(Radius.circular(32));
 
     return AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) {
         return Transform.translate(offset: Offset(_shakeAnimation.value, 0), child: child);
       },
-      child: isMobile ? _buildMobileDialog(theme) : _buildTvDialog(theme),
-    );
-  }
-
-  Widget _buildMobileDialog(ThemeData theme) {
-    return AlertDialog(
-      title: _buildTitle(theme),
-      content: Column(
-        mainAxisSize: .min,
-        crossAxisAlignment: .start,
-        children: [
-          _TvPinInput(
-            key: _pinInputKey,
-            onSubmit: _submit,
-            onCancel: _cancel,
-            hasError: widget.errorMessage != null,
-            isMobile: true,
-          ),
-          if (widget.errorMessage != null) ...[
-            const SizedBox(height: 12),
-            Text(widget.errorMessage!, style: TextStyle(color: theme.colorScheme.error, fontSize: 12), maxLines: 2),
-          ],
-        ],
-      ),
-      actions: [
-        FocusableButton(
-          focusNode: _cancelFocusNode,
-          useBackgroundFocus: true,
-          onPressed: _cancel,
-          onNavigateUp: _focusPinInput,
-          onBack: _cancel,
-          child: TextButton(onPressed: _cancel, child: Text(t.common.cancel)),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildTvDialog(ThemeData theme) {
-    final colorScheme = theme.colorScheme;
-    final desktop = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
-
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 56, vertical: 32),
-      backgroundColor: Colors.transparent,
-      elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-      child: GlassSurface(
-        enabled: desktop,
-        tint: theme.scaffoldBackgroundColor,
-        opacity: 0.88,
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          constraints: BoxConstraints(maxWidth: desktop ? 288 : 320),
-          padding: EdgeInsets.all(desktop ? 24 : 14),
-          decoration: BoxDecoration(
-            color: desktop ? Colors.transparent : colorScheme.surface.withValues(alpha: 0.96),
-            borderRadius: BorderRadius.circular(22),
-          ),
-          child: Column(
-            mainAxisSize: .min,
-            crossAxisAlignment: .stretch,
-            children: [
-              _buildTitle(theme),
-              SizedBox(height: desktop ? 24 : 12),
-              _TvPinInput(
-                key: _pinInputKey,
-                onSubmit: _submit,
-                onCancel: _cancel,
-                hasError: widget.errorMessage != null,
-                isMobile: false,
+      child: Dialog(
+        insetPadding: EdgeInsets.symmetric(horizontal: isMobile ? 28 : 48, vertical: 24),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        shape: const RoundedRectangleBorder(borderRadius: cardRadius),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: isMobile ? 316 : 308),
+          child: GlassSurface(
+            enabled: useGlass,
+            tint: isDark ? const Color(0xFF07080C) : colorScheme.surface,
+            opacity: isDark ? 0.90 : 0.92,
+            sigma: 34,
+            borderRadius: cardRadius,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: useGlass ? Colors.transparent : colorScheme.surface.withValues(alpha: 0.96),
+                borderRadius: cardRadius,
               ),
-              if (widget.errorMessage != null) ...[
-                const SizedBox(height: 12),
-                Text(widget.errorMessage!, style: TextStyle(color: colorScheme.error, fontSize: 12), maxLines: 2),
-              ],
-            ],
+              child: SingleChildScrollView(
+                padding: EdgeInsets.fromLTRB(24, isMobile ? 20 : 22, 24, isMobile ? 16 : 22),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    _buildHeader(theme, isDark),
+                    const SizedBox(height: 16),
+                    _TvPinInput(
+                      key: _pinInputKey,
+                      onSubmit: _submit,
+                      onCancel: _cancel,
+                      hasError: widget.errorMessage != null,
+                      isMobile: isMobile,
+                    ),
+                    if (widget.errorMessage != null) ...[
+                      const SizedBox(height: 12),
+                      Text(
+                        widget.errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: colorScheme.error,
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w500,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                    if (isMobile) ...[
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: _cancel,
+                        style: TextButton.styleFrom(
+                          visualDensity: VisualDensity.compact,
+                          foregroundColor: colorScheme.onSurface.withValues(alpha: 0.68),
+                        ),
+                        child: Text(t.common.cancel),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildTitle(ThemeData theme) {
-    return Row(
+  Widget _buildHeader(ThemeData theme, bool isDark) {
+    final colorScheme = theme.colorScheme;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        AppIcon(Symbols.lock_outline_rounded, fill: 1, size: 24, color: theme.colorScheme.primary),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            widget.userName,
-            overflow: .ellipsis,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07),
+            border: Border.all(
+              width: 0.75,
+              color: colorScheme.onSurface.withValues(alpha: isDark ? 0.14 : 0.10),
+            ),
+          ),
+          child: Center(
+            child: AppIcon(Symbols.lock_rounded, fill: 1, size: 21, color: colorScheme.primary),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Text(
+          widget.userName,
+          textAlign: TextAlign.center,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: theme.textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: -0.25,
           ),
         ),
       ],
@@ -208,9 +212,6 @@ class _TvPinInput extends StatefulWidget {
 }
 
 class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
-  static const _keySize = 60.0;
-  static const _keyGap = 6.0;
-  static const _rowGap = 6.0;
   static const _keypadColumns = 3;
   static const _rows = <List<_PinKey>>[
     [_PinKey.digit(1), _PinKey.digit(2), _PinKey.digit(3)],
@@ -224,8 +225,9 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
   int _row = 0;
   int _column = 0;
 
-  // Keep a single mobile text input client so iOS does not hide/show the
-  // software keyboard while advancing between visual PIN boxes.
+  // Keep a single hidden text input client on mobile so hardware keyboards and
+  // automated text input work seamlessly without raising the system soft
+  // keyboard over the on-screen circular PIN pad.
   final FocusNode _mobileFocusNode = FocusNode(debugLabel: 'PinInputMobile');
   late final TextEditingController _mobileController = createTextEditingController();
   final FocusNode _keypadFocusNode = FocusNode(debugLabel: 'PinKeypad');
@@ -305,17 +307,20 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
     return _digits.map((d) => d.toString()).join();
   }
 
+  void _syncMobileControllerFromDigits() {
+    if (!widget.isMobile) return;
+    final text = _digits.whereType<int>().map((d) => d.toString()).join();
+    if (_mobileController.text != text) {
+      _mobileController.value = TextEditingValue(
+        text: text,
+        selection: TextSelection.collapsed(offset: text.length),
+      );
+    }
+  }
+
   void _trySubmit() {
     final pin = _getPin();
     if (pin != null) widget.onSubmit(pin);
-  }
-
-  void _requestInputFocus() {
-    if (widget.isMobile) {
-      _requestMobileKeyboardFocus();
-    } else {
-      _requestKeypadFocus();
-    }
   }
 
   void _requestKeypadFocus() {
@@ -344,11 +349,13 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
     final length = _pinLength;
     if (length >= _digits.length) return;
 
+    HapticFeedback.lightImpact();
     setState(() {
       _digits[length] = digit;
       final nextLength = length + 1;
       _activeIndex = nextLength >= _digits.length ? _digits.length - 1 : nextLength;
     });
+    _syncMobileControllerFromDigits();
 
     if (length + 1 == _digits.length) _submitWhenCompleteAfterFrame();
   }
@@ -357,10 +364,12 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
     final length = _pinLength;
     if (length == 0) return;
 
+    HapticFeedback.selectionClick();
     setState(() {
       _digits[length - 1] = null;
       _activeIndex = length - 1;
     });
+    _syncMobileControllerFromDigits();
   }
 
   void _submitWhenCompleteAfterFrame() {
@@ -371,7 +380,6 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
     });
   }
 
-  // Map digit keys (both main keyboard and numpad)
   static final _digitKeyMap = <LogicalKeyboardKey, int>{
     LogicalKeyboardKey.digit0: 0,
     LogicalKeyboardKey.digit1: 1,
@@ -444,6 +452,29 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
     return KeyEventResult.ignored;
   }
 
+  KeyEventResult _handleMobileHardwareKey(FocusNode _, KeyEvent event) {
+    final backResult = handleBackKeyAction(event, widget.onCancel);
+    if (backResult != KeyEventResult.ignored) return backResult;
+
+    if (event is KeyDownEvent) {
+      final key = event.logicalKey;
+      if (key == LogicalKeyboardKey.backspace || key == LogicalKeyboardKey.delete) {
+        _deleteLastDigit();
+        return KeyEventResult.handled;
+      }
+      final digit = _digitKeyMap[key];
+      if (digit != null) {
+        _appendDigit(digit);
+        return KeyEventResult.handled;
+      }
+      if (event.isPhysicalKeyboardEnter) {
+        _trySubmit();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
+  }
+
   void _onMobilePinChanged(String value) {
     final digitsOnly = value.replaceAll(RegExp(r'\D'), '');
     final pin = switch (digitsOnly.length) {
@@ -469,6 +500,7 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
         _deleteLastDigit();
         return;
       case _PinKeyType.close:
+        HapticFeedback.selectionClick();
         widget.onCancel();
         return;
     }
@@ -489,7 +521,39 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
   @override
   Widget build(BuildContext context) {
     if (widget.isMobile) {
-      return _buildMobileLayout(context);
+      return Focus(
+        onKeyEvent: _handleMobileHardwareKey,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            SizedBox(
+              width: 1,
+              height: 1,
+              child: IgnorePointer(
+                child: TextField(
+                  controller: _mobileController,
+                  focusNode: _mobileFocusNode,
+                  keyboardType: TextInputType.none,
+                  textInputAction: TextInputAction.done,
+                  maxLength: 4,
+                  obscureText: true,
+                  autocorrect: false,
+                  enableSuggestions: false,
+                  enableInteractiveSelection: false,
+                  showCursor: false,
+                  cursorColor: Colors.transparent,
+                  style: const TextStyle(color: Colors.transparent, fontSize: 1, height: 1),
+                  decoration: const InputDecoration(counterText: '', border: InputBorder.none, contentPadding: .zero),
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)],
+                  onChanged: _onMobilePinChanged,
+                  onSubmitted: (_) => _trySubmit(),
+                ),
+              ),
+            ),
+            _buildKeypadLayout(context),
+          ],
+        ),
+      );
     }
 
     return Focus(
@@ -502,23 +566,30 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
 
   Widget _buildKeypadLayout(BuildContext context) {
     return Column(
-      mainAxisSize: .min,
-      children: [_buildDigitRow(context), const SizedBox(height: 18), _buildKeypad(context)],
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        _buildDigitRow(context),
+        const SizedBox(height: 24),
+        _buildKeypad(context),
+      ],
     );
   }
 
   Widget _buildKeypad(BuildContext context) {
+    final keyGap = widget.isMobile ? 16.0 : 12.0;
+    final rowGap = widget.isMobile ? 12.0 : 10.0;
+
     return Column(
-      mainAxisSize: .min,
+      mainAxisSize: MainAxisSize.min,
       children: [
         for (int row = 0; row < _rows.length; row++) ...[
-          if (row > 0) const SizedBox(height: _rowGap),
+          if (row > 0) SizedBox(height: rowGap),
           Row(
-            mainAxisAlignment: .center,
-            mainAxisSize: .min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               for (int col = 0; col < _keypadColumns; col++) ...[
-                if (col > 0) const SizedBox(width: _keyGap),
+                if (col > 0) SizedBox(width: keyGap),
                 _buildKey(context, _rows[row][col], row, col),
               ],
             ],
@@ -529,169 +600,191 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
   }
 
   Widget _buildKey(BuildContext context, _PinKey key, int row, int column) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final desktop = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
     final selected =
+        !widget.isMobile &&
         row == _row &&
         column == _column &&
         (PlatformDetector.isTVDevice() || (InputModeTracker.isKeyboardMode(context) && _keypadFocusNode.hasFocus));
-    final background = selected
-        ? colorScheme.primary
-        : (desktop
-              ? colorScheme.onSurface.withValues(alpha: 0.09)
-              : colorScheme.surfaceContainerHighest.withValues(alpha: 0.88));
-    final foreground = selected ? colorScheme.onPrimary : colorScheme.onSurface;
 
-    return ClickableCursor(
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _row = row;
-            _column = column;
-          });
-          _activate(key);
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
-          width: desktop ? 54 : _keySize,
-          height: desktop ? 54 : _keySize,
-          alignment: .center,
-          decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(desktop ? 27 : 14)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 4),
-            child: _buildKeyContent(context, key, foreground),
-          ),
-        ),
-      ),
+    final shortViewport = MediaQuery.sizeOf(context).height < 680;
+    final double keyDiameter = shortViewport
+        ? 50.0
+        : (widget.isMobile ? 64.0 : (PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice() ? 58.0 : 62.0));
+
+    return _PinPadCircleButton(
+      pinKey: key,
+      diameter: keyDiameter,
+      selected: selected,
+      onTap: () {
+        setState(() {
+          _row = row;
+          _column = column;
+        });
+        if (widget.isMobile) _requestMobileKeyboardFocus();
+        _activate(key);
+      },
     );
   }
 
-  Widget _buildKeyContent(BuildContext context, _PinKey key, Color foreground) {
-    final icon = key.icon;
-    if (icon != null) {
-      return AppIcon(
-        icon,
-        color: foreground,
-        size: PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice() ? 22 : 30,
-      );
-    }
-
-    return FittedBox(
-      fit: BoxFit.scaleDown,
-      child: Text(
-        key.label,
-        maxLines: 1,
-        style: Theme.of(context).textTheme.titleLarge?.copyWith(color: foreground, fontWeight: .w600),
-      ),
-    );
-  }
-
-  Widget _buildDigitRow(BuildContext _) {
+  Widget _buildDigitRow(BuildContext context) {
     return Row(
-      mainAxisSize: .min,
-      mainAxisAlignment: .center,
+      mainAxisSize: MainAxisSize.min,
+      mainAxisAlignment: MainAxisAlignment.center,
       children: [
         for (int i = 0; i < 4; i++) ...[
-          if (i > 0) const SizedBox(width: 12),
-          _DigitBox(
-            digit: _digits[i],
-            isActive: (widget.isMobile ? _mobileFocusNode.hasFocus : true) && _activeIndex == i,
+          if (i > 0) const SizedBox(width: 16),
+          _PasscodeDot(
+            filled: _digits[i] != null,
+            isActive: _activeIndex == i && _digits[i] == null,
           ),
         ],
       ],
     );
   }
+}
 
-  Widget _buildMobileLayout(BuildContext context) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: _requestMobileKeyboardFocus,
-      child: Stack(
-        alignment: .center,
-        children: [
-          SizedBox(
-            width: 222,
-            height: 56,
-            child: IgnorePointer(
-              child: TextField(
-                controller: _mobileController,
-                focusNode: _mobileFocusNode,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-                textAlign: TextAlign.center,
-                maxLength: 4,
-                obscureText: true,
-                autocorrect: false,
-                enableSuggestions: false,
-                enableInteractiveSelection: false,
-                showCursor: false,
-                cursorColor: Colors.transparent,
-                style: const TextStyle(color: Colors.transparent, fontSize: 1, height: 1),
-                decoration: const InputDecoration(counterText: '', border: InputBorder.none, contentPadding: .zero),
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(4)],
-                onChanged: _onMobilePinChanged,
-                onSubmitted: (_) => _trySubmit(),
+class _PinPadCircleButton extends StatefulWidget {
+  const _PinPadCircleButton({
+    required this.pinKey,
+    required this.diameter,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final _PinKey pinKey;
+  final double diameter;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  State<_PinPadCircleButton> createState() => _PinPadCircleButtonState();
+}
+
+class _PinPadCircleButtonState extends State<_PinPadCircleButton> {
+  bool _hovered = false;
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+    final isUtilityKey = widget.pinKey.type != _PinKeyType.digit;
+
+    final Color background;
+    final Color borderColor;
+    final Color foreground;
+    if (widget.selected) {
+      background = colorScheme.primary;
+      borderColor = colorScheme.primary;
+      foreground = colorScheme.onPrimary;
+    } else if (_pressed) {
+      background = colorScheme.onSurface.withValues(alpha: isDark ? 0.24 : 0.18);
+      borderColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.30 : 0.22);
+      foreground = colorScheme.onSurface;
+    } else if (_hovered) {
+      background = colorScheme.onSurface.withValues(alpha: isDark ? 0.15 : 0.11);
+      borderColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.20 : 0.14);
+      foreground = colorScheme.onSurface;
+    } else if (isUtilityKey) {
+      background = colorScheme.onSurface.withValues(alpha: isDark ? 0.04 : 0.03);
+      borderColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.08 : 0.06);
+      foreground = colorScheme.onSurface.withValues(alpha: 0.78);
+    } else {
+      background = colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07);
+      borderColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.14 : 0.10);
+      foreground = colorScheme.onSurface;
+    }
+
+    final icon = widget.pinKey.icon;
+
+    return ClickableCursor(
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _hovered = true),
+        onExit: (_) => setState(() => _hovered = false),
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (_) => setState(() => _pressed = true),
+          onTapUp: (_) => setState(() => _pressed = false),
+          onTapCancel: () => setState(() => _pressed = false),
+          onTap: widget.onTap,
+          child: AnimatedScale(
+            scale: _pressed ? 0.93 : 1.0,
+            duration: const Duration(milliseconds: 110),
+            curve: Curves.easeOutCubic,
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 120),
+              width: widget.diameter,
+              height: widget.diameter,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: background,
+                border: Border.all(width: 0.85, color: borderColor),
               ),
+              child: icon != null
+                  ? AppIcon(icon, color: foreground, size: 23)
+                  : Text(
+                      widget.pinKey.label,
+                      maxLines: 1,
+                      style: TextStyle(
+                        color: foreground,
+                        fontSize: 25,
+                        fontWeight: FontWeight.w500,
+                        height: 1.0,
+                        letterSpacing: -0.3,
+                        fontFeatures: const [FontFeature.tabularFigures()],
+                      ),
+                    ),
             ),
           ),
-          _buildDigitRow(context),
-        ],
+        ),
       ),
     );
   }
 }
 
-class _DigitBox extends StatelessWidget {
-  final int? digit;
+class _PasscodeDot extends StatelessWidget {
+  final bool filled;
   final bool isActive;
 
-  const _DigitBox({required this.digit, required this.isActive});
+  const _PasscodeDot({required this.filled, required this.isActive});
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    if (PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice()) {
-      return AnimatedContainer(
+    final colorScheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    return AnimatedScale(
+      scale: filled ? 1.12 : 1.0,
+      duration: const Duration(milliseconds: 150),
+      curve: Curves.easeOutBack,
+      child: AnimatedContainer(
         duration: const Duration(milliseconds: 150),
-        width: 12,
-        height: 12,
+        width: 14,
+        height: 14,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: theme.colorScheme.onSurface.withValues(alpha: digit != null ? 1 : 0.22),
-        ),
-      );
-    }
-    final focusColor = FocusTheme.getFocusBorderColor(context);
-
-    return Column(
-      mainAxisSize: .min,
-      children: [
-        AnimatedContainer(
-          duration: const Duration(milliseconds: 150),
-          width: 48,
-          height: 56,
-          alignment: .center,
-          decoration: BoxDecoration(
-            borderRadius: const BorderRadius.all(Radius.circular(FocusTheme.defaultBorderRadius)),
-            border: Border.fromBorderSide(
-              BorderSide(
-                color: isActive ? focusColor : theme.colorScheme.outlineVariant,
-                width: isActive ? FocusTheme.focusBorderWidth : 1.5,
-              ),
-            ),
-            color: isActive ? focusColor.withValues(alpha: 0.08) : Colors.transparent,
+          color: filled ? colorScheme.onSurface : Colors.transparent,
+          border: Border.all(
+            width: filled ? 0 : (isActive ? 1.8 : 1.5),
+            color: filled
+                ? colorScheme.onSurface
+                : (isActive
+                      ? colorScheme.primary.withValues(alpha: 0.85)
+                      : colorScheme.onSurface.withValues(alpha: isDark ? 0.28 : 0.24)),
           ),
-          child: Text(
-            digit != null ? '•' : '–',
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: .bold,
-              color: digit != null
-                  ? theme.colorScheme.onSurface
-                  : theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-            ),
-          ),
+          boxShadow: filled
+              ? [
+                  BoxShadow(
+                    color: colorScheme.onSurface.withValues(alpha: isDark ? 0.28 : 0.14),
+                    blurRadius: 8,
+                  ),
+                ]
+              : null,
         ),
-      ],
+      ),
     );
   }
 }
@@ -706,8 +799,6 @@ class _PinKey {
   const _PinKey.backspace() : type = _PinKeyType.backspace, digit = null;
   const _PinKey.close() : type = _PinKeyType.close, digit = null;
 
-  /// Only evaluated for digit keys — icon keys short-circuit on [icon] in
-  /// [_TvPinInputState._buildKeyContent].
   String get label => digit.toString();
 
   IconData? get icon {
@@ -724,8 +815,6 @@ class _PinKey {
 
 /// Shows the PIN entry dialog and returns the entered PIN, or null if cancelled
 Future<String?> showPinEntryDialog(BuildContext context, String userName, {String? errorMessage}) {
-  // PIN entry guards root-owned profile activation and must survive disposal of
-  // the active profile session while the binder switches users.
   return showAnimatedRootDialog<String>(
     context: context,
     barrierDismissible: false,

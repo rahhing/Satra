@@ -1,3 +1,4 @@
+import 'dart:ui' show ImageFilter;
 import 'dart:async';
 import '../theme/app_motion.dart';
 import '../widgets/hero_page_indicators.dart';
@@ -26,6 +27,7 @@ import '../widgets/cycling_media_backdrop.dart';
 import '../widgets/hero_carousel_backdrop.dart';
 import '../widgets/optimized_media_image.dart' show ClearLogoImage, blurArtwork;
 import '../widgets/toolbar_scrim.dart';
+import '../widgets/glass_surface.dart';
 import '../widgets/browse_toolbar_actions.dart';
 import '../widgets/focusable_tab_chip.dart';
 import '../media/media_library.dart';
@@ -58,6 +60,7 @@ import '../utils/snackbar_helper.dart';
 import '../utils/video_player_navigation.dart';
 import '../utils/layout_constants.dart';
 import '../utils/platform_detector.dart';
+import '../utils/scroll_to_top.dart';
 import '../utils/tone_mapped_logo_image.dart';
 import '../theme/mono_tokens.dart';
 import 'libraries/content_state_builder.dart';
@@ -74,7 +77,8 @@ class DiscoverScreen extends StatefulWidget {
 }
 
 class _DiscoverScreenState extends State<DiscoverScreen>
-    with Refreshable, ManualRefreshable, FullRefreshable, TabVisibilityAware, FocusableTab, WidgetsBindingObserver {
+    with Refreshable, ManualRefreshable, FullRefreshable, TabVisibilityAware, FocusableTab, WidgetsBindingObserver
+    implements ScrollToTopable {
   static const Duration _heroAutoScrollDuration = Duration(seconds: 8);
 
   /// Data + refresh policy live in [DiscoverProvider]; this state keeps only
@@ -573,7 +577,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   void _startAutoScroll() {
     _autoScrollTimer?.cancel();
     if (PlatformDetector.isTV()) return;
-    if (_isAutoScrollPaused || !_isTabVisible || WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations) return;
+    if (_isAutoScrollPaused ||
+        !_isTabVisible ||
+        WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations)
+      return;
 
     _autoScrollTimer = Timer.periodic(_heroAutoScrollDuration, (timer) {
       if (_onDeck.isEmpty || !_heroController.hasClients || _isAutoScrollPaused) {
@@ -703,6 +710,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final foregroundColor = colorScheme.onSurface;
     final showSections = PlatformDetector.shouldUseSideNavigation(context);
+    if (!showSections && PlatformDetector.isMobile(context)) {
+      return _buildMobileOverlaidAppBar(context, foregroundColor: foregroundColor);
+    }
     final libraries = _visibleHomeLibraries(context);
     return ToolbarScrim.navigation(
       navigation: SettingValueBuilder<String?>(
@@ -711,10 +721,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           final mainServerLibraries = _currentMainServerLibraries(context, listen: true);
           final mainScope = MainScreenFocusScope.of(context, listen: false);
           final showTopNav =
-              PlatformDetector.isTV() ||
-              mainServerLibraries.isNotEmpty ||
-              mainScope?.selectLibrary != null ||
-              mainScope?.selectHome != null;
+              showSections &&
+              (PlatformDetector.isTV() ||
+                  mainServerLibraries.isNotEmpty ||
+                  mainScope?.selectLibrary != null ||
+                  mainScope?.selectHome != null);
           if (!showTopNav) {
             return Align(
               alignment: AlignmentDirectional.centerStart,
@@ -840,6 +851,76 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   @override
+  void scrollToTop() {
+    unawaited(smoothScrollToTop(_scrollController));
+  }
+
+  Widget _buildMobileOverlaidAppBar(BuildContext context, {required Color foregroundColor}) {
+    final safePadding = MediaQuery.paddingOf(context);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final glassTint = isDark ? const Color(0xFF07080C) : null;
+    return Padding(
+      padding: EdgeInsets.only(
+        top: safePadding.top + 6,
+        left: safePadding.left + 16,
+        right: safePadding.right + 16,
+        bottom: 8,
+      ),
+      child: Row(
+        children: [
+          Semantics(
+            button: true,
+            label: t.discover.title,
+            child: GestureDetector(
+              key: const ValueKey('discover_scroll_to_top_pill'),
+              behavior: HitTestBehavior.opaque,
+              onTap: scrollToTop,
+              child: GlassSurface(
+                interactive: true,
+                borderRadius: const BorderRadius.all(Radius.circular(999)),
+                sigma: 26,
+                opacity: 0.68,
+                tint: glassTint,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
+                  child: Text(
+                    t.discover.title,
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      color: foregroundColor,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          const Spacer(),
+          GlassSurface(
+            interactive: true,
+            borderRadius: const BorderRadius.all(Radius.circular(999)),
+            sigma: 26,
+            opacity: 0.68,
+            tint: glassTint,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              child: BrowseToolbarActions(
+                actionBarKey: _actionBarKey,
+                onRefresh: manualRefresh,
+                onNavigateLeft: () {},
+                onNavigateDown: _focusContentFromAppBar,
+                onProfileSwitchingChanged: (busy) {
+                  if (mounted) setState(() => _switchingProfile = busy);
+                },
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return SettingsBuilder(
       prefs: const [
@@ -900,111 +981,152 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
     final theme = Theme.of(context);
     final continueWatchingHub = _onDeck.isEmpty ? null : _continueWatchingHub;
+    final scrollView = CustomScrollView(
+      controller: _scrollController,
+      slivers: [
+        // Hero Section (Continue Watching) - at top of screen
+        Builder(
+          builder: (context) {
+            if (_onDeck.isNotEmpty && showHeroSection) {
+              return _buildHeroSection();
+            }
+            // Add top padding when hero is not shown
+            return SliverToBoxAdapter(child: SizedBox(height: kToolbarHeight + MediaQuery.paddingOf(context).top + 16));
+          },
+        ),
+        if (_isLoading) LoadingIndicatorBox.sliver,
+        if (_errorMessage != null) SliverErrorState(message: _errorMessage!, onRetry: _discover.load),
+        if (!_isLoading && _errorMessage == null) ...[
+          if (continueWatchingHub != null)
+            SliverToBoxAdapter(
+              child: HubSection(
+                key: _continueWatchingHubKey,
+                hub: continueWatchingHub,
+                focusMemory: _hubFocusMemory,
+                icon: hubIconFor(continueWatchingHub),
+                onRefresh: _discover.updateItem,
+                onRemoveFromContinueWatching: _discover.refreshContinueWatching,
+                isInContinueWatching: true,
+                loadMoreItems: _discover.loadAllContinueWatching,
+                onVerticalNavigation: (isUp) => _handleVerticalNavigation(0, isUp),
+                onNavigateUp: _focusTopBoundary,
+              ),
+            ),
+
+          // Recommendation Hubs (Trending, Top in Genre, etc.)
+          for (int i = 0; i < _hubs.length; i++)
+            SliverToBoxAdapter(
+              child: HubSection(
+                key: i < _orderedHubKeys.length ? _orderedHubKeys[i] : null,
+                hub: _hubs[i],
+                focusMemory: _hubFocusMemory,
+                icon: hubIconFor(_hubs[i]),
+                showServerName: showServerNameOnHubs || hubsSpanMultipleServers,
+                onRefresh: _discover.updateItem,
+                // Hub index is i + 1 if continue watching exists, otherwise i
+                onVerticalNavigation: (isUp) => _handleVerticalNavigation(_onDeck.isNotEmpty ? i + 1 : i, isUp),
+                onNavigateUp: (i == 0 && _onDeck.isEmpty) ? _focusTopBoundary : null,
+              ),
+            ),
+
+          // Show loading skeleton for hubs while they're loading
+          if (_areHubsLoading && _hubs.isEmpty)
+            for (int i = 0; i < 3; i++)
+              SliverToBoxAdapter(
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: .start,
+                    children: [
+                      Container(
+                        width: 200,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          color: theme.colorScheme.surfaceContainerHighest,
+                          borderRadius: const BorderRadius.all(Radius.circular(4)),
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        height: 200,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: 5,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              margin: const EdgeInsets.only(right: 12),
+                              width: 140,
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.surfaceContainerHighest,
+                                borderRadius: BorderRadius.circular(tokens(context).radiusSm),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+          if (_onDeck.isEmpty && _hubs.isEmpty && !_areHubsLoading)
+            SliverEmptyState(
+              message: t.discover.noContentAvailable,
+              subtitle: t.discover.addMediaToLibraries,
+              icon: Symbols.movie_rounded,
+            ),
+
+          SliverToBoxAdapter(child: SizedBox(height: 24 + bottomPadding)),
+        ],
+      ],
+    );
+
+    final isMobile = PlatformDetector.isMobile(context);
+    final useIOSHeroAtmosphere = PlatformDetector.isHandheldIOS(context);
+
     return Material(
       color: theme.scaffoldBackgroundColor,
       child: Stack(
+        fit: StackFit.expand,
         children: [
-          CustomScrollView(
-            controller: _scrollController,
-            slivers: [
-              // Hero Section (Continue Watching) - at top of screen
-              Builder(
-                builder: (context) {
-                  if (_onDeck.isNotEmpty && showHeroSection) {
-                    return _buildHeroSection();
-                  }
-                  // Add top padding when hero is not shown
-                  return SliverToBoxAdapter(
-                    child: SizedBox(height: kToolbarHeight + MediaQuery.paddingOf(context).top + 16),
-                  );
-                },
+          if (useIOSHeroAtmosphere && showHeroSection && _onDeck.isNotEmpty)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: ExcludeSemantics(
+                  child: RepaintBoundary(
+                    child: ValueListenableBuilder<int>(
+                      valueListenable: _heroIndex,
+                      builder: (context, idx, _) {
+                        final item = _onDeck[idx.clamp(0, _onDeck.length - 1)];
+                        final size = MediaQuery.sizeOf(context);
+                        final paths = item.heroArtCandidates(containerAspectRatio: size.aspectRatio);
+                        if (paths.isEmpty) return ColoredBox(color: theme.scaffoldBackgroundColor);
+                        return _HeroBackgroundFade(
+                          scrollController: _scrollController,
+                          heroHeight: math.min(500 + MediaQuery.paddingOf(context).top, size.height * 0.65),
+                          child: CyclingMediaBackdrop(
+                            mediaKey: item.globalKey,
+                            imagePaths: paths,
+                            client: _getMediaClientForItem(item),
+                            width: size.width,
+                            height: size.height,
+                            fallbackColor: theme.scaffoldBackgroundColor,
+                            active: false,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
               ),
-              if (_isLoading) LoadingIndicatorBox.sliver,
-              if (_errorMessage != null) SliverErrorState(message: _errorMessage!, onRetry: _discover.load),
-              if (!_isLoading && _errorMessage == null) ...[
-                if (continueWatchingHub != null)
-                  SliverToBoxAdapter(
-                    child: HubSection(
-                      key: _continueWatchingHubKey,
-                      hub: continueWatchingHub,
-                      focusMemory: _hubFocusMemory,
-                      icon: hubIconFor(continueWatchingHub),
-                      onRefresh: _discover.updateItem,
-                      onRemoveFromContinueWatching: _discover.refreshContinueWatching,
-                      isInContinueWatching: true,
-                      loadMoreItems: _discover.loadAllContinueWatching,
-                      onVerticalNavigation: (isUp) => _handleVerticalNavigation(0, isUp),
-                      onNavigateUp: _focusTopBoundary,
-                    ),
-                  ),
-
-                // Recommendation Hubs (Trending, Top in Genre, etc.)
-                for (int i = 0; i < _hubs.length; i++)
-                  SliverToBoxAdapter(
-                    child: HubSection(
-                      key: i < _orderedHubKeys.length ? _orderedHubKeys[i] : null,
-                      hub: _hubs[i],
-                      focusMemory: _hubFocusMemory,
-                      icon: hubIconFor(_hubs[i]),
-                      showServerName: showServerNameOnHubs || hubsSpanMultipleServers,
-                      onRefresh: _discover.updateItem,
-                      // Hub index is i + 1 if continue watching exists, otherwise i
-                      onVerticalNavigation: (isUp) => _handleVerticalNavigation(_onDeck.isNotEmpty ? i + 1 : i, isUp),
-                      onNavigateUp: (i == 0 && _onDeck.isEmpty) ? _focusTopBoundary : null,
-                    ),
-                  ),
-
-                // Show loading skeleton for hubs while they're loading
-                if (_areHubsLoading && _hubs.isEmpty)
-                  for (int i = 0; i < 3; i++)
-                    SliverToBoxAdapter(
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: .start,
-                          children: [
-                            Container(
-                              width: 200,
-                              height: 24,
-                              decoration: BoxDecoration(
-                                color: theme.colorScheme.surfaceContainerHighest,
-                                borderRadius: const BorderRadius.all(Radius.circular(4)),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            SizedBox(
-                              height: 200,
-                              child: ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: 5,
-                                itemBuilder: (context, index) {
-                                  return Container(
-                                    margin: const EdgeInsets.only(right: 12),
-                                    width: 140,
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).colorScheme.surfaceContainerHighest,
-                                      borderRadius: BorderRadius.circular(tokens(context).radiusSm),
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                if (_onDeck.isEmpty && _hubs.isEmpty && !_areHubsLoading)
-                  SliverEmptyState(
-                    message: t.discover.noContentAvailable,
-                    subtitle: t.discover.addMediaToLibraries,
-                    icon: Symbols.movie_rounded,
-                  ),
-
-                SliverToBoxAdapter(child: SizedBox(height: 24 + bottomPadding)),
-              ],
-            ],
-          ),
+            ),
+          isMobile
+              ? RefreshIndicator(
+                  edgeOffset: MediaQuery.paddingOf(context).top + 56,
+                  onRefresh: _refreshFromToolbar,
+                  child: scrollView,
+                )
+              : scrollView,
           // Overlaid app bar — excluded from default focus traversal so that
           // initial/tab-switch focus lands on content (hero/hubs), not the toolbar.
           // Toolbar buttons are still reachable via explicit UP from hero section.
@@ -1136,7 +1258,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              Positioned.fill(child: _buildHeroBackdrop(heroHeight)),
+              if (!PlatformDetector.isHandheldIOS(context)) Positioned.fill(child: _buildHeroBackdrop(heroHeight)),
               PageView.builder(
                 controller: _heroController,
                 itemCount: _onDeck.length,
@@ -1160,7 +1282,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                     top: false,
                     bottom: false,
                     child: Align(
-                      alignment: Alignment.centerRight,
+                      alignment: MediaQuery.sizeOf(context).width >= 600 ? Alignment.centerRight : Alignment.center,
                       child: ValueListenableBuilder<int>(
                         valueListenable: _heroIndex,
                         builder: (context, index, _) => HeroPageIndicators(
@@ -1229,24 +1351,30 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               ),
             ),
           ),
-          // Gradient Overlay - blends into scaffold background
+          // Gradient Overlay - blends into scaffold background (or atmospheric
+          // blurred canvas on mobile, matching Desktop's spotlight wash).
           Positioned(
             top: 0,
             left: 0,
             right: 0,
-            bottom: -4, // Extend past stack bounds to ensure coverage
+            bottom: 0,
             child: Builder(
               builder: (context) {
                 final bgColor = Theme.of(context).scaffoldBackgroundColor;
+                final useIOSHeroAtmosphere = PlatformDetector.isHandheldIOS(context);
                 return Container(
                   decoration: BoxDecoration(
                     gradient: LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      // Reach full bg before the bottom edge so the hero
-                      // blends seamlessly into the content below and the
-                      // page dots sit on a solid band.
-                      colors: [bgColor.withValues(alpha: 0), bgColor.withValues(alpha: 0.9), bgColor, bgColor],
+                      colors: useIOSHeroAtmosphere
+                          ? [
+                              bgColor.withValues(alpha: 0),
+                              bgColor.withValues(alpha: 0.56),
+                              bgColor.withValues(alpha: 0.74),
+                              bgColor.withValues(alpha: 0.78),
+                            ]
+                          : [bgColor.withValues(alpha: 0), bgColor.withValues(alpha: 0.9), bgColor, bgColor],
                       stops: isTv ? const [0.25, 0.78, 0.94, 1.0] : const [0.5, 0.85, 0.94, 1.0],
                     ),
                   ),
@@ -1571,4 +1699,53 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       },
     );
   }
+}
+
+class _HeroBackgroundFade extends StatelessWidget {
+  const _HeroBackgroundFade({required this.child, required this.scrollController, required this.heroHeight});
+  final Widget child;
+  final ScrollController scrollController;
+  final double heroHeight;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, constraints) => AnimatedBuilder(
+      animation: scrollController,
+      builder: (context, _) {
+        final height = constraints.maxHeight;
+        final offset = scrollController.hasClients ? scrollController.offset.clamp(0.0, double.infinity) : 0.0;
+        final start = ((heroHeight - offset - 180) / height).clamp(0.0, 1.0);
+        final end = ((heroHeight - offset + 30) / height).clamp(0.0, 1.0);
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            ImageFiltered(
+              imageFilter: ImageFilter.blur(sigmaX: 35, sigmaY: 35, tileMode: TileMode.clamp),
+              child: child,
+            ),
+            if (end > 0)
+              ShaderMask(
+                blendMode: BlendMode.dstIn,
+                shaderCallback: (bounds) => LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: const [Colors.black, Colors.transparent],
+                  stops: [start, end],
+                ).createShader(bounds),
+                child: child,
+              ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.42)],
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ),
+  );
 }

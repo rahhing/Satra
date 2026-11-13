@@ -65,6 +65,52 @@ void main() {
     expect(find.byType(PinEntryDialog), findsNothing);
   });
 
+  testWidgets('mobile PIN entry renders clickable 0-9 keypad buttons and submits tapped PIN', (tester) async {
+    TvDetectionService.debugSetAppleTVOverride(false);
+    String? result;
+
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: ThemeData(platform: TargetPlatform.iOS),
+        home: Builder(
+          builder: (context) => Scaffold(
+            body: TextButton(
+              onPressed: () async {
+                result = await showPinEntryDialog(context, 'Protected Profile');
+              },
+              child: const Text('Open'),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    await tester.tap(find.text('Open'));
+    await tester.pumpAndSettle();
+
+    for (var d = 0; d <= 9; d++) {
+      expect(find.text('$d'), findsOneWidget);
+    }
+    expect(find.byIcon(Symbols.backspace_rounded), findsOneWidget);
+    expect(find.byIcon(Symbols.close_rounded), findsOneWidget);
+
+    await tester.tap(find.text('7'));
+    await tester.pump();
+    await tester.tap(find.text('3'));
+    await tester.pump();
+    await tester.tap(find.byIcon(Symbols.backspace_rounded));
+    await tester.pump();
+    await tester.tap(find.text('4'));
+    await tester.pump();
+    await tester.tap(find.text('0'));
+    await tester.pump();
+    await tester.tap(find.text('9'));
+    await tester.pumpAndSettle();
+
+    expect(result, '7409');
+    expect(find.byType(PinEntryDialog), findsNothing);
+  });
+
   testWidgets('mobile PIN normalizes oversized input before submitting', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(false);
     String? result;

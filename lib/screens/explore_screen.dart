@@ -22,6 +22,7 @@ import '../services/catalog/catalog_source.dart';
 import '../services/settings_service.dart';
 import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
+import '../utils/scroll_to_top.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/app_menu.dart';
 import '../widgets/catalog_source_logo.dart';
@@ -60,10 +61,17 @@ class ExploreScreenState extends State<ExploreScreen>
         FullRefreshable,
         TabVisibilityAware,
         FocusableTab,
-        DebouncedMediaSearch<ExploreScreen, MediaItem> {
+        DebouncedMediaSearch<ExploreScreen, MediaItem>
+    implements ScrollToTopable {
   late ExploreProvider _explore;
   late CatalogSourcesProvider _sources;
   CatalogSourceId? _activeSourceId;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void scrollToTop() {
+    unawaited(smoothScrollToTop(_scrollController));
+  }
 
   /// Per-row focus keys, keyed by hub id so focus memory survives reloads.
   final Map<String, GlobalKey<HubSectionState>> _hubKeysById = {};
@@ -143,6 +151,7 @@ class ExploreScreenState extends State<ExploreScreen>
   @override
   void dispose() {
     _sources.removeListener(_onActiveSourceChanged);
+    _scrollController.dispose();
     _spotlight.dispose();
     super.dispose();
   }
@@ -346,6 +355,7 @@ class ExploreScreenState extends State<ExploreScreen>
     );
 
     Widget scroll(List<Widget> body) => CustomScrollView(
+      controller: _scrollController,
       physics: const AlwaysScrollableScrollPhysics(),
       slivers: [appBar(), searchField(), ...body],
     );
@@ -389,7 +399,7 @@ class ExploreScreenState extends State<ExploreScreen>
               onNavigateUp: i == 0 ? searchFocusNode.requestFocus : null,
             ),
           ),
-        const SliverToBoxAdapter(child: SizedBox(height: 16)),
+        SliverToBoxAdapter(child: SizedBox(height: 16 + MediaQuery.paddingOf(context).bottom)),
       ]);
     }
 

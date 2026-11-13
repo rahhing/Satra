@@ -287,19 +287,17 @@ class DownloadsScreenState extends State<DownloadsScreen>
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                       alignment: .centerLeft,
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            _buildTabChip(t.downloads.manage, 0),
-                            const SizedBox(width: 8),
-                            _buildTabChip(t.downloads.tvShows, 1),
-                            const SizedBox(width: 8),
-                            _buildTabChip(t.downloads.movies, 2),
-                            const SizedBox(width: 8),
-                            _buildTabChip(t.downloads.music, 3),
-                          ],
-                        ),
+                      child: TabChipStrip(
+                        motionId: 'mobile_downloads_tabs',
+                        children: [
+                          _buildTabChip(t.downloads.manage, 0),
+                          const SizedBox(width: 8),
+                          _buildTabChip(t.downloads.tvShows, 1),
+                          const SizedBox(width: 8),
+                          _buildTabChip(t.downloads.movies, 2),
+                          const SizedBox(width: 8),
+                          _buildTabChip(t.downloads.music, 3),
+                        ],
                       ),
                     ),
                   Expanded(

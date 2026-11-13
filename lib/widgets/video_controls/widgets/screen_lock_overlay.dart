@@ -5,7 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../i18n/strings.g.dart';
+import '../../../utils/platform_detector.dart';
 import '../../app_icon.dart';
+import '../../glass_surface.dart';
 
 enum _UnlockPrompt { hidden, shown, armed }
 
@@ -103,6 +105,24 @@ class _ScreenLockOverlayState extends State<ScreenLockOverlay> {
     final armed = _prompt == _UnlockPrompt.armed;
     final label = armed ? t.videoControls.tapAgainToUnlock : t.videoControls.tapToUnlock;
     final foreground = armed ? Colors.black : Colors.white;
+    final useIOSLiquidGlass = PlatformDetector.isHandheldIOS(context) && !armed;
+    final pillContent = Row(
+      mainAxisSize: .min,
+      children: [
+        AppIcon(
+          armed ? Symbols.lock_open_rounded : Symbols.lock_rounded,
+          fill: 1,
+          color: foreground,
+          size: 20,
+        ),
+        const SizedBox(width: 8),
+        Text(
+          label,
+          style: TextStyle(color: foreground, fontSize: 14, fontWeight: .w500),
+        ),
+      ],
+    );
+
     return Listener(
       onPointerDown: _handlePointerDown,
       onPointerUp: _handlePointerEnd,
@@ -142,29 +162,27 @@ class _ScreenLockOverlayState extends State<ScreenLockOverlay> {
                           // so holding the button never resolves as a tap.
                           onLongPress: () {},
                           child: ExcludeSemantics(
-                            child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                              decoration: BoxDecoration(
-                                color: armed ? Colors.white : Colors.black.withValues(alpha: 0.6),
-                                borderRadius: const BorderRadius.all(Radius.circular(28)),
-                              ),
-                              child: Row(
-                                mainAxisSize: .min,
-                                children: [
-                                  AppIcon(
-                                    armed ? Symbols.lock_open_rounded : Symbols.lock_rounded,
-                                    fill: 1,
-                                    color: foreground,
-                                    size: 20,
+                            child: useIOSLiquidGlass
+                                ? GlassSurface(
+                                    interactive: true,
+                                    blurNativeVideo: true,
+                                    borderRadius: const BorderRadius.all(Radius.circular(999)),
+                                    sigma: 26,
+                                    opacity: 0.62,
+                                    tint: const Color(0xFF07080C),
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                      child: pillContent,
+                                    ),
+                                  )
+                                : Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                                    decoration: BoxDecoration(
+                                      color: armed ? Colors.white : Colors.black.withValues(alpha: 0.6),
+                                      borderRadius: const BorderRadius.all(Radius.circular(28)),
+                                    ),
+                                    child: pillContent,
                                   ),
-                                  const SizedBox(width: 8),
-                                  Text(
-                                    label,
-                                    style: TextStyle(color: foreground, fontSize: 14, fontWeight: .w500),
-                                  ),
-                                ],
-                              ),
-                            ),
                           ),
                         ),
                       ),
