@@ -10,6 +10,7 @@ import '../../../theme/mono_tokens.dart';
 import '../../../utils/platform_detector.dart';
 import '../../app_icon.dart';
 import '../../glass_surface.dart';
+import '../../ios_glass_control.dart';
 
 class SkipMarkerButton extends StatelessWidget {
   final MediaMarker marker;
@@ -80,59 +81,68 @@ class SkipMarkerButton extends StatelessWidget {
         return KeyEventResult.ignored;
       },
       child: useIOSLiquidGlass
-          ? GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () {
-                HapticFeedback.lightImpact();
-                _activate();
-              },
-              child: GlassSurface(
-                interactive: true,
-                blurNativeVideo: true,
-                borderRadius: borderRadius,
-                sigma: 26,
-                opacity: 0.62,
-                tint: const Color(0xFF07080C),
-                child: Stack(
-                  children: [
-                    if (isAutoSkipActive && shouldShowAutoSkip)
-                      Positioned.fill(
-                        child: ClipRRect(
-                          borderRadius: borderRadius,
-                          child: Row(
-                            children: [
-                              Expanded(
-                                flex: (autoSkipProgress * 100).round(),
-                                child: ColoredBox(color: Colors.white.withValues(alpha: 0.20)),
-                              ),
-                              Expanded(
-                                flex: ((1.0 - autoSkipProgress) * 100).round(),
-                                child: const ColoredBox(color: Colors.transparent),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-                      child: Row(
-                        mainAxisSize: .min,
-                        children: [
-                          Text(
-                            buttonText,
-                            style: const TextStyle(
-                              color: Colors.white,
-                              fontSize: 15.5,
-                              fontWeight: .w600,
-                              letterSpacing: -0.2,
+          ? IOSGlassButton(
+              label: buttonText,
+              title: buttonText,
+              titleSize: 15.5,
+              symbol: showNextEpisode ? 'forward.end.fill' : 'forward.fill',
+              symbolSize: 17,
+              progress: showAutoSkipCountdown ? autoSkipProgress : null,
+              onPressed: _activate,
+              child: GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  _activate();
+                },
+                child: GlassSurface(
+                  interactive: true,
+                  blurNativeVideo: true,
+                  borderRadius: borderRadius,
+                  sigma: 26,
+                  opacity: 0.62,
+                  tint: const Color(0xFF07080C),
+                  child: Stack(
+                    children: [
+                      if (isAutoSkipActive && shouldShowAutoSkip)
+                        Positioned.fill(
+                          child: ClipRRect(
+                            borderRadius: borderRadius,
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  flex: (autoSkipProgress * 100).round(),
+                                  child: ColoredBox(color: Colors.white.withValues(alpha: 0.20)),
+                                ),
+                                Expanded(
+                                  flex: ((1.0 - autoSkipProgress) * 100).round(),
+                                  child: const ColoredBox(color: Colors.transparent),
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(width: 8),
-                          AppIcon(buttonIcon, fill: 1, color: Colors.white, size: 20),
-                        ],
+                        ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                        child: Row(
+                          mainAxisSize: .min,
+                          children: [
+                            Text(
+                              buttonText,
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 15.5,
+                                fontWeight: .w600,
+                                letterSpacing: -0.2,
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            AppIcon(buttonIcon, fill: 1, color: Colors.white, size: 20),
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             )

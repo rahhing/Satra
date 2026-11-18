@@ -84,6 +84,20 @@ See [docs/visual-redesign.md](docs/visual-redesign.md) for architecture and rede
 - Companion Remote — control the desktop app from mobile
 - Automatic HiDPI / 4K desktop UI scaling with manual scale override
 
+## iOS Sideloading (AltStore & SideStore)
+
+Install and update Satra on iOS / iPadOS via **SideStore** or **AltStore**:
+
+- **One-Tap Sideload Page**: [https://rahhing.github.io/Satra/](https://rahhing.github.io/Satra/)
+- **Source URL**: `https://rahhing.github.io/Satra/source.json`
+
+To build a fresh ad-hoc-sealed IPA and publish an updated source manifest from macOS:
+
+```bash
+scripts/build-ios-altstore.sh
+scripts/publish-ios-source.sh
+```
+
 ## Building from Source
 
 ### Prerequisites

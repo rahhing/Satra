@@ -200,8 +200,12 @@ void main() {
       return result;
     }
 
-    testWidgets('a landscape phone or head unit uses the rail', (tester) async {
+    testWidgets('a landscape tablet uses the rail', (tester) async {
       expect(await evaluate(tester, size: const Size(1080, 600)), isTrue);
+    });
+
+    testWidgets('an iPhone in landscape keeps the bottom bar', (tester) async {
+      expect(await evaluate(tester, size: const Size(844, 390), platform: TargetPlatform.iOS), isFalse);
     });
 
     testWidgets('portrait keeps the bottom bar', (tester) async {

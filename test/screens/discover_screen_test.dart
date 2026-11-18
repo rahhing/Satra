@@ -9,6 +9,7 @@ import 'package:satra/media/library_query.dart';
 import 'package:satra/media/media_sort.dart' as media_sort;
 import 'package:satra/media/media_playlist.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:satra/connection/connection.dart';
@@ -42,6 +43,9 @@ import 'package:satra/screens/discover_screen.dart';
 import 'package:satra/screens/main_screen.dart';
 import 'package:satra/screens/libraries/libraries_screen.dart';
 import 'package:satra/widgets/focusable_tab_chip.dart';
+import 'package:satra/widgets/glass_surface.dart';
+import 'package:satra/widgets/hub_section.dart';
+import 'package:satra/widgets/ios_glass_control.dart';
 import 'package:satra/utils/media_server_http_client.dart';
 import 'package:satra/services/data_aggregation_service.dart';
 import 'package:satra/services/multi_server_manager.dart';
@@ -602,7 +606,7 @@ void main() {
     expect(tester.widget<TvSpotlightBackground>(find.byType(TvSpotlightBackground)).item?.id, continueItem.id);
   });
 
-  testWidgets('non-TV hero keeps indicators visible in keyboard mode and fades to solid bg', (tester) async {
+  testWidgets('desktop hero keeps indicators visible in keyboard mode and fades to solid bg', (tester) async {
     TvDetectionService.debugSetAppleTVOverride(false);
     await SettingsService.getInstance();
     tester.view.devicePixelRatio = 1.0;
@@ -683,7 +687,7 @@ void main() {
           ],
           child: InputModeTracker(
             child: MaterialApp(
-              theme: monoTheme(MonoPalette.dark),
+              theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.linux),
               home: MainScreenFocusScope(
                 sideNavigationWidth: _testExpandedBleed,
                 reservedSideNavigationWidth: _testCollapsedBleed,
@@ -705,18 +709,15 @@ void main() {
     await tester.pump(const Duration(milliseconds: 100));
 
     expect(find.byType(PageView), findsOneWidget);
-    expect(find.byIcon(Symbols.pause_rounded), findsOneWidget, reason: 'hero indicators render in pointer mode');
+    final firstMarker = find.byKey(const ValueKey('hero_page_0'));
+    expect(firstMarker, findsOneWidget, reason: 'hero indicators render in pointer mode');
 
     // Entering keyboard mode must not hide the indicators on non-TV devices
     // (regression: back-key/BT-keyboard events left them permanently hidden).
     await tester.sendKeyDownEvent(LogicalKeyboardKey.arrowDown);
     await tester.sendKeyUpEvent(LogicalKeyboardKey.arrowDown);
     await tester.pump();
-    expect(
-      find.byIcon(Symbols.pause_rounded),
-      findsOneWidget,
-      reason: 'hero indicators stay visible in keyboard mode on non-TV',
-    );
+    expect(firstMarker, findsOneWidget, reason: 'hero indicators stay visible in keyboard mode on non-TV');
 
     // The bottom fade must end in solid scaffold background before the hero
     // edge so the artwork cannot ghost through at the hero/content boundary.
@@ -742,6 +743,143 @@ void main() {
 
     // Dispose the screen so the hero's periodic timers are cancelled before
     // the binding's pending-timer check.
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('iPhone landscape Discover keeps part of the first shelf visible below the hero', (tester) async {
+    final movie = testMediaItem(id: 'featured', title: 'Featured', artPath: '/art', serverId: 'server_1');
+    final client = _FakeMediaServerClient(continueWatching: [movie], hubs: const []);
+    await _pumpDiscoverShell(tester, isTv: false, platform: TargetPlatform.iOS, mediaClient: client);
+    tester.view.physicalSize = const Size(844, 390);
+    tester.view.padding = const FakeViewPadding(left: 47, right: 47, bottom: 21);
+    addTearDown(tester.view.resetPadding);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final play = find.text(t.common.play);
+    final shelf = find.byType(HubSection).first;
+    expect(tester.getTopLeft(play).dx, inInclusiveRange(47, 140));
+    expect(tester.getTopLeft(shelf).dx, 47);
+    expect(tester.getBottomLeft(play).dy, lessThan(tester.getTopLeft(shelf).dy));
+    expect(tester.getTopLeft(shelf).dy, lessThan(325));
+    expect(tester.takeException(), isNull);
+    await tester.pumpWidget(const SizedBox());
+  });
+
+  testWidgets('iOS Discover caps the scroll shade and uses mobile hero controls', (tester) async {
+    final movie = testMediaItem(id: 'featured', title: 'Featured', artPath: '/art', serverId: 'server_1');
+    final client = _FakeMediaServerClient(
+      continueWatching: [
+        movie,
+        testMediaItem(id: 'next', title: 'Next', artPath: '/next-art', serverId: 'server_1'),
+      ],
+      hubs: [
+        for (var i = 0; i < 12; i++) MediaHub(id: 'hub_$i', title: 'Shelf $i', type: 'movie', items: [movie], size: 1),
+      ],
+    );
+    await _pumpDiscoverShell(tester, isTv: false, platform: TargetPlatform.iOS, mediaClient: client);
+
+    final scroll = tester.widget<CustomScrollView>(find.byType(CustomScrollView)).controller!;
+    final screen = scroll.position.viewportDimension;
+    final shade = find.byKey(const ValueKey('discover_hero_background_shade'));
+    final sharp = find.byKey(const ValueKey('discover_backdrop_sharp'));
+    final blur = find.byKey(const ValueKey('discover_backdrop_blur'));
+    double alpha() {
+      final gradient = (tester.widget<DecoratedBox>(shade).decoration as BoxDecoration).gradient!;
+      return gradient.colors.first.a;
+    }
+
+    expect(find.byKey(const ValueKey('hero_page_0')), findsOneWidget);
+    expect(find.byIcon(Symbols.pause_rounded), findsNothing);
+    expect(find.byType(RefreshIndicator), findsNothing);
+    expect(alpha(), closeTo(.04, .001));
+    final blurBounds = tester.getRect(blur);
+    final blurSource = find.byKey(const ValueKey('discover_backdrop_blur_source'));
+    expect(tester.getRect(blurSource), tester.getRect(sharp));
+    final gradient = (tester.widget<DecoratedBox>(shade).decoration as BoxDecoration).gradient as LinearGradient;
+    expect(gradient.stops![2], closeTo(tester.getSize(sharp).height / blurBounds.height, .001));
+    expect(gradient.colors[2].a, closeTo(.56, .001));
+    // From the beginning of Continue Watching downward, shade progressively darkens.
+    final cwTop = tester.getTopLeft(find.text('Continue Watching')).dy;
+    final cwStopIndex = gradient.stops!.indexWhere((s) => (s - cwTop / blurBounds.height).abs() < .05);
+    expect(cwStopIndex, greaterThanOrEqualTo(3));
+    for (var i = cwStopIndex; i < gradient.colors.length - 1; i++) {
+      expect(gradient.colors[i + 1].a, greaterThan(gradient.colors[i].a));
+    }
+    expect(gradient.colors.last.a, greaterThan(.80));
+    scroll.jumpTo(100);
+    await tester.pump();
+    expect(tester.widget<Transform>(sharp).transform.getTranslation().y, -100);
+    expect(tester.getRect(blur), blurBounds);
+    scroll.jumpTo(screen / 2);
+    await tester.pump();
+    final midScrollTopAlpha = alpha();
+    expect(midScrollTopAlpha, greaterThan(.35));
+    scroll.jumpTo(screen);
+    await tester.pump();
+    expect(alpha(), greaterThan(midScrollTopAlpha));
+    expect(sharp, findsNothing);
+    expect(tester.getRect(blur), blurBounds);
+    expect(scroll.position.maxScrollExtent, greaterThan(screen * 2));
+    scroll.jumpTo(screen * 2);
+    await tester.pump();
+    final maximum = alpha();
+    expect(maximum, closeTo(.93, .001));
+    scroll.jumpTo(screen * 2.5);
+    await tester.pump();
+    expect(alpha(), closeTo(maximum, .001));
+    scroll.jumpTo(0);
+    await tester.pump();
+    expect(alpha(), closeTo(.04, .001));
+    expect(sharp, findsOneWidget);
+
+    // Disabling Darken Backdrop in Appearance settings restores the lighter shade curve.
+    final settings = SettingsService.instance;
+    await settings.write(SettingsService.darkenMobileBackdrop, false);
+    await tester.pump();
+    expect(alpha(), 0);
+    scroll.jumpTo(screen / 2);
+    await tester.pump();
+    expect(alpha(), closeTo(.14, .001));
+    scroll.jumpTo(screen);
+    await tester.pump();
+    expect(alpha(), closeTo(.28, .001));
+    scroll.jumpTo(0);
+    await tester.pump();
+    await settings.write(SettingsService.darkenMobileBackdrop, true);
+    await tester.pump();
+
+    await settings.write(SettingsService.useClassicMobileBackdrop, true);
+    await tester.pump();
+    expect(sharp, findsNothing);
+    expect(blur, findsNothing);
+    expect(alpha(), closeTo(.04, .001));
+    await settings.write(SettingsService.useClassicMobileBackdrop, false);
+    await tester.pump();
+    expect(sharp, findsOneWidget);
+
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    GlassSurface.debugEnableIOSNativeGlass = true;
+    try {
+      final beforeRefresh = client.globalHubCalls;
+      final gesture = await tester.startGesture(const Offset(190, 300));
+      await gesture.moveBy(const Offset(0, 180));
+      await tester.pump();
+      await gesture.moveBy(const Offset(0, 200));
+      await tester.pump();
+      expect(
+        find.byWidgetPredicate((widget) => widget is IOSGlassControl && widget.configuration['kind'] == 'refresh'),
+        findsOneWidget,
+      );
+      await gesture.up();
+      for (var i = 0; i < 8; i++) {
+        await tester.pump(const Duration(milliseconds: 100));
+      }
+      expect(client.globalHubCalls, greaterThan(beforeRefresh));
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+      GlassSurface.debugEnableIOSNativeGlass = null;
+    }
     await tester.pumpWidget(const SizedBox());
   });
 
@@ -1211,17 +1349,24 @@ Future<_GatedDiscover> _pumpGatedDiscover(WidgetTester tester, {bool underRootCo
 /// Mounts [DiscoverScreen] in the smallest graph both layout branches need, so
 /// one test can compare the TV and non-TV chrome without rebuilding it twice.
 /// Takes ownership of [watchTogether].
-Future<void> _pumpDiscoverShell(WidgetTester tester, {required bool isTv, WatchTogetherProvider? watchTogether}) async {
+Future<void> _pumpDiscoverShell(
+  WidgetTester tester, {
+  required bool isTv,
+  WatchTogetherProvider? watchTogether,
+  TargetPlatform? platform,
+  _FakeMediaServerClient? mediaClient,
+}) async {
   TvDetectionService.debugSetAppleTVOverride(isTv);
   await SettingsService.getInstance();
   tester.view.devicePixelRatio = 1.0;
-  tester.view.physicalSize = const Size(1280, 720);
+  final size = platform == TargetPlatform.iOS ? const Size(390, 844) : const Size(1280, 720);
+  tester.view.physicalSize = size;
   addTearDown(() {
     tester.view.resetDevicePixelRatio();
     tester.view.resetPhysicalSize();
   });
 
-  final client = _FakeMediaServerClient(hubs: const []);
+  final client = mediaClient ?? _FakeMediaServerClient(hubs: const []);
   final manager = MultiServerManager()..debugRegisterClientForTesting(client);
   final multiServerProvider = testMultiServerProvider(manager);
   final hiddenLibrariesProvider = HiddenLibrariesProvider();
@@ -1280,13 +1425,13 @@ Future<void> _pumpDiscoverShell(WidgetTester tester, {required bool isTv, WatchT
         ],
         child: InputModeTracker(
           child: MaterialApp(
-            theme: monoTheme(MonoPalette.dark),
+            theme: monoTheme(MonoPalette.dark).copyWith(platform: platform),
             home: MainScreenFocusScope(
               sideNavigationWidth: _testExpandedBleed,
               reservedSideNavigationWidth: _testCollapsedBleed,
               foregroundLeft: 0,
-              foregroundWidth: 1280,
-              viewportWidth: 1280,
+              foregroundWidth: size.width,
+              viewportWidth: size.width,
               child: const DiscoverScreen(),
             ),
           ),
@@ -1305,6 +1450,7 @@ class _FakeMediaServerClient implements MediaServerClient {
   final List<MediaHub> hubs;
   List<MediaItem> continueWatching;
   final sectionCalls = <String>[];
+  int globalHubCalls = 0;
 
   _FakeMediaServerClient({required this.hubs, this.continueWatching = const []});
 
@@ -1319,6 +1465,9 @@ class _FakeMediaServerClient implements MediaServerClient {
 
   @override
   ServerCapabilities get capabilities => ServerCapabilities.plex;
+
+  @override
+  String thumbnailUrl(String? path, {int? width, int? height, bool cover = true}) => '';
 
   @override
   Future<LibraryPage<MediaItem>> fetchCollectionsPage(
@@ -1376,7 +1525,10 @@ class _FakeMediaServerClient implements MediaServerClient {
     int limit = defaultHubPreviewLimit,
     bool includePlaybackHubs = true,
     HubFetchDiagnostics? diagnostics,
-  }) async => hubs;
+  }) async {
+    globalHubCalls++;
+    return hubs;
+  }
 
   @override
   dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);

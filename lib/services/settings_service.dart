@@ -667,6 +667,8 @@ class SettingsService extends BaseSharedPreferencesService {
   static const seekTimeLarge = IntPref('seek_time_large', defaultValue: 30);
   static const rewindOnResume = IntPref('rewind_on_resume');
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
+  static const useClassicMobileBackdrop = BoolPref('use_classic_mobile_backdrop');
+  static const darkenMobileBackdrop = BoolPref('darken_mobile_backdrop', defaultValue: true);
   static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: true);
   static const focusGlow = BoolPref('focus_glow', defaultValue: false);
   static const cardHoverLift = BoolPref('card_hover_lift', defaultValue: true);
@@ -950,6 +952,7 @@ class SettingsService extends BaseSharedPreferencesService {
   /// that core lists the device (see `applyPreferredAudioDevice`). Names are
   /// per machine, so reset-only in the registry.
   static const audioOutputDevice = StringPref('audio_output_device', defaultValue: 'auto');
+  static const showMobileLiveTv = BoolPref('show_mobile_live_tv');
   static const liveTvDefaultFavorites = BoolPref('live_tv_default_favorites');
   static const matchRefreshRate = BoolPref('match_refresh_rate');
   static const matchDynamicRange = BoolPref('match_dynamic_range');
@@ -1529,6 +1532,8 @@ class SettingsService extends BaseSharedPreferencesService {
     seekTimeSmall,
     seekTimeLarge,
     showHeroSection,
+    useClassicMobileBackdrop,
+    darkenMobileBackdrop,
     sleepTimerDuration,
     audioSyncOffset,
     subtitleSyncOffset,
@@ -1658,6 +1663,7 @@ class SettingsService extends BaseSharedPreferencesService {
     defaultQualityPreset,
     cellularQualityPreset,
     musicQualityPreset,
+    showMobileLiveTv,
     liveTvDefaultFavorites,
     matchRefreshRate,
     matchDynamicRange,

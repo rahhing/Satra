@@ -85,10 +85,7 @@ class _FilledPillIndicator extends StatelessWidget {
         return Container(
           width: 54,
           height: 184,
-          decoration: BoxDecoration(
-            color: Colors.black.withValues(alpha: 0.60),
-            borderRadius: pillRadius,
-          ),
+          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.60), borderRadius: pillRadius),
           clipBehavior: Clip.antiAlias,
           child: interior,
         );

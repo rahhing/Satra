@@ -1510,11 +1510,7 @@ class _CatalogBadges extends StatelessWidget {
                   strokeAlign: BorderSide.strokeAlignInside,
                 ),
                 boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.28),
-                    blurRadius: 6,
-                    offset: const Offset(0, 1.5),
-                  ),
+                  BoxShadow(color: Colors.black.withValues(alpha: 0.28), blurRadius: 6, offset: const Offset(0, 1.5)),
                 ],
               ),
               child: Padding(

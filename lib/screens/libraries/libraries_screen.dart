@@ -697,10 +697,7 @@ class _LibrariesScreenState extends State<LibrariesScreen>
   }
 
   void _showLibraryManagementSheet() {
-    showLibraryManagementSheet(
-      context,
-      onToggleVisibility: _toggleLibraryVisibility,
-    );
+    showLibraryManagementSheet(context, onToggleVisibility: _toggleLibraryVisibility);
   }
 
   AppMenuHeader<String> _buildLibraryServerHeaderMenuItem(MediaLibrary library, String serverKey) {

@@ -15,6 +15,7 @@ import '../theme/mono_tokens.dart';
 import '../utils/focus_utils.dart';
 import 'app_icon.dart';
 import 'clickable_cursor.dart';
+import 'ios_glass_control.dart';
 import 'overlay_sheet.dart';
 
 typedef AppMenuEntryBuilder<T> = List<AppMenuEntry<T>> Function(BuildContext context);
@@ -319,6 +320,11 @@ class AppMenuButton<T> extends StatefulWidget {
   final AppMenuEntryBuilder<T> entriesBuilder;
   final ValueChanged<T>? onSelected;
   final AppMenuAnchorAlignment anchorAlignment;
+  final String? iosGlassSymbol;
+  final double? iosGlassSymbolSize;
+  final bool iosGlassChromeless;
+  final Color? iosGlassForegroundColor;
+  final String? Function(T value)? iosMenuSymbol;
 
   const AppMenuButton({
     super.key,
@@ -330,6 +336,11 @@ class AppMenuButton<T> extends StatefulWidget {
     required this.entriesBuilder,
     this.onSelected,
     this.anchorAlignment = AppMenuAnchorAlignment.start,
+    this.iosGlassSymbol,
+    this.iosGlassSymbolSize,
+    this.iosGlassChromeless = false,
+    this.iosGlassForegroundColor,
+    this.iosMenuSymbol,
   }) : assert(icon != null || child != null, 'AppMenuButton requires icon or child');
 
   @override
@@ -382,7 +393,33 @@ class AppMenuButtonState<T> extends State<AppMenuButton<T>> {
         ),
       );
       final tooltip = widget.tooltip;
-      return tooltip == null ? button : Tooltip(message: tooltip, child: button);
+      final fallback = tooltip == null ? button : Tooltip(message: tooltip, child: button);
+      final symbol = widget.iosGlassSymbol;
+      if (symbol == null) return fallback;
+      final entries = widget.entriesBuilder(context);
+      final items = entries.whereType<AppMenuItem<T>>().toList();
+      if (items.length != entries.length || items.any((item) => item.label == null || item.value is! String)) {
+        return fallback;
+      }
+      return IOSGlassButton(
+        label: tooltip ?? MaterialLocalizations.of(context).moreButtonTooltip,
+        symbol: symbol,
+        symbolSize: widget.iosGlassSymbolSize,
+        chromeless: widget.iosGlassChromeless,
+        foregroundColor: widget.iosGlassForegroundColor,
+        onPressed: widget.enabled ? _handlePressed : null,
+        menuItems: [
+          for (final item in items)
+            if (item.enabled)
+              {'id': item.value as String, 'label': item.label!, 'symbol': ?widget.iosMenuSymbol?.call(item.value)},
+        ],
+        onMenuSelected: (value) {
+          if (!widget.enabled) return;
+          final item = items.where((item) => item.value == value && item.enabled).firstOrNull;
+          if (item != null) widget.onSelected?.call(item.value);
+        },
+        child: fallback,
+      );
     }
 
     return IconButton(icon: widget.icon!, tooltip: widget.tooltip, onPressed: widget.enabled ? _handlePressed : null);

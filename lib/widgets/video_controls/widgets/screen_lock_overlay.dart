@@ -109,12 +109,7 @@ class _ScreenLockOverlayState extends State<ScreenLockOverlay> {
     final pillContent = Row(
       mainAxisSize: .min,
       children: [
-        AppIcon(
-          armed ? Symbols.lock_open_rounded : Symbols.lock_rounded,
-          fill: 1,
-          color: foreground,
-          size: 20,
-        ),
+        AppIcon(armed ? Symbols.lock_open_rounded : Symbols.lock_rounded, fill: 1, color: foreground, size: 20),
         const SizedBox(width: 8),
         Text(
           label,

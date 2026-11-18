@@ -174,6 +174,20 @@ class AppearanceSettingsScreen extends StatelessWidget {
                 title: t.settings.showHeroSection,
                 subtitle: t.settings.showHeroSectionDescription,
               ),
+            if (PlatformDetector.isMobile(context) && !PlatformDetector.isAutomotive()) ...[
+              SettingSwitchTile(
+                pref: SettingsService.darkenMobileBackdrop,
+                icon: Symbols.contrast_rounded,
+                title: t.settings.darkenMobileBackdrop,
+                subtitle: t.settings.darkenMobileBackdropDescription,
+              ),
+              SettingSwitchTile(
+                pref: SettingsService.useClassicMobileBackdrop,
+                icon: Symbols.wallpaper_rounded,
+                title: t.settings.useClassicMobileBackdrop,
+                subtitle: t.settings.useClassicMobileBackdropDescription,
+              ),
+            ],
             _continueWatchingActionSelector(),
             _episodeActionSelector(),
             SettingSwitchTile(
@@ -227,6 +241,13 @@ class AppearanceSettingsScreen extends StatelessWidget {
         SettingsGroup(
           title: t.settings.liveTv,
           children: [
+            if (PlatformDetector.isMobile(context) && !PlatformDetector.isAutomotive())
+              SettingSwitchTile(
+                pref: SettingsService.showMobileLiveTv,
+                icon: Symbols.live_tv_rounded,
+                title: t.settings.showMobileLiveTv,
+                subtitle: t.settings.showMobileLiveTvDescription,
+              ),
             SettingSwitchTile(
               pref: SettingsService.liveTvDefaultFavorites,
               icon: Symbols.star_rounded,

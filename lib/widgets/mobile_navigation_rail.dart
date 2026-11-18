@@ -4,6 +4,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../i18n/strings.g.dart';
 import '../navigation/navigation_tabs.dart';
 import 'app_icon.dart';
+import 'ios_glass_control.dart';
 import 'navigation_label_fit.dart';
 
 /// The mobile shell's navigation in landscape: the bottom [NavigationBar]'s
@@ -87,7 +88,8 @@ class MobileNavigationRail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final selectedIndex = tabs.indexWhere((tab) => tab.id == selectedTab);
-    final hasHeaderAction = isOffline || onSearchPressed != null;
+    final search = onSearchPressed;
+    final hasHeaderAction = isOffline || search != null;
     return LayoutBuilder(
       builder: (context, constraints) {
         final height = constraints.maxHeight;
@@ -104,13 +106,23 @@ class MobileNavigationRail extends StatelessWidget {
           backgroundColor: backgroundColor,
           leading: isOffline
               ? _reconnectAction(context)
-              : (onSearchPressed != null
+              : (search != null
                     ? Padding(
                         padding: const EdgeInsets.only(bottom: 8),
-                        child: IconButton(
-                          tooltip: t.common.search,
-                          onPressed: onSearchPressed,
-                          icon: const AppIcon(Symbols.search_rounded, size: 20),
+                        child: IOSGlassButton(
+                          label: t.common.search,
+                          symbol: 'magnifyingglass',
+                          symbolSize: 20,
+                          regularSymbolWeight: true,
+                          onPressed: search,
+                          child: SizedBox.square(
+                            dimension: 44,
+                            child: IconButton(
+                              tooltip: t.common.search,
+                              onPressed: search,
+                              icon: const AppIcon(Symbols.search_rounded, size: 20),
+                            ),
+                          ),
                         ),
                       )
                     : null),

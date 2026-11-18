@@ -226,6 +226,47 @@ void main() {
       await tester.pumpAndSettle();
     }
 
+    testWidgets('landscape iOS Spotlight stays usable above the software keyboard', (tester) async {
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(667, 375);
+      tester.view.viewInsets = const FakeViewPadding(bottom: 225);
+      addTearDown(() {
+        tester.view.resetViewInsets();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetPhysicalSize();
+      });
+
+      final navigator = GlobalKey<NavigatorState>();
+      await tester.pumpWidget(
+        TranslationProvider(
+          child: MaterialApp(
+            navigatorKey: navigator,
+            theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.iOS),
+            home: const Scaffold(body: SizedBox(key: ValueKey('spotlight_host'))),
+          ),
+        ),
+      );
+      final route = buildSpotlightRoute(
+        hostContext: tester.element(find.byKey(const ValueKey('spotlight_host'))),
+        hostNavigator: navigator.currentState!,
+        initialQuery: 'unmatched query',
+      );
+      navigator.currentState!.push(route);
+      await tester.pumpAndSettle();
+
+      final bubble = find.byType(UniversalSpotlightBubble);
+      for (final label in [t.common.clear, t.common.close]) {
+        final button = find.descendant(of: bubble, matching: find.byTooltip(label));
+        expect(tester.getSize(button), const Size(44, 44));
+        expect(tester.getBottomRight(button).dy, lessThanOrEqualTo(150));
+      }
+      expect(tester.takeException(), isNull);
+
+      await tester.tap(find.descendant(of: bubble, matching: find.byTooltip(t.common.close)));
+      await tester.pumpAndSettle();
+      expect(bubble, findsNothing);
+    });
+
     testWidgets('Ctrl + Space toggles Universal Spotlight open/closed and Escape dismisses it', (tester) async {
       tester.view.devicePixelRatio = 1.0;
       tester.view.physicalSize = const Size(1440, 900);
@@ -577,4 +618,3 @@ void main() {
     );
   });
 }
-

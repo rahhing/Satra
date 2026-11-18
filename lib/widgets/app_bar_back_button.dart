@@ -8,6 +8,7 @@ import '../i18n/strings.g.dart';
 import '../utils/platform_detector.dart';
 import 'app_icon.dart';
 import 'glass_surface.dart';
+import 'ios_glass_control.dart';
 
 /// Defines the visual style of the back button
 enum BackButtonStyle {
@@ -130,22 +131,29 @@ class _AppBarBackButtonState extends State<AppBarBackButton> {
             child: useIOSGlassOrb
                 ? Padding(
                     padding: EdgeInsets.all(isVideoGlassOrb ? 4 : 8),
-                    child: SizedBox(
-                      width: 42,
-                      height: 42,
-                      child: GlassSurface(
-                        interactive: true,
-                        blurNativeVideo: isVideoGlassOrb,
-                        borderRadius: const BorderRadius.all(Radius.circular(999)),
-                        sigma: 26,
-                        opacity: isVideoGlassOrb ? 0.56 : 0.68,
-                        tint: isVideoGlassOrb || isDarkTheme ? const Color(0xFF07080C) : null,
-                        child: Center(
-                          child: AppIcon(
-                            isVideoGlassOrb ? Symbols.close_rounded : Symbols.arrow_back_ios_new_rounded,
-                            fill: 1,
-                            color: icon,
-                            size: isVideoGlassOrb ? 21 : 18,
+                    child: IOSGlassButton(
+                      label: semanticLabel,
+                      symbol: isVideoGlassOrb ? 'xmark' : 'chevron.backward',
+                      symbolSize: isVideoGlassOrb ? 19 : 17,
+                      foregroundColor: widget.color,
+                      onPressed: _handlePressed,
+                      child: SizedBox(
+                        width: 42,
+                        height: 42,
+                        child: GlassSurface(
+                          interactive: true,
+                          blurNativeVideo: isVideoGlassOrb,
+                          borderRadius: const BorderRadius.all(Radius.circular(999)),
+                          sigma: 26,
+                          opacity: isVideoGlassOrb ? 0.56 : 0.68,
+                          tint: isVideoGlassOrb || isDarkTheme ? const Color(0xFF07080C) : null,
+                          child: Center(
+                            child: AppIcon(
+                              isVideoGlassOrb ? Symbols.close_rounded : Symbols.arrow_back_ios_new_rounded,
+                              fill: 1,
+                              color: icon,
+                              size: isVideoGlassOrb ? 21 : 18,
+                            ),
                           ),
                         ),
                       ),

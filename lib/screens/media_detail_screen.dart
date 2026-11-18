@@ -127,6 +127,7 @@ const double _heroChromeHeight = 58;
 /// row height, the hero's bottom inset and its side insets. Shared by the
 /// hero's height floor and its content budget so the two cannot disagree.
 const double _heroLogoHeight = 120;
+const double _landscapeHeroLogoHeight = 72;
 const double _heroLogoGap = 12;
 const double _heroActionHeight = 48;
 const double _heroBottomInset = 16;
@@ -2400,8 +2401,20 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
 
   bool get _hasInfoRows {
     final metadata = _metadata;
-    return metadata.studio != null || metadata.directors?.isNotEmpty == true || metadata.contentRating != null;
+    return metadata.studio != null ||
+        metadata.directors?.isNotEmpty == true ||
+        metadata.contentRating != null ||
+        (_usesIOSDetailLayout &&
+            (metadata.genres?.isNotEmpty == true || _titleRatings(metadata).isNotEmpty || !widget.isOffline));
   }
+
+  bool get _usesIOSDetailLayout {
+    if (!PlatformDetector.isHandheldIOS(context)) return false;
+    final width = MediaQuery.sizeOf(context).width - MediaQuery.paddingOf(context).horizontal - _heroSideInset * 2;
+    return _usesLandscapePhoneDetail || _isCompactHero(width);
+  }
+
+  bool get _usesLandscapePhoneDetail => PlatformDetector.isCompactMobileLandscape(context);
 
   /// Focus the trailing info rows (studio / directors / contentRating) and scroll them into view.
   void _focusInfoRows() {
@@ -2941,6 +2954,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     final client = _getMediaClientForMetadata(context);
     final hasPinnedLastEpisode = _hasPinnedLastEpisodeInList;
     return ListView.builder(
+      primary: false,
       addAutomaticKeepAlives: false,
       addSemanticIndexes: false,
       shrinkWrap: true,
@@ -2962,6 +2976,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
           client: client,
           isOffline: widget.isOffline,
           autofocus: false,
+          compact: _usesLandscapePhoneDetail,
           focusNode: _episodeListFocusNode(episode: episode, index: index, hasPinnedLastEpisode: hasPinnedLastEpisode),
           onNavigateUp: index == 0
               ? () {
@@ -3503,30 +3518,30 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       );
     }
 
-    // Determine header height based on screen size. The hero is 60% of the
-    // viewport but never shorter than a full hero needs — status bar and
-    // back-button strip, the full-size logo, both chip rows (three where the
-    // compact hero gives the scores their own) and the action row. Portrait
-    // phones and tablets clear that floor easily; a phone in landscape does
-    // not, and without it the budget shrinks the logo away.
+    // Keep the header large enough for the back button, title, facts and
+    // playback actions even on a short viewport.
     final size = MediaQuery.sizeOf(context);
     final viewPadding = MediaQuery.paddingOf(context);
-    final heroChipRows =
-        _isCompactHero(size.width - viewPadding.horizontal - _heroSideInset * 2) && _titleRatings(metadata).isNotEmpty
+    final useIOSDetailLayout = _usesIOSDetailLayout;
+    final landscapePhone = _usesLandscapePhoneDetail;
+    final compactLandscape = useIOSDetailLayout && landscapePhone;
+    final heroChipRows = useIOSDetailLayout
+        ? 1
+        : _isCompactHero(size.width - viewPadding.horizontal - _heroSideInset * 2) && _titleRatings(metadata).isNotEmpty
         ? 3
         : 2;
     final heroFloor = isTv
         ? 0.0
         : viewPadding.top +
               _heroChromeHeight +
-              _heroLogoHeight +
+              (compactLandscape ? _landscapeHeroLogoHeight : _heroLogoHeight) +
               _heroLogoGap +
               _HeroChips.height * heroChipRows +
               _HeroChips.spacing * (heroChipRows - 1) +
               _HeroChips.actionGap +
               _heroActionHeight +
               _heroBottomInset;
-    final headerHeight = isTv ? size.height : math.max(size.height * 0.6, heroFloor);
+    final headerHeight = isTv ? size.height : math.max(size.height * (useIOSDetailLayout ? 0.50 : 0.6), heroFloor);
 
     if (isTv) {
       return _buildTvDetailScreen(context, metadata, _handleMediaDetailBackKey);
@@ -3581,10 +3596,10 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                           // Reduced top inset keeps the Overview/first section
                           // tight under the hero's action row (the hero already
                           // contributes its own bottom inset above this).
-                          padding: .fromLTRB(
-                            isTv ? TvLayoutConstants.horizontalInset : 16,
-                            isTv ? 8 : 4,
-                            isTv ? TvLayoutConstants.horizontalInset : 16,
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                            landscapePhone ? _heroChromeHeight + 8 : 16,
+                            useIOSDetailLayout || isTv ? 8 : 4,
+                            16,
                             isTv ? 8 : 16,
                           ),
                           child: Column(
@@ -3592,27 +3607,34 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                             children: [
                               // Summary
                               if (!isTv && metadata.summary != null && metadata.summary!.isNotEmpty) ...[
-                                Text(key: _overviewSectionKey, t.discover.overview, style: sectionTitleStyle),
-                                const SizedBox(height: 12),
-                                CollapsibleText(
-                                  text: metadata.summary!,
-                                  maxLines: isMobile ? 6 : 4,
-                                  style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
-                                  focusNode: _overviewFocusNode,
-                                  skipTraversal: false,
-                                  onNavigateUp: () {
-                                    _scrollController.animateTo(
-                                      0,
-                                      duration: AppMotion.duration(context, AppMotion.fast),
-                                      curve: AppMotion.curve,
-                                    );
-                                    _playButtonFocusNode.requestFocus();
-                                  },
-                                  onNavigateDown: _focusBelowOverview,
-                                  onNavigateLeft: () {},
-                                  onNavigateRight: () {},
+                                if (!useIOSDetailLayout) ...[
+                                  Text(key: _overviewSectionKey, t.discover.overview, style: sectionTitleStyle),
+                                  const SizedBox(height: 12),
+                                ],
+                                Semantics(
+                                  key: useIOSDetailLayout ? _overviewSectionKey : null,
+                                  container: useIOSDetailLayout,
+                                  label: useIOSDetailLayout ? t.discover.overview : null,
+                                  child: CollapsibleText(
+                                    text: metadata.summary!,
+                                    maxLines: compactLandscape ? 3 : (useIOSDetailLayout || !isMobile ? 4 : 6),
+                                    style: theme.textTheme.bodyLarge?.copyWith(height: useIOSDetailLayout ? 1.45 : 1.6),
+                                    focusNode: _overviewFocusNode,
+                                    skipTraversal: false,
+                                    onNavigateUp: () {
+                                      _scrollController.animateTo(
+                                        0,
+                                        duration: AppMotion.duration(context, AppMotion.fast),
+                                        curve: AppMotion.curve,
+                                      );
+                                      _playButtonFocusNode.requestFocus();
+                                    },
+                                    onNavigateDown: _focusBelowOverview,
+                                    onNavigateLeft: () {},
+                                    onNavigateRight: () {},
+                                  ),
                                 ),
-                                const SizedBox(height: 12),
+                                SizedBox(height: useIOSDetailLayout ? 22 : 12),
                               ],
 
                               // Seasons / Episodes (for TV shows and seasons)
@@ -3703,6 +3725,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                                     key: _infoRowsSectionKey,
                                     crossAxisAlignment: .start,
                                     children: [
+                                      if (useIOSDetailLayout) ..._buildIOSDetailInfo(metadata),
                                       if (metadata.studio != null) ...[
                                         _buildInfoRow(t.discover.studio, metadata.studio!),
                                         const SizedBox(height: 12),
@@ -3737,7 +3760,6 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                   child: ValueListenableBuilder<double>(
                     valueListenable: _scrollOffset,
                     builder: (context, offset, child) => IgnorePointer(
-                      ignoring: offset < 50,
                       child: AnimatedOpacity(
                         opacity: (offset / 100).clamp(0.0, 1.0),
                         duration: AppMotion.duration(context, AppMotion.fast),
@@ -3745,7 +3767,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                       ),
                     ),
                     child: SizedBox(
-                      height: MediaQuery.paddingOf(context).top + 58,
+                      height: viewPadding.top + _heroChromeHeight,
                       child: RasterizedGradient(
                         gradient: LinearGradient(
                           begin: Alignment.topCenter,
@@ -3762,9 +3784,9 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
                   ),
                 ),
                 // Back button (always visible)
-                Positioned(
+                PositionedDirectional(
                   top: 0,
-                  left: 0,
+                  start: 0,
                   child: DesktopAppBarHelper.buildAdjustedLeading(
                     AppBarBackButton(
                       style: BackButtonStyle.circular,
@@ -4731,6 +4753,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
   /// it keeps the hero's fixed, no-parallax relationship to the content.
   Widget _buildHeroBackdropLayer(BuildContext context, MediaItem metadata, Size size, double headerHeight) {
     final artHeight = _heroArtHeight(size, headerHeight);
+    final fadesIntoAtmosphere = _usesIOSDetailLayout;
 
     return Positioned(
       top: 0,
@@ -4745,68 +4768,94 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
             return Transform.translate(offset: Offset(0, -offset), child: child);
           },
           child: RepaintBoundary(
-            child: Stack(
-              fit: .expand,
-              children: [
-                Builder(
-                  builder: (context) {
-                    final containerAspect = size.width / artHeight;
-                    final heroArtPaths = metadata.heroArtCandidates(containerAspectRatio: containerAspect);
-                    if (heroArtPaths.isEmpty) return const PlaceholderContainer();
+            child: Builder(
+              builder: (context) {
+                final backdrop = Stack(
+                  fit: .expand,
+                  children: [
+                    Builder(
+                      builder: (context) {
+                        final containerAspect = size.width / artHeight;
+                        final heroArtPaths = metadata.heroArtCandidates(containerAspectRatio: containerAspect);
+                        if (heroArtPaths.isEmpty) return const PlaceholderContainer();
 
-                    return blurArtwork(
-                      CyclingMediaBackdrop(
-                        mediaKey: metadata.globalKey,
-                        imagePaths: metadata.heroRotationPaths(containerAspectRatio: containerAspect),
-                        fallbackImagePaths: heroArtPaths,
-                        client: _getArtworkMediaClient(context),
-                        localArtworkPathResolver: widget.isOffline
-                            ? (path) => _offlineArtworkCandidatePath(context, path)
-                            : null,
-                        allowNetwork: !widget.isOffline,
-                        width: size.width,
-                        height: artHeight,
-                        fallbackColor: Theme.of(context).colorScheme.surfaceContainerHighest,
-                      ),
-                    );
-                  },
-                ),
+                        return blurArtwork(
+                          CyclingMediaBackdrop(
+                            mediaKey: metadata.globalKey,
+                            imagePaths: metadata.heroRotationPaths(containerAspectRatio: containerAspect),
+                            fallbackImagePaths: heroArtPaths,
+                            client: _getArtworkMediaClient(context),
+                            localArtworkPathResolver: widget.isOffline
+                                ? (path) => _offlineArtworkCandidatePath(context, path)
+                                : null,
+                            allowNetwork: !widget.isOffline,
+                            width: size.width,
+                            height: artHeight,
+                            focusCrop: true,
+                            fallbackColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                          ),
+                        );
+                      },
+                    ),
 
-                // Gradient overlay
-                Builder(
-                  builder: (context) {
-                    final bgColor = Theme.of(context).scaffoldBackgroundColor;
-                    // Full-height eased scrim. The light global dim (alpha 0.2 at
-                    // the very top) lowers the contrast the ramp has to bridge on
-                    // bright artwork — without it, any fade to solid compresses
-                    // into a visible band above the content stack. The body samples
-                    // easeInOut (continuous curvature — hand-picked stops kink at
-                    // every boundary); the tail instead decays the remaining
-                    // transparency geometrically (~1/8 per sample) because an eased
-                    // zero-slope landing leaves a faint artwork glow that pure-black
-                    // (OLED) backgrounds expose. Solid bg from 94% so nothing ghosts
-                    // where the artwork ends, on any theme.
-                    //
-                    // The ramp spans the art box, not the hero, so on wide windows
-                    // it keeps fading past the hero edge and the bottom of the frame
-                    // dissolves behind the overview instead of being cut off.
-                    const scrimAlphas = [0.20, 0.234, 0.325, 0.453, 0.60, 0.747, 0.875, 0.985, 0.998, 1.0];
-                    const scrimXs = [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.9375, 1.0];
-                    const solidStop = 0.94;
-                    return RasterizedGradient(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          for (final a in scrimAlphas) bgColor.withValues(alpha: a),
-                          bgColor,
-                        ],
-                        stops: [for (final x in scrimXs) solidStop * x, 1.0],
-                      ),
-                    );
-                  },
-                ),
-              ],
+                    // Gradient overlay
+                    Builder(
+                      builder: (context) {
+                        final bgColor = Theme.of(context).scaffoldBackgroundColor;
+                        if (fadesIntoAtmosphere) {
+                          return RasterizedGradient(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [bgColor.withValues(alpha: 0.16), bgColor.withValues(alpha: 0.48)],
+                            ),
+                          );
+                        }
+                        // Full-height eased scrim. The light global dim (alpha 0.2 at
+                        // the very top) lowers the contrast the ramp has to bridge on
+                        // bright artwork — without it, any fade to solid compresses
+                        // into a visible band above the content stack. The body samples
+                        // easeInOut (continuous curvature — hand-picked stops kink at
+                        // every boundary); the tail instead decays the remaining
+                        // transparency geometrically (~1/8 per sample) because an eased
+                        // zero-slope landing leaves a faint artwork glow that pure-black
+                        // (OLED) backgrounds expose. Solid bg from 94% so nothing ghosts
+                        // where the artwork ends, on any theme.
+                        //
+                        // The ramp spans the art box, not the hero, so on wide windows
+                        // it keeps fading past the hero edge and the bottom of the frame
+                        // dissolves behind the overview instead of being cut off.
+                        const scrimAlphas = [0.20, 0.234, 0.325, 0.453, 0.60, 0.747, 0.875, 0.985, 0.998, 1.0];
+                        const scrimXs = [0.0, 0.125, 0.25, 0.375, 0.5, 0.625, 0.75, 0.875, 0.9375, 1.0];
+                        const solidStop = 0.94;
+                        return RasterizedGradient(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              for (final a in scrimAlphas) bgColor.withValues(alpha: a),
+                              bgColor,
+                            ],
+                            stops: [for (final x in scrimXs) solidStop * x, 1.0],
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                );
+                if (!fadesIntoAtmosphere) return backdrop;
+                return ShaderMask(
+                  key: const ValueKey('detail_atmosphere_fade'),
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) => const LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [Colors.black, Colors.transparent],
+                    stops: [0.40, 1.0],
+                  ).createShader(bounds),
+                  child: backdrop,
+                );
+              },
             ),
           ),
         ),
@@ -4824,8 +4873,8 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
       top: false,
       bottom: false,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(
-          _heroSideInset,
+        padding: EdgeInsetsDirectional.fromSTEB(
+          _usesLandscapePhoneDetail ? _heroChromeHeight + 8 : _heroSideInset,
           MediaQuery.paddingOf(context).top + _heroChromeHeight,
           _heroSideInset,
           _heroBottomInset,
@@ -4841,6 +4890,9 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
         if (constraints.maxHeight <= 0 || constraints.maxWidth <= 0) return const SizedBox.shrink();
 
         final availableHeight = constraints.maxHeight.isFinite ? constraints.maxHeight : 264.0;
+        if (_usesIOSDetailLayout) {
+          return _buildIOSDetailHeader(context, metadata, constraints.maxWidth, availableHeight);
+        }
         const desiredLogoHeight = _heroLogoHeight;
         const desiredLogoWidth = 400.0;
         const actionHeight = _heroActionHeight;
@@ -4966,6 +5018,88 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
         );
       },
     );
+  }
+
+  Widget _buildIOSDetailHeader(BuildContext context, MediaItem metadata, double width, double height) {
+    final theme = Theme.of(context);
+    final landscape = _usesLandscapePhoneDetail;
+    final textAlignment = landscape ? AlignmentDirectional.centerStart : Alignment.center;
+    final facts = <MetadataLinePart>[
+      if (metadata.year case final year?) MetadataLineText('$year', dropPriority: 0),
+      if (metadata.contentRating case final rating?) MetadataLineText(formatContentRating(rating), dropPriority: 2),
+      if (metadata.durationMs case final duration?) MetadataLineText(formatDurationTextual(duration), dropPriority: 1),
+      for (final quality in buildMediaQualityLabels(metadata)) MetadataLineText(quality, dropPriority: 3),
+    ];
+    final logoHeight = (height - _heroActionHeight - (facts.isEmpty ? 12 : 54)).clamp(
+      0.0,
+      landscape ? _landscapeHeroLogoHeight : _heroLogoHeight,
+    );
+    final logoWidth = landscape ? math.min(width, 330.0) : width;
+    return Align(
+      alignment: landscape ? AlignmentDirectional.bottomStart : Alignment.bottomCenter,
+      child: Column(
+        crossAxisAlignment: landscape ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (logoHeight >= 24) ...[
+            _buildDetailLogoOrTitle(
+              context,
+              metadata,
+              width: logoWidth,
+              height: logoHeight,
+              availableWidth: logoWidth,
+              alignment: textAlignment.resolve(Directionality.of(context)),
+              titleBuilder: (context, title) => _buildDetailTitle(
+                context,
+                title,
+                fontSize: landscape ? 32 : 36,
+                textAlign: landscape ? TextAlign.start : TextAlign.center,
+              ),
+            ),
+            const SizedBox(height: 10),
+          ],
+          if (facts.isNotEmpty) ...[
+            SizedBox(
+              height: 28,
+              child: FittedMetadataLine(
+                parts: facts,
+                textStyle: (theme.textTheme.bodyMedium ?? const TextStyle()).copyWith(
+                  color: theme.colorScheme.onSurface.withValues(alpha: 0.78),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+          ],
+          SizedBox(
+            height: _heroActionHeight,
+            width: landscape ? math.min(width, 410.0) : null,
+            child: _buildActionButtons(metadata, showTracksStatus: !landscape),
+          ),
+        ],
+      ),
+    );
+  }
+
+  List<Widget> _buildIOSDetailInfo(MediaItem metadata) {
+    final ratings = _titleRatings(metadata);
+    return [
+      if (metadata.genres case final genres? when genres.isNotEmpty) ...[
+        _buildInfoRow(t.libraries.tabs.genres, genres.join(' · ')),
+        const SizedBox(height: 12),
+      ],
+      if (ratings.isNotEmpty || !widget.isOffline) ...[
+        Wrap(
+          spacing: 12,
+          runSpacing: 6,
+          crossAxisAlignment: WrapCrossAlignment.center,
+          children: [
+            for (final rating in ratings) InlineRatingBadges(ratings: [rating]),
+            if (!widget.isOffline) _buildUserRatingChip(metadata),
+          ],
+        ),
+        const SizedBox(height: 12),
+      ],
+    ];
   }
 
   /// Get the primary trailer from the extras list; null hides the button.

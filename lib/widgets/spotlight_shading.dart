@@ -4,7 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 
 /// Bakes the static readability scrims into one small texture. Backdrop fades
-/// and scrolling then blend a single quad instead of five full-screen shaders.
+/// and scrolling then blend a single quad instead of several full-screen shaders.
 class SpotlightShading extends StatefulWidget {
   const SpotlightShading({super.key, required this.size, required this.shelfStart, required this.dockBand});
 
@@ -145,12 +145,14 @@ class _ShadingPainter extends CustomPainter {
         stops: [0, shelfStart, (shelfStart + .10).clamp(0, .95), 1],
       ),
     );
-    gradient(
-      LinearGradient(
-        colors: [Colors.black.withValues(alpha: .55), Colors.black.withValues(alpha: .40), Colors.transparent],
-        stops: [0, dockBand * .6, dockBand],
-      ),
-    );
+    if (dockBand > 0) {
+      gradient(
+        LinearGradient(
+          colors: [Colors.black.withValues(alpha: .55), Colors.black.withValues(alpha: .40), Colors.transparent],
+          stops: [0, dockBand * .6, dockBand],
+        ),
+      );
+    }
   }
 
   @override

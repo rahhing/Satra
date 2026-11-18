@@ -35,6 +35,7 @@ class EpisodeCard extends StatefulWidget {
   final Future<void> Function(MediaItem source)? onRefresh;
   final Future<void> Function()? onListRefresh;
   final bool autofocus;
+  final bool compact;
   final bool isOffline;
   final String? localPosterPath;
   final FocusNode? focusNode;
@@ -48,6 +49,7 @@ class EpisodeCard extends StatefulWidget {
     this.onRefresh,
     this.onListRefresh,
     this.autofocus = false,
+    this.compact = false,
     this.isOffline = false,
     this.localPosterPath,
     this.focusNode,
@@ -127,6 +129,7 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
     final episode = _effectiveEpisode(context);
     final shouldBlur = hideSpoilers && episode.shouldHideSpoiler;
     final qualityLabels = [...buildMediaQualityLabels(episode), ?buildMediaSizeLabel(episode)];
+    final colors = Theme.of(context).colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
@@ -159,16 +162,20 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
               onSecondaryTap: showContextMenuFromTap,
               hoverColor: Theme.of(context).colorScheme.surface.withValues(alpha: 0.05),
               child: Container(
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(tokens(context).radiusSm),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 4),
+                decoration: widget.compact
+                    ? BoxDecoration(
+                        border: Border(bottom: BorderSide(color: colors.outlineVariant.withValues(alpha: .4))),
+                      )
+                    : BoxDecoration(
+                        color: colors.surfaceContainerLow,
+                        borderRadius: BorderRadius.circular(tokens(context).radiusSm),
+                      ),
+                padding: EdgeInsets.symmetric(vertical: widget.compact ? 8 : 4),
                 child: Row(
-                  crossAxisAlignment: .start,
+                  crossAxisAlignment: widget.compact ? CrossAxisAlignment.center : CrossAxisAlignment.start,
                   children: [
                     SizedBox(
-                      width: 144,
+                      width: widget.compact ? 124 : 144,
                       child: MediaCardArtwork(
                         borderRadius: tokens(context).radiusSm,
                         item: episode,
@@ -267,7 +274,7 @@ class _EpisodeCardState extends State<EpisodeCard> with ContextMenuTapMixin<Epis
                             else
                               CollapsibleText(
                                 text: episode.summary!,
-                                maxLines: 3,
+                                maxLines: widget.compact ? 2 : 3,
                                 small: true,
                                 suppressExpandSemantics: true,
                                 style: Theme.of(

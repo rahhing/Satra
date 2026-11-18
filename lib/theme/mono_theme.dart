@@ -3,6 +3,7 @@ import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'mono_tokens.dart';
 import 'app_motion.dart';
 
@@ -386,7 +387,7 @@ ThemeData _buildMonoTheme(MonoPalette c, {required TargetPlatform platform, doub
     switchTheme: SwitchThemeData(
       mouseCursor: clickableCursor,
       // A transparent icon keeps both thumb sizes equal in Material's switch.
-      thumbIcon: const WidgetStatePropertyAll(Icon(Icons.circle, color: Colors.transparent, size: 1)),
+      thumbIcon: const WidgetStatePropertyAll(Icon(Symbols.circle_rounded, color: Colors.transparent, size: 1)),
       thumbColor: WidgetStateProperty.resolveWith((states) {
         final selected = states.contains(WidgetState.selected);
         final color = selected ? onAccent : c.text;

@@ -2321,6 +2321,72 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('iPhone detail flows from Play into the synopsis without a separate overview header', (tester) async {
+      const summary = 'Two teenagers discover that they have mysteriously swapped lives.';
+      final movie = testMediaItem(
+        id: 'ios_movie',
+        title: 'Featured Film',
+        summary: summary,
+        year: 2016,
+        genres: const ['Drama'],
+        serverId: 'server_1',
+      );
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
+      await pumpPhoneDetail(tester, client, movie, theme: monoTheme(MonoPalette.dark).copyWith(platform: .iOS));
+      tester.view.physicalSize = const Size(390, 844);
+      await tester.pump();
+      expect(find.byKey(const ValueKey('detail_atmosphere_fade')), findsOneWidget);
+      expect(find.text(t.discover.overview), findsNothing);
+      final play = find.text(t.common.play);
+      expect(play, findsOneWidget);
+      expect(tester.getBottomLeft(play).dy, lessThan(tester.getTopLeft(find.text(summary)).dy));
+      expect(find.text('Drama'), findsOneWidget);
+      expect(tester.getTopLeft(find.text('Drama')).dy, greaterThan(tester.getBottomLeft(find.text(summary)).dy));
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('iPhone landscape detail scrolls back from Episodes through the top fade', (tester) async {
+      const summary = 'A young apprentice discovers a hidden world of magic.';
+      final show = buildShow(summary: summary);
+      final season = buildSeason(show, 1);
+      final client = _FakeMediaServerClient(
+        show: show,
+        childrenByParent: {
+          show.id: [season],
+          season.id: [for (var i = 1; i <= 12; i++) buildEpisode(show, season, i)],
+        },
+      );
+      await pumpPhoneDetail(tester, client, show, theme: monoTheme(MonoPalette.dark).copyWith(platform: .iOS));
+      tester.view.physicalSize = const Size(390, 844);
+      await tester.pump();
+      tester.view.physicalSize = const Size(844, 390);
+      tester.view.padding = const FakeViewPadding(left: 47, right: 47, bottom: 21);
+      addTearDown(tester.view.resetPadding);
+      await tester.pumpAndSettle();
+
+      final title = find.byType(FittingTitleText).first;
+      expect(tester.widget<FittingTitleText>(title).textAlign, TextAlign.start);
+      expect(find.byKey(const ValueKey('detail_atmosphere_fade')), findsOneWidget);
+      expect(tester.getTopLeft(find.text(summary)).dy, lessThan(300));
+
+      final scroll = tester.state<ScrollableState>(find.byType(Scrollable).first).position;
+      await tester.dragFrom(const Offset(450, 290), const Offset(0, -255));
+      await tester.pumpAndSettle();
+      expect(scroll.pixels, greaterThan(100));
+      final episode = find.byType(EpisodeCard).hitTestable().first;
+      expect(tester.widget<EpisodeCard>(episode).compact, isTrue);
+
+      final before = scroll.pixels;
+      await tester.dragFrom(const Offset(450, 32), const Offset(0, 200));
+      await tester.pumpAndSettle();
+      expect(scroll.pixels, lessThan(before));
+      await tester.dragFrom(const Offset(450, 55), const Offset(0, 300));
+      await tester.pumpAndSettle();
+      expect(scroll.pixels, closeTo(0, 1));
+      expect(title.hitTestable(), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('logo-less title gets a wider slot than the logo and shrinks to fit it', (tester) async {
       // #1796: the fallback title used to be laid out in the 400px logo slot
       // and ellipsized on its second line with most of a desktop hero still

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -9,6 +10,7 @@ import '../navigation/navigation_tabs.dart';
 import '../theme/app_motion.dart';
 import 'app_icon.dart';
 import 'glass_surface.dart';
+import 'ios_glass_control.dart';
 import 'navigation_label_fit.dart';
 
 /// iOS 26-style floating Liquid Glass capsule tab bar with a press-and-hold
@@ -20,6 +22,7 @@ class MobileGlassTabBar extends StatelessWidget {
     required this.tabs,
     required this.selectedTab,
     required this.hideLabels,
+    this.isLandscape = false,
     required this.onDestinationSelected,
     this.onActiveTabReselected,
     this.onLibrariesLongPress,
@@ -29,14 +32,15 @@ class MobileGlassTabBar extends StatelessWidget {
   final List<NavigationTab> tabs;
   final NavigationTabId selectedTab;
   final bool hideLabels;
+  final bool isLandscape;
   final ValueChanged<NavigationTabId> onDestinationSelected;
   final VoidCallback? onActiveTabReselected;
   final VoidCallback? onLibrariesLongPress;
   final VoidCallback? onSearchPressed;
 
-  static const double _heightWithLabels = 60.0;
+  static const double _heightWithLabels = 64.0;
   static const double _heightCompact = 52.0;
-  static const double _capsuleHorizontalInset = 6.0;
+  static const double _capsuleHorizontalInset = 3.0;
   static const double _capsuleVerticalInset = 4.0;
   static const BorderRadius _capsuleRadius = BorderRadius.all(Radius.circular(999));
 
@@ -44,133 +48,51 @@ class MobileGlassTabBar extends StatelessWidget {
   Widget build(BuildContext context) {
     if (tabs.isEmpty) return const SizedBox.shrink();
 
-    return _NativeTabBar(
-      tabs: tabs,
-      selectedTab: selectedTab,
-      hideLabels: hideLabels,
-      onDestinationSelected: onDestinationSelected,
-      onActiveTabReselected: onActiveTabReselected,
-      onSearchPressed: onSearchPressed,
-    );
-  }
-}
-
-class _NativeTabBar extends StatefulWidget {
-  const _NativeTabBar({
-    required this.tabs,
-    required this.selectedTab,
-    required this.hideLabels,
-    required this.onDestinationSelected,
-    this.onActiveTabReselected,
-    this.onSearchPressed,
-  });
-  final List<NavigationTab> tabs;
-  final NavigationTabId selectedTab;
-  final bool hideLabels;
-  final ValueChanged<NavigationTabId> onDestinationSelected;
-  final VoidCallback? onActiveTabReselected;
-  final VoidCallback? onSearchPressed;
-  @override
-  State<_NativeTabBar> createState() => _NativeTabBarState();
-}
-
-class _NativeTabBarState extends State<_NativeTabBar> {
-  MethodChannel? _channel;
-  Map<String, Object> get _params => {
-    'tabs': [
-      for (final tab in widget.tabs) {'id': tab.id.name, 'label': tab.getLabel()},
-    ],
-    'selected': widget.tabs.indexWhere((tab) => tab.id == widget.selectedTab).clamp(0, widget.tabs.length - 1),
-    'hideLabels': widget.hideLabels,
-    'dark': Theme.of(context).brightness == Brightness.dark,
-  };
-  @override
-  void didUpdateWidget(covariant _NativeTabBar oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    _channel?.invokeMethod<void>('update', _params);
-  }
-
-  @override
-  void dispose() {
-    _channel?.setMethodCallHandler(null);
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) => Row(
-    children: [
-      Expanded(
-        child: SizedBox(
-          height: widget.hideLabels ? 52 : 60,
-          child: UiKitView(
-            viewType: 'com.satra/ios_tab_bar',
-            creationParams: _params,
-            creationParamsCodec: const StandardMessageCodec(),
-            onPlatformViewCreated: (id) {
-              final channel = MethodChannel('com.satra/ios_tab_bar/$id');
-              _channel = channel;
-              channel.setMethodCallHandler((call) async {
-                if (call.method != 'selected' || !mounted) return;
-                final index = call.arguments as int;
-                if (index == widget.tabs.length) {
-                  widget.onSearchPressed?.call();
-                  channel.invokeMethod<void>('update', _params);
-                  return;
-                }
-                if (index < 0 || index >= widget.tabs.length) return;
-                final tab = widget.tabs[index];
-                if (tab.id == widget.selectedTab) {
-                  widget.onActiveTabReselected?.call();
-                } else {
-                  widget.onDestinationSelected(tab.id);
-                }
-              });
-              channel.invokeMethod<void>('update', _params);
-            },
-          ),
-        ),
-      ),
-      if (widget.onSearchPressed != null) ...[
-        const SizedBox(width: 4),
-        _MobileGlassSearchOrb(size: 48, onPressed: widget.onSearchPressed!),
-      ],
-    ],
-  );
-}
-
-class _LegacyMobileGlassTabBar extends MobileGlassTabBar {
-  const _LegacyMobileGlassTabBar({
-    required super.tabs,
-    required super.selectedTab,
-    required super.hideLabels,
-    required super.onDestinationSelected,
-    super.onActiveTabReselected,
-    super.onLibrariesLongPress,
-    super.onSearchPressed,
-  });
-  @override
-  Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final glassTint = isDark ? const Color(0xFF07080C) : null;
-    final barHeight = hideLabels ? MobileGlassTabBar._heightCompact : MobileGlassTabBar._heightWithLabels;
+    final barHeight = hideLabels ? _heightCompact : _heightWithLabels;
     final selectedIndex = tabs.indexWhere((tab) => tab.id == selectedTab);
     final activeIndex = selectedIndex >= 0 ? selectedIndex : 0;
 
-    final tabCapsule = SizedBox(
-      height: barHeight,
-      child: GlassSurface(
-        interactive: true,
-        borderRadius: MobileGlassTabBar._capsuleRadius,
-        sigma: 28,
-        opacity: 0.68,
-        tint: glassTint,
-        child: _TabCapsuleInterior(
-          tabs: tabs,
-          activeIndex: activeIndex,
-          hideLabels: hideLabels,
-          onDestinationSelected: onDestinationSelected,
-          onActiveTabReselected: onActiveTabReselected,
-          onLibrariesLongPress: onLibrariesLongPress,
+    final tabCapsule = IOSGlassControl.adaptive(
+      native: (_) => SizedBox(
+        height: hideLabels ? 58 : (isLandscape ? 86 : 78),
+        child: IOSGlassControl(
+          configuration: {
+            'kind': 'tabBar',
+            'tabs': [
+              for (final tab in tabs) {'id': tab.id.name, 'label': tab.getLabel()},
+            ],
+            'selected': tabs[activeIndex].id.name,
+            'hideLabels': hideLabels,
+            if (onLibrariesLongPress != null) 'quickPicker': t.libraries.selectLibrary,
+          },
+          onAction: (action, value) {
+            if (action == 'librariesHeld') {
+              onLibrariesLongPress?.call();
+            } else if (action == 'selected') {
+              for (final tab in tabs) {
+                if (tab.id.name != value) continue;
+                if (tab.id == selectedTab) {
+                  onActiveTabReselected?.call();
+                } else {
+                  onDestinationSelected(tab.id);
+                }
+                break;
+              }
+            }
+          },
+        ),
+      ),
+      child: SizedBox(
+        height: barHeight,
+        child: _NavigationGlass(
+          child: _TabCapsuleInterior(
+            tabs: tabs,
+            activeIndex: activeIndex,
+            hideLabels: hideLabels,
+            onDestinationSelected: onDestinationSelected,
+            onActiveTabReselected: onActiveTabReselected,
+            onLibrariesLongPress: onLibrariesLongPress,
+          ),
         ),
       ),
     );
@@ -181,14 +103,33 @@ class _LegacyMobileGlassTabBar extends MobileGlassTabBar {
     return Row(
       children: [
         Expanded(child: tabCapsule),
-        const SizedBox(width: 10),
+        SizedBox(width: isLandscape ? 12 : 8),
         _MobileGlassSearchOrb(
           key: const ValueKey('mobile_glass_search_orb'),
-          size: barHeight,
-          tint: glassTint,
+          size: hideLabels ? _heightCompact : (isLandscape ? 62 : 57),
+          nativeVerticalOffset: -3,
           onPressed: searchCallback,
         ),
       ],
+    );
+  }
+}
+
+class _NavigationGlass extends StatelessWidget {
+  const _NavigationGlass({required this.child});
+
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GlassSurface(
+      interactive: true,
+      borderRadius: MobileGlassTabBar._capsuleRadius,
+      sigma: 28,
+      opacity: 0.80,
+      tint: isDark ? const Color(0xFF07080C) : null,
+      child: child,
     );
   }
 }
@@ -226,6 +167,7 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
   double? _scrubVisualSlot;
   bool _isScrubbing = false;
   bool _longPressFired = false;
+  NavigationTabId? _lastScrubbedTab;
   Timer? _librariesLongPressTimer;
   double _lastSlotWidth = 0.0;
   bool _lastIsRtl = false;
@@ -251,11 +193,12 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
   }
 
   void _handlePointerDown(PointerDownEvent event) {
-    if (widget.tabs.isEmpty || _lastSlotWidth <= 0) return;
+    if (_activePointer != null || _lastSlotWidth <= 0 || event.buttons != kPrimaryButton) return;
     _activePointer = event.pointer;
     _downLocalPosition = event.localPosition;
     _isScrubbing = false;
     _longPressFired = false;
+    _lastScrubbedTab = null;
 
     final touchedVisualSlot = _visualSlotFromDx(event.localPosition.dx).round();
     final touchedIndex = _logicalIndexForVisualSlot(touchedVisualSlot);
@@ -265,21 +208,26 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
     _loupeController.forward();
 
     _librariesLongPressTimer?.cancel();
-    if (widget.tabs[touchedIndex].id == NavigationTabId.libraries && widget.onLibrariesLongPress != null) {
+    final onLibrariesLongPress = widget.onLibrariesLongPress;
+    if (widget.tabs[touchedIndex].id == NavigationTabId.libraries && onLibrariesLongPress != null) {
       _librariesLongPressTimer = Timer(const Duration(milliseconds: 460), () {
         if (!mounted || _activePointer == null || _isScrubbing) return;
         _longPressFired = true;
         _loupeController.reverse();
         HapticFeedback.mediumImpact();
-        widget.onLibrariesLongPress!();
+        onLibrariesLongPress();
       });
     }
   }
 
   void _handlePointerMove(PointerMoveEvent event) {
     if (_activePointer != event.pointer || _longPressFired || _lastSlotWidth <= 0) return;
-    final down = _downLocalPosition;
-    if (down != null && (event.localPosition - down).distance > 8.0 && !_isScrubbing) {
+    final delta = event.localPosition - _downLocalPosition!;
+    if (!_isScrubbing && delta.distance > 8.0) {
+      if (delta.dy.abs() > delta.dx.abs()) {
+        _resetPointer();
+        return;
+      }
       _isScrubbing = true;
       _librariesLongPressTimer?.cancel();
     }
@@ -290,41 +238,44 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
     setState(() {
       _scrubVisualSlot = continuousVisual;
     });
-    if (hoveredIndex != widget.activeIndex) {
+    final hoveredTab = widget.tabs[hoveredIndex].id;
+    final previousTab = _lastScrubbedTab ?? widget.tabs[widget.activeIndex].id;
+    _lastScrubbedTab = hoveredTab;
+    if (hoveredTab != previousTab) {
       HapticFeedback.selectionClick();
-      widget.onDestinationSelected(widget.tabs[hoveredIndex].id);
+      widget.onDestinationSelected(hoveredTab);
     }
   }
 
   void _handlePointerUp(PointerUpEvent event) {
     if (_activePointer != event.pointer) return;
-    _librariesLongPressTimer?.cancel();
     final wasLongPress = _longPressFired;
     final wasScrubbing = _isScrubbing;
-    _activePointer = null;
-    _downLocalPosition = null;
-    _isScrubbing = false;
-    _longPressFired = false;
-    _loupeController.reverse();
+    final lastScrubbedTab = _lastScrubbedTab;
+    _resetPointer();
 
-    if (!wasLongPress && _lastSlotWidth > 0 && widget.tabs.isNotEmpty) {
-      final targetVisual = _visualSlotFromDx(event.localPosition.dx).round();
-      final targetIndex = _logicalIndexForVisualSlot(targetVisual);
-      if (targetIndex != widget.activeIndex) {
-        if (!wasScrubbing) HapticFeedback.selectionClick();
-        widget.onDestinationSelected(widget.tabs[targetIndex].id);
-      } else if (!wasScrubbing) {
-        widget.onActiveTabReselected?.call();
-      }
+    final size = context.size;
+    if (wasLongPress ||
+        _lastSlotWidth <= 0 ||
+        (!wasScrubbing && (size == null || !(Offset.zero & size).contains(event.localPosition)))) {
+      return;
     }
 
-    setState(() {
-      _scrubVisualSlot = null;
-    });
+    final targetIndex = _logicalIndexForVisualSlot(_visualSlotFromDx(event.localPosition.dx).round());
+    final targetTab = widget.tabs[targetIndex].id;
+    if (wasScrubbing ? targetTab != lastScrubbedTab : targetIndex != widget.activeIndex) {
+      HapticFeedback.selectionClick();
+      widget.onDestinationSelected(targetTab);
+    } else if (!wasScrubbing) {
+      widget.onActiveTabReselected?.call();
+    }
   }
 
   void _handlePointerCancel(PointerCancelEvent event) {
-    if (_activePointer != event.pointer) return;
+    if (_activePointer == event.pointer) _resetPointer();
+  }
+
+  void _resetPointer() {
     _librariesLongPressTimer?.cancel();
     _activePointer = null;
     _downLocalPosition = null;
@@ -358,11 +309,11 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
         final visualSlot = _scrubVisualSlot ?? settledVisualSlot;
         final indicatorLeft = MobileGlassTabBar._capsuleHorizontalInset + visualSlot * slotWidth;
 
-        final labelStyle = TextStyle(
-          fontSize: 10.5,
+        final labelStyle = (theme.textTheme.labelSmall ?? const TextStyle()).copyWith(
+          fontSize: 11,
+          height: 1.15,
           fontWeight: FontWeight.w600,
           letterSpacing: -0.15,
-          color: theme.colorScheme.onSurface,
         );
 
         Widget itemsRow = Padding(
@@ -379,6 +330,10 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
                     tab: widget.tabs[i],
                     selected: i == widget.activeIndex,
                     hideLabels: widget.hideLabels,
+                    labelStyle: labelStyle,
+                    onSemanticsLongPress: widget.tabs[i].id == NavigationTabId.libraries
+                        ? widget.onLibrariesLongPress
+                        : null,
                     onSemanticsTap: () {
                       if (i != widget.activeIndex) {
                         HapticFeedback.selectionClick();
@@ -396,7 +351,7 @@ class _TabCapsuleInteriorState extends State<_TabCapsuleInterior> with SingleTic
         if (!widget.hideLabels && slotWidth > 0) {
           itemsRow = NavigationLabelScale(
             labels: [for (final tab in widget.tabs) tab.getLabel()],
-            labelWidth: (slotWidth - 8).clamp(1.0, double.infinity),
+            labelWidth: (slotWidth - 4).clamp(1.0, double.infinity),
             style: labelStyle,
             child: itemsRow,
           );
@@ -476,34 +431,39 @@ class _MobileGlassTabButton extends StatelessWidget {
     required this.tab,
     required this.selected,
     required this.hideLabels,
+    required this.labelStyle,
     required this.onSemanticsTap,
+    this.onSemanticsLongPress,
   });
 
   final NavigationTab tab;
   final bool selected;
   final bool hideLabels;
+  final TextStyle labelStyle;
   final VoidCallback onSemanticsTap;
+  final VoidCallback? onSemanticsLongPress;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final label = tab.getLabel();
-    final fgColor = selected ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.72);
+    final fgColor = selected ? colorScheme.primary : colorScheme.onSurface.withValues(alpha: 0.88);
 
     return Semantics(
       selected: selected,
       button: true,
       label: label,
       onTap: onSemanticsTap,
+      onLongPress: onSemanticsLongPress,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 4),
+        padding: const EdgeInsets.symmetric(horizontal: 2),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppIcon(tab.icon, fill: selected ? 1 : 0, size: hideLabels ? 23 : 21, color: fgColor),
+            AppIcon(tab.icon, fill: selected ? 1 : 0, size: 24, color: fgColor),
             if (!hideLabels) ...[
-              const SizedBox(height: 2),
+              const SizedBox(height: 3),
               ExcludeSemantics(
                 child: Text(
                   label,
@@ -511,13 +471,7 @@ class _MobileGlassTabButton extends StatelessWidget {
                   softWrap: false,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 10.5,
-                    height: 1.15,
-                    letterSpacing: -0.15,
-                    fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                    color: fgColor,
-                  ),
+                  style: labelStyle.copyWith(fontWeight: selected ? FontWeight.w600 : FontWeight.w500, color: fgColor),
                 ),
               ),
             ],
@@ -529,19 +483,23 @@ class _MobileGlassTabButton extends StatelessWidget {
 }
 
 class _MobileGlassSearchOrb extends StatelessWidget {
-  const _MobileGlassSearchOrb({super.key, required this.size, required this.onPressed, this.tint});
+  const _MobileGlassSearchOrb({super.key, required this.size, this.nativeVerticalOffset = 0, required this.onPressed});
 
   final double size;
+  final double nativeVerticalOffset;
   final VoidCallback onPressed;
-  final Color? tint;
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Semantics(
-      button: true,
+    return IOSGlassButton(
       label: t.common.search,
+      symbol: 'magnifyingglass',
+      symbolSize: 21,
+      regularSymbolWeight: true,
+      nativeOffset: Offset(0, nativeVerticalOffset),
+      onPressed: onPressed,
       child: Tooltip(
         message: t.common.search,
         child: GestureDetector(
@@ -553,12 +511,7 @@ class _MobileGlassSearchOrb extends StatelessWidget {
           child: SizedBox(
             width: size,
             height: size,
-            child: GlassSurface(
-              interactive: true,
-              borderRadius: MobileGlassTabBar._capsuleRadius,
-              sigma: 28,
-              opacity: 0.68,
-              tint: tint,
+            child: _NavigationGlass(
               child: Center(
                 child: AppIcon(Symbols.search_rounded, size: 22, color: colorScheme.onSurface.withValues(alpha: 0.90)),
               ),

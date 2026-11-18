@@ -460,6 +460,19 @@ List<SpotlightEntry> buildLocalSpotlightEntries({
       keywords: const ['background', 'brightness', 'dim', 'darken', 'lighten', 'blur', 'glass', 'appearance'],
       onActivate: () => openSettingScreen(const AppearanceSettingsScreen()),
     ),
+    if (PlatformDetector.isMobile(hostContext) && !PlatformDetector.isAutomotive())
+      SpotlightEntry(
+        id: 'setting:darken_mobile_backdrop',
+        title: t.settings.darkenMobileBackdrop,
+        subtitle: t.settings.appearance,
+        badge: t.common.settings,
+        icon: Symbols.contrast_rounded,
+        category: SpotlightCategory.settings,
+        type: SpotlightEntryType.setting,
+        basePriority: 66,
+        keywords: const ['backdrop', 'darken', 'dim', 'bright', 'continue watching', 'blur', 'home', 'appearance'],
+        onActivate: () => openSettingScreen(const AppearanceSettingsScreen()),
+      ),
     SpotlightEntry(
       id: 'setting:playback',
       title: t.settings.videoPlayback,

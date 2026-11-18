@@ -61,77 +61,78 @@ void main() {
     expect(glassClipPaths, findsNWidgets(baseClipCount));
   });
 
-  testWidgets('Bottom-docked GlassSurface keeps top corners rounded, defaults translucent, and scales with opacity slider', (
-    tester,
-  ) async {
-    await SettingsService.instance.write(SettingsService.liquidGlass, true);
-    await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.20);
-    final boundaryKey = GlobalKey();
+  testWidgets(
+    'Bottom-docked GlassSurface keeps top corners rounded, defaults translucent, and scales with opacity slider',
+    (tester) async {
+      await SettingsService.instance.write(SettingsService.liquidGlass, true);
+      await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.20);
+      final boundaryKey = GlobalKey();
 
-    await tester.pumpWidget(
-      MaterialApp(
-        theme: monoTheme(MonoPalette.dark),
-        home: Scaffold(
-          backgroundColor: const Color(0xFF00AAFF),
-          body: Center(
-            child: RepaintBoundary(
-              key: boundaryKey,
-              child: const ColoredBox(
-                color: Color(0xFF00AAFF),
-                child: SizedBox(
-                  width: 240,
-                  height: 160,
-                  child: GlassSurface(
-                    borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-                    opacity: 0.86,
-                    child: SizedBox.expand(),
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: monoTheme(MonoPalette.dark),
+          home: Scaffold(
+            backgroundColor: const Color(0xFF00AAFF),
+            body: Center(
+              child: RepaintBoundary(
+                key: boundaryKey,
+                child: const ColoredBox(
+                  color: Color(0xFF00AAFF),
+                  child: SizedBox(
+                    width: 240,
+                    height: 160,
+                    child: GlassSurface(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+                      opacity: 0.86,
+                      child: SizedBox.expand(),
+                    ),
                   ),
                 ),
               ),
             ),
           ),
         ),
-      ),
-    );
-    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 80)));
-    await tester.pump();
+      );
+      await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 80)));
+      await tester.pump();
 
-    final boundary = boundaryKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
-    final defaultImage = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
-    final defaultBytes = await tester.runAsync(() => defaultImage!.toByteData(format: ui.ImageByteFormat.rawRgba));
-    expect(defaultBytes, isNotNull);
+      final boundary = boundaryKey.currentContext!.findRenderObject()! as RenderRepaintBoundary;
+      final defaultImage = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
+      final defaultBytes = await tester.runAsync(() => defaultImage!.toByteData(format: ui.ImageByteFormat.rawRgba));
+      expect(defaultBytes, isNotNull);
 
-    int channelIn(ByteData data, int x, int y, int c) => data.getUint8((y * 240 + x) * 4 + c);
+      int channelIn(ByteData data, int x, int y, int c) => data.getUint8((y * 240 + x) * 4 + c);
 
-    // Default Liquid Glass opacity (20%) stays crystal-translucent over #00AAFF.
-    expect(channelIn(defaultBytes!, 120, 80, 2), greaterThan(170));
-    expect((channelIn(defaultBytes, 2, 157, 2) - channelIn(defaultBytes, 2, 105, 2)).abs(), lessThanOrEqualTo(6));
-    expect((channelIn(defaultBytes, 237, 157, 2) - channelIn(defaultBytes, 237, 105, 2)).abs(), lessThanOrEqualTo(6));
+      // Default Liquid Glass opacity (20%) stays crystal-translucent over #00AAFF.
+      expect(channelIn(defaultBytes!, 120, 80, 2), greaterThan(170));
+      expect((channelIn(defaultBytes, 2, 157, 2) - channelIn(defaultBytes, 2, 105, 2)).abs(), lessThanOrEqualTo(6));
+      expect((channelIn(defaultBytes, 237, 157, 2) - channelIn(defaultBytes, 237, 105, 2)).abs(), lessThanOrEqualTo(6));
 
-    // Raising Liquid Glass Opacity to 90% deepens the smoked tint while keeping
-    // top-left rounded and bottom corners sharp and uniformly filled.
-    await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.90);
-    await tester.pump();
+      // Raising Liquid Glass Opacity to 90% deepens the smoked tint while keeping
+      // top-left rounded and bottom corners sharp and uniformly filled.
+      await SettingsService.instance.write(SettingsService.liquidGlassOpacity, 0.90);
+      await tester.pump();
 
-    final denseImage = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
-    final bytes = await tester.runAsync(() => denseImage!.toByteData(format: ui.ImageByteFormat.rawRgba));
-    expect(bytes, isNotNull);
+      final denseImage = await tester.runAsync(() => boundary.toImage(pixelRatio: 1.0));
+      final bytes = await tester.runAsync(() => denseImage!.toByteData(format: ui.ImageByteFormat.rawRgba));
+      expect(bytes, isNotNull);
 
-    int channelAt(int x, int y, int c) => bytes!.getUint8((y * 240 + x) * 4 + c);
+      int channelAt(int x, int y, int c) => bytes!.getUint8((y * 240 + x) * 4 + c);
 
-    // Top-left (2, 2) lies outside the 28px top-left rounded corner, so the
-    // bright cyan backdrop (#00AAFF) remains completely untouched.
-    expect(channelAt(2, 2, 2), greaterThan(230));
-    expect(channelAt(2, 2, 0), lessThan(20));
+      // Top-left (2, 2) lies outside the 28px top-left rounded corner, so the
+      // bright cyan backdrop (#00AAFF) remains completely untouched.
+      expect(channelAt(2, 2, 2), greaterThan(230));
+      expect(channelAt(2, 2, 0), lessThan(20));
 
-    // Bottom-left (2, 157) and bottom-right (237, 157) must be completely filled
-    // by the dark smoked glass with no curved cutoff or semi-opaque wedge,
-    // matching the vertical edge 50px higher up.
-    expect(channelAt(2, 157, 2), lessThan(80));
-    expect(channelAt(237, 157, 2), lessThan(80));
-    expect((channelAt(2, 157, 0) - channelAt(2, 105, 0)).abs(), lessThanOrEqualTo(6));
-    expect((channelAt(237, 157, 0) - channelAt(237, 105, 0)).abs(), lessThanOrEqualTo(6));
-  });
+      // Bottom-left (2, 157) and bottom-right (237, 157) must be completely filled
+      // by the dark smoked glass with no curved cutoff or semi-opaque wedge,
+      // matching the vertical edge 50px higher up.
+      expect(channelAt(2, 157, 2), lessThan(80));
+      expect(channelAt(237, 157, 2), lessThan(80));
+      expect((channelAt(2, 157, 0) - channelAt(2, 105, 0)).abs(), lessThanOrEqualTo(6));
+      expect((channelAt(237, 157, 0) - channelAt(237, 105, 0)).abs(), lessThanOrEqualTo(6));
+    },
+  );
 
   testWidgets('OverlaySheetHost(blurNativeVideo: true) blurs native video for all hosted sheets', (tester) async {
     late BuildContext innerContext;

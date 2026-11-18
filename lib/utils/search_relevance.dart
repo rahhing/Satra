@@ -12,6 +12,7 @@ const int defaultMediaSearchLimit = 100;
 
 final RegExp _searchSeparatorPattern = RegExp(r'[^\p{L}\p{N}\p{M}]+', unicode: true);
 
+// ignore: unused-code
 List<MediaItem> rankMediaSearchResults(List<MediaItem> items, String query, {int? limit}) =>
     _rankBySearchRelevance(items, query, _mediaScore, limit: limit);
 

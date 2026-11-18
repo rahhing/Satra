@@ -56,7 +56,8 @@ Route<void> buildSpotlightRoute({
     reverseTransitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 150)),
     pageBuilder: (routeContext, animation, secondaryAnimation) {
       final keyboardBottom = MediaQuery.viewInsetsOf(routeContext).bottom;
-      final isCompact = MediaQuery.sizeOf(routeContext).width < 600;
+      final viewport = MediaQuery.sizeOf(routeContext);
+      final isCompact = viewport.width < 600 || (isMobileHost && viewport.height < 500);
       return AnimatedPadding(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
@@ -203,10 +204,7 @@ final class _SpotlightLayoutMetrics {
     final item = entry.mediaItem;
     if (item == null) return false;
     final kind = item.kind;
-    return kind != MediaKind.episode &&
-        kind != MediaKind.artist &&
-        kind != MediaKind.album &&
-        kind != MediaKind.track;
+    return kind != MediaKind.episode && kind != MediaKind.artist && kind != MediaKind.album && kind != MediaKind.track;
   }
 }
 
@@ -275,10 +273,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     if (initial.isNotEmpty) {
       _controller.selection = TextSelection.collapsed(offset: initial.length);
     }
-    _inputFocusNode = FocusNode(
-      debugLabel: 'SpotlightInput',
-      onKeyEvent: (_, event) => _handleKeyEvent(event),
-    );
+    _inputFocusNode = FocusNode(debugLabel: 'SpotlightInput', onKeyEvent: (_, event) => _handleKeyEvent(event));
     _smoothScrollTicker = createTicker(_onSmoothScrollTick);
     _rebuildLocalEntries();
     _invalidateDisplayCache();
@@ -335,9 +330,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
 
     final prev = _lastSmoothTick;
     _lastSmoothTick = elapsed;
-    final dt = prev == null
-        ? (1.0 / 120.0)
-        : ((elapsed - prev).inMicroseconds / 1000000.0).clamp(0.001, 0.05);
+    final dt = prev == null ? (1.0 / 120.0) : ((elapsed - prev).inMicroseconds / 1000000.0).clamp(0.001, 0.05);
     final factor = 1.0 - math.exp(-dt * _smoothSpeed);
     final next = current + diff * factor;
     pos.jumpTo(next.clamp(pos.minScrollExtent, pos.maxScrollExtent));
@@ -407,9 +400,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
       final current = position.pixels;
       final remaining = _smoothScrollTicker.isActive ? (_smoothTargetOffset - current) : 0.0;
       // Reverse immediately if wheel direction flips mid-glide
-      final origin = (remaining * delta < 0)
-          ? current
-          : (_smoothScrollTicker.isActive ? _smoothTargetOffset : current);
+      final origin = (remaining * delta < 0) ? current : (_smoothScrollTicker.isActive ? _smoothTargetOffset : current);
       final target = (origin + delta).clamp(position.minScrollExtent, position.maxScrollExtent);
       _animateScrollTo(target, speed: 20.0);
     });
@@ -933,7 +924,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                     Container(height: 1, color: hairlineColor),
                     Flexible(
                       child: selectable.isEmpty
-                          ? _buildEmptyState(context, tk)
+                          ? SingleChildScrollView(child: _buildEmptyState(tk, isMobile: isMobile))
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 final maxListHeight = constraints.maxHeight.isFinite
@@ -959,6 +950,9 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                           onPointerScroll: _handlePointerScroll,
                                           child: ListView.builder(
                                             controller: _scrollController,
+                                            keyboardDismissBehavior: isMobile
+                                                ? ScrollViewKeyboardDismissBehavior.onDrag
+                                                : ScrollViewKeyboardDismissBehavior.manual,
                                             shrinkWrap: false,
                                             addAutomaticKeepAlives: false,
                                             addSemanticIndexes: false,
@@ -1030,7 +1024,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     final inputFontSize = isMobile ? 17.0 : 21.0;
 
     return Padding(
-      padding: isMobile ? const EdgeInsets.fromLTRB(16, 14, 12, 12) : const EdgeInsets.fromLTRB(24, 20, 20, 15),
+      padding: isMobile ? const EdgeInsets.fromLTRB(16, 6, 8, 6) : const EdgeInsets.fromLTRB(24, 20, 20, 15),
       child: Row(
         children: [
           SizedBox(
@@ -1058,6 +1052,9 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
               focusNode: _inputFocusNode,
               autofocus: true,
               textInputAction: TextInputAction.search,
+              onSubmitted: (value) {
+                if (_debounceTimer?.isActive ?? false) _scheduleRemoteSearch(value.trim(), immediate: true);
+              },
               onChanged: _onQueryChanged,
               cursorColor: colorScheme.primary,
               cursorWidth: 2.0,
@@ -1090,10 +1087,10 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           ),
           if (hasQuery)
             IconButton(
-              visualDensity: VisualDensity.compact,
-              style: const ButtonStyle(
-                padding: WidgetStatePropertyAll(EdgeInsets.all(6)),
-                minimumSize: WidgetStatePropertyAll(Size(32, 32)),
+              visualDensity: isMobile ? VisualDensity.standard : VisualDensity.compact,
+              style: ButtonStyle(
+                padding: const WidgetStatePropertyAll(EdgeInsets.all(6)),
+                minimumSize: WidgetStatePropertyAll(Size.square(isMobile ? 44 : 32)),
                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               ),
               tooltip: t.common.clear,
@@ -1104,14 +1101,17 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                 _inputFocusNode.requestFocus();
               },
             ),
-          if (isMobile) ...[
-            const SizedBox(width: 4),
-            Semantics(
-              button: true,
-              label: t.common.close,
-              child: GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: widget.onDismiss,
+          if (isMobile)
+            IconButton(
+              tooltip: t.common.close,
+              onPressed: widget.onDismiss,
+              style: const ButtonStyle(
+                minimumSize: WidgetStatePropertyAll(Size.square(44)),
+                padding: WidgetStatePropertyAll(EdgeInsets.zero),
+                visualDensity: VisualDensity.standard,
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: ExcludeSemantics(
                 child: Container(
                   width: 30,
                   height: 30,
@@ -1120,12 +1120,15 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                     color: colorScheme.onSurface.withValues(alpha: isDark ? 0.11 : 0.08),
                   ),
                   child: Center(
-                    child: AppIcon(Symbols.close_rounded, size: 18, color: colorScheme.onSurface.withValues(alpha: 0.78)),
+                    child: AppIcon(
+                      Symbols.close_rounded,
+                      size: 18,
+                      color: colorScheme.onSurface.withValues(alpha: 0.78),
+                    ),
                   ),
                 ),
               ),
             ),
-          ],
         ],
       ),
     );
@@ -1283,11 +1286,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                         _KeycapBadge(label: '↵', colorScheme: colorScheme, tk: tk, isDark: isDark),
                       ] else if (isCompactPhone) ...[
                         const SizedBox(width: 6),
-                        AppIcon(
-                          Symbols.chevron_right_rounded,
-                          size: 18,
-                          color: tk.textMuted.withValues(alpha: 0.42),
-                        ),
+                        AppIcon(Symbols.chevron_right_rounded, size: 18, color: tk.textMuted.withValues(alpha: 0.42)),
                       ],
                     ],
                   ),
@@ -1393,11 +1392,12 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     );
   }
 
-  Widget _buildEmptyState(BuildContext context, MonoTokens tk) {
+  Widget _buildEmptyState(MonoTokens tk, {required bool isMobile}) {
     final query = _controller.text.trim();
+    final padding = EdgeInsets.symmetric(vertical: isMobile ? 18 : 48, horizontal: isMobile ? 16 : 28);
     if (_isLoadingRemote) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 52, horizontal: 28),
+        padding: padding,
         child: Center(
           child: Text(t.common.loading, style: TextStyle(fontSize: 15, color: tk.textMuted)),
         ),
@@ -1405,7 +1405,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 28),
+      padding: padding,
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

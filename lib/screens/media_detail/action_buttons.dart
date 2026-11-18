@@ -14,20 +14,23 @@ class _DownloadButtonSpec {
 }
 
 extension _MediaDetailActionButtons on _MediaDetailScreenState {
-  Widget _buildActionButtons(MediaItem metadata) {
+  Widget _buildActionButtons(MediaItem metadata, {bool showTracksStatus = true}) {
     // Tie asynchronous playback prompts to the actionable subtree, not the
     // route's State: a deleted first-route detail intentionally stays mounted.
-    return Builder(builder: (context) => _buildAvailableActionButtons(context, metadata));
+    return Builder(
+      builder: (context) => _buildAvailableActionButtons(context, metadata, showTracksStatus: showTracksStatus),
+    );
   }
 
-  Widget _buildAvailableActionButtons(BuildContext context, MediaItem metadata) {
+  Widget _buildAvailableActionButtons(BuildContext context, MediaItem metadata, {required bool showTracksStatus}) {
     final isTv = PlatformDetector.isTV();
     final tvScale = TvLayoutConstants.scaleOf(context);
     final actionSize = isTv ? _tvDetailActionSize * tvScale : 48.0;
-    final playButtonLabel = _getPlayButtonLabel(metadata);
+    final progressLabel = _getPlayButtonLabel(metadata);
     final playIcon = _getPlayButtonIcon(metadata);
     final playActionLabel = playIcon == Symbols.resume_rounded ? t.common.resume : t.common.play;
-    final playSemanticsLabel = playButtonLabel.isEmpty ? playActionLabel : '$playActionLabel $playButtonLabel';
+    final playButtonLabel = progressLabel.isEmpty && _usesIOSDetailLayout ? playActionLabel : progressLabel;
+    final playSemanticsLabel = progressLabel.isEmpty ? playActionLabel : '$playActionLabel $progressLabel';
     final playIconSize = isTv ? 22 * tvScale : 20.0;
     final playTextStyle = TextStyle(fontSize: isTv ? 17 * tvScale : 16, fontWeight: .w700);
     final playButtonIcon = AppIcon(playIcon, fill: 1, size: playIconSize);
@@ -425,7 +428,7 @@ extension _MediaDetailActionButtons on _MediaDetailScreenState {
     // never compact because of it. On TV the hero is a 60% column, so the
     // status is placed at the screen edge by _buildTvDetailScreen instead.
     Widget? tracksStatusFor(List<FocusableAction> actions, double maxWidth) {
-      if (isTv || !maxWidth.isFinite) return null;
+      if (isTv || !showTracksStatus || !maxWidth.isFinite) return null;
       final remaining = maxWidth - estimatedRowWidth(actions) - gap;
       if (remaining < 160) return null;
       return _buildPlaybackTracksStatus(context, metadata, isTv: false, tvScale: tvScale, maxWidth: remaining);

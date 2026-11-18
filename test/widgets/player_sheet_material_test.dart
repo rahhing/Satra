@@ -55,8 +55,8 @@ void main() {
     final create = calls.singleWhere((call) => call.method == 'create');
     final args = create.arguments as Map;
     expect(args['viewType'], 'com.satra/macos_glass_surface');
-    final decoded =
-        (const StandardMessageCodec().decodeMessage(ByteData.sublistView(args['params'])) as Map).cast<String, Object?>();
+    final decoded = (const StandardMessageCodec().decodeMessage(ByteData.sublistView(args['params'])) as Map)
+        .cast<String, Object?>();
     expect(decoded['dark'], isTrue);
     expect(decoded['liquidGlass'], isFalse);
     expect(decoded['tl'], isA<double>());
@@ -120,9 +120,7 @@ void main() {
           theme: theme,
           home: const Scaffold(
             body: Stack(
-              children: [
-                Positioned(top: 0, left: 0, right: 0, child: ToolbarScrim(child: SizedBox(height: 48))),
-              ],
+              children: [Positioned(top: 0, left: 0, right: 0, child: ToolbarScrim(child: SizedBox(height: 48)))],
             ),
           ),
         ),

@@ -13,6 +13,7 @@ import '../utils/content_utils.dart';
 import '../utils/formatters.dart';
 import '../utils/layout_constants.dart';
 import '../utils/media_image_helper.dart';
+import '../utils/platform_detector.dart';
 import '../services/settings_service.dart';
 import '../utils/tone_mapped_logo_image.dart';
 import 'cycling_media_backdrop.dart';
@@ -64,6 +65,7 @@ class TvSpotlightBackground extends StatelessWidget {
     final bgColor = Theme.of(context).scaffoldBackgroundColor;
 
     final size = MediaQuery.sizeOf(context);
+    final isDesktop = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
     final containerAspect = size.width / size.height;
     final fallbackPaths = media == null
         ? const <String>[]
@@ -72,10 +74,11 @@ class TvSpotlightBackground extends StatelessWidget {
       pref: SettingsService.tvCornerSpotlightBackdrop,
       builder: (context, cornerBackdrop, _) {
         final shelfStart = ((size.height - contentBottom) / size.height + 0.06).clamp(0.45, 0.76);
-        final dockBand = ((contentLeft ?? 24) * 0.75 / size.width).clamp(0.025, 0.12);
+        final dockBand = isDesktop ? 0.0 : ((contentLeft ?? 24) * 0.75 / size.width).clamp(0.025, 0.12);
         final backdrop = CyclingMediaBackdrop(
           controller: backdropController,
           frameBuilder: (context, artwork) => SpotlightArtwork(artwork: artwork, size: size, corner: cornerBackdrop),
+          focusCrop: isDesktop,
           mediaKey: media?.globalKey,
           imagePaths: media?.heroRotationPaths(containerAspectRatio: containerAspect) ?? const [],
           fallbackImagePaths: fallbackPaths,

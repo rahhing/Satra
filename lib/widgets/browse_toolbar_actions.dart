@@ -112,10 +112,14 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
   /// Pulls live state from [ActiveProfileProvider]; the menu reuses
   /// [_userMenuItems] for the menu contents so d-pad and tap paths
   /// stay in sync.
-  FocusableAction _buildUserMenuAction(BuildContext context) {
+  FocusableAction _buildUserMenuAction(BuildContext context, {bool compact = false}) {
     final activeProvider = context.watch<ActiveProfileProvider>();
     final active = activeProvider.active;
     final profiles = activeProvider.profiles;
+    final foregroundColor = Theme.of(context).colorScheme.onSurface;
+    final avatar = active != null
+        ? ProfileAvatar(profile: active, size: 32, avatarUrl: activeProvider.avatarUrlFor(active.id))
+        : AppIcon(Symbols.account_circle_rounded, fill: 1, size: 32, color: foregroundColor);
 
     return FocusableAction(
       debugLabel: 'profile_menu',
@@ -123,15 +127,14 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
       child: AppMenuButton<String>(
         key: _userMenuKey,
         enabled: !_switchingProfile,
-        icon: active != null
-            ? ProfileAvatar(profile: active, size: 32, avatarUrl: activeProvider.avatarUrlFor(active.id))
-            : const AppIcon(Symbols.account_circle_rounded, fill: 1, size: 32, color: Colors.white),
+        icon: compact ? null : avatar,
         tooltip: t.profiles.sectionTitle,
         adaptiveSheet: true,
         anchorAlignment: AppMenuAnchorAlignment.end,
         onSelected: (value) => unawaited(_handleUserMenuAction(context, value)),
         entriesBuilder: (context) =>
             _userMenuItems(context, activeProfile: active, profiles: profiles, activeProvider: activeProvider),
+        child: compact ? SizedBox(width: 40, height: 40, child: Center(child: avatar)) : null,
       ),
     );
   }
@@ -227,6 +230,14 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
               builder: (context, watchTogether, companionRemote, _) {
                 final isDesktop = PlatformDetector.shouldActAsRemoteHost(context);
                 final compactMobile = PlatformDetector.isMobile(context);
+                final compactButtonStyle = compactMobile
+                    ? IconButton.styleFrom(
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(40, 40),
+                        fixedSize: const Size(40, 40),
+                      )
+                    : null;
                 void openWatchTogether() =>
                     Navigator.push(context, MaterialPageRoute(builder: (_) => const WatchTogetherScreen()));
                 void openCompanionRemote() {
@@ -240,6 +251,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                 Widget buildWatchTogetherButton() => Stack(
                   children: [
                     IconButton(
+                      style: compactButtonStyle,
                       icon: AppIcon(
                         Symbols.group_rounded,
                         fill: watchTogether.isInSession ? 1 : 0,
@@ -252,8 +264,8 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                     // not swallow its hover and clicks (#2846).
                     if (watchTogether.isInSession && watchTogether.participantCount > 1)
                       Positioned(
-                        top: 6,
-                        right: 6,
+                        top: compactMobile ? 3 : 6,
+                        right: compactMobile ? 3 : 6,
                         child: IgnorePointer(
                           child: Container(
                             padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
@@ -274,6 +286,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                 Widget buildCompanionRemoteButton() => Stack(
                   children: [
                     IconButton(
+                      style: compactButtonStyle,
                       icon: AppIcon(
                         Symbols.phone_android_rounded,
                         fill: companionRemote.isConnected ? 1 : 0,
@@ -284,8 +297,8 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                     ),
                     if (companionRemote.isConnected)
                       Positioned(
-                        top: 6,
-                        right: 6,
+                        top: compactMobile ? 4 : 6,
+                        right: compactMobile ? 4 : 6,
                         child: IgnorePointer(
                           child: Container(
                             width: 8,
@@ -324,6 +337,17 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                         debugLabel: 'mobile_more_actions',
                         child: AppMenuButton<String>(
                           tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
+                          iosGlassSymbol: 'ellipsis',
+                          iosGlassSymbolSize: 18,
+                          iosGlassChromeless: true,
+                          iosGlassForegroundColor: foregroundColor,
+                          iosMenuSymbol: (action) => switch (action) {
+                            'watch_together' => 'person.2',
+                            'companion_remote' => 'iphone',
+                            'manage_libraries' => 'square.and.pencil',
+                            'refresh' => 'arrow.clockwise',
+                            _ => null,
+                          },
                           adaptiveSheet: true,
                           anchorAlignment: AppMenuAnchorAlignment.end,
                           entriesBuilder: (_) => [
@@ -343,11 +367,7 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                                 icon: Symbols.edit_rounded,
                                 label: t.libraries.manageLibraries,
                               ),
-                            AppMenuItem(
-                              value: 'refresh',
-                              icon: Symbols.refresh_rounded,
-                              label: t.common.refresh,
-                            ),
+                            AppMenuItem(value: 'refresh', icon: Symbols.refresh_rounded, label: t.common.refresh),
                           ],
                           onSelected: (action) {
                             switch (action) {
@@ -362,15 +382,13 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                             }
                           },
                           child: SizedBox(
-                            width: 36,
-                            height: 36,
-                            child: Center(
-                              child: AppIcon(Symbols.more_horiz_rounded, size: 21, color: foregroundColor),
-                            ),
+                            width: 40,
+                            height: 40,
+                            child: Center(child: AppIcon(Symbols.more_horiz_rounded, size: 21, color: foregroundColor)),
                           ),
                         ),
                       ),
-                      _buildUserMenuAction(context),
+                      _buildUserMenuAction(context, compact: true),
                     ],
                   );
                 }

@@ -264,10 +264,7 @@ class TrackChapterControls extends StatelessWidget {
               onPressed: () {
                 state.onCancelAutoHide?.call();
                 OverlaySheetController.of(context)
-                    .show(
-                      blurNativeVideo: true,
-                      builder: (_) => QueueSheet(onItemSelected: state.onQueueItemSelected!),
-                    )
+                    .show(blurNativeVideo: true, builder: (_) => QueueSheet(onItemSelected: state.onQueueItemSelected!))
                     .whenComplete(() => state.onStartAutoHide?.call());
               },
             ),

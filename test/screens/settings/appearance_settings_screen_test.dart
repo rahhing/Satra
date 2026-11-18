@@ -29,6 +29,7 @@ void main() {
     (false, TargetPlatform.linux),
     (true, TargetPlatform.linux),
     (false, TargetPlatform.android),
+    (false, TargetPlatform.iOS),
   ]) {
     testWidgets('Appearance controls save and reflect every choice: TV=$tv, $platform', (tester) async {
       TvDetectionService.debugSetAppleTVOverride(tv);
@@ -55,6 +56,13 @@ void main() {
         ),
       );
       await tester.pumpAndSettle();
+      final isHandheld = platform == TargetPlatform.android || platform == TargetPlatform.iOS;
+      expect(find.text(t.settings.showMobileLiveTv), isHandheld ? findsOneWidget : findsNothing);
+      expect(SettingsService.instance.read(SettingsService.showMobileLiveTv), isFalse);
+      expect(find.text(t.settings.useClassicMobileBackdrop), isHandheld ? findsOneWidget : findsNothing);
+      expect(SettingsService.instance.read(SettingsService.useClassicMobileBackdrop), isFalse);
+      expect(find.text(t.settings.darkenMobileBackdrop), isHandheld ? findsOneWidget : findsNothing);
+      expect(SettingsService.instance.read(SettingsService.darkenMobileBackdrop), isTrue);
 
       final switches = tester
           .widgetList<SettingSwitchTile>(find.byWidgetPredicate((widget) => widget is SettingSwitchTile))

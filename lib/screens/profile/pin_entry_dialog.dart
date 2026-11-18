@@ -127,11 +127,7 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
                       Text(
                         widget.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: colorScheme.error,
-                          fontSize: 12.5,
-                          fontWeight: FontWeight.w500,
-                        ),
+                        style: TextStyle(color: colorScheme.error, fontSize: 12.5, fontWeight: FontWeight.w500),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -168,14 +164,9 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color: colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07),
-            border: Border.all(
-              width: 0.75,
-              color: colorScheme.onSurface.withValues(alpha: isDark ? 0.14 : 0.10),
-            ),
+            border: Border.all(width: 0.75, color: colorScheme.onSurface.withValues(alpha: isDark ? 0.14 : 0.10)),
           ),
-          child: Center(
-            child: AppIcon(Symbols.lock_rounded, fill: 1, size: 21, color: colorScheme.primary),
-          ),
+          child: Center(child: AppIcon(Symbols.lock_rounded, fill: 1, size: 21, color: colorScheme.primary)),
         ),
         const SizedBox(height: 12),
         Text(
@@ -183,10 +174,7 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
           textAlign: TextAlign.center,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
-          style: theme.textTheme.titleMedium?.copyWith(
-            fontWeight: FontWeight.w700,
-            letterSpacing: -0.25,
-          ),
+          style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700, letterSpacing: -0.25),
         ),
       ],
     );
@@ -567,11 +555,7 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
   Widget _buildKeypadLayout(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildDigitRow(context),
-        const SizedBox(height: 24),
-        _buildKeypad(context),
-      ],
+      children: [_buildDigitRow(context), const SizedBox(height: 24), _buildKeypad(context)],
     );
   }
 
@@ -633,10 +617,7 @@ class _TvPinInputState extends State<_TvPinInput> with ControllerDisposerMixin {
       children: [
         for (int i = 0; i < 4; i++) ...[
           if (i > 0) const SizedBox(width: 16),
-          _PasscodeDot(
-            filled: _digits[i] != null,
-            isActive: _activeIndex == i && _digits[i] == null,
-          ),
+          _PasscodeDot(filled: _digits[i] != null, isActive: _activeIndex == i && _digits[i] == null),
         ],
       ],
     );
@@ -776,12 +757,7 @@ class _PasscodeDot extends StatelessWidget {
                       : colorScheme.onSurface.withValues(alpha: isDark ? 0.28 : 0.24)),
           ),
           boxShadow: filled
-              ? [
-                  BoxShadow(
-                    color: colorScheme.onSurface.withValues(alpha: isDark ? 0.28 : 0.14),
-                    blurRadius: 8,
-                  ),
-                ]
+              ? [BoxShadow(color: colorScheme.onSurface.withValues(alpha: isDark ? 0.28 : 0.14), blurRadius: 8)]
               : null,
         ),
       ),

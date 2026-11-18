@@ -8,6 +8,7 @@ import 'dart:io' show Platform;
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart' show CupertinoSliverRefreshControl, RefreshIndicatorMode;
 import 'package:satra/widgets/app_icon.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:provider/provider.dart';
@@ -28,6 +29,7 @@ import '../widgets/hero_carousel_backdrop.dart';
 import '../widgets/optimized_media_image.dart' show ClearLogoImage, blurArtwork;
 import '../widgets/toolbar_scrim.dart';
 import '../widgets/glass_surface.dart';
+import '../widgets/ios_glass_control.dart';
 import '../widgets/browse_toolbar_actions.dart';
 import '../widgets/focusable_tab_chip.dart';
 import '../media/media_library.dart';
@@ -579,8 +581,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     if (PlatformDetector.isTV()) return;
     if (_isAutoScrollPaused ||
         !_isTabVisible ||
-        WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations)
+        WidgetsBinding.instance.platformDispatcher.accessibilityFeatures.disableAnimations) {
       return;
+    }
 
     _autoScrollTimer = Timer.periodic(_heroAutoScrollDuration, (timer) {
       if (_onDeck.isEmpty || !_heroController.hasClients || _isAutoScrollPaused) {
@@ -868,9 +871,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       ),
       child: Row(
         children: [
-          Semantics(
-            button: true,
+          IOSGlassButton(
             label: t.discover.title,
+            title: t.discover.title,
+            titleSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
+            onPressed: scrollToTop,
             child: GestureDetector(
               key: const ValueKey('discover_scroll_to_top_pill'),
               behavior: HitTestBehavior.opaque,
@@ -903,7 +908,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
             opacity: 0.68,
             tint: glassTint,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 3),
+              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
               child: BrowseToolbarActions(
                 actionBarKey: _actionBarKey,
                 onRefresh: manualRefresh,
@@ -926,6 +931,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
       prefs: const [
         SettingsService.showServerNameOnHubs,
         SettingsService.showHeroSection,
+        SettingsService.useClassicMobileBackdrop,
+        SettingsService.darkenMobileBackdrop,
         SettingsService.hideSpoilers,
         SettingsService.libraryDensity,
         SettingsService.episodePosterMode,
@@ -981,14 +988,21 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final bottomPadding = MediaQuery.paddingOf(context).bottom;
     final theme = Theme.of(context);
     final continueWatchingHub = _onDeck.isEmpty ? null : _continueWatchingHub;
+    final isIOS = PlatformDetector.isHandheldIOS(context);
+    final isMobileBackdrop = PlatformDetector.isMobile(context) && !PlatformDetector.isAutomotive();
+    final useAnchoredBackdrop = isMobileBackdrop && !svc.read(SettingsService.useClassicMobileBackdrop);
+    final darkenBackdrop = isMobileBackdrop && svc.read(SettingsService.darkenMobileBackdrop);
+    final heroHeight = _heroHeight(context);
     final scrollView = CustomScrollView(
       controller: _scrollController,
+      physics: isIOS ? const BouncingScrollPhysics(parent: AlwaysScrollableScrollPhysics()) : null,
       slivers: [
+        if (isIOS) _buildIOSRefreshControl(context),
         // Hero Section (Continue Watching) - at top of screen
         Builder(
           builder: (context) {
             if (_onDeck.isNotEmpty && showHeroSection) {
-              return _buildHeroSection();
+              return _buildHeroSection(heroHeight, drawsBackdrop: !isIOS && !useAnchoredBackdrop);
             }
             // Add top padding when hero is not shown
             return SliverToBoxAdapter(child: SizedBox(height: kToolbarHeight + MediaQuery.paddingOf(context).top + 16));
@@ -998,34 +1012,42 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         if (_errorMessage != null) SliverErrorState(message: _errorMessage!, onRetry: _discover.load),
         if (!_isLoading && _errorMessage == null) ...[
           if (continueWatchingHub != null)
-            SliverToBoxAdapter(
-              child: HubSection(
-                key: _continueWatchingHubKey,
-                hub: continueWatchingHub,
-                focusMemory: _hubFocusMemory,
-                icon: hubIconFor(continueWatchingHub),
-                onRefresh: _discover.updateItem,
-                onRemoveFromContinueWatching: _discover.refreshContinueWatching,
-                isInContinueWatching: true,
-                loadMoreItems: _discover.loadAllContinueWatching,
-                onVerticalNavigation: (isUp) => _handleVerticalNavigation(0, isUp),
-                onNavigateUp: _focusTopBoundary,
+            SliverSafeArea(
+              top: false,
+              bottom: false,
+              sliver: SliverToBoxAdapter(
+                child: HubSection(
+                  key: _continueWatchingHubKey,
+                  hub: continueWatchingHub,
+                  focusMemory: _hubFocusMemory,
+                  icon: hubIconFor(continueWatchingHub),
+                  onRefresh: _discover.updateItem,
+                  onRemoveFromContinueWatching: _discover.refreshContinueWatching,
+                  isInContinueWatching: true,
+                  loadMoreItems: _discover.loadAllContinueWatching,
+                  onVerticalNavigation: (isUp) => _handleVerticalNavigation(0, isUp),
+                  onNavigateUp: _focusTopBoundary,
+                ),
               ),
             ),
 
           // Recommendation Hubs (Trending, Top in Genre, etc.)
           for (int i = 0; i < _hubs.length; i++)
-            SliverToBoxAdapter(
-              child: HubSection(
-                key: i < _orderedHubKeys.length ? _orderedHubKeys[i] : null,
-                hub: _hubs[i],
-                focusMemory: _hubFocusMemory,
-                icon: hubIconFor(_hubs[i]),
-                showServerName: showServerNameOnHubs || hubsSpanMultipleServers,
-                onRefresh: _discover.updateItem,
-                // Hub index is i + 1 if continue watching exists, otherwise i
-                onVerticalNavigation: (isUp) => _handleVerticalNavigation(_onDeck.isNotEmpty ? i + 1 : i, isUp),
-                onNavigateUp: (i == 0 && _onDeck.isEmpty) ? _focusTopBoundary : null,
+            SliverSafeArea(
+              top: false,
+              bottom: false,
+              sliver: SliverToBoxAdapter(
+                child: HubSection(
+                  key: i < _orderedHubKeys.length ? _orderedHubKeys[i] : null,
+                  hub: _hubs[i],
+                  focusMemory: _hubFocusMemory,
+                  icon: hubIconFor(_hubs[i]),
+                  showServerName: showServerNameOnHubs || hubsSpanMultipleServers,
+                  onRefresh: _discover.updateItem,
+                  // Hub index is i + 1 if continue watching exists, otherwise i
+                  onVerticalNavigation: (isUp) => _handleVerticalNavigation(_onDeck.isNotEmpty ? i + 1 : i, isUp),
+                  onNavigateUp: (i == 0 && _onDeck.isEmpty) ? _focusTopBoundary : null,
+                ),
               ),
             ),
 
@@ -1082,29 +1104,27 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     );
 
     final isMobile = PlatformDetector.isMobile(context);
-    final useIOSHeroAtmosphere = PlatformDetector.isHandheldIOS(context);
 
     return Material(
       color: theme.scaffoldBackgroundColor,
       child: Stack(
         fit: StackFit.expand,
         children: [
-          if (useIOSHeroAtmosphere && showHeroSection && _onDeck.isNotEmpty)
+          if ((isIOS || useAnchoredBackdrop) && showHeroSection && _onDeck.isNotEmpty)
             Positioned.fill(
               child: IgnorePointer(
                 child: ExcludeSemantics(
                   child: RepaintBoundary(
                     child: ValueListenableBuilder<int>(
                       valueListenable: _heroIndex,
-                      builder: (context, idx, _) {
-                        final item = _onDeck[idx.clamp(0, _onDeck.length - 1)];
-                        final size = MediaQuery.sizeOf(context);
-                        final paths = item.heroArtCandidates(containerAspectRatio: size.aspectRatio);
-                        if (paths.isEmpty) return ColoredBox(color: theme.scaffoldBackgroundColor);
-                        return _HeroBackgroundFade(
-                          scrollController: _scrollController,
-                          heroHeight: math.min(500 + MediaQuery.paddingOf(context).top, size.height * 0.65),
-                          child: CyclingMediaBackdrop(
+                      builder: (context, idx, _) => LayoutBuilder(
+                        builder: (context, constraints) {
+                          final item = _onDeck[idx.clamp(0, _onDeck.length - 1)];
+                          final size = constraints.biggest;
+                          if (size.isEmpty) return const SizedBox.shrink();
+                          final paths = item.heroArtCandidates(containerAspectRatio: size.aspectRatio);
+                          if (paths.isEmpty) return ColoredBox(color: theme.scaffoldBackgroundColor);
+                          final artwork = CyclingMediaBackdrop(
                             mediaKey: item.globalKey,
                             imagePaths: paths,
                             client: _getMediaClientForItem(item),
@@ -1112,15 +1132,47 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                             height: size.height,
                             fallbackColor: theme.scaffoldBackgroundColor,
                             active: false,
-                          ),
-                        );
-                      },
+                            focusCrop: useAnchoredBackdrop,
+                            frameBuilder: !useAnchoredBackdrop
+                                ? null
+                                : (_, artwork) => _AnchoredHeroBackdrop(
+                                    scrollController: _scrollController,
+                                    heroHeight: heroHeight,
+                                    artworkHeightFraction: _usesCompactLandscapeHero(context) ? .90 : .72,
+                                    darkenBackdrop: darkenBackdrop,
+                                    artwork: artwork,
+                                  ),
+                          );
+                          return useAnchoredBackdrop
+                              ? artwork
+                              : _HeroBackgroundFade(
+                                  scrollController: _scrollController,
+                                  heroHeight: math.min(500 + MediaQuery.paddingOf(context).top, size.height * 0.65),
+                                  darkenBackdrop: darkenBackdrop,
+                                  child: artwork,
+                                );
+                        },
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          isMobile
+          if (_usesCompactLandscapeHero(context) && showHeroSection && _onDeck.isNotEmpty)
+            Positioned.fill(
+              child: IgnorePointer(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: RadialGradient(
+                      center: const AlignmentDirectional(-.88, -.42),
+                      radius: 1.15,
+                      colors: [theme.scaffoldBackgroundColor.withValues(alpha: .64), Colors.transparent],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          isMobile && !isIOS
               ? RefreshIndicator(
                   edgeOffset: MediaQuery.paddingOf(context).top + 56,
                   onRefresh: _refreshFromToolbar,
@@ -1136,6 +1188,49 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           ],
         ],
       ),
+    );
+  }
+
+  Widget _buildIOSRefreshControl(BuildContext context) {
+    final extent = MediaQuery.paddingOf(context).top + 60;
+    return CupertinoSliverRefreshControl(
+      refreshIndicatorExtent: extent,
+      refreshTriggerPullDistance: extent + 16,
+      onRefresh: _refreshFromToolbar,
+      builder: (context, mode, pulledExtent, triggerDistance, indicatorExtent) {
+        return IOSGlassControl.adaptive(
+          native: (context) {
+            if (pulledExtent < extent - 8 || mode == RefreshIndicatorMode.done) return const SizedBox.shrink();
+            return Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 6),
+                child: IgnorePointer(
+                  child: SizedBox.square(
+                    dimension: 44,
+                    child: IOSGlassControl(
+                      configuration: {
+                        'kind': 'refresh',
+                        'progress': (pulledExtent / triggerDistance).clamp(0.0, 1.0),
+                        'refreshing': mode == RefreshIndicatorMode.refresh,
+                        'label': t.common.refresh,
+                      },
+                      onAction: (_, _) {},
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
+          child: CupertinoSliverRefreshControl.buildRefreshIndicator(
+            context,
+            mode,
+            pulledExtent,
+            triggerDistance,
+            indicatorExtent,
+          ),
+        );
+      },
     );
   }
 
@@ -1229,26 +1324,29 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     );
   }
 
-  Widget _buildHeroSection() {
-    if (_onDeck.isNotEmpty) {
-      ArtworkAtmosphereScope.select(context, _onDeck[_heroIndex.value.clamp(0, _onDeck.length - 1)]);
-    }
+  bool _usesCompactLandscapeHero(BuildContext context) => PlatformDetector.isCompactMobileLandscape(context);
+
+  double _heroHeight(BuildContext context) {
     final statusBarHeight = MediaQuery.paddingOf(context).top;
     final useSideNav = PlatformDetector.shouldUseSideNavigation(context);
     final isTv = PlatformDetector.isTV();
     final viewportHeight = MediaQuery.sizeOf(context).height;
     final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-    // Mobile keeps its fixed hero, except where that would swamp the screen.
-    // A landscape phone is shorter than the hero itself: fill the viewport
-    // and let the item compact. A short portrait viewport (iPhone Duo, compact
-    // phones) caps it at about two thirds so the first hub row still shows.
-    final heroHeight = isTv
+    // Leave room to see the start of the shelves on a short phone display.
+    if (_usesCompactLandscapeHero(context)) return math.min(viewportHeight * .68, 310 + statusBarHeight);
+    return isTv
         ? viewportHeight * 0.82
         : useSideNav
         ? viewportHeight * 0.75
         : isLandscape
         ? math.min(500 + statusBarHeight, viewportHeight)
         : math.min(500 + statusBarHeight, viewportHeight * 0.65);
+  }
+
+  Widget _buildHeroSection(double heroHeight, {required bool drawsBackdrop}) {
+    ArtworkAtmosphereScope.select(context, _onDeck[_heroIndex.value.clamp(0, _onDeck.length - 1)]);
+    final isTv = PlatformDetector.isTV();
+    final compactLandscape = _usesCompactLandscapeHero(context);
     return SliverToBoxAdapter(
       child: Focus(
         focusNode: _heroFocusNode,
@@ -1258,7 +1356,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
           child: Stack(
             clipBehavior: Clip.none,
             children: [
-              if (!PlatformDetector.isHandheldIOS(context)) Positioned.fill(child: _buildHeroBackdrop(heroHeight)),
+              if (drawsBackdrop) Positioned.fill(child: _buildHeroBackdrop(heroHeight)),
               PageView.builder(
                 controller: _heroController,
                 itemCount: _onDeck.length,
@@ -1275,14 +1373,18 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               ),
               if (!isTv && _onDeck.length > 1)
                 Positioned(
-                  bottom: 18,
+                  bottom: compactLandscape ? 8 : 18,
                   right: 24,
                   left: 24,
                   child: SafeArea(
                     top: false,
                     bottom: false,
                     child: Align(
-                      alignment: MediaQuery.sizeOf(context).width >= 600 ? Alignment.centerRight : Alignment.center,
+                      alignment: compactLandscape
+                          ? AlignmentDirectional.centerStart
+                          : MediaQuery.sizeOf(context).width >= 600
+                          ? Alignment.centerRight
+                          : Alignment.center,
                       child: ValueListenableBuilder<int>(
                         valueListenable: _heroIndex,
                         builder: (context, index, _) => HeroPageIndicators(
@@ -1406,6 +1508,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         width: artSize.width,
         height: artSize.height,
         fallbackColor: fallbackColor,
+        focusCrop: PlatformDetector.isDesktop(context),
       ),
     );
   }
@@ -1417,16 +1520,16 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final screenWidth = MediaQuery.sizeOf(context).width;
     final isLargeScreen = ScreenBreakpoints.isWideTabletOrLarger(screenWidth);
     final isTv = PlatformDetector.isTV();
-    final alignLeft = isTv || isLargeScreen;
+    final compactLandscape = _usesCompactLandscapeHero(context);
+    final alignLeft = isTv || isLargeScreen || compactLandscape;
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    // A landscape phone hands the hero its whole ~400dp viewport, and a short
-    // portrait one its capped height; the usual logo and bottom offset would
-    // push the content up into the top bar.
     final compact = !isTv && heroHeight < 450;
     final heroLogoWidth = isTv ? TvLayoutConstants.heroLogoWidth : 400.0;
     final heroLogoHeight = isTv
         ? TvLayoutConstants.heroLogoHeight
+        : compactLandscape
+        ? (heroHeight - 196).clamp(30.0, 60.0)
         : compact
         ? 80.0
         : 120.0;
@@ -1467,6 +1570,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
               Positioned(
                 bottom: isTv
                     ? 88
+                    : compactLandscape
+                    ? 34
                     : compact
                     ? 44
                     : isLargeScreen
@@ -1496,7 +1601,11 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                       alignment: alignLeft ? Alignment.centerLeft : Alignment.center,
                       child: ConstrainedBox(
                         constraints: BoxConstraints(
-                          maxWidth: isTv ? TvLayoutConstants.heroContentMaxWidth : double.infinity,
+                          maxWidth: isTv
+                              ? TvLayoutConstants.heroContentMaxWidth
+                              : compactLandscape
+                              ? 300
+                              : double.infinity,
                         ),
                         child: Column(
                           crossAxisAlignment: alignLeft ? CrossAxisAlignment.start : CrossAxisAlignment.center,
@@ -1532,7 +1641,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
                             // Metadata as dot-separated text with content type
                             if (heroItem.year != null || heroItem.contentRating != null || heroItem.rating != null) ...[
-                              const SizedBox(height: 16),
+                              SizedBox(height: compactLandscape ? 6 : 16),
                               Text(
                                 [
                                   contentTypeLabel,
@@ -1551,8 +1660,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
 
                             if (!alignLeft) ...[const SizedBox(height: 20), _buildSmartPlayButton(heroItem)],
 
-                            if (heroItem.summary != null && !shouldHideSpoiler) ...[
-                              const SizedBox(height: 12),
+                            if (heroItem.summary != null &&
+                                !shouldHideSpoiler &&
+                                (!compactLandscape || heroHeight >= 280)) ...[
+                              SizedBox(height: compactLandscape ? 4 : 12),
                               RichText(
                                 maxLines: isTv ? 3 : 2,
                                 overflow: .ellipsis,
@@ -1577,7 +1688,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                                   ],
                                 ),
                               ),
-                            ] else if (shouldHideSpoiler &&
+                            ] else if (!compactLandscape &&
+                                shouldHideSpoiler &&
                                 isEpisode &&
                                 heroItem.parentIndex != null &&
                                 heroItem.index != null) ...[
@@ -1595,7 +1707,10 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                               ),
                             ],
 
-                            if (alignLeft) ...[SizedBox(height: isTv ? 28 : 20), _buildSmartPlayButton(heroItem)],
+                            if (alignLeft) ...[
+                              SizedBox(height: isTv ? 28 : (compactLandscape ? 10 : 20)),
+                              _buildSmartPlayButton(heroItem),
+                            ],
                           ],
                         ),
                       ),
@@ -1701,51 +1816,249 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 }
 
-class _HeroBackgroundFade extends StatelessWidget {
-  const _HeroBackgroundFade({required this.child, required this.scrollController, required this.heroHeight});
-  final Widget child;
+class _AnchoredHeroBackdrop extends StatelessWidget {
+  const _AnchoredHeroBackdrop({
+    required this.artwork,
+    required this.scrollController,
+    required this.heroHeight,
+    required this.artworkHeightFraction,
+    required this.darkenBackdrop,
+  });
+
+  final Widget artwork;
   final ScrollController scrollController;
   final double heroHeight;
+  final double artworkHeightFraction;
+  final bool darkenBackdrop;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
-    builder: (context, constraints) => AnimatedBuilder(
-      animation: scrollController,
-      builder: (context, _) {
-        final height = constraints.maxHeight;
-        final offset = scrollController.hasClients ? scrollController.offset.clamp(0.0, double.infinity) : 0.0;
-        final start = ((heroHeight - offset - 180) / height).clamp(0.0, 1.0);
-        final end = ((heroHeight - offset + 30) / height).clamp(0.0, 1.0);
-        return Stack(
-          fit: StackFit.expand,
-          children: [
-            ImageFiltered(
+    builder: (context, constraints) {
+      final size = constraints.biggest;
+      if (size.isEmpty) return const SizedBox.shrink();
+      final theme = Theme.of(context);
+      final shadeBaseColor = theme.brightness == Brightness.light ? theme.scaffoldBackgroundColor : Colors.black;
+      // A shorter, near-square sharp region preserves more of a widescreen
+      // image before it fades into the full-height blur behind the controls.
+      final sharpHeight = math.min(size.height, math.min(heroHeight * artworkHeightFraction, size.width / .95));
+      final artworkFrame = SizedBox(width: size.width, height: sharpHeight, child: artwork);
+      return Stack(
+        fit: StackFit.expand,
+        children: [
+          RepaintBoundary(
+            key: const ValueKey('discover_backdrop_blur'),
+            child: ImageFiltered(
               imageFilter: ImageFilter.blur(sigmaX: 35, sigmaY: 35, tileMode: TileMode.clamp),
-              child: child,
-            ),
-            if (end > 0)
-              ShaderMask(
-                blendMode: BlendMode.dstIn,
-                shaderCallback: (bounds) => LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: const [Colors.black, Colors.transparent],
-                  stops: [start, end],
-                ).createShader(bounds),
-                child: child,
+              child: Column(
+                children: [
+                  KeyedSubtree(key: const ValueKey('discover_backdrop_blur_source'), child: artworkFrame),
+                  if (sharpHeight < size.height)
+                    Expanded(
+                      child: FittedBox(
+                        fit: BoxFit.fill,
+                        // Reflect at the join so the blur extends the same
+                        // crop instead of introducing a second composition.
+                        child: Transform.flip(flipY: true, child: artworkFrame),
+                      ),
+                    ),
+                ],
               ),
-            DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, Colors.black.withValues(alpha: 0.42)],
+            ),
+          ),
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: sharpHeight,
+            child: ClipRect(
+              child: AnimatedBuilder(
+                animation: scrollController,
+                child: RepaintBoundary(
+                  child: ShaderMask(
+                    blendMode: BlendMode.dstIn,
+                    shaderCallback: (bounds) => const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.white, Colors.white, Colors.transparent],
+                      stops: [0, .42, 1],
+                    ).createShader(bounds),
+                    child: artwork,
+                  ),
                 ),
+                builder: (context, child) {
+                  final offset = _heroBackdropScrollOffset(scrollController);
+                  if (offset >= sharpHeight) return const SizedBox.shrink();
+                  return Transform.translate(
+                    key: const ValueKey('discover_backdrop_sharp'),
+                    offset: Offset(0, -offset),
+                    child: child,
+                  );
+                },
               ),
             ),
+          ),
+          AnimatedBuilder(
+            animation: scrollController,
+            builder: (context, _) => _heroBackgroundShade(
+              _heroBackdropScrollOffset(scrollController),
+              size.height,
+              artworkEnd: sharpHeight / size.height,
+              heroHeight: heroHeight,
+              darkenBackdrop: darkenBackdrop,
+              baseColor: shadeBaseColor,
+            ),
+          ),
+        ],
+      );
+    },
+  );
+}
+
+double _heroBackdropScrollOffset(ScrollController controller) =>
+    controller.hasClients ? math.max(0, controller.offset) : 0;
+
+Widget _heroBackgroundShade(
+  double offset,
+  double height, {
+  double? artworkEnd,
+  double? heroHeight,
+  bool darkenBackdrop = false,
+  Color baseColor = Colors.black,
+}) {
+  if (!darkenBackdrop) {
+    const maxScrollShade = 0.28;
+    final scrollShade = height > 0 ? (offset / height).clamp(0.0, 1.0) * maxScrollShade : 0.0;
+    Color shade(double base) => Colors.black.withValues(alpha: base + (1 - base) * scrollShade);
+    return DecoratedBox(
+      key: const ValueKey('discover_hero_background_shade'),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            shade(0),
+            if (artworkEnd != null) ...[shade(.06), shade(.52)],
+            shade(artworkEnd == null ? .42 : .62),
           ],
-        );
-      },
+          stops: artworkEnd == null ? null : [0, artworkEnd * .42, artworkEnd, 1],
+        ),
+      ),
+    );
+  }
+
+  final cwDocStart = (heroHeight != null && heroHeight > 0) ? heroHeight : height * 0.65;
+  final sharpDocEnd = artworkEnd != null ? math.min(cwDocStart, artworkEnd * height) : cwDocStart * 0.72;
+  final sharpDocMid = sharpDocEnd * 0.42;
+
+  double alphaAtDocY(double docY) {
+    if (docY <= 0) return 0.04;
+    if (docY <= sharpDocMid) {
+      return sharpDocMid > 0 ? 0.04 + (0.12 - 0.04) * (docY / sharpDocMid) : 0.12;
+    }
+    if (docY <= sharpDocEnd) {
+      final span = sharpDocEnd - sharpDocMid;
+      return span > 0 ? 0.12 + (0.56 - 0.12) * ((docY - sharpDocMid) / span) : 0.56;
+    }
+    if (docY <= cwDocStart) {
+      final span = cwDocStart - sharpDocEnd;
+      return span > 0 ? 0.56 + (0.66 - 0.56) * ((docY - sharpDocEnd) / span) : 0.66;
+    }
+    final depth = height > 0 ? ((docY - cwDocStart) / (height * 0.90)).clamp(0.0, 1.0) : 1.0;
+    final eased = 1.0 - math.pow(1.0 - depth, 1.85).toDouble();
+    return 0.66 + (0.93 - 0.66) * eased;
+  }
+
+  final rawStops = <double>[
+    if (height > 0) ...[
+      (sharpDocMid - offset) / height,
+      (sharpDocEnd - offset) / height,
+      (cwDocStart - offset) / height,
+    ],
+  ];
+  final lowerStart = height > 0 ? ((cwDocStart - offset) / height).clamp(0.0, 1.0) : 0.0;
+  if (lowerStart < 0.98) {
+    for (final fraction in const [0.25, 0.55, 0.80]) {
+      rawStops.add(lowerStart + (1.0 - lowerStart) * fraction);
+    }
+  }
+  rawStops.sort();
+
+  final stops = <double>[0.0];
+  for (final s in rawStops) {
+    if (s > stops.last + 0.005 && s < 0.995) {
+      stops.add(s);
+    }
+  }
+  stops.add(1.0);
+
+  return DecoratedBox(
+    key: const ValueKey('discover_hero_background_shade'),
+    decoration: BoxDecoration(
+      gradient: LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        stops: stops,
+        colors: [for (final s in stops) baseColor.withValues(alpha: alphaAtDocY(offset + s * height))],
+      ),
     ),
   );
+}
+
+class _HeroBackgroundFade extends StatelessWidget {
+  const _HeroBackgroundFade({
+    required this.child,
+    required this.scrollController,
+    required this.heroHeight,
+    this.darkenBackdrop = false,
+  });
+
+  final Widget child;
+  final ScrollController scrollController;
+  final double heroHeight;
+  final bool darkenBackdrop;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final shadeBaseColor = theme.brightness == Brightness.light ? theme.scaffoldBackgroundColor : Colors.black;
+    return LayoutBuilder(
+      builder: (context, constraints) => AnimatedBuilder(
+        animation: scrollController,
+        builder: (context, _) {
+          final height = constraints.maxHeight;
+          if (height <= 0) return const SizedBox.shrink();
+          final offset = _heroBackdropScrollOffset(scrollController);
+          final start = ((heroHeight - offset - 180) / height).clamp(0.0, 1.0);
+          final end = ((heroHeight - offset + 30) / height).clamp(0.0, 1.0);
+          return Stack(
+            fit: StackFit.expand,
+            children: [
+              ImageFiltered(
+                imageFilter: ImageFilter.blur(sigmaX: 35, sigmaY: 35, tileMode: TileMode.clamp),
+                child: child,
+              ),
+              if (end > 0)
+                ShaderMask(
+                  blendMode: BlendMode.dstIn,
+                  shaderCallback: (bounds) => LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: const [Colors.black, Colors.transparent],
+                    stops: [start, end],
+                  ).createShader(bounds),
+                  child: child,
+                ),
+              _heroBackgroundShade(
+                offset,
+                height,
+                heroHeight: heroHeight,
+                darkenBackdrop: darkenBackdrop,
+                baseColor: shadeBaseColor,
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 }

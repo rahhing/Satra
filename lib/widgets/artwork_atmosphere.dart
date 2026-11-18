@@ -56,6 +56,7 @@ class ArtworkAtmosphereScope extends InheritedWidget {
   bool updateShouldNotify(ArtworkAtmosphereScope oldWidget) => controller != oldWidget.controller;
 }
 
+// ignore: unused-code
 /// A black canvas with a soft wash from the selected title's real artwork.
 /// Foreground pages remain independent; glass chrome samples this same canvas.
 class ArtworkAtmosphereHost extends StatefulWidget {

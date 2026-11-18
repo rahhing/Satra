@@ -420,6 +420,8 @@ void main() {
       backdropPaths: [first.path, second.path],
       serverId: 'server-1',
     );
+    final rotation = BackdropRotationController();
+    addTearDown(rotation.dispose);
     await tester.pumpWidget(
       MaterialApp(
         home: TvSpotlightBackground(
@@ -428,19 +430,34 @@ void main() {
           showInfo: false,
           allowNetwork: false,
           localArtworkPathResolver: (path) => path,
+          backdropController: rotation,
         ),
       ),
     );
-    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
-    await tester.pump();
-    await tester.pump();
-    expect(renderedFilePaths(tester), [first.path]);
+    Future<void> showLoadedFrame(File file) async {
+      final finder = find.byType(CyclingMediaBackdrop);
+      final context = tester.element(finder);
+      final backdrop = tester.widget<CyclingMediaBackdrop>(finder);
+      final ratio = MediaImageHelper.artworkPixelRatio(context, imageType: ImageType.art);
+      final (width, height) = MediaImageHelper.getMemCacheDimensions(
+        displayWidth: (backdrop.width * ratio).round(),
+        displayHeight: (backdrop.height * ratio).round(),
+        imageType: ImageType.art,
+      );
+      final provider = MediaImageHelper.boundedDecode(FileImage(file), memWidth: width, memHeight: height);
+      await tester.runAsync(() => precacheImage(provider, context));
+      await tester.pump();
+      await tester.pump();
+    }
+
+    await showLoadedFrame(first);
+    expect(rotation.currentIndex, 0);
+    expect(find.byKey(ValueKey<Object?>((item.globalKey, first.path))), findsWidgets);
 
     await tester.pump(const Duration(seconds: 10));
-    await tester.runAsync(() => Future<void>.delayed(const Duration(milliseconds: 20)));
-    await tester.pump();
-    await tester.pump();
-    expect(renderedFilePaths(tester).last, second.path);
+    await showLoadedFrame(second);
+    expect(rotation.currentIndex, 1);
+    expect(find.byKey(ValueKey<Object?>((item.globalKey, second.path))), findsWidgets);
 
     await tester.pumpWidget(const SizedBox.shrink());
   });

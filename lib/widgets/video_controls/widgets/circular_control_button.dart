@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import 'package:satra/widgets/app_icon.dart';
 
 import '../../../utils/platform_detector.dart';
 import '../../glass_surface.dart';
+import '../../ios_glass_control.dart';
 
 /// A circular transport button used in the mobile video controls.
 ///
@@ -34,7 +36,7 @@ class CircularControlButton extends StatelessWidget {
       final orbDiameter = isPrimary ? 78.0 : 54.0;
       final glyphSize = isPrimary ? 40.0 : 27.0;
 
-      return Semantics(
+      final fallback = Semantics(
         label: semanticLabel,
         button: true,
         enabled: isEnabled,
@@ -69,6 +71,21 @@ class CircularControlButton extends StatelessWidget {
             ),
           ),
         ),
+      );
+      final symbol = switch (icon) {
+        Symbols.skip_previous_rounded => 'backward.end.fill',
+        Symbols.skip_next_rounded => 'forward.end.fill',
+        Symbols.pause_rounded => 'pause.fill',
+        Symbols.play_arrow_rounded => 'play.fill',
+        _ => null,
+      };
+      if (symbol == null) return fallback;
+      return IOSGlassButton(
+        label: semanticLabel,
+        symbol: symbol,
+        symbolSize: glyphSize,
+        onPressed: onPressed,
+        child: fallback,
       );
     }
 

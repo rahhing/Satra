@@ -469,7 +469,10 @@ class _MobileVideoControlsState extends State<MobileVideoControls> with SingleTi
               else
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: const BoxDecoration(color: Colors.red, borderRadius: BorderRadius.all(Radius.circular(4))),
+                  decoration: const BoxDecoration(
+                    color: Colors.red,
+                    borderRadius: BorderRadius.all(Radius.circular(4)),
+                  ),
                   child: Text(
                     t.liveTv.live,
                     style: const TextStyle(color: Colors.white, fontWeight: .bold, fontSize: 12),
@@ -513,10 +516,7 @@ class _MobileVideoControlsState extends State<MobileVideoControls> with SingleTi
                 sigma: 28,
                 opacity: 0.56,
                 tint: const Color(0xFF07080C),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(10, 6, 10, 10),
-                  child: timeline,
-                ),
+                child: Padding(padding: const EdgeInsets.fromLTRB(10, 6, 10, 10), child: timeline),
               ),
             )
           : Padding(padding: const EdgeInsets.all(16), child: timeline),

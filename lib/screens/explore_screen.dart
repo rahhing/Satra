@@ -258,7 +258,7 @@ class ExploreScreenState extends State<ExploreScreen>
         anchorAlignment: anchorAlignment,
         onSelected: (id) => unawaited(sources.setActiveSource(id)),
         entriesBuilder: (context) => _sourceMenuEntries(sources, active),
-      child: trigger,
+        child: trigger,
       );
     }
     return FocusablePopupMenuButton<CatalogSourceId>(
@@ -495,9 +495,7 @@ class ExploreScreenState extends State<ExploreScreen>
               child: _buildSourceSwitcher(
                 sources,
                 active,
-                textStyle: Theme.of(
-                  context,
-                ).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w600),
+                textStyle: Theme.of(context).textTheme.titleMedium?.copyWith(color: foregroundColor, fontWeight: .w600),
                 anchorAlignment: AppMenuAnchorAlignment.end,
                 parentOwnsFocus: true,
               ),

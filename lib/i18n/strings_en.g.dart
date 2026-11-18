@@ -530,6 +530,18 @@ class Translations$settings$en {
 	/// en: 'Display featured content carousel on home screen'
 	String get showHeroSectionDescription => 'Display featured content carousel on home screen';
 
+	/// en: 'Use Classic Backdrop'
+	String get useClassicMobileBackdrop => 'Use Classic Backdrop';
+
+	/// en: 'Use the previous Discover artwork layout and scroll effect'
+	String get useClassicMobileBackdropDescription => 'Use the previous Discover artwork layout and scroll effect';
+
+	/// en: 'Darken Backdrop'
+	String get darkenMobileBackdrop => 'Darken Backdrop';
+
+	/// en: 'Progressively darken the blurred Home backdrop from Continue Watching downward'
+	String get darkenMobileBackdropDescription => 'Progressively darken the blurred Home backdrop from Continue Watching downward';
+
 	/// en: 'Seconds'
 	String get secondsLabel => 'Seconds';
 
@@ -1417,6 +1429,12 @@ class Translations$settings$en {
 
 	/// en: 'Display the Explore tab with content from Plex Discover and connected trackers'
 	String get showExploreTabDescription => 'Display the Explore tab with content from Plex Discover and connected trackers';
+
+	/// en: 'Show Live TV Tab'
+	String get showMobileLiveTv => 'Show Live TV Tab';
+
+	/// en: 'Show Live TV in the tab bar when your server supports it'
+	String get showMobileLiveTvDescription => 'Show Live TV in the tab bar when your server supports it';
 
 	/// en: 'Default to Favorite Channels'
 	String get liveTvDefaultFavorites => 'Default to Favorite Channels';
@@ -8443,6 +8461,10 @@ extension on Translations {
 			'settings.seasonPoster' => 'Season Poster',
 			'settings.episodeThumbnail' => 'Thumbnail',
 			'settings.showHeroSectionDescription' => 'Display featured content carousel on home screen',
+			'settings.useClassicMobileBackdrop' => 'Use Classic Backdrop',
+			'settings.useClassicMobileBackdropDescription' => 'Use the previous Discover artwork layout and scroll effect',
+			'settings.darkenMobileBackdrop' => 'Darken Backdrop',
+			'settings.darkenMobileBackdropDescription' => 'Progressively darken the blurred Home backdrop from Continue Watching downward',
 			'settings.secondsLabel' => 'Seconds',
 			'settings.minutesLabel' => 'Minutes',
 			'settings.secondsShort' => 's',
@@ -8739,6 +8761,8 @@ extension on Translations {
 			'settings.startupSection' => 'Startup Section',
 			'settings.showExploreTab' => 'Show Explore Tab',
 			'settings.showExploreTabDescription' => 'Display the Explore tab with content from Plex Discover and connected trackers',
+			'settings.showMobileLiveTv' => 'Show Live TV Tab',
+			'settings.showMobileLiveTvDescription' => 'Show Live TV in the tab bar when your server supports it',
 			'settings.liveTvDefaultFavorites' => 'Default to Favorite Channels',
 			'settings.liveTvDefaultFavoritesDescription' => 'Show only favorite channels when opening Live TV',
 			'settings.general' => 'General',
@@ -8777,14 +8801,14 @@ extension on Translations {
 			'settings.scopeSyncOffsets' => 'Audio & Subtitle Sync',
 			'settings.playerScopeOff' => 'Don\'t save',
 			'settings.playerScopeGlobal' => 'Everywhere',
+			_ => null,
+		} ?? switch (path) {
 			'settings.playerScopeLibrary' => 'Per library',
 			'settings.playerScopeTitle' => 'Per show or movie',
 			'settings.exportDialogTitle' => 'Export Satra settings',
 			'themeEditor.builtIn' => 'Built-in',
 			'themeEditor.presets' => 'Presets',
 			'themeEditor.custom' => 'Custom',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.customEmpty' => 'Not created yet',
 			'themeEditor.editCustom' => 'Edit custom theme',
 			'themeEditor.editCustomDescription' => 'Choose every color yourself',
@@ -9291,14 +9315,14 @@ extension on Translations {
 			'profiles.signedOutPlex' => 'Signed out of Plex.',
 			'profiles.signOutFailed' => 'Sign out failed.',
 			'profiles.sectionTitle' => 'Profiles',
+			_ => null,
+		} ?? switch (path) {
 			'profiles.summarySingle' => 'Add profiles to mix managed users and local identities',
 			'profiles.summaryMultipleWithActive' => ({required Object count, required Object activeName}) => '${count} profiles · active: ${activeName}',
 			'profiles.summaryMultiple' => ({required Object count}) => '${count} profiles',
 			'profiles.removeConnectionTitle' => 'Remove connection?',
 			'profiles.removeConnectionMessage' => ({required Object displayName, required Object connectionLabel}) => 'Remove ${displayName}\'s access to ${connectionLabel}. Other profiles keep it.',
 			'profiles.deleteProfileTitle' => 'Delete profile?',
-			_ => null,
-		} ?? switch (path) {
 			'profiles.deleteProfileMessage' => ({required Object displayName}) => 'Remove ${displayName} and its connections. Servers stay available.',
 			'profiles.profileNameLabel' => 'Profile name',
 			'profiles.pinProtectionLabel' => 'PIN protection',
@@ -9805,14 +9829,14 @@ extension on Translations {
 			'liveTv.whatsOn' => 'What\'s On',
 			'liveTv.watchChannel' => 'Watch Channel',
 			'liveTv.favorites' => 'Favorites',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.reorderFavorites' => 'Reorder Favorites',
 			'liveTv.noFavoriteChannels' => 'No favorite channels',
 			'liveTv.noFavoriteChannelsHint' => 'Show all channels, then long-press a channel to add it to your favorites.',
 			'liveTv.showAllChannels' => 'Show All Channels',
 			'liveTv.favoritesLoadFailed' => 'Could not load favorites. Check your connection and try again.',
 			'liveTv.favoritesUpdateFailed' => 'Could not update favorites. Check your connection and try again.',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.joinSession' => 'Join Session in Progress',
 			'liveTv.watchFromStart' => ({required Object minutes}) => 'Watch from start (${minutes} min ago)',
 			'liveTv.watchLive' => 'Watch Live',
@@ -10319,14 +10343,14 @@ extension on Translations {
 			'videoSettings.audioOutputSpatial' => 'Spatial Audio',
 			'videoSettings.audioOutputStereo' => 'Stereo',
 			'videoSettings.audioNormalization' => 'Normalize Loudness',
+			_ => null,
+		} ?? switch (path) {
 			'videoSettings.audioNormalizationDisablesPassthrough' => 'Decodes audio to PCM; passthrough is off while this is on',
 			'performanceOverlay.color' => 'Color',
 			'performanceOverlay.performance' => 'Performance',
 			'performanceOverlay.buffer' => 'Buffer',
 			'performanceOverlay.app' => 'App',
 			'performanceOverlay.decoder' => 'Decoder',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.rawDecoder' => 'Raw Decoder',
 			'performanceOverlay.tunneling' => 'Tunneling',
 			'performanceOverlay.passthrough' => 'Passthrough',

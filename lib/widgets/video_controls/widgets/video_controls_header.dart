@@ -64,10 +64,7 @@ class VideoControlsHeader extends StatelessWidget {
         if (!inSession) return const SizedBox.shrink();
         return Padding(
           padding: const EdgeInsets.only(right: 8),
-          child: WatchTogetherSessionIndicator(
-            onCancelAutoHide: onCancelAutoHide,
-            onStartAutoHide: onStartAutoHide,
-          ),
+          child: WatchTogetherSessionIndicator(onCancelAutoHide: onCancelAutoHide, onStartAutoHide: onStartAutoHide),
         );
       },
     );

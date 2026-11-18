@@ -11,6 +11,7 @@ import '../theme/app_motion.dart';
 import '../media/media_server_client.dart';
 import '../services/device_performance.dart';
 import '../utils/media_image_helper.dart';
+import 'artwork_focal_point.dart';
 import 'optimized_media_image.dart';
 
 /// Shares only the last painted backdrop across retained browsing pages.
@@ -124,6 +125,7 @@ class CyclingMediaBackdrop extends StatefulWidget {
     this.active = true,
     this.fit = BoxFit.cover,
     this.alignment = Alignment.center,
+    this.focusCrop = false,
     this.rotationInterval = const Duration(seconds: 10),
     this.fadeDuration = const Duration(milliseconds: 280),
     this.controller,
@@ -149,6 +151,7 @@ class CyclingMediaBackdrop extends StatefulWidget {
   final double height;
   final BoxFit fit;
   final Alignment alignment;
+  final bool focusCrop;
   final Color fallbackColor;
   final Duration rotationInterval;
   final Duration fadeDuration;
@@ -377,13 +380,14 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
     final provider = path == null || pending ? null : _providerFor(context, path, localFile);
     if (path != null && provider == null && !pending) _reportMissingProvider(path);
     final compose = widget.frameBuilder;
-    if (compose != null) {
+    if (compose != null || widget.focusCrop) {
       return _ComposedBackdropArtwork(
         artworkKey: (widget.mediaKey, path),
         image: provider,
         pending: pending,
         fit: widget.fit,
         alignment: widget.alignment,
+        focusCrop: widget.focusCrop,
         fallbackColor: widget.fallbackColor,
         duration: _disableAnimations ? Duration.zero : DevicePerformance.reducedDuration(widget.fadeDuration),
         compose: compose,
@@ -442,6 +446,7 @@ class _ComposedBackdropArtwork extends StatefulWidget {
     required this.pending,
     required this.fit,
     required this.alignment,
+    required this.focusCrop,
     required this.fallbackColor,
     required this.compose,
     required this.duration,
@@ -453,8 +458,9 @@ class _ComposedBackdropArtwork extends StatefulWidget {
   final bool pending;
   final BoxFit fit;
   final Alignment alignment;
+  final bool focusCrop;
   final Color fallbackColor;
-  final Widget Function(BuildContext, Widget) compose;
+  final Widget Function(BuildContext, Widget)? compose;
   final Duration duration;
   final VoidCallback onImageError;
 
@@ -615,15 +621,40 @@ class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with
     super.dispose();
   }
 
-  Widget _image(ImageInfo frame, Object? key, {Animation<double>? opacity}) => RawImage(
-    key: ValueKey(key),
-    image: frame.image,
-    scale: frame.scale,
-    fit: widget.fit,
-    alignment: widget.alignment,
-    opacity: opacity,
-    filterQuality: MediaImageHelper.artworkFilterQuality(context, ImageType.art),
-  );
+  Widget _image(ImageInfo frame, Object? key, {Animation<double>? opacity}) {
+    Widget raw(Alignment alignment, {Key? key}) => RawImage(
+      key: key,
+      image: frame.image,
+      scale: frame.scale,
+      fit: widget.fit,
+      alignment: alignment,
+      opacity: opacity,
+      filterQuality: MediaImageHelper.artworkFilterQuality(context, ImageType.art),
+    );
+
+    if (!widget.focusCrop || DevicePerformance.isReduced) return raw(widget.alignment, key: ValueKey(key));
+    final imageSize = Size(frame.image.width.toDouble(), frame.image.height.toDouble());
+    return LayoutBuilder(
+      key: ValueKey(key),
+      builder: (context, constraints) {
+        final size = constraints.biggest;
+        if (size.isEmpty || !size.isFinite) return raw(widget.alignment);
+        final visible = applyBoxFit(widget.fit, imageSize, size).source;
+        if (visible.width / imageSize.width > .92 && visible.height / imageSize.height > .92) {
+          return raw(widget.alignment);
+        }
+        return FutureBuilder<Offset>(
+          future: ArtworkFocalPoint.resolve((key, imageSize), frame.image),
+          builder: (context, snapshot) {
+            final point = snapshot.data;
+            return raw(
+              point == null ? widget.alignment : ArtworkFocalPoint.alignment(point, imageSize, size, widget.fit),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -640,7 +671,7 @@ class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with
         if (previous == null && current == null) ColoredBox(color: widget.fallbackColor),
       ],
     );
-    return widget.compose(context, artwork);
+    return widget.compose?.call(context, artwork) ?? artwork;
   }
 }
 

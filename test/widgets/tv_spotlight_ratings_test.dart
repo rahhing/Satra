@@ -7,6 +7,7 @@ import 'package:satra/media/media_kind.dart';
 import 'package:satra/media/media_rating.dart';
 import 'package:satra/services/settings_service.dart';
 import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/spotlight_shading.dart';
 import 'package:satra/widgets/tv_spotlight_background.dart';
 
 import '../test_helpers/prefs.dart';
@@ -57,6 +58,19 @@ void main() {
   });
 
   tearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+
+  testWidgets('desktop spotlight omits the narrow left edge scrim', (tester) async {
+    PlatformDetector.debugSetIsDesktopOSOverride(true);
+    addTearDown(() => PlatformDetector.debugSetIsDesktopOSOverride(null));
+    const movie = MediaItem.plex(id: 'movie_1', kind: MediaKind.movie, title: 'Spotlight Movie');
+    await _pumpSpotlight(tester, movie);
+    final shading = find.byType(SpotlightShading);
+    expect(tester.widget<SpotlightShading>(shading).dockBand, greaterThan(0));
+
+    TvDetectionService.debugSetAppleTVOverride(false);
+    await _pumpSpotlight(tester, movie);
+    expect(tester.widget<SpotlightShading>(shading).dockBand, 0);
+  });
 
   testWidgets('spotlight opacity keeps the title above the artwork scrim', (tester) async {
     await _pumpSpotlight(tester, const MediaItem.plex(id: 'movie_1', kind: MediaKind.movie, title: 'Spotlight Movie'));

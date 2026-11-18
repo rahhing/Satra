@@ -102,6 +102,13 @@ class GlassSurface extends StatelessWidget {
     return major == null || major >= 26;
   }();
 
+  /// Whether a platform view can host the system Liquid Glass controls.
+  static bool get supportsNativeIOSGlass {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return false;
+    return debugEnableIOSNativeGlass ??
+        (io.Platform.isIOS && _hostIOSSupportsLiquidGlass && WidgetsBinding.instance is WidgetsFlutterBinding);
+  }
+
   final Widget child;
   final BorderRadius borderRadius;
   final Color? tint;
@@ -140,10 +147,26 @@ class GlassSurface extends StatelessWidget {
   ];
 
   static List<double> _backdropBrightnessMatrix(double scale) => <double>[
-    scale, 0, 0, 0, 0,
-    0, scale, 0, 0, 0,
-    0, 0, scale, 0, 0,
-    0, 0, 0, 1, 0,
+    scale,
+    0,
+    0,
+    0,
+    0,
+    0,
+    scale,
+    0,
+    0,
+    0,
+    0,
+    0,
+    scale,
+    0,
+    0,
+    0,
+    0,
+    0,
+    1,
+    0,
   ];
 
   @override
@@ -202,17 +225,13 @@ class GlassSurface extends StatelessWidget {
 
     final animation = GlassTransitionScope.of(context);
     final rawSurface = tint ?? scheme.surface;
-    final surface = isDark
-        ? Color.lerp(rawSurface, const Color(0xFF050609), useLiquid ? 0.48 : 0.28)!
-        : rawSurface;
+    final surface = isDark ? Color.lerp(rawSurface, const Color(0xFF050609), useLiquid ? 0.48 : 0.28)! : rawSurface;
 
     final double baseOpacity;
     if (useLiquid) {
       baseOpacity = (effectiveLiquidOpacity * (isDark ? 0.92 : 0.88)).clamp(0.0, 0.94);
     } else {
-      final rawBaseOpacity = (blurNativeVideo && effects)
-          ? (isDark ? 0.48 : opacity.clamp(0.36, 0.72))
-          : opacity;
+      final rawBaseOpacity = (blurNativeVideo && effects) ? (isDark ? 0.48 : opacity.clamp(0.36, 0.72)) : opacity;
       if (effects && clampedBgBrightness > 1.001 && isDark) {
         final brighten = (clampedBgBrightness - 1.0).clamp(0.0, 1.0);
         baseOpacity = rawBaseOpacity * (1.0 - 0.75 * brighten);
@@ -298,9 +317,9 @@ class GlassSurface extends StatelessWidget {
         // NSGlassEffectView(.clear) stays crystal-clear at low opacity while
         // scaling native tintColor and foreground glaze smoothly up to 100%.
         nativeTintStrength = (effectiveLiquidOpacity * (isDark ? 0.82 : 0.68)).clamp(0.0, 0.86);
-        macOSOverlayAlpha = (effectiveLiquidOpacity * effectiveLiquidOpacity * (isDark ? 0.68 : 0.52) +
-                effectiveLiquidOpacity * 0.04)
-            .clamp(0.0, 0.72);
+        macOSOverlayAlpha =
+            (effectiveLiquidOpacity * effectiveLiquidOpacity * (isDark ? 0.68 : 0.52) + effectiveLiquidOpacity * 0.04)
+                .clamp(0.0, 0.72);
       } else {
         nativeTintStrength = 0.0;
         final baseMacOSAlpha = blurNativeVideo
@@ -340,9 +359,7 @@ class GlassSurface extends StatelessWidget {
           border: (border && !nativeLiquid)
               ? Border.all(
                   width: 1.0,
-                  color: Colors.white.withValues(
-                    alpha: ((isDark ? 0.10 : 0.65) * visibility).clamp(0.0, 1.0),
-                  ),
+                  color: Colors.white.withValues(alpha: ((isDark ? 0.10 : 0.65) * visibility).clamp(0.0, 1.0)),
                 )
               : null,
         ),
@@ -395,111 +412,40 @@ class GlassSurface extends StatelessWidget {
       final nativeLiquid = useLiquid && _hostIOSSupportsLiquidGlass;
       final effectiveSigma = (sigma * blurAmount).clamp(12.0, 48.0);
 
-      final double nativeTintStrength;
-      final double iosOverlayAlpha;
+      final nativeTintStrength = nativeLiquid
+          ? (effectiveLiquidOpacity * (interactive ? 0.40 : 0.96)).clamp(0.0, 0.82)
+          : 0.0;
+
+      final Widget pane;
       if (nativeLiquid) {
-        if (interactive) {
-          // Match Desktop ToolbarScrim's creamy dark frosted glass while keeping
-          // native iOS 26 UIGlassEffect rim refraction vibrant.
-          final pillTintFactor = blurNativeVideo ? 0.38 : (isDark ? 0.54 : 0.38);
-          nativeTintStrength = (effectiveLiquidOpacity * pillTintFactor).clamp(0.14, 0.68);
-          iosOverlayAlpha = blurNativeVideo
-              ? (effectiveLiquidOpacity * (isDark ? 0.26 : 0.16)).clamp(0.10, 0.36)
-              : (effectiveLiquidOpacity * (isDark ? 0.42 : 0.28)).clamp(0.16, 0.48);
-        } else {
-          // Menus, context sheets, dialogs, and Spotlight prioritize effortless
-          // legibility over busy artwork/text — enforce a rich frosted tint floor.
-          final readabilityFloor = blurNativeVideo ? (isDark ? 0.48 : 0.36) : (isDark ? 0.72 : 0.62);
-          final scaled = effectiveLiquidOpacity * (isDark ? 0.88 : 0.78);
-          nativeTintStrength = math.max(readabilityFloor * 0.82, scaled).clamp(0.32, 0.90);
-          iosOverlayAlpha = math.max(
-            readabilityFloor,
-            effectiveLiquidOpacity * (isDark ? 0.84 : 0.74),
-          ).clamp(0.36, 0.88);
-        }
+        // The system material provides the fill, edge, and refraction.
+        pane = content;
       } else {
-        nativeTintStrength = 0.0;
-        final baseIOSAlpha = blurNativeVideo
+        final fallbackAlpha = blurNativeVideo
             ? (isDark ? 0.36 : 0.24)
-            : (interactive
-                  ? (isDark ? (opacity * 0.56).clamp(0.28, 0.48) : (opacity * 0.38).clamp(0.18, 0.34))
-                  : (isDark ? (opacity * 0.84).clamp(0.68, 0.86) : (opacity * 0.78).clamp(0.60, 0.82)));
-        if (backgroundBrightness > 1.001) {
-          final brighten = (backgroundBrightness - 1.0).clamp(0.0, 1.0);
-          iosOverlayAlpha = baseIOSAlpha * (1.0 - 0.85 * brighten);
-        } else {
-          iosOverlayAlpha = baseIOSAlpha;
-        }
-      }
-
-      final gradedIOSContent = nativeLiquid
-          ? content
-          : DecoratedBox(
-              decoration: BoxDecoration(
-                borderRadius: resolvedRadius,
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: isDark
-                      ? [
-                          Colors.white.withValues(alpha: 0.03 * visibility),
-                          Colors.black.withValues(alpha: 0.04 * visibility),
-                        ]
-                      : [Colors.white.withValues(alpha: 0.08 * visibility), Colors.transparent],
-                ),
-              ),
-              child: content,
-            );
-
-      Widget iosPane = DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: resolvedRadius,
-          color: surface.withValues(alpha: iosOverlayAlpha * visibility),
-          border: border
-              ? Border.all(
-                  width: 0.75,
-                  color: Colors.white.withValues(
-                    alpha: ((isDark ? (nativeLiquid ? 0.12 : 0.16) : 0.62) * visibility).clamp(0.0, 1.0),
-                  ),
-                )
-              : null,
-        ),
-        child: gradedIOSContent,
-      );
-
-      if (!nativeLiquid && backgroundBrightness < 0.999) {
-        final darken = (1.0 - backgroundBrightness).clamp(0.0, 1.0);
-        iosPane = DecoratedBox(
+            : (interactive ? opacity * 0.55 : opacity * 0.84);
+        final brightness = backgroundBrightness.clamp(0.0, 2.0);
+        pane = DecoratedBox(
           decoration: BoxDecoration(
             borderRadius: resolvedRadius,
-            color: Colors.black.withValues(alpha: 0.62 * darken * visibility),
+            color: Color.lerp(surface, Colors.black, (1 - brightness).clamp(0.0, 1.0))!.withValues(
+              alpha: (fallbackAlpha * (1 - 0.85 * (brightness - 1).clamp(0.0, 1.0)) * visibility).clamp(0.0, 1.0),
+            ),
+            border: border
+                ? Border.all(width: 0.75, color: Colors.white.withValues(alpha: (isDark ? 0.16 : 0.62) * visibility))
+                : null,
           ),
-          child: iosPane,
+          child: content,
         );
       }
 
-      if (interactive) {
-        return _InteractiveLiquidGlassFrame(
-          liquidGlass: nativeLiquid,
-          isDark: isDark,
-          borderRadius: resolvedRadius,
-          visibility: visibility,
-          tintArgb: surface.toARGB32(),
-          tintStrength: nativeTintStrength,
-          sigma: effectiveSigma,
-          pane: iosPane,
-        );
-      }
-
-      // Keep UiKitView outside ClipRRect so Flutter never wraps it in an
-      // offscreen ChildClippingView mask that isolates CABackdropLayer.
       return Stack(
         children: [
           Positioned.fill(
             child: IgnorePointer(
               child: _IOSNativeGlassBackdrop(
                 liquidGlass: nativeLiquid,
-                interactive: false,
+                interactive: interactive,
                 isDark: isDark,
                 borderRadius: resolvedRadius,
                 visibility: visibility,
@@ -509,13 +455,7 @@ class GlassSurface extends StatelessWidget {
               ),
             ),
           ),
-          if (useLiquid && !nativeLiquid)
-            Positioned.fill(
-              child: IgnorePointer(
-                child: _LiquidSheenLayer(borderRadius: resolvedRadius, visibility: visibility, isDark: isDark),
-              ),
-            ),
-          ClipRRect(borderRadius: resolvedRadius, child: iosPane),
+          ClipRRect(borderRadius: resolvedRadius, child: pane),
         ],
       );
     }
@@ -524,9 +464,7 @@ class GlassSurface extends StatelessWidget {
     final baseFill = surface.withValues(alpha: effectiveAlpha);
     final gradientScale = useLiquid
         ? (effectiveLiquidOpacity * 1.4).clamp(0.0, 1.0)
-        : (backgroundBrightness > 1.001 && isDark
-              ? (1.0 - 0.75 * (backgroundBrightness - 1.0).clamp(0.0, 1.0))
-              : 1.0);
+        : (backgroundBrightness > 1.001 && isDark ? (1.0 - 0.75 * (backgroundBrightness - 1.0).clamp(0.0, 1.0)) : 1.0);
 
     // Keep `color` and `gradient` on separate DecoratedBoxes because Flutter's
     // BoxDecoration replaces `paint.color` RGB when `paint.shader` is non-null.
@@ -601,11 +539,7 @@ class GlassSurface extends StatelessWidget {
           inner: blurFilter,
         );
       }
-      filteredContent = BackdropFilter(
-        enabled: effects,
-        filter: backdropFilter,
-        child: pane,
-      );
+      filteredContent = BackdropFilter(enabled: effects, filter: backdropFilter, child: pane);
     }
 
     final glass = ClipRRect(borderRadius: borderRadius, child: filteredContent);
@@ -707,167 +641,6 @@ class _MacOSNativeGlassBackdropState extends State<_MacOSNativeGlassBackdrop> {
   }
 }
 
-/// Implements iOS 26's pressurized interactive Liquid Glass physics when holding
-/// or sliding a finger on floating capsules, orbs, and bottom bars:
-/// - Smoothly inflates the glass lens outward (inversely scaled by surface width
-///   so circular orbs expand ~7.5%, header bubbles ~4.8%, and wide bars ~2.4%).
-/// - Tracks the finger's live local position to render a radial specular bloom
-///   and luminous refractive rim while boosting native `UIGlassEffect` luminosity.
-class _InteractiveLiquidGlassFrame extends StatefulWidget {
-  const _InteractiveLiquidGlassFrame({
-    required this.liquidGlass,
-    required this.isDark,
-    required this.borderRadius,
-    required this.visibility,
-    required this.tintArgb,
-    required this.tintStrength,
-    required this.sigma,
-    required this.pane,
-  });
-
-  final bool liquidGlass;
-  final bool isDark;
-  final BorderRadius borderRadius;
-  final double visibility;
-  final int tintArgb;
-  final double tintStrength;
-  final double sigma;
-  final Widget pane;
-
-  @override
-  State<_InteractiveLiquidGlassFrame> createState() => _InteractiveLiquidGlassFrameState();
-}
-
-class _InteractiveLiquidGlassFrameState extends State<_InteractiveLiquidGlassFrame>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _pressController = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 150),
-    reverseDuration: const Duration(milliseconds: 280),
-  );
-  final ValueNotifier<Alignment> _touchAlignment = ValueNotifier<Alignment>(Alignment.center);
-  int? _activePointer;
-  double _surfaceWidth = 140.0;
-
-  @override
-  void dispose() {
-    _pressController.dispose();
-    _touchAlignment.dispose();
-    super.dispose();
-  }
-
-  void _updateTouchOffset(Offset localPosition) {
-    final box = context.findRenderObject() as RenderBox?;
-    if (box == null || !box.hasSize) return;
-    final size = box.size;
-    _surfaceWidth = size.width;
-    if (size.width <= 0 || size.height <= 0) return;
-    final nx = ((localPosition.dx / size.width) * 2.0 - 1.0).clamp(-1.0, 1.0);
-    final ny = ((localPosition.dy / size.height) * 2.0 - 1.0).clamp(-1.0, 1.0);
-    _touchAlignment.value = Alignment(nx, ny);
-  }
-
-  void _handlePointerDown(PointerDownEvent event) {
-    _activePointer = event.pointer;
-    _updateTouchOffset(event.localPosition);
-    _pressController.forward();
-  }
-
-  void _handlePointerMove(PointerMoveEvent event) {
-    if (_activePointer != event.pointer) return;
-    _updateTouchOffset(event.localPosition);
-  }
-
-  void _handlePointerEnd(PointerEvent event) {
-    if (_activePointer != event.pointer) return;
-    _activePointer = null;
-    _pressController.reverse();
-  }
-
-  double get _maxScaleBoost {
-    if (_surfaceWidth <= 72) return 0.075;
-    if (_surfaceWidth <= 210) return 0.048;
-    return 0.024;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Listener(
-      behavior: HitTestBehavior.translucent,
-      onPointerDown: _handlePointerDown,
-      onPointerMove: _handlePointerMove,
-      onPointerUp: _handlePointerEnd,
-      onPointerCancel: _handlePointerEnd,
-      child: AnimatedBuilder(
-        animation: Listenable.merge([_pressController, _touchAlignment]),
-        child: ClipRRect(borderRadius: widget.borderRadius, child: widget.pane),
-        builder: (context, clippedPane) {
-          final rawT = _pressController.value;
-          final easedT = Curves.easeOutCubic.transform(rawT);
-          final scale = 1.0 + easedT * _maxScaleBoost;
-          final align = _touchAlignment.value;
-          final pivot = Alignment(align.x * 0.35, align.y * 0.35);
-          final quantizedPress = (easedT * 20).round() / 20.0;
-
-          return Transform.scale(
-            scale: scale,
-            alignment: pivot,
-            child: Stack(
-              children: [
-                Positioned.fill(
-                  child: IgnorePointer(
-                    child: _IOSNativeGlassBackdrop(
-                      liquidGlass: widget.liquidGlass,
-                      interactive: true,
-                      isDark: widget.isDark,
-                      borderRadius: widget.borderRadius,
-                      visibility: widget.visibility,
-                      tintArgb: widget.tintArgb,
-                      tintStrength: widget.tintStrength,
-                      sigma: widget.sigma,
-                      pressProgress: quantizedPress,
-                    ),
-                  ),
-                ),
-                clippedPane!,
-                if (easedT > 0.005)
-                  Positioned.fill(
-                    child: IgnorePointer(
-                      child: ClipRRect(
-                        borderRadius: widget.borderRadius,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            borderRadius: widget.borderRadius,
-                            gradient: RadialGradient(
-                              center: align,
-                              radius: 1.05,
-                              colors: [
-                                Colors.white.withValues(alpha: (widget.isDark ? 0.20 : 0.34) * easedT * widget.visibility),
-                                Colors.white.withValues(alpha: (widget.isDark ? 0.06 : 0.12) * easedT * widget.visibility),
-                                Colors.transparent,
-                              ],
-                              stops: const [0.0, 0.45, 1.0],
-                            ),
-                            border: Border.all(
-                              width: 1.0,
-                              color: Colors.white.withValues(
-                                alpha: ((widget.isDark ? 0.24 : 0.55) * easedT * widget.visibility).clamp(0.0, 1.0),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
 class _IOSNativeGlassBackdrop extends StatefulWidget {
   const _IOSNativeGlassBackdrop({
     required this.liquidGlass,
@@ -878,7 +651,6 @@ class _IOSNativeGlassBackdrop extends StatefulWidget {
     required this.tintArgb,
     required this.tintStrength,
     required this.sigma,
-    this.pressProgress = 0.0,
   });
 
   final bool liquidGlass;
@@ -889,7 +661,6 @@ class _IOSNativeGlassBackdrop extends StatefulWidget {
   final int tintArgb;
   final double tintStrength;
   final double sigma;
-  final double pressProgress;
 
   @override
   State<_IOSNativeGlassBackdrop> createState() => _IOSNativeGlassBackdropState();
@@ -914,7 +685,6 @@ class _IOSNativeGlassBackdropState extends State<_IOSNativeGlassBackdrop> {
     'tintArgb': widget.tintArgb,
     'tintStrength': widget.tintStrength,
     'sigma': widget.sigma,
-    'pressProgress': widget.pressProgress,
   };
 
   void _handlePlatformViewCreated(int id) {
@@ -1318,10 +1088,12 @@ class _LiquidSheenPainter extends CustomPainter {
     }
 
     // Fallback specular meniscus rim before shader program finishes loading
-    final topDocked = borderRadius.topLeft.x <= 0.5 &&
+    final topDocked =
+        borderRadius.topLeft.x <= 0.5 &&
         borderRadius.topRight.x <= 0.5 &&
         (borderRadius.bottomLeft.x > 0.5 || borderRadius.bottomRight.x > 0.5);
-    final bottomDocked = borderRadius.bottomLeft.x <= 0.5 &&
+    final bottomDocked =
+        borderRadius.bottomLeft.x <= 0.5 &&
         borderRadius.bottomRight.x <= 0.5 &&
         (borderRadius.topLeft.x > 0.5 || borderRadius.topRight.x > 0.5);
     final rimRect = Rect.fromLTRB(

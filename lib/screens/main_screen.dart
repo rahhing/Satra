@@ -69,6 +69,7 @@ import '../widgets/mobile_glass_tab_bar.dart';
 import '../widgets/mobile_navigation_rail.dart';
 import '../widgets/vertical_bar_shell.dart';
 import '../widgets/glass_surface.dart';
+import '../widgets/ios_glass_control.dart';
 import '../widgets/utility_panel_route.dart';
 import '../widgets/retained_tab_view.dart';
 import '../widgets/focusable_tab_chip.dart';
@@ -421,6 +422,7 @@ class _MainScreenState extends State<MainScreen>
   MultiServerProvider? _multiServerProvider;
   CatalogSourcesProvider? _catalogSourcesProvider;
   ValueListenable<bool>? _showExploreTabListenable;
+  ValueListenable<bool>? _showMobileLiveTvListenable;
   RouteObserver<PageRoute<dynamic>>? _profileRouteObserver;
   SpotlightController? _spotlightController;
   bool _lastHasLiveTv = false;
@@ -522,7 +524,7 @@ class _MainScreenState extends State<MainScreen>
     // Synchronize _lastHasLiveTv with provider before building screens
     // so _buildScreens and _hasLiveTv getter agree from the start.
     try {
-      _lastHasLiveTv = context.read<MultiServerProvider>().hasLiveTv;
+      _lastHasLiveTv = _shouldShowLiveTv(context.read<MultiServerProvider>().hasLiveTv);
     } catch (_) {
       _lastHasLiveTv = false;
     }
@@ -535,6 +537,8 @@ class _MainScreenState extends State<MainScreen>
     // mid-session; the catalog-sources listener covers source changes.
     _showExploreTabListenable = SettingsService.instanceOrNull?.listenable(SettingsService.showExploreTab);
     _showExploreTabListenable?.addListener(_handleCatalogSourcesChanged);
+    _showMobileLiveTvListenable = SettingsService.instanceOrNull?.listenable(SettingsService.showMobileLiveTv);
+    _showMobileLiveTvListenable?.addListener(_handleLiveTvChanged);
     _currentTab = _defaultTabForMode(_isOffline);
     _lastOnlineTabId = _isOffline ? null : NavigationTabId.discover;
     _autoSwitchedToDownloads = _isOffline && _currentTab == NavigationTabId.downloads;
@@ -968,6 +972,7 @@ class _MainScreenState extends State<MainScreen>
     _multiServerProvider?.removeListener(_handleLiveTvChanged);
     _catalogSourcesProvider?.removeListener(_handleCatalogSourcesChanged);
     _showExploreTabListenable?.removeListener(_handleCatalogSourcesChanged);
+    _showMobileLiveTvListenable?.removeListener(_handleLiveTvChanged);
     if (_bindingSettleListener != null) {
       _activeProfileForListener?.removeListener(_bindingSettleListener!);
     }
@@ -1172,13 +1177,20 @@ class _MainScreenState extends State<MainScreen>
   }
 
   void _handleLiveTvChanged() {
-    final hasLiveTv = _multiServerProvider?.hasLiveTv ?? false;
+    final hasLiveTv = _shouldShowLiveTv(_multiServerProvider?.hasLiveTv ?? false);
     if (hasLiveTv == _lastHasLiveTv) return;
     _lastHasLiveTv = hasLiveTv;
 
     _handleTabAvailabilityChanged();
     _applyPendingStartupTab();
   }
+
+  bool _shouldShowLiveTv(bool serverSupportsLiveTv) =>
+      serverSupportsLiveTv &&
+      (PlatformDetector.isTV() ||
+          PlatformDetector.isAutomotive() ||
+          !(Platform.isAndroid || PlatformDetector.isHandheldAppleMobile()) ||
+          (SettingsService.instanceOrNull?.read(SettingsService.showMobileLiveTv) ?? false));
 
   void _applyPendingStartupTab() {
     final pending = _pendingStartupTab;
@@ -1683,11 +1695,12 @@ class _MainScreenState extends State<MainScreen>
 
   static const _contentTabs = [NavigationTabId.discover, NavigationTabId.libraries];
 
-  Widget _buildBottomNavigationBar(BuildContext context, {required bool hideLabels}) {
+  Widget _buildBottomNavigationBar(BuildContext context, {required bool hideLabels, required bool isLandscape}) {
     return MobileGlassTabBar(
       tabs: _getBottomNavigationTabs(context),
       selectedTab: _currentTab,
       hideLabels: hideLabels,
+      isLandscape: isLandscape,
       onDestinationSelected: _selectTab,
       onActiveTabReselected: () => _onScreen<ScrollToTopable>(_currentTab, (screen) => screen.scrollToTop()),
       onLibrariesLongPress: () => _showLibraryQuickPicker(context),
@@ -1792,7 +1805,7 @@ class _MainScreenState extends State<MainScreen>
           child: switch (IphoneDuo.verticalBarEdgeOf(context)) {
             final VerticalBarEdge edge => _buildVerticalBarShell(context, edge),
             null when PlatformDetector.shouldUseLandscapeNavigationRail(context) => _buildLandscapeShell(context),
-            null => _buildPortraitShell(context),
+            null => _buildBottomBarShell(context),
           },
         ),
       ),
@@ -1839,32 +1852,43 @@ class _MainScreenState extends State<MainScreen>
       body: Builder(
         builder: (context) {
           final isRtl = Directionality.of(context) == TextDirection.rtl;
+          final colors = Theme.of(context).colorScheme;
           return Row(
             children: [
-              SettingValueBuilder<bool>(
-                pref: SettingsService.showNavBarLabels,
-                builder: (context, showNavBarLabels, _) {
-                  _scheduleNavBarMeasure(rail: true);
-                  return MobileNavigationRail(
-                    key: _navBarKey,
-                    tabs: _getBottomNavigationTabs(context),
-                    selectedTab: _currentTab,
-                    showLabels: showNavBarLabels,
-                    onDestinationSelected: _selectTab,
-                    onLibrariesLongPress: () => _showLibraryQuickPicker(context),
-                    onSearchPressed: _isOffline ? null : () => _openSpotlight(),
-                    isOffline: _isOffline,
-                    isReconnecting: _isReconnecting,
-                    onReconnect: _triggerReconnect,
-                  );
-                },
+              ColoredBox(
+                key: _navBarKey,
+                color: Color.lerp(colors.surfaceContainerLow, colors.surface, .65)!,
+                child: SafeArea(
+                  left: !isRtl,
+                  right: isRtl,
+                  child: SettingValueBuilder<bool>(
+                    pref: SettingsService.showNavBarLabels,
+                    builder: (context, showNavBarLabels, _) {
+                      _scheduleNavBarMeasure(rail: true);
+                      return MobileNavigationRail(
+                        tabs: _getBottomNavigationTabs(context),
+                        selectedTab: _currentTab,
+                        showLabels: showNavBarLabels,
+                        onDestinationSelected: _selectTab,
+                        onLibrariesLongPress: () => _showLibraryQuickPicker(context),
+                        onSearchPressed: _isOffline ? null : () => _openSpotlight(),
+                        isOffline: _isOffline,
+                        isReconnecting: _isReconnecting,
+                        onReconnect: _triggerReconnect,
+                        backgroundColor: Colors.transparent,
+                      );
+                    },
+                  ),
+                ),
               ),
               Expanded(
-                child: MediaQuery.removePadding(
-                  context: context,
-                  removeLeft: !isRtl,
-                  removeRight: isRtl,
-                  child: _buildTickerAwareStack(),
+                child: ClipRect(
+                  child: MediaQuery.removePadding(
+                    context: context,
+                    removeLeft: !isRtl,
+                    removeRight: isRtl,
+                    child: _buildTickerAwareStack(),
+                  ),
                 ),
               ),
             ],
@@ -1874,7 +1898,8 @@ class _MainScreenState extends State<MainScreen>
     );
   }
 
-  Widget _buildPortraitShell(BuildContext context) {
+  Widget _buildBottomBarShell(BuildContext context) {
+    final compactLandscape = PlatformDetector.isCompactMobileLandscape(context);
     return Scaffold(
       backgroundColor: Colors.transparent,
       extendBody: true,
@@ -1889,43 +1914,52 @@ class _MainScreenState extends State<MainScreen>
               bottom: false,
               child: Padding(
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
-                child: GlassSurface(
-                  interactive: true,
-                  borderRadius: const BorderRadius.all(Radius.circular(999)),
-                  sigma: 24,
-                  opacity: 0.58,
-                  child: Material(
-                    type: MaterialType.transparency,
-                    child: InkWell(
-                      borderRadius: const BorderRadius.all(Radius.circular(999)),
-                      onTap: _isReconnecting ? null : _triggerReconnect,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: .center,
-                          children: [
-                            if (_isReconnecting)
-                              SizedBox(
-                                width: 15,
-                                height: 15,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
+                child: IOSGlassButton(
+                  label: t.common.reconnect,
+                  title: t.common.reconnect,
+                  titleSize: 13.5,
+                  symbol: 'wifi',
+                  symbolSize: 15,
+                  showsActivity: _isReconnecting,
+                  onPressed: _isReconnecting ? null : _triggerReconnect,
+                  child: GlassSurface(
+                    interactive: true,
+                    borderRadius: const BorderRadius.all(Radius.circular(999)),
+                    sigma: 24,
+                    opacity: 0.58,
+                    child: Material(
+                      type: MaterialType.transparency,
+                      child: InkWell(
+                        borderRadius: const BorderRadius.all(Radius.circular(999)),
+                        onTap: _isReconnecting ? null : _triggerReconnect,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+                          child: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: .center,
+                            children: [
+                              if (_isReconnecting)
+                                SizedBox(
+                                  width: 15,
+                                  height: 15,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                )
+                              else
+                                AppIcon(Symbols.wifi_rounded, size: 17, color: Theme.of(context).colorScheme.primary),
+                              const SizedBox(width: 8),
+                              Text(
+                                t.common.reconnect,
+                                style: TextStyle(
+                                  fontSize: 13.5,
+                                  fontWeight: .w600,
                                   color: Theme.of(context).colorScheme.primary,
                                 ),
-                              )
-                            else
-                              AppIcon(Symbols.wifi_rounded, size: 17, color: Theme.of(context).colorScheme.primary),
-                            const SizedBox(width: 8),
-                            Text(
-                              t.common.reconnect,
-                              style: TextStyle(
-                                fontSize: 13.5,
-                                fontWeight: .w600,
-                                color: Theme.of(context).colorScheme.primary,
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -1937,16 +1971,15 @@ class _MainScreenState extends State<MainScreen>
             pref: SettingsService.showNavBarLabels,
             builder: (context, showNavBarLabels, _) {
               final hideLabels = !showNavBarLabels;
+              final horizontalInset = PlatformDetector.isHandheldIOS(context) ? 8.0 : 16.0;
               _scheduleNavBarMeasure(rail: false);
               return SafeArea(
                 top: false,
-                minimum: EdgeInsets.fromLTRB(
-                  PlatformDetector.isHandheldIOS(context) ? 6 : 16,
-                  0,
-                  PlatformDetector.isHandheldIOS(context) ? 6 : 16,
-                  10,
+                minimum: EdgeInsets.fromLTRB(horizontalInset, 0, horizontalInset, compactLandscape ? 12 : 10),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: compactLandscape ? 500 : double.infinity),
+                  child: _buildBottomNavigationBar(context, hideLabels: hideLabels, isLandscape: compactLandscape),
                 ),
-                child: _buildBottomNavigationBar(context, hideLabels: hideLabels),
               );
             },
           ),

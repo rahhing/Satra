@@ -1,12 +1,14 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 
 import '../media/media_item.dart';
 import '../services/hover_preview_controller.dart';
 import '../theme/app_motion.dart';
 import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
+import 'app_icon.dart';
 import 'media_preview_surface.dart';
 
 /// Artwork-only feedback: captions keep their layout and every overlay shares
@@ -204,7 +206,7 @@ class _MediaCardArtworkState extends State<MediaCardArtwork> with WidgetsBinding
                         builder: (context, loaded, _) => AnimatedOpacity(
                           opacity: loaded && _hovered ? 1 : 0,
                           duration: AppMotion.duration(context, AppMotion.fast),
-                          child: const Icon(Icons.volume_off_rounded, size: 18, color: Colors.white),
+                          child: const AppIcon(Symbols.volume_off_rounded, size: 18, color: Colors.white),
                         ),
                       ),
                     ),

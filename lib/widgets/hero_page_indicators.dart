@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../theme/app_motion.dart';
+import '../utils/platform_detector.dart';
 
 /// One marker per rotating hero, with a softly expanding active capsule.
 class HeroPageIndicators extends StatelessWidget {
@@ -28,14 +29,15 @@ class HeroPageIndicators extends StatelessWidget {
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        IconButton(
-          tooltip: pauseLabel,
-          onPressed: onTogglePaused,
-          visualDensity: VisualDensity.compact,
-          iconSize: 16,
-          color: Colors.white.withValues(alpha: 0.85),
-          icon: Icon(paused ? Symbols.play_arrow_rounded : Symbols.pause_rounded),
-        ),
+        if (!PlatformDetector.isMobile(context))
+          IconButton(
+            tooltip: pauseLabel,
+            onPressed: onTogglePaused,
+            visualDensity: VisualDensity.compact,
+            iconSize: 16,
+            color: Colors.white.withValues(alpha: 0.85),
+            icon: Icon(paused ? Symbols.play_arrow_rounded : Symbols.pause_rounded),
+          ),
         Flexible(
           child: SingleChildScrollView(
             scrollDirection: Axis.horizontal,

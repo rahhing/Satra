@@ -247,13 +247,16 @@ class PlatformDetector {
     return isDesktop(context);
   }
 
-  /// Mobile shell in landscape: the bottom navigation bar becomes a leading
-  /// [NavigationRail] so a wide, short viewport — a rotated phone, a car head
-  /// unit — keeps its height for content. Not the desktop/TV sidebar: every
-  /// other mobile layout decision stays as it is.
-  static bool shouldUseLandscapeNavigationRail(BuildContext context) {
-    return isMobile(context) && MediaQuery.orientationOf(context) == Orientation.landscape;
-  }
+  static bool _isMobileLandscape(BuildContext context) =>
+      isMobile(context) && MediaQuery.orientationOf(context) == Orientation.landscape;
+
+  /// Short, landscape handheld windows keep the floating bottom tabs.
+  static bool isCompactMobileLandscape(BuildContext context) =>
+      _isMobileLandscape(context) && !isAutomotive() && MediaQuery.sizeOf(context).height < 600;
+
+  /// Tablets with room for a rail and vehicle displays use side navigation.
+  static bool shouldUseLandscapeNavigationRail(BuildContext context) =>
+      _isMobileLandscape(context) && !isCompactMobileLandscape(context);
 
   /// Whether this device should act as a companion remote host (receiver).
   /// Desktop platforms and Android TV are hosts; phones/tablets are controllers.

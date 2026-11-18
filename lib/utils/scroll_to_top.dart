@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/services.dart';
@@ -40,7 +41,7 @@ Future<void> smoothScrollToTop(ScrollController controller) async {
   }
 
   if (futures.isNotEmpty) {
-    HapticFeedback.lightImpact();
+    unawaited(HapticFeedback.lightImpact());
     await Future.wait(futures);
   }
 }
