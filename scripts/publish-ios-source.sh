@@ -71,11 +71,11 @@ tree="$(git mktree < "$tree_input")"
 commit="$(git commit-tree "$tree" -m "Publish AltStore/SideStore source for ${release_tag}")"
 git push origin "$commit:refs/heads/gh-pages" --force
 
-# Ensure GitHub Pages is enabled on gh-pages.
+# Ensure GitHub Pages is enabled on gh-pages (ignore 409 if GitHub auto-enabled on push).
 if ! gh api "repos/${repo}/pages" >/dev/null 2>&1; then
   gh api -X POST "repos/${repo}/pages" \
     -f "source[branch]=gh-pages" \
-    -f "source[path]=/" >/dev/null
+    -f "source[path]=/" >/dev/null 2>&1 || true
 fi
 
 echo "Published release: ${repo_url}/releases/tag/${release_tag}"
