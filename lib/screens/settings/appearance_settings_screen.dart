@@ -37,6 +37,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
     // Nullable watch: hosts without the profile session scope (tests) simply
     // never show the Explore toggle, mirroring the tab's own visibility.
     final hasExplore = context.watch<CatalogSourcesProvider?>()?.hasAnySource ?? false;
+    final showHoverEffects = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
     return SettingsPage(
       title: Text(t.settings.appearance),
       children: [
@@ -69,6 +70,42 @@ class AppearanceSettingsScreen extends StatelessWidget {
             ],
           ),
         ),
+
+        if (showHoverEffects || PlatformDetector.isTV())
+          SettingsGroup(
+            title: t.settings.browseEffects,
+            children: [
+              if (showHoverEffects) ...[
+                SettingSwitchTile(
+                  pref: SettingsService.cardHoverLift,
+                  icon: Symbols.open_with_rounded,
+                  title: t.settings.cardHoverLift,
+                  subtitle: t.settings.cardHoverLiftDescription,
+                ),
+                _percentSliderTile(
+                  sliderKey: const ValueKey('shelf_heading_hover_opacity'),
+                  pref: SettingsService.shelfHeadingHoverOpacity,
+                  icon: Symbols.title_rounded,
+                  title: t.settings.shelfHeadingHoverOpacity,
+                  description: t.settings.shelfHeadingHoverOpacityDescription,
+                  min: 0.55,
+                  max: 1.0,
+                  divisions: 9,
+                ),
+              ],
+              if (PlatformDetector.isTV())
+                _percentSliderTile(
+                  sliderKey: const ValueKey('spotlight_artwork_opacity'),
+                  pref: SettingsService.spotlightArtworkOpacity,
+                  icon: Symbols.brightness_6_rounded,
+                  title: t.settings.spotlightArtworkOpacity,
+                  description: t.settings.spotlightArtworkOpacityDescription,
+                  min: 0.2,
+                  max: 1.0,
+                  divisions: 16,
+                ),
+            ],
+          ),
 
         SettingsGroup(
           title: t.settings.libraryAndCards,
@@ -458,10 +495,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 4),
-            Text(
-              description,
-              style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
-            ),
+            Text(description, style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant)),
             const SizedBox(height: 6),
             FocusableSlider(
               key: sliderKey,

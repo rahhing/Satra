@@ -63,8 +63,6 @@ class TvSpotlightBackground extends StatelessWidget {
     final media = item;
     final bgColor = Theme.of(context).scaffoldBackgroundColor;
 
-    // Keep artwork at its original brightness above the browsing shelves.
-    // Local shading below supports cards and the dock without a black fill.
     final size = MediaQuery.sizeOf(context);
     final containerAspect = size.width / size.height;
     final fallbackPaths = media == null
@@ -95,6 +93,16 @@ class TvSpotlightBackground extends StatelessWidget {
           fit: StackFit.expand,
           children: [
             RepaintBoundary(child: backdrop),
+            Positioned.fill(
+              child: IgnorePointer(
+                child: SettingValueBuilder<double>(
+                  pref: SettingsService.spotlightArtworkOpacity,
+                  builder: (context, opacity, _) => opacity >= 1
+                      ? const SizedBox.shrink()
+                      : ColoredBox(color: bgColor.withValues(alpha: 1 - opacity.clamp(0.2, 1.0))),
+                ),
+              ),
+            ),
             Positioned.fill(
               child: IgnorePointer(
                 child: SpotlightShading(

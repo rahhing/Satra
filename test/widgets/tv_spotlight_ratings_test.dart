@@ -58,6 +58,22 @@ void main() {
 
   tearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
 
+  testWidgets('spotlight opacity keeps the title above the artwork scrim', (tester) async {
+    await _pumpSpotlight(tester, const MediaItem.plex(id: 'movie_1', kind: MediaKind.movie, title: 'Spotlight Movie'));
+    final title = find.text('Spotlight Movie');
+    final titleBounds = tester.getRect(title);
+    final background = Theme.of(tester.element(title)).scaffoldBackgroundColor;
+    final scrim = find.byWidgetPredicate(
+      (widget) => widget is ColoredBox && widget.color == background.withValues(alpha: 0.5),
+    );
+    expect(scrim, findsNothing);
+
+    await SettingsService.instance.write(SettingsService.spotlightArtworkOpacity, 0.5);
+    await tester.pumpAndSettle();
+    expect(scrim, findsOneWidget);
+    expect(tester.getRect(title), titleBounds);
+  });
+
   testWidgets('dashboard spotlight badges every rating the listing carried', (tester) async {
     await _pumpSpotlight(
       tester,

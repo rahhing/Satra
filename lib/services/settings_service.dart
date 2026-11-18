@@ -669,6 +669,9 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
   static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: true);
   static const focusGlow = BoolPref('focus_glow', defaultValue: false);
+  static const cardHoverLift = BoolPref('card_hover_lift', defaultValue: true);
+  static const shelfHeadingHoverOpacity = DoublePref('shelf_heading_hover_opacity', defaultValue: 0.70);
+  static const spotlightArtworkOpacity = DoublePref('spotlight_artwork_opacity', defaultValue: 1.0);
   static bool _liquidGlassDefault() => PlatformDetector.defaultsToLiquidGlass();
   static double _liquidGlassOpacityDefault() {
     if (PlatformDetector.isMacOS() || PlatformDetector.isHandheldAppleMobile()) return 0.65;
@@ -1583,6 +1586,9 @@ class SettingsService extends BaseSharedPreferencesService {
     useExternalPlayer,
     forceTvMode,
     visualEffects,
+    cardHoverLift,
+    shelfHeadingHoverOpacity,
+    spotlightArtworkOpacity,
     liquidGlass,
     liquidGlassOpacity,
     glassBlurAmount,

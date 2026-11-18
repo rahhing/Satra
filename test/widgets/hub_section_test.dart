@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show PointerDeviceKind;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,8 @@ import 'package:satra/widgets/media_card.dart';
 import 'package:satra/widgets/hub_section.dart';
 import 'package:satra/utils/layout_constants.dart';
 import 'package:satra/widgets/media_grid_delegate.dart';
+import 'package:satra/widgets/hover_lift.dart';
+import 'package:satra/widgets/shelf_hover_depth.dart';
 import 'package:satra/widgets/tv_browse_rail.dart';
 
 import '../test_helpers/media_items.dart';
@@ -34,6 +37,86 @@ void main() {
   tearDown(() {
     TvDetectionService.debugSetAppleTVOverride(null);
   });
+
+  for (final useSpotlightRail in [false, true]) {
+    testWidgets('only a nearby hovered card fades the shelf heading: spotlight=$useSpotlightRail', (tester) async {
+      PlatformDetector.debugSetIsDesktopOSOverride(true);
+      TvDetectionService.debugSetAppleTVOverride(false);
+      addTearDown(() => PlatformDetector.debugSetIsDesktopOSOverride(null));
+      tester.view.devicePixelRatio = 1;
+      tester.view.physicalSize = const Size(1440, 900);
+      addTearDown(tester.view.reset);
+
+      final hub = MediaHub(
+        id: 'continue_watching',
+        title: 'Continue Watching',
+        type: 'episode',
+        items: [
+          for (var index = 1; index <= 3; index++)
+            testMediaItem(
+              id: 'episode_$index',
+              backend: MediaBackend.plex,
+              kind: MediaKind.episode,
+              title: 'Episode $index',
+            ),
+        ],
+        size: 3,
+      );
+      final focusMemory = HubFocusMemory();
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: monoTheme(MonoPalette.oled),
+          home: Scaffold(
+            body: useSpotlightRail
+                ? TvBrowseRail(hubs: [hub], focusMemory: focusMemory, iconForHub: (_, _) => Symbols.play_circle_rounded)
+                : ListView(
+                    children: [HubSection(hub: hub, focusMemory: focusMemory, icon: Symbols.play_circle_rounded)],
+                  ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      final heading = find.text(hub.title);
+      final headingFade = find.descendant(of: find.byType(ShelfHeading), matching: find.byType(FadeTransition));
+      double opacity() => tester.widget<FadeTransition>(headingFade).opacity.value;
+      final cards = find.byType(MediaCard);
+      final mouse = await tester.createGesture(kind: PointerDeviceKind.mouse);
+      await mouse.addPointer(location: const Offset(10, 5));
+      final headingBounds = tester.getRect(heading);
+      expect(opacity(), 1);
+
+      await mouse.moveTo(tester.getTopLeft(cards.first) + const Offset(40, 40));
+      await tester.pumpAndSettle();
+      expect(opacity(), closeTo(0.70, 0.001));
+      expect(tester.getRect(heading), headingBounds);
+
+      final settings = SettingsService.instance;
+      await settings.write(SettingsService.cardHoverLift, false);
+      await tester.pumpAndSettle();
+      final cardScale = find.descendant(of: find.byType(HoverLift).first, matching: find.byType(AnimatedScale));
+      expect(tester.widget<AnimatedScale>(cardScale).scale, 1);
+      expect(opacity(), closeTo(0.70, 0.001));
+
+      await mouse.moveTo(tester.getTopLeft(cards.at(2)) + const Offset(30, 40));
+      await tester.pumpAndSettle();
+      expect(opacity(), 1);
+
+      await mouse.moveTo(tester.getTopLeft(cards.first) + const Offset(40, 40));
+      await tester.pumpAndSettle();
+      expect(opacity(), closeTo(0.70, 0.001));
+      await settings.write(SettingsService.shelfHeadingHoverOpacity, 1.0);
+      await tester.pumpAndSettle();
+      expect(opacity(), 1);
+
+      await settings.write(SettingsService.shelfHeadingHoverOpacity, 0.6);
+      await tester.pumpAndSettle();
+      expect(opacity(), closeTo(0.6, 0.001));
+      await mouse.removePointer();
+      await tester.pumpAndSettle();
+      expect(opacity(), 1);
+    });
+  }
 
   testWidgets('custom item callbacks own pointer actions', (tester) async {
     final item = testMediaItem(

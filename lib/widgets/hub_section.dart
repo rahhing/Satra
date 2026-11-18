@@ -26,6 +26,7 @@ import 'card_inflation_budget.dart';
 import 'focus_builders.dart';
 import 'media_card.dart';
 import 'media_grid_delegate.dart';
+import 'shelf_hover_depth.dart';
 import 'skeleton_media_card.dart';
 import 'sliver_child_memo.dart';
 import '../utils/scroll_utils.dart';
@@ -505,7 +506,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
       context,
     ).textTheme.titleLarge?.copyWith(fontSize: isTv ? 26 : 22, fontWeight: FontWeight.w700, letterSpacing: -0.5);
 
-    return Padding(
+    final content = Padding(
       padding: .only(
         bottom: isTv && !widget.inset && widget.cardSizing == HubCardSizing.shelf
             ? TvLayoutConstants.shelfVerticalGap
@@ -535,7 +536,9 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                       AppIcon(widget.icon, fill: 1, size: isTv ? 28 : null),
                       SizedBox(width: isTv ? 12 : 8),
                       Flexible(
-                        child: Text(widget.hub.title, style: titleStyle, overflow: .ellipsis, maxLines: 1),
+                        child: ShelfHeading(
+                          child: Text(widget.hub.title, style: titleStyle, overflow: .ellipsis, maxLines: 1),
+                        ),
                       ),
                       if (widget.totalResults case final totalResults?) ...[
                         SizedBox(width: isTv ? 12 : 8),
@@ -754,12 +757,14 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
                               isOnScreen: () {
                                 final itemLeft = index * _itemExtent;
                                 final itemRight = itemLeft + _itemExtent;
-                                final scrollOffset = (_scrollController.hasClients &&
+                                final scrollOffset =
+                                    (_scrollController.hasClients &&
                                         _scrollController.positions.length == 1 &&
                                         _scrollController.position.hasPixels)
                                     ? _scrollController.position.pixels
                                     : 0.0;
-                                final viewport = (_scrollController.hasClients &&
+                                final viewport =
+                                    (_scrollController.hasClients &&
                                         _scrollController.positions.length == 1 &&
                                         _scrollController.position.hasViewportDimension)
                                     ? _scrollController.position.viewportDimension
@@ -836,6 +841,7 @@ class HubSectionState extends State<HubSection> with MountedSetStateMixin, Skele
         ],
       ),
     );
+    return ShelfHoverDepth.supported ? ShelfHoverDepth(child: content) : content;
   }
 
   void _onItemTapped(int index) {

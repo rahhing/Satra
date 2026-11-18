@@ -101,6 +101,13 @@ void main() {
         expect(SettingsService.instance.prefs.getInt(SettingsService.libraryDensity.key), density);
         expect(tester.widget<Slider>(densitySlider).value, density.toDouble());
       }
+      final opacityPref = tv ? SettingsService.spotlightArtworkOpacity : SettingsService.shelfHeadingHoverOpacity;
+      final opacitySlider = find.descendant(of: find.byKey(ValueKey(opacityPref.key)), matching: find.byType(Slider));
+      tester.widget<Slider>(opacitySlider).onChanged!(0.8);
+      await tester.pumpAndSettle();
+      expect(SettingsService.instance.prefs.getDouble(opacityPref.key), 0.8);
+      expect(tester.widget<Slider>(opacitySlider).value, 0.8);
+
       if (!tv && platform == TargetPlatform.linux) {
         final scaleRow = find.byWidgetPredicate(
           (widget) => widget is SettingSelectionTile<double> && widget.pref == SettingsService.desktopUiScale,
@@ -206,7 +213,9 @@ void main() {
     );
   });
 
-  testWidgets('Display group swaps Blur Amount & Background Brightness with Liquid Glass Opacity (non-macOS default)', (tester) async {
+  testWidgets('Display group swaps Blur Amount & Background Brightness with Liquid Glass Opacity (non-macOS default)', (
+    tester,
+  ) async {
     PlatformDetector.debugSetIsMacOSOverride(false);
     addTearDown(() => PlatformDetector.debugSetIsMacOSOverride(null));
     tester.view.devicePixelRatio = 1;

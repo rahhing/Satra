@@ -602,6 +602,27 @@ class Translations$settings$en {
 	/// en: 'Spacious'
 	String get gridSpacingSpacious => 'Spacious';
 
+	/// en: 'Browse Effects'
+	String get browseEffects => 'Browse Effects';
+
+	/// en: 'Card Hover Lift'
+	String get cardHoverLift => 'Card Hover Lift';
+
+	/// en: 'Lift artwork slightly as the pointer passes over a card.'
+	String get cardHoverLiftDescription => 'Lift artwork slightly as the pointer passes over a card.';
+
+	/// en: 'Shelf Title Opacity on Hover'
+	String get shelfHeadingHoverOpacity => 'Shelf Title Opacity on Hover';
+
+	/// en: 'Fade the shelf title when a nearby card is hovered. Set to 100% for solid text.'
+	String get shelfHeadingHoverOpacityDescription => 'Fade the shelf title when a nearby card is hovered. Set to 100% for solid text.';
+
+	/// en: 'Spotlight Artwork Opacity'
+	String get spotlightArtworkOpacity => 'Spotlight Artwork Opacity';
+
+	/// en: 'Blend the spotlight backdrop into the page background.'
+	String get spotlightArtworkOpacityDescription => 'Blend the spotlight backdrop into the page background.';
+
 	/// en: 'Corner Spotlight Backdrop'
 	String get tvCornerSpotlightBackdrop => 'Corner Spotlight Backdrop';
 
@@ -8446,6 +8467,13 @@ extension on Translations {
 			'settings.gridSpacingTight' => 'Tight',
 			'settings.gridSpacingNormal' => 'Normal',
 			'settings.gridSpacingSpacious' => 'Spacious',
+			'settings.browseEffects' => 'Browse Effects',
+			'settings.cardHoverLift' => 'Card Hover Lift',
+			'settings.cardHoverLiftDescription' => 'Lift artwork slightly as the pointer passes over a card.',
+			'settings.shelfHeadingHoverOpacity' => 'Shelf Title Opacity on Hover',
+			'settings.shelfHeadingHoverOpacityDescription' => 'Fade the shelf title when a nearby card is hovered. Set to 100% for solid text.',
+			'settings.spotlightArtworkOpacity' => 'Spotlight Artwork Opacity',
+			'settings.spotlightArtworkOpacityDescription' => 'Blend the spotlight backdrop into the page background.',
 			'settings.tvCornerSpotlightBackdrop' => 'Corner Spotlight Backdrop',
 			'settings.tvCornerSpotlightBackdropDescription' => 'Show spotlight artwork in the top-right corner instead of filling the screen',
 			'settings.viewMode' => 'View Mode',
@@ -8755,6 +8783,8 @@ extension on Translations {
 			'themeEditor.builtIn' => 'Built-in',
 			'themeEditor.presets' => 'Presets',
 			'themeEditor.custom' => 'Custom',
+			_ => null,
+		} ?? switch (path) {
 			'themeEditor.customEmpty' => 'Not created yet',
 			'themeEditor.editCustom' => 'Edit custom theme',
 			'themeEditor.editCustomDescription' => 'Choose every color yourself',
@@ -8762,8 +8792,6 @@ extension on Translations {
 			'themeEditor.savedLocked' => 'Saved — unlocks with the Theme & Icon Pack',
 			'themeEditor.title' => 'Custom Theme',
 			'themeEditor.startFrom' => 'Start from',
-			_ => null,
-		} ?? switch (path) {
 			'themeEditor.startFromDescription' => 'Copy all colors from another theme',
 			'themeEditor.colors' => 'Colors',
 			'themeEditor.preview' => 'Preview',
@@ -9269,6 +9297,8 @@ extension on Translations {
 			'profiles.removeConnectionTitle' => 'Remove connection?',
 			'profiles.removeConnectionMessage' => ({required Object displayName, required Object connectionLabel}) => 'Remove ${displayName}\'s access to ${connectionLabel}. Other profiles keep it.',
 			'profiles.deleteProfileTitle' => 'Delete profile?',
+			_ => null,
+		} ?? switch (path) {
 			'profiles.deleteProfileMessage' => ({required Object displayName}) => 'Remove ${displayName} and its connections. Servers stay available.',
 			'profiles.profileNameLabel' => 'Profile name',
 			'profiles.pinProtectionLabel' => 'PIN protection',
@@ -9276,8 +9306,6 @@ extension on Translations {
 			'profiles.noPinSetEditOnPlex' => 'No PIN set. To require one, edit the home user on plex.tv.',
 			'profiles.setPin' => 'Set PIN',
 			'profiles.setPinTitle' => 'Set PIN',
-			_ => null,
-		} ?? switch (path) {
 			'profiles.confirmPinTitle' => 'Confirm PIN',
 			'profiles.pinSet' => 'PIN set',
 			'profiles.changePin' => 'Change',
@@ -9783,6 +9811,8 @@ extension on Translations {
 			'liveTv.showAllChannels' => 'Show All Channels',
 			'liveTv.favoritesLoadFailed' => 'Could not load favorites. Check your connection and try again.',
 			'liveTv.favoritesUpdateFailed' => 'Could not update favorites. Check your connection and try again.',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.joinSession' => 'Join Session in Progress',
 			'liveTv.watchFromStart' => ({required Object minutes}) => 'Watch from start (${minutes} min ago)',
 			'liveTv.watchLive' => 'Watch Live',
@@ -9790,8 +9820,6 @@ extension on Translations {
 			'liveTv.record' => 'Record',
 			'liveTv.recordEpisode' => 'Record Episode',
 			'liveTv.recordSeries' => 'Record Series',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.recordOptions' => 'Record Options',
 			'liveTv.saveTo' => 'Save to',
 			'liveTv.recordings' => 'Recordings',
@@ -10297,6 +10325,8 @@ extension on Translations {
 			'performanceOverlay.buffer' => 'Buffer',
 			'performanceOverlay.app' => 'App',
 			'performanceOverlay.decoder' => 'Decoder',
+			_ => null,
+		} ?? switch (path) {
 			'performanceOverlay.rawDecoder' => 'Raw Decoder',
 			'performanceOverlay.tunneling' => 'Tunneling',
 			'performanceOverlay.passthrough' => 'Passthrough',
@@ -10304,8 +10334,6 @@ extension on Translations {
 			'performanceOverlay.rotation' => 'Rotation',
 			'performanceOverlay.dvSource' => 'DV Source',
 			'performanceOverlay.dvPath' => 'DV Path',
-			_ => null,
-		} ?? switch (path) {
 			'performanceOverlay.dvRouteDecoder' => 'Dolby Vision decoder',
 			'performanceOverlay.dvRouteDecoderP81' => 'Dolby Vision decoder (P7→8.1)',
 			'performanceOverlay.dvRouteBaseLayer' => 'Base layer',

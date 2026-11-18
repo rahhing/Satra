@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
+import '../services/settings_service.dart';
 import '../theme/app_motion.dart';
+import 'settings_builder.dart';
+import 'shelf_hover_depth.dart';
 
 /// A stable subtree keeps images and inline players mounted while the pointer
 /// enters, presses, leaves, or reverses an in-flight animation.
@@ -29,32 +32,67 @@ class HoverLift extends StatefulWidget {
 class _HoverLiftState extends State<HoverLift> {
   bool _hovered = false;
   bool _pressed = false;
+  ShelfHoverDepthState? _shelf;
+
+  void _startHover() {
+    if (_hovered) return;
+    _shelf = ShelfHoverDepth.maybeOf(context);
+    _shelf?.enterCard(context);
+    setState(() => _hovered = true);
+  }
+
+  void _leaveShelf() {
+    _shelf?.leaveCard(context);
+    _shelf = null;
+  }
+
+  @override
+  void deactivate() {
+    // MouseRegion doesn't send onExit when a card is removed during a refresh.
+    _leaveShelf();
+    _hovered = false;
+    _pressed = false;
+    super.deactivate();
+  }
 
   @override
   Widget build(BuildContext context) {
     final motion = AppMotion.duration(context) != Duration.zero;
     return MouseRegion(
       onEnter: (event) {
-        if (event.buttons == 0) setState(() => _hovered = true);
+        if (event.buttons == 0) _startHover();
       },
-      onExit: (_) => setState(() {
-        _hovered = false;
-        _pressed = false;
-      }),
+      onHover: (event) {
+        if (event.buttons == 0) _startHover();
+      },
+      onExit: (_) {
+        _leaveShelf();
+        setState(() {
+          _hovered = false;
+          _pressed = false;
+        });
+      },
       child: Listener(
         onPointerDown: (_) => setState(() => _pressed = true),
         onPointerUp: (_) => setState(() => _pressed = false),
         onPointerCancel: (_) => setState(() => _pressed = false),
-        child: AnimatedScale(
-          duration: AppMotion.duration(context, _pressed ? AppMotion.fast : AppMotion.standard),
-          curve: AppMotion.curve,
-          scale: !motion ? 1 : (_pressed ? 0.985 : (_hovered ? HoverLift.hoverScale : 1)),
-          child: AnimatedSlide(
-            duration: AppMotion.duration(context),
-            curve: AppMotion.curve,
-            offset: motion && _hovered && !_pressed ? const Offset(0, -HoverLift.liftFraction) : Offset.zero,
-            child: widget.child,
-          ),
+        child: SettingValueBuilder<bool>(
+          pref: SettingsService.cardHoverLift,
+          child: widget.child,
+          builder: (context, liftEnabled, child) {
+            final lifted = motion && liftEnabled && _hovered && !_pressed;
+            return AnimatedScale(
+              duration: AppMotion.duration(context, _pressed ? AppMotion.fast : AppMotion.standard),
+              curve: AppMotion.curve,
+              scale: lifted ? HoverLift.hoverScale : (motion && _pressed ? 0.985 : 1),
+              child: AnimatedSlide(
+                duration: AppMotion.duration(context),
+                curve: AppMotion.curve,
+                offset: lifted ? const Offset(0, -HoverLift.liftFraction) : Offset.zero,
+                child: child,
+              ),
+            );
+          },
         ),
       ),
     );

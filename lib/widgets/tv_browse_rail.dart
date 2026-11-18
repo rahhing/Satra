@@ -42,6 +42,7 @@ import 'media_context_menu.dart';
 import 'optimized_media_image.dart';
 import 'rasterized_gradient.dart';
 import 'settings_builder.dart';
+import 'shelf_hover_depth.dart';
 import 'sliver_child_memo.dart';
 
 const _inactiveArtworkDimAlpha = 0.3;
@@ -1634,36 +1635,37 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
             // below is passed through as a stable child.
             bool isActiveHub() => _focusModel.hubIndex == hubIndex;
 
+            final section = SizedBox(
+              key: _hubSectionKeys.putIfAbsent(hubIndex, () => GlobalKey()),
+              height: sectionHeight,
+              child: Column(
+                crossAxisAlignment: .stretch,
+                children: [
+                  ListenableSelector<bool>(
+                    listenable: _focusModel,
+                    selector: isActiveHub,
+                    builder: (context, isActive, _) =>
+                        _buildHubHeader(context, hub: hub, hubIndex: hubIndex, isActive: isActive, scale: scale),
+                  ),
+                  _buildHubRail(
+                    hub: hub,
+                    hubIndex: hubIndex,
+                    episodePosterMode: modes[hubIndex],
+                    metrics: metrics,
+                    scale: scale,
+                    fullCardLayout: fullCardLayout,
+                    leftOverflow: leftOverflow,
+                    interactionExpansion: interactionExpansion,
+                    railViewportWidth: railViewportWidth,
+                  ),
+                ],
+              ),
+            );
             return SnapshotWidget(
               controller: _verticalScrollSnapshotController,
               mode: SnapshotMode.permissive,
               autoresize: true,
-              child: SizedBox(
-                key: _hubSectionKeys.putIfAbsent(hubIndex, () => GlobalKey()),
-                height: sectionHeight,
-                child: Column(
-                  crossAxisAlignment: .stretch,
-                  children: [
-                    ListenableSelector<bool>(
-                      listenable: _focusModel,
-                      selector: isActiveHub,
-                      builder: (context, isActive, _) =>
-                          _buildHubHeader(context, hub: hub, hubIndex: hubIndex, isActive: isActive, scale: scale),
-                    ),
-                    _buildHubRail(
-                      hub: hub,
-                      hubIndex: hubIndex,
-                      episodePosterMode: modes[hubIndex],
-                      metrics: metrics,
-                      scale: scale,
-                      fullCardLayout: fullCardLayout,
-                      leftOverflow: leftOverflow,
-                      interactionExpansion: interactionExpansion,
-                      railViewportWidth: railViewportWidth,
-                    ),
-                  ],
-                ),
-              ),
+              child: ShelfHoverDepth.supported ? ShelfHoverDepth(child: section) : section,
             );
           },
         ),
@@ -1764,15 +1766,18 @@ class TvBrowseRailState extends State<TvBrowseRail> with TickerProviderStateMixi
             child: Row(
               children: [
                 Flexible(
-                  child: Text(
-                    hub.title,
-                    maxLines: 1,
-                    overflow: .ellipsis,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: titleColor,
-                      fontSize: 18 * scale,
-                      height: 1,
-                      fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
+                  child: ShelfHeading(
+                    enabled: isActive,
+                    child: Text(
+                      hub.title,
+                      maxLines: 1,
+                      overflow: .ellipsis,
+                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        color: titleColor,
+                        fontSize: 18 * scale,
+                        height: 1,
+                        fontWeight: isActive ? FontWeight.w800 : FontWeight.w700,
+                      ),
                     ),
                   ),
                 ),
