@@ -1,0 +1,55 @@
+{
+  "name": "Satra",
+  "identifier": "com.rahhing.satra.source",
+  "subtitle": "Plex & Jellyfin Media Player for iOS",
+  "description": "Official AltStore & SideStore source for Satra on iOS and iPadOS.",
+  "iconURL": "https://rahhing.github.io/Satra/icon.png",
+  "website": "https://github.com/rahhing/Satra",
+  "tintColor": "#38BDF8",
+  "featuredApps": [
+    "com.rahhing.satra"
+  ],
+  "apps": [
+    {
+      "name": "Satra",
+      "bundleIdentifier": "com.rahhing.satra",
+      "developerName": "Satra",
+      "subtitle": "Beautiful Plex & Jellyfin client",
+      "localizedDescription": "Satra is a fast, native Liquid Glass media player for Plex and Jellyfin on iOS, iPadOS, macOS, and TV with HDR playback, offline downloads, Watch Together, and multi-server profiles.",
+      "iconURL": "https://rahhing.github.io/Satra/icon.png",
+      "tintColor": "#38BDF8",
+      "category": "entertainment",
+      "beta": false,
+      "downloadURL": "https://github.com/rahhing/Satra/releases/download/ios-v2.26.0-160/Satra-AltStore.ipa",
+      "version": "2.26.0",
+      "buildVersion": "160",
+      "versionDate": "2026-11-18T13:35:35Z",
+      "versionDescription": "Native iOS Liquid Glass UI refinements, flush top-right menu pill, aligned bottom Search orb, and progressive Continue Watching backdrop darkening.",
+      "size": 58608275,
+      "sha256": "73d4ebc1437ffebe839d1edd0344dea1411e142ec72346005a47f910bd33163f",
+      "minOSVersion": "15.5",
+      "appPermissions": {
+        "entitlements": [],
+        "privacy": {
+          "NSCameraUsageDescription": "Camera is used to scan QR codes for Companion Remote pairing.",
+          "NSLocalNetworkUsageDescription": "This app needs to connect to your media servers on your local network.",
+          "NSLocationWhenInUseUsageDescription": "Satra uses location access when iOS requires it to detect your local network and connect to your media servers.",
+          "NSPhotoLibraryUsageDescription": "Satra needs photo library access so you can choose images to upload as media artwork."
+        }
+      },
+      "versions": [
+        {
+          "version": "2.26.0",
+          "buildVersion": "160",
+          "date": "2026-11-18T13:35:35Z",
+          "localizedDescription": "Native iOS Liquid Glass UI refinements, flush top-right menu pill, aligned bottom Search orb, and progressive Continue Watching backdrop darkening.",
+          "downloadURL": "https://github.com/rahhing/Satra/releases/download/ios-v2.26.0-160/Satra-AltStore.ipa",
+          "size": 58608275,
+          "sha256": "73d4ebc1437ffebe839d1edd0344dea1411e142ec72346005a47f910bd33163f",
+          "minOSVersion": "15.5"
+        }
+      ]
+    }
+  ],
+  "news": []
+}

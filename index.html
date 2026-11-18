@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Satra — AltStore &amp; SideStore Source</title>
+  <link rel="icon" href="icon.png">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #050608;
+      --card: rgba(20, 23, 31, 0.78);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --sidestore: #6366f1;
+      --altstore: #0ea5e9;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", sans-serif;
+      background:
+        radial-gradient(circle at 50% -10%, rgba(56, 189, 248, 0.22), transparent 55%),
+        radial-gradient(circle at 85% 95%, rgba(99, 102, 241, 0.16), transparent 45%),
+        var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+    main {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--border);
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    .icon {
+      width: 72px;
+      height: 72px;
+      border-radius: 18px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    }
+    h1 {
+      font-size: 1.65rem;
+      font-weight: 700;
+      letter-spacing: -0.03em;
+      margin: 0 0 4px;
+    }
+    .meta {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+    p.desc {
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      margin: 0 0 22px;
+    }
+    .actions {
+      display: grid;
+      gap: 11px;
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.98rem;
+      text-decoration: none;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .btn:active { transform: scale(0.98); opacity: 0.9; }
+    .btn-sidestore { background: linear-gradient(135deg, #6366f1, #4f46e5); }
+    .btn-altstore { background: linear-gradient(135deg, #0ea5e9, #0284c7); }
+    .btn-ipa {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--text);
+    }
+    .source-box {
+      background: rgba(0, 0, 0, 0.38);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 12px 14px;
+    }
+    .source-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .source-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    code {
+      flex: 1;
+      font-size: 0.82rem;
+      color: var(--accent);
+      word-break: break-all;
+    }
+    button.copy {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    footer {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+    footer a { color: var(--muted); }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="header">
+      <img class="icon" src="icon.png" alt="Satra icon">
+      <div>
+        <h1>Satra</h1>
+        <div class="meta">v2.26.0 (160) &bull; 55.9 MB &bull; iOS 15.5+</div>
+      </div>
+    </div>
+    <p class="desc">Native iOS Liquid Glass UI refinements, flush top-right menu pill, aligned bottom Search orb, and progressive Continue Watching backdrop darkening.</p>
+    <div class="actions">
+      <a class="btn btn-sidestore" href="sidestore://source?url=https%3A%2F%2Frahhing.github.io%2FSatra%2Fsource.json">Add Source to SideStore</a>
+      <a class="btn btn-altstore" href="altstore://source?url=https%3A%2F%2Frahhing.github.io%2FSatra%2Fsource.json">Add Source to AltStore</a>
+      <a class="btn btn-ipa" href="https://github.com/rahhing/Satra/releases/download/ios-v2.26.0-160/Satra-AltStore.ipa">Download IPA Directly</a>
+    </div>
+    <div class="source-box">
+      <div class="source-label">Source URL (AltStore / SideStore / Feather)</div>
+      <div class="source-row">
+        <code id="source-url">https://rahhing.github.io/Satra/source.json</code>
+        <button class="copy" type="button" onclick="navigator.clipboard.writeText(document.getElementById('source-url').textContent).then(() => { this.textContent = 'Copied!'; setTimeout(() => this.textContent = 'Copy', 1800); })">Copy</button>
+      </div>
+    </div>
+    <footer>
+      <a href="https://github.com/rahhing/Satra">GitHub Repository</a> &bull; SHA-256: 73d4ebc1437f&hellip;
+    </footer>
+  </main>
+</body>
+</html>
