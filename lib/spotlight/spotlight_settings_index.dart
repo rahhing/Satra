@@ -28,6 +28,7 @@ import '../services/fullscreen_state_manager.dart';
 import '../services/keyboard_shortcuts_service.dart';
 import '../utils/platform_detector.dart';
 import '../watch_together/watch_together.dart';
+import '../widgets/artwork_atmosphere.dart';
 import '../widgets/companion_remote/remote_session_dialog.dart';
 import '../widgets/library_management_sheet.dart';
 import '../widgets/utility_panel_route.dart';
@@ -460,7 +461,8 @@ List<SpotlightEntry> buildLocalSpotlightEntries({
       keywords: const ['background', 'brightness', 'dim', 'darken', 'lighten', 'blur', 'glass', 'appearance'],
       onActivate: () => openSettingScreen(const AppearanceSettingsScreen()),
     ),
-    if (PlatformDetector.isMobile(hostContext) && !PlatformDetector.isAutomotive())
+    if ((PlatformDetector.isMobile(hostContext) && !PlatformDetector.isAutomotive()) ||
+        ArtworkAtmosphereScope.supportsDesktopArtwork(hostContext))
       SpotlightEntry(
         id: 'setting:darken_mobile_backdrop',
         title: t.settings.darkenMobileBackdrop,
@@ -473,6 +475,32 @@ List<SpotlightEntry> buildLocalSpotlightEntries({
         keywords: const ['backdrop', 'darken', 'dim', 'bright', 'continue watching', 'blur', 'home', 'appearance'],
         onActivate: () => openSettingScreen(const AppearanceSettingsScreen()),
       ),
+    if (!PlatformDetector.shouldUseSideNavigation(hostContext)) ...[
+      SpotlightEntry(
+        id: 'setting:search_in_top_bar',
+        title: t.settings.searchInTopBar,
+        subtitle: t.settings.appearance,
+        badge: t.common.settings,
+        icon: Symbols.search_rounded,
+        category: SpotlightCategory.settings,
+        type: SpotlightEntryType.setting,
+        basePriority: 64,
+        keywords: const ['search', 'top', 'bottom', 'bar', 'dock', 'navigation', 'appearance'],
+        onActivate: () => openSettingScreen(const AppearanceSettingsScreen()),
+      ),
+      SpotlightEntry(
+        id: 'setting:separate_bottom_search_button',
+        title: t.settings.separateBottomSearchButton,
+        subtitle: t.settings.appearance,
+        badge: t.common.settings,
+        icon: Symbols.dock_to_right_rounded,
+        category: SpotlightCategory.settings,
+        type: SpotlightEntryType.setting,
+        basePriority: 62,
+        keywords: const ['search', 'separate', 'detached', 'orb', 'bottom', 'bar', 'dock', 'navigation', 'appearance'],
+        onActivate: () => openSettingScreen(const AppearanceSettingsScreen()),
+      ),
+    ],
     SpotlightEntry(
       id: 'setting:playback',
       title: t.settings.videoPlayback,

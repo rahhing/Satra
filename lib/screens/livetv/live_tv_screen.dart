@@ -26,6 +26,7 @@ import '../../utils/live_tv_matching.dart';
 import '../../utils/platform_detector.dart';
 import '../../utils/serial_future_queue.dart';
 import '../../utils/snackbar_helper.dart';
+import '../../widgets/artwork_atmosphere.dart';
 import '../../widgets/focusable_tab_chip.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../libraries/state_messages.dart';
@@ -805,6 +806,7 @@ class _LiveTvScreenState extends State<LiveTvScreen>
 
     final isRecordings = _currentTab == LiveTvTab.recordings;
     return Scaffold(
+      backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
       appBar: AppBar(
         title: useSideNav ? TabChipStrip(children: _buildTabChipItems()) : Text(t.liveTv.title),
         actions: DesktopAppBarHelper.buildAdjustedActions([

@@ -3563,19 +3563,7 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
           child: Scaffold(
             body: Stack(
               children: [
-                Positioned.fill(
-                  child: ArtworkAtmosphere(
-                    item: metadata,
-                    client: _getArtworkMediaClient(context),
-                    allowNetwork: !widget.isOffline,
-                    localArtworkPathResolver: widget.isOffline
-                        ? (path) => _offlineArtworkCandidatePath(context, path)
-                        : null,
-                  ),
-                ),
-                // Background art sits behind the scroll view so it can be
-                // taller than the hero sliver without displacing content.
-                _buildHeroBackdropLayer(context, metadata, size, headerHeight),
+                Positioned.fill(child: _buildDetailBackdrop(context, metadata, size, headerHeight)),
 
                 CustomScrollView(
                   primary: true,
@@ -4749,11 +4737,52 @@ class _MediaDetailScreenState extends State<MediaDetailScreen>
     return (size.width / backdropAspect).clamp(headerHeight, maxArtHeight).toDouble();
   }
 
+  Widget _buildDetailBackdrop(BuildContext context, MediaItem metadata, Size size, double headerHeight) {
+    Widget backdrop({double? darkness, bool showAtmosphere = true}) => Stack(
+      fit: StackFit.expand,
+      children: [
+        if (showAtmosphere)
+          ArtworkAtmosphere(
+            item: metadata,
+            client: _getArtworkMediaClient(context),
+            allowNetwork: !widget.isOffline,
+            localArtworkPathResolver: widget.isOffline ? (path) => _offlineArtworkCandidatePath(context, path) : null,
+            darkness: darkness,
+          ),
+        _buildHeroBackdropLayer(
+          context,
+          metadata,
+          size,
+          headerHeight,
+          fadesIntoAtmosphere: _usesIOSDetailLayout || darkness != null,
+        ),
+      ],
+    );
+    if (!ArtworkAtmosphereScope.supportsDesktopArtwork(context)) return backdrop();
+    return SettingsBuilder(
+      prefs: const [
+        SettingsService.useClassicMobileBackdrop,
+        SettingsService.darkenMobileBackdrop,
+        SettingsService.mobileBackdropDarkness,
+      ],
+      builder: (context) {
+        final enabled =
+            !context.settingsRead(SettingsService.useClassicMobileBackdrop) && AppMotion.effectsEnabled(context);
+        return backdrop(darkness: enabled ? desktopArtworkDarkness() : null, showAtmosphere: enabled);
+      },
+    );
+  }
+
   /// Backdrop + scrim, painted behind the scroll view and translated with it so
   /// it keeps the hero's fixed, no-parallax relationship to the content.
-  Widget _buildHeroBackdropLayer(BuildContext context, MediaItem metadata, Size size, double headerHeight) {
+  Widget _buildHeroBackdropLayer(
+    BuildContext context,
+    MediaItem metadata,
+    Size size,
+    double headerHeight, {
+    required bool fadesIntoAtmosphere,
+  }) {
     final artHeight = _heroArtHeight(size, headerHeight);
-    final fadesIntoAtmosphere = _usesIOSDetailLayout;
 
     return Positioned(
       top: 0,

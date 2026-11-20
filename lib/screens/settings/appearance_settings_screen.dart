@@ -13,6 +13,7 @@ import '../../services/device_performance.dart';
 import '../../utils/platform_detector.dart';
 import '../../utils/desktop_ui_scale.dart';
 import '../../widgets/app_icon.dart';
+import '../../widgets/artwork_atmosphere.dart';
 import '../../widgets/overlay_sheet.dart';
 import '../../widgets/setting_tile.dart';
 import '../../widgets/settings_page.dart';
@@ -38,6 +39,7 @@ class AppearanceSettingsScreen extends StatelessWidget {
     // never show the Explore toggle, mirroring the tab's own visibility.
     final hasExplore = context.watch<CatalogSourcesProvider?>()?.hasAnySource ?? false;
     final showHoverEffects = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
+    final desktopBackdrop = ArtworkAtmosphereScope.supportsDesktopArtwork(context);
     return SettingsPage(
       title: Text(t.settings.appearance),
       children: [
@@ -71,40 +73,49 @@ class AppearanceSettingsScreen extends StatelessWidget {
           ),
         ),
 
-        if (showHoverEffects || PlatformDetector.isTV())
-          SettingsGroup(
-            title: t.settings.browseEffects,
-            children: [
-              if (showHoverEffects) ...[
-                SettingSwitchTile(
-                  pref: SettingsService.cardHoverLift,
-                  icon: Symbols.open_with_rounded,
-                  title: t.settings.cardHoverLift,
-                  subtitle: t.settings.cardHoverLiftDescription,
-                ),
-                _percentSliderTile(
-                  sliderKey: const ValueKey('shelf_heading_hover_opacity'),
-                  pref: SettingsService.shelfHeadingHoverOpacity,
-                  icon: Symbols.title_rounded,
-                  title: t.settings.shelfHeadingHoverOpacity,
-                  description: t.settings.shelfHeadingHoverOpacityDescription,
-                  min: 0.55,
-                  max: 1.0,
-                  divisions: 9,
-                ),
+        if (desktopBackdrop || showHoverEffects || PlatformDetector.isTV())
+          SettingsBuilder(
+            prefs: const [SettingsService.useClassicMobileBackdrop, SettingsService.darkenMobileBackdrop],
+            builder: (context) => SettingsGroup(
+              title: t.settings.browseEffects,
+              children: [
+                if (desktopBackdrop)
+                  ..._backdropControls(
+                    desktop: true,
+                    darken: context.settingsRead(SettingsService.darkenMobileBackdrop),
+                    classic: context.settingsRead(SettingsService.useClassicMobileBackdrop),
+                  ),
+                if (showHoverEffects) ...[
+                  SettingSwitchTile(
+                    pref: SettingsService.cardHoverLift,
+                    icon: Symbols.open_with_rounded,
+                    title: t.settings.cardHoverLift,
+                    subtitle: t.settings.cardHoverLiftDescription,
+                  ),
+                  _percentSliderTile(
+                    sliderKey: const ValueKey('shelf_heading_hover_opacity'),
+                    pref: SettingsService.shelfHeadingHoverOpacity,
+                    icon: Symbols.title_rounded,
+                    title: t.settings.shelfHeadingHoverOpacity,
+                    description: t.settings.shelfHeadingHoverOpacityDescription,
+                    min: 0.55,
+                    max: 1.0,
+                    divisions: 9,
+                  ),
+                ],
+                if (PlatformDetector.isTV())
+                  _percentSliderTile(
+                    sliderKey: const ValueKey('spotlight_artwork_opacity'),
+                    pref: SettingsService.spotlightArtworkOpacity,
+                    icon: Symbols.brightness_6_rounded,
+                    title: t.settings.spotlightArtworkOpacity,
+                    description: t.settings.spotlightArtworkOpacityDescription,
+                    min: 0.2,
+                    max: 1.0,
+                    divisions: 16,
+                  ),
               ],
-              if (PlatformDetector.isTV())
-                _percentSliderTile(
-                  sliderKey: const ValueKey('spotlight_artwork_opacity'),
-                  pref: SettingsService.spotlightArtworkOpacity,
-                  icon: Symbols.brightness_6_rounded,
-                  title: t.settings.spotlightArtworkOpacity,
-                  description: t.settings.spotlightArtworkOpacityDescription,
-                  min: 0.2,
-                  max: 1.0,
-                  divisions: 16,
-                ),
-            ],
+            ),
           ),
 
         SettingsGroup(
@@ -164,78 +175,87 @@ class AppearanceSettingsScreen extends StatelessWidget {
           ],
         ),
 
-        SettingsGroup(
-          title: t.settings.homeScreen,
-          children: [
-            if (!PlatformDetector.isTV())
+        SettingValueBuilder<bool>(
+          pref: SettingsService.darkenMobileBackdrop,
+          builder: (context, darkenMobileBackdrop, _) => SettingsGroup(
+            title: t.settings.homeScreen,
+            children: [
+              if (!PlatformDetector.isTV())
+                SettingSwitchTile(
+                  pref: SettingsService.showHeroSection,
+                  icon: Symbols.featured_play_list_rounded,
+                  title: t.settings.showHeroSection,
+                  subtitle: t.settings.showHeroSectionDescription,
+                ),
+              if (PlatformDetector.isMobile(context) && !PlatformDetector.isAutomotive())
+                ..._backdropControls(desktop: false, darken: darkenMobileBackdrop, classic: false),
+              _continueWatchingActionSelector(),
+              _episodeActionSelector(),
               SettingSwitchTile(
-                pref: SettingsService.showHeroSection,
-                icon: Symbols.featured_play_list_rounded,
-                title: t.settings.showHeroSection,
-                subtitle: t.settings.showHeroSectionDescription,
+                pref: SettingsService.useGlobalHubs,
+                icon: Symbols.home_rounded,
+                title: t.settings.useGlobalHubs,
+                subtitle: t.settings.useGlobalHubsDescription,
               ),
-            if (PlatformDetector.isMobile(context) && !PlatformDetector.isAutomotive()) ...[
               SettingSwitchTile(
-                pref: SettingsService.darkenMobileBackdrop,
-                icon: Symbols.contrast_rounded,
-                title: t.settings.darkenMobileBackdrop,
-                subtitle: t.settings.darkenMobileBackdropDescription,
-              ),
-              SettingSwitchTile(
-                pref: SettingsService.useClassicMobileBackdrop,
-                icon: Symbols.wallpaper_rounded,
-                title: t.settings.useClassicMobileBackdrop,
-                subtitle: t.settings.useClassicMobileBackdropDescription,
+                pref: SettingsService.showServerNameOnHubs,
+                icon: Symbols.dns_rounded,
+                title: t.settings.showServerNameOnHubs,
+                subtitle: t.settings.showServerNameOnHubsDescription,
               ),
             ],
-            _continueWatchingActionSelector(),
-            _episodeActionSelector(),
-            SettingSwitchTile(
-              pref: SettingsService.useGlobalHubs,
-              icon: Symbols.home_rounded,
-              title: t.settings.useGlobalHubs,
-              subtitle: t.settings.useGlobalHubsDescription,
-            ),
-            SettingSwitchTile(
-              pref: SettingsService.showServerNameOnHubs,
-              icon: Symbols.dns_rounded,
-              title: t.settings.showServerNameOnHubs,
-              subtitle: t.settings.showServerNameOnHubsDescription,
-            ),
-          ],
+          ),
         ),
 
-        SettingsGroup(
-          title: t.settings.navigation,
-          children: [
-            if (hasExplore)
+        SettingValueBuilder<bool>(
+          pref: SettingsService.searchInTopBar,
+          builder: (context, searchInTopBar, _) => SettingsGroup(
+            title: t.settings.navigation,
+            children: [
+              if (hasExplore)
+                SettingSwitchTile(
+                  pref: SettingsService.showExploreTab,
+                  icon: Symbols.explore_rounded,
+                  title: t.settings.showExploreTab,
+                  subtitle: t.settings.showExploreTabDescription,
+                ),
+              if (!PlatformDetector.shouldUseSideNavigation(context))
+                SettingSwitchTile(
+                  pref: SettingsService.groupLibrariesByServer,
+                  icon: Symbols.dns_rounded,
+                  title: t.settings.groupLibrariesByServer,
+                  subtitle: t.settings.groupLibrariesByServerDescription,
+                ),
+              if (!PlatformDetector.shouldUseSideNavigation(context))
+                SettingSwitchTile(
+                  pref: SettingsService.showNavBarLabels,
+                  icon: Symbols.label_rounded,
+                  title: t.settings.showNavBarLabels,
+                  subtitle: t.settings.showNavBarLabelsDescription,
+                ),
+              if (!PlatformDetector.shouldUseSideNavigation(context)) ...[
+                SettingSwitchTile(
+                  pref: SettingsService.searchInTopBar,
+                  icon: Symbols.search_rounded,
+                  title: t.settings.searchInTopBar,
+                  subtitle: t.settings.searchInTopBarDescription,
+                ),
+                if (!searchInTopBar)
+                  SettingSwitchTile(
+                    pref: SettingsService.separateBottomSearchButton,
+                    icon: Symbols.dock_to_right_rounded,
+                    title: t.settings.separateBottomSearchButton,
+                    subtitle: t.settings.separateBottomSearchButtonDescription,
+                  ),
+              ],
               SettingSwitchTile(
-                pref: SettingsService.showExploreTab,
-                icon: Symbols.explore_rounded,
-                title: t.settings.showExploreTab,
-                subtitle: t.settings.showExploreTabDescription,
+                pref: SettingsService.showUnwatchedCount,
+                icon: Symbols.counter_1_rounded,
+                title: t.settings.showUnwatchedCount,
+                subtitle: t.settings.showUnwatchedCountDescription,
               ),
-            if (!PlatformDetector.shouldUseSideNavigation(context))
-              SettingSwitchTile(
-                pref: SettingsService.groupLibrariesByServer,
-                icon: Symbols.dns_rounded,
-                title: t.settings.groupLibrariesByServer,
-                subtitle: t.settings.groupLibrariesByServerDescription,
-              ),
-            if (!PlatformDetector.shouldUseSideNavigation(context))
-              SettingSwitchTile(
-                pref: SettingsService.showNavBarLabels,
-                icon: Symbols.label_rounded,
-                title: t.settings.showNavBarLabels,
-                subtitle: t.settings.showNavBarLabelsDescription,
-              ),
-            SettingSwitchTile(
-              pref: SettingsService.showUnwatchedCount,
-              icon: Symbols.counter_1_rounded,
-              title: t.settings.showUnwatchedCount,
-              subtitle: t.settings.showUnwatchedCountDescription,
-            ),
-          ],
+            ],
+          ),
         ),
 
         SettingsGroup(
@@ -487,6 +507,36 @@ class AppearanceSettingsScreen extends StatelessWidget {
     max: 2.0,
     divisions: 40,
   );
+
+  List<Widget> _backdropControls({required bool desktop, required bool darken, required bool classic}) => [
+    if (!classic) ...[
+      SettingSwitchTile(
+        pref: SettingsService.darkenMobileBackdrop,
+        icon: Symbols.contrast_rounded,
+        title: t.settings.darkenMobileBackdrop,
+        subtitle: desktop ? t.settings.darkenDesktopBackdropDescription : t.settings.darkenMobileBackdropDescription,
+      ),
+      if (darken)
+        _percentSliderTile(
+          sliderKey: const ValueKey('mobile_backdrop_darkness'),
+          pref: SettingsService.mobileBackdropDarkness,
+          icon: Symbols.brightness_4_rounded,
+          title: t.settings.darkenMobileBackdropAmount,
+          description: t.settings.darkenMobileBackdropAmountDescription,
+          min: 0.0,
+          max: 1.0,
+          divisions: 20,
+        ),
+    ],
+    SettingSwitchTile(
+      pref: SettingsService.useClassicMobileBackdrop,
+      icon: Symbols.wallpaper_rounded,
+      title: t.settings.useClassicMobileBackdrop,
+      subtitle: desktop
+          ? t.settings.useClassicDesktopBackdropDescription
+          : t.settings.useClassicMobileBackdropDescription,
+    ),
+  ];
 
   Widget _percentSliderTile({
     required Key sliderKey,

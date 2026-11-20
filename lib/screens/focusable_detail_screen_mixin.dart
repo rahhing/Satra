@@ -8,6 +8,7 @@ import '../media/media_item.dart';
 import '../mixins/grid_focus_node_mixin.dart';
 import '../services/settings_service.dart';
 import '../utils/platform_detector.dart';
+import '../widgets/artwork_atmosphere.dart';
 import '../widgets/settings_builder.dart';
 import '../widgets/focusable_media_card.dart';
 import '../widgets/media_card_sliver_layout.dart';
@@ -121,7 +122,7 @@ mixin FocusableDetailScreenMixin<T extends StatefulWidget> on State<T>, GridFocu
             Navigator.pop(context);
           }
         },
-        child: Scaffold(body: body),
+        child: Scaffold(backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context), body: body),
       ),
     );
   }

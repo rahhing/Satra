@@ -536,11 +536,23 @@ class Translations$settings$en {
 	/// en: 'Use the previous Discover artwork layout and scroll effect'
 	String get useClassicMobileBackdropDescription => 'Use the previous Discover artwork layout and scroll effect';
 
+	/// en: 'Use the original artwork backdrop in desktop browsing'
+	String get useClassicDesktopBackdropDescription => 'Use the original artwork backdrop in desktop browsing';
+
+	/// en: 'Darken the blurred artwork behind the desktop interface'
+	String get darkenDesktopBackdropDescription => 'Darken the blurred artwork behind the desktop interface';
+
 	/// en: 'Darken Backdrop'
 	String get darkenMobileBackdrop => 'Darken Backdrop';
 
-	/// en: 'Progressively darken the blurred Home backdrop from Continue Watching downward'
-	String get darkenMobileBackdropDescription => 'Progressively darken the blurred Home backdrop from Continue Watching downward';
+	/// en: 'Darken the blurred area outside the Home backdrop image'
+	String get darkenMobileBackdropDescription => 'Darken the blurred area outside the Home backdrop image';
+
+	/// en: 'Backdrop Blur Darkness'
+	String get darkenMobileBackdropAmount => 'Backdrop Blur Darkness';
+
+	/// en: 'How much to darken the blurred area outside the backdrop image'
+	String get darkenMobileBackdropAmountDescription => 'How much to darken the blurred area outside the backdrop image';
 
 	/// en: 'Seconds'
 	String get secondsLabel => 'Seconds';
@@ -1420,6 +1432,18 @@ class Translations$settings$en {
 
 	/// en: 'Display text labels under navigation bar icons'
 	String get showNavBarLabelsDescription => 'Display text labels under navigation bar icons';
+
+	/// en: 'Search Button in Top Bar'
+	String get searchInTopBar => 'Search Button in Top Bar';
+
+	/// en: 'Place Search at the top instead of on the far right of the bottom bar'
+	String get searchInTopBarDescription => 'Place Search at the top instead of on the far right of the bottom bar';
+
+	/// en: 'Separate Search Button'
+	String get separateBottomSearchButton => 'Separate Search Button';
+
+	/// en: 'Display Search as a separate button to the right of the bottom bar'
+	String get separateBottomSearchButtonDescription => 'Display Search as a separate button to the right of the bottom bar';
 
 	/// en: 'Startup Section'
 	String get startupSection => 'Startup Section';
@@ -8463,8 +8487,12 @@ extension on Translations {
 			'settings.showHeroSectionDescription' => 'Display featured content carousel on home screen',
 			'settings.useClassicMobileBackdrop' => 'Use Classic Backdrop',
 			'settings.useClassicMobileBackdropDescription' => 'Use the previous Discover artwork layout and scroll effect',
+			'settings.useClassicDesktopBackdropDescription' => 'Use the original artwork backdrop in desktop browsing',
+			'settings.darkenDesktopBackdropDescription' => 'Darken the blurred artwork behind the desktop interface',
 			'settings.darkenMobileBackdrop' => 'Darken Backdrop',
-			'settings.darkenMobileBackdropDescription' => 'Progressively darken the blurred Home backdrop from Continue Watching downward',
+			'settings.darkenMobileBackdropDescription' => 'Darken the blurred area outside the Home backdrop image',
+			'settings.darkenMobileBackdropAmount' => 'Backdrop Blur Darkness',
+			'settings.darkenMobileBackdropAmountDescription' => 'How much to darken the blurred area outside the backdrop image',
 			'settings.secondsLabel' => 'Seconds',
 			'settings.minutesLabel' => 'Minutes',
 			'settings.secondsShort' => 's',
@@ -8758,6 +8786,10 @@ extension on Translations {
 			'settings.autoHidePerformanceOverlayDescription' => 'Fade the performance overlay with the playback controls',
 			'settings.showNavBarLabels' => 'Show Navigation Bar Labels',
 			'settings.showNavBarLabelsDescription' => 'Display text labels under navigation bar icons',
+			'settings.searchInTopBar' => 'Search Button in Top Bar',
+			'settings.searchInTopBarDescription' => 'Place Search at the top instead of on the far right of the bottom bar',
+			'settings.separateBottomSearchButton' => 'Separate Search Button',
+			'settings.separateBottomSearchButtonDescription' => 'Display Search as a separate button to the right of the bottom bar',
 			'settings.startupSection' => 'Startup Section',
 			'settings.showExploreTab' => 'Show Explore Tab',
 			'settings.showExploreTabDescription' => 'Display the Explore tab with content from Plex Discover and connected trackers',
@@ -8793,6 +8825,8 @@ extension on Translations {
 			'settings.rememberBrightnessLevelDescription' => 'Start playback at the brightness set by the last swipe',
 			'settings.controls' => 'Controls',
 			'settings.rememberPlayerChanges' => 'Remember Player Changes',
+			_ => null,
+		} ?? switch (path) {
 			'settings.rememberPlayerChangesDescription' => 'Where a change made during playback is saved and reapplied from',
 			'settings.scopePlaybackSpeed' => 'Playback Speed',
 			'settings.scopeShaderPreset' => 'Shader Preset',
@@ -8801,8 +8835,6 @@ extension on Translations {
 			'settings.scopeSyncOffsets' => 'Audio & Subtitle Sync',
 			'settings.playerScopeOff' => 'Don\'t save',
 			'settings.playerScopeGlobal' => 'Everywhere',
-			_ => null,
-		} ?? switch (path) {
 			'settings.playerScopeLibrary' => 'Per library',
 			'settings.playerScopeTitle' => 'Per show or movie',
 			'settings.exportDialogTitle' => 'Export Satra settings',
@@ -9307,6 +9339,8 @@ extension on Translations {
 			'profiles.active' => 'Active',
 			'profiles.manage' => 'Manage',
 			'profiles.delete' => 'Delete',
+			_ => null,
+		} ?? switch (path) {
 			'profiles.signOut' => 'Sign out',
 			'profiles.signOutPlexTitle' => 'Sign out of Plex?',
 			'profiles.signOutPlexMessage' => ({required Object displayName}) => 'Remove ${displayName} and all Plex Home users? Sign back in anytime.',
@@ -9315,8 +9349,6 @@ extension on Translations {
 			'profiles.signedOutPlex' => 'Signed out of Plex.',
 			'profiles.signOutFailed' => 'Sign out failed.',
 			'profiles.sectionTitle' => 'Profiles',
-			_ => null,
-		} ?? switch (path) {
 			'profiles.summarySingle' => 'Add profiles to mix managed users and local identities',
 			'profiles.summaryMultipleWithActive' => ({required Object count, required Object activeName}) => '${count} profiles · active: ${activeName}',
 			'profiles.summaryMultiple' => ({required Object count}) => '${count} profiles',
@@ -9821,6 +9853,8 @@ extension on Translations {
 			'liveTv.today' => 'Today',
 			'liveTv.tomorrow' => 'Tomorrow',
 			'liveTv.midnight' => 'Midnight',
+			_ => null,
+		} ?? switch (path) {
 			'liveTv.overnight' => 'Overnight',
 			'liveTv.morning' => 'Morning',
 			'liveTv.daytime' => 'Daytime',
@@ -9829,8 +9863,6 @@ extension on Translations {
 			'liveTv.whatsOn' => 'What\'s On',
 			'liveTv.watchChannel' => 'Watch Channel',
 			'liveTv.favorites' => 'Favorites',
-			_ => null,
-		} ?? switch (path) {
 			'liveTv.reorderFavorites' => 'Reorder Favorites',
 			'liveTv.noFavoriteChannels' => 'No favorite channels',
 			'liveTv.noFavoriteChannelsHint' => 'Show all channels, then long-press a channel to add it to your favorites.',
@@ -10335,6 +10367,8 @@ extension on Translations {
 			'videoSettings.hdrToneMappingPlayer' => 'Player',
 			'videoSettings.hdrToneMappingPlayerDescription' => 'Map to the display\'s peak brightness in the player, then tell the compositor the result.',
 			'videoSettings.hdrToneMappingFailed' => 'Couldn\'t change HDR tone mapping — the previous mode is still active.',
+			_ => null,
+		} ?? switch (path) {
 			'videoSettings.audioOutput' => 'Audio Output',
 			'videoSettings.performanceOverlay' => 'Performance Overlay',
 			'videoSettings.audioOutputDolbyAtmos' => 'Dolby Atmos',
@@ -10343,8 +10377,6 @@ extension on Translations {
 			'videoSettings.audioOutputSpatial' => 'Spatial Audio',
 			'videoSettings.audioOutputStereo' => 'Stereo',
 			'videoSettings.audioNormalization' => 'Normalize Loudness',
-			_ => null,
-		} ?? switch (path) {
 			'videoSettings.audioNormalizationDisablesPassthrough' => 'Decodes audio to PCM; passthrough is off while this is on',
 			'performanceOverlay.color' => 'Color',
 			'performanceOverlay.performance' => 'Performance',

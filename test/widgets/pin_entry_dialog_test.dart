@@ -1,15 +1,21 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:satra/screens/profile/pin_entry_dialog.dart';
 import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/glass_surface.dart';
 
 void main() {
   tearDown(() {
     TvDetectionService.debugSetAppleTVOverride(null);
+    PlatformDetector.debugSetIsIOSOverride(null);
+    PlatformDetector.debugSetIsDesktopOSOverride(null);
+    GlassSurface.debugEnableIOSNativeGlass = null;
+    debugDefaultTargetPlatformOverride = null;
   });
 
   testWidgets('mobile PIN entry keeps one focused text field while entering digits', (tester) async {
@@ -440,6 +446,76 @@ void main() {
     expect(completed, isTrue);
     expect(result, isNull);
     expect(find.byType(PinEntryDialog), findsNothing);
+  });
+
+  testWidgets('handheld iOS mounts native SwiftUI PIN keypad and handles submit and cancel', (tester) async {
+    debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+    PlatformDetector.debugSetIsIOSOverride(true);
+    PlatformDetector.debugSetIsDesktopOSOverride(false);
+    TvDetectionService.debugSetAppleTVOverride(false);
+    GlassSurface.debugEnableIOSNativeGlass = true;
+
+    try {
+      String? result;
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: ThemeData.dark().copyWith(platform: TargetPlatform.iOS),
+          home: Builder(
+            builder: (context) => Scaffold(
+              body: TextButton(
+                onPressed: () async {
+                  result = await showPinEntryDialog(context, 'Locked Profile', errorMessage: 'Wrong PIN');
+                },
+                child: const Text('Open'),
+              ),
+            ),
+          ),
+        ),
+      );
+
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+
+      final uiKitFinder = find.byKey(const ValueKey('ios_native_pin_keypad'));
+      expect(uiKitFinder, findsOneWidget);
+      final uiKitView = tester.widget<UiKitView>(uiKitFinder);
+      expect(uiKitView.viewType, 'com.satra/ios_pin_keypad');
+      final params = uiKitView.creationParams! as Map<String, Object>;
+      expect(params['userName'], 'Locked Profile');
+      expect(params['errorMessage'], 'Wrong PIN');
+      expect(params['dark'], isTrue);
+
+      // Simulate platform view creation + native SwiftUI keypad submitting '4821'.
+      uiKitView.onPlatformViewCreated!(42);
+      const codec = StandardMethodCodec();
+      await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        'com.satra/ios_pin_keypad/42',
+        codec.encodeMethodCall(const MethodCall('submit', '4821')),
+        (_) {},
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, '4821');
+      expect(find.byType(PinEntryDialog), findsNothing);
+
+      // Re-open and simulate native cancel.
+      result = 'unchanged';
+      await tester.tap(find.text('Open'));
+      await tester.pumpAndSettle();
+      final cancelView = tester.widget<UiKitView>(find.byKey(const ValueKey('ios_native_pin_keypad')));
+      cancelView.onPlatformViewCreated!(43);
+      await tester.binding.defaultBinaryMessenger.handlePlatformMessage(
+        'com.satra/ios_pin_keypad/43',
+        codec.encodeMethodCall(const MethodCall('cancel')),
+        (_) {},
+      );
+      await tester.pumpAndSettle();
+
+      expect(result, isNull);
+      expect(find.byType(PinEntryDialog), findsNothing);
+    } finally {
+      debugDefaultTargetPlatformOverride = null;
+    }
   });
 }
 

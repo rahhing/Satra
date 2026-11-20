@@ -11,6 +11,7 @@ import 'package:satra/providers/companion_remote_provider.dart';
 import 'package:satra/providers/libraries_provider.dart';
 import 'package:satra/providers/multi_server_provider.dart';
 import 'package:satra/services/settings_service.dart' hide ThemeMode;
+import 'package:satra/spotlight/spotlight_shortcut.dart';
 import 'package:satra/theme/mono_theme.dart';
 import 'package:satra/utils/platform_detector.dart';
 import 'package:satra/watch_together/watch_together.dart';
@@ -165,6 +166,7 @@ void main() {
 
     final actionBarKey = GlobalKey<FocusableActionBarState>();
     var refreshed = 0;
+    var downloadsOpened = 0;
 
     await tester.pumpWidget(
       TranslationProvider(
@@ -179,20 +181,23 @@ void main() {
           child: InputModeTracker(
             child: MaterialApp(
               theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.iOS),
-              home: Scaffold(
-                body: Align(
-                  alignment: Alignment.topRight,
-                  child: GlassSurface(
-                    key: const ValueKey('top_right_pill'),
-                    interactive: true,
-                    borderRadius: const BorderRadius.all(Radius.circular(999)),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
-                      child: BrowseToolbarActions(
-                        actionBarKey: actionBarKey,
-                        onRefresh: () => refreshed++,
-                        onNavigateLeft: () {},
-                        onNavigateDown: () {},
+              home: MainScreenFocusScope(
+                openDownloads: () => downloadsOpened++,
+                child: Scaffold(
+                  body: Align(
+                    alignment: Alignment.topRight,
+                    child: GlassSurface(
+                      key: const ValueKey('top_right_pill'),
+                      interactive: true,
+                      borderRadius: const BorderRadius.all(Radius.circular(999)),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 3),
+                        child: BrowseToolbarActions(
+                          actionBarKey: actionBarKey,
+                          onRefresh: () => refreshed++,
+                          onNavigateLeft: () {},
+                          onNavigateDown: () {},
+                        ),
                       ),
                     ),
                   ),
@@ -205,6 +210,12 @@ void main() {
     );
     await tester.pump();
 
+    final downloadsGlass = find.byWidgetPredicate(
+      (widget) => widget is IOSGlassControl && widget.configuration['symbol'] == 'arrow.down',
+    );
+    expect(downloadsGlass, findsOneWidget);
+    expect(tester.widget<IOSGlassControl>(downloadsGlass).configuration['chromeless'], isTrue);
+
     final moreGlass = find.byWidgetPredicate(
       (widget) => widget is IOSGlassControl && widget.configuration['symbol'] == 'ellipsis',
     );
@@ -213,19 +224,97 @@ void main() {
     expect(config['chromeless'], isTrue);
 
     final pillRect = tester.getRect(find.byKey(const ValueKey('top_right_pill')));
+    final downloadsRect = tester.getRect(downloadsGlass);
     final moreRect = tester.getRect(moreGlass);
     final profileRect = tester.getRect(find.byTooltip(t.profiles.sectionTitle));
 
+    expect(downloadsRect.size, const Size(40, 40));
     expect(moreRect.size, const Size(40, 40));
     expect(profileRect.size, const Size(40, 40));
     expect(pillRect.height, 46);
+    expect(downloadsRect.left, greaterThanOrEqualTo(pillRect.left));
+    expect(downloadsRect.right, lessThanOrEqualTo(moreRect.left + 1));
     expect(moreRect.top, greaterThanOrEqualTo(pillRect.top));
     expect(moreRect.bottom, lessThanOrEqualTo(pillRect.bottom));
     expect(moreRect.left, greaterThanOrEqualTo(pillRect.left));
+    expect(downloadsRect.center.dy, closeTo(profileRect.center.dy, 0.01));
     expect(moreRect.center.dy, closeTo(profileRect.center.dy, 0.01));
 
+    tester.widget<IOSGlassControl>(downloadsGlass).onAction('pressed', null);
+    expect(downloadsOpened, 1);
     tester.widget<IOSGlassControl>(moreGlass).onAction('menuSelected', 'refresh');
     expect(refreshed, 1);
     debugDefaultTargetPlatformOverride = null;
+  });
+
+  testWidgets('handheld mobile BrowseToolbarActions shows top search button only when searchInTopBar is enabled', (
+    tester,
+  ) async {
+    PlatformDetector.debugSetIsDesktopOSOverride(false);
+    PlatformDetector.debugSetIsIOSOverride(true);
+    TvDetectionService.debugSetAppleTVOverride(false);
+
+    final settings = await SettingsService.getInstance();
+    tester.view.devicePixelRatio = 1.0;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(() {
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetPhysicalSize();
+    });
+
+    final profileStack = await ProfileStack.create();
+    addTearDown(profileStack.dispose);
+
+    final multi = testMultiServer();
+    final libraries = LibrariesProvider();
+    final watchTogether = WatchTogetherProvider();
+    final remote = CompanionRemoteProvider();
+    addTearDown(libraries.dispose);
+    addTearDown(watchTogether.dispose);
+    addTearDown(remote.dispose);
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MultiProvider(
+          providers: [
+            ChangeNotifierProvider<ActiveProfileProvider>.value(value: profileStack.active),
+            ChangeNotifierProvider<MultiServerProvider>.value(value: multi.provider),
+            ChangeNotifierProvider<LibrariesProvider>.value(value: libraries),
+            ChangeNotifierProvider<WatchTogetherProvider>.value(value: watchTogether),
+            ChangeNotifierProvider<CompanionRemoteProvider>.value(value: remote),
+          ],
+          child: InputModeTracker(
+            child: SpotlightScope(
+              controller: SpotlightController(),
+              child: MaterialApp(
+                theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.iOS),
+                home: Scaffold(
+                  body: Align(
+                    alignment: Alignment.topRight,
+                    child: BrowseToolbarActions(
+                      actionBarKey: GlobalKey<FocusableActionBarState>(),
+                      onRefresh: () {},
+                      onNavigateLeft: () {},
+                      onNavigateDown: () {},
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(find.byKey(const ValueKey('toolbar_search_button')), findsNothing);
+
+    await settings.write(SettingsService.searchInTopBar, true);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('toolbar_search_button')), findsOneWidget);
+
+    await settings.write(SettingsService.searchInTopBar, false);
+    await tester.pumpAndSettle();
+    expect(find.byKey(const ValueKey('toolbar_search_button')), findsNothing);
   });
 }

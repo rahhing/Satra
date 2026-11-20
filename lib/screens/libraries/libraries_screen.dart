@@ -18,6 +18,7 @@ import '../../providers/hidden_libraries_provider.dart';
 import '../../providers/libraries_provider.dart';
 import '../../providers/multi_server_provider.dart';
 import '../../services/settings_service.dart';
+import '../../widgets/artwork_atmosphere.dart';
 import '../../widgets/settings_builder.dart';
 import '../../utils/app_logger.dart';
 import '../../utils/library_grouping.dart';
@@ -1207,7 +1208,9 @@ class _LibrariesScreenState extends State<LibrariesScreen>
     );
 
     return Scaffold(
-      backgroundColor: useTvRecommendedBackdrop ? Colors.transparent : null,
+      backgroundColor: useTvRecommendedBackdrop
+          ? Colors.transparent
+          : ArtworkAtmosphereScope.backgroundColorOf(context),
       body: useSideNavigation
           ? Stack(
               fit: StackFit.expand,

@@ -31,6 +31,7 @@ import '../../services/background_work_diagnostics_service.dart';
 import '../../services/settings_service.dart' as settings;
 import '../../services/settings_mutation_service.dart';
 import '../../services/supporter/supporter_mode.dart';
+import '../../widgets/artwork_atmosphere.dart';
 import '../../widgets/background_download_warning_banner.dart';
 import '../../services/update_service.dart';
 import '../../utils/dialogs.dart';
@@ -184,6 +185,7 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
   Widget _buildContent(BuildContext sheetContext, {required bool hasLibraries}) {
     final inPanel = UtilityPanelScope.isPresent(sheetContext);
     return Scaffold(
+      backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(sheetContext),
       // Horizontal-only SafeArea: the groups clear a landscape notch or
       // iPhone Duo's portrait sensor column.
       body: SafeArea(

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -32,8 +33,18 @@ bool isSpotlightShortcut(
 /// stack so pressing `Ctrl + Space` toggles it open and closed cleanly.
 class SpotlightRouteTracker extends NavigatorObserver {
   Route<dynamic>? _activeSpotlightRoute;
+  final ValueNotifier<bool> _isOpen = ValueNotifier<bool>(false);
 
   bool get isSpotlightOpen => _activeSpotlightRoute != null;
+  ValueListenable<bool> get isOpenListenable => _isOpen;
+
+  void _setActiveRoute(Route<dynamic>? route) {
+    _activeSpotlightRoute = route;
+    final open = route != null;
+    if (_isOpen.value != open) {
+      _isOpen.value = open;
+    }
+  }
 
   bool closeIfOpen() {
     final route = _activeSpotlightRoute;
@@ -51,23 +62,23 @@ class SpotlightRouteTracker extends NavigatorObserver {
 
   @override
   void didPush(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (_isSpotlight(route)) _activeSpotlightRoute = route;
+    if (_isSpotlight(route)) _setActiveRoute(route);
   }
 
   @override
   void didPop(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (identical(route, _activeSpotlightRoute)) _activeSpotlightRoute = null;
+    if (identical(route, _activeSpotlightRoute)) _setActiveRoute(null);
   }
 
   @override
   void didRemove(Route<dynamic> route, Route<dynamic>? previousRoute) {
-    if (identical(route, _activeSpotlightRoute)) _activeSpotlightRoute = null;
+    if (identical(route, _activeSpotlightRoute)) _setActiveRoute(null);
   }
 
   @override
   void didReplace({Route<dynamic>? newRoute, Route<dynamic>? oldRoute}) {
-    if (identical(oldRoute, _activeSpotlightRoute)) _activeSpotlightRoute = null;
-    if (_isSpotlight(newRoute)) _activeSpotlightRoute = newRoute;
+    if (identical(oldRoute, _activeSpotlightRoute)) _setActiveRoute(null);
+    if (_isSpotlight(newRoute)) _setActiveRoute(newRoute);
   }
 }
 
@@ -79,6 +90,16 @@ class SpotlightController {
 
   SpotlightShellCallbacks Function()? callbacksProvider;
   void Function({String? initialQuery})? _opener;
+  final ValueNotifier<bool> _isOpen = ValueNotifier<bool>(false);
+
+  bool get isOpen => _isOpen.value;
+  ValueListenable<bool> get isOpenListenable => _isOpen;
+
+  void _setOpen(bool open) {
+    if (_isOpen.value != open) {
+      _isOpen.value = open;
+    }
+  }
 
   void open({String? initialQuery}) => _opener?.call(initialQuery: initialQuery);
 }
@@ -123,10 +144,16 @@ class SpotlightShortcut extends StatefulWidget {
 }
 
 class _SpotlightShortcutState extends State<SpotlightShortcut> {
+  void _syncOpenState() {
+    widget.controller._setOpen(widget.routeTracker.isSpotlightOpen);
+  }
+
   @override
   void initState() {
     super.initState();
     widget.controller._opener = _openSpotlight;
+    widget.routeTracker.isOpenListenable.addListener(_syncOpenState);
+    _syncOpenState();
     SpotlightController.activeInstance = widget.controller;
     HardwareKeyboard.instance.addHandler(_handleGlobalKeyEvent);
   }
@@ -134,19 +161,27 @@ class _SpotlightShortcutState extends State<SpotlightShortcut> {
   @override
   void didUpdateWidget(covariant SpotlightShortcut oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.routeTracker != widget.routeTracker) {
+      oldWidget.routeTracker.isOpenListenable.removeListener(_syncOpenState);
+      widget.routeTracker.isOpenListenable.addListener(_syncOpenState);
+    }
     if (oldWidget.controller != widget.controller) {
       oldWidget.controller._opener = null;
+      oldWidget.controller._setOpen(false);
       widget.controller._opener = _openSpotlight;
       SpotlightController.activeInstance = widget.controller;
     }
+    _syncOpenState();
   }
 
   @override
   void dispose() {
+    widget.routeTracker.isOpenListenable.removeListener(_syncOpenState);
     HardwareKeyboard.instance.removeHandler(_handleGlobalKeyEvent);
     if (identical(widget.controller._opener, _openSpotlight)) {
       widget.controller._opener = null;
     }
+    widget.controller._setOpen(false);
     if (identical(SpotlightController.activeInstance, widget.controller)) {
       SpotlightController.activeInstance = null;
     }

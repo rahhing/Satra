@@ -25,15 +25,23 @@ void main() {
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
 
-  for (final (tv, platform) in [
-    (false, TargetPlatform.linux),
-    (true, TargetPlatform.linux),
-    (false, TargetPlatform.android),
-    (false, TargetPlatform.iOS),
+  for (final (tv, platform, desktopTvLayout) in [
+    (false, TargetPlatform.linux, false),
+    (true, TargetPlatform.linux, false),
+    (false, TargetPlatform.macOS, true),
+    (false, TargetPlatform.android, false),
+    (false, TargetPlatform.iOS, false),
   ]) {
     testWidgets('Appearance controls save and reflect every choice: TV=$tv, $platform', (tester) async {
-      TvDetectionService.debugSetAppleTVOverride(tv);
-      addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+      if (desktopTvLayout) {
+        await TvDetectionService.getInstance(forceTv: true);
+        expect(PlatformDetector.isTV(), isTrue);
+        expect(PlatformDetector.isTVDevice(), isFalse);
+        expect(PlatformDetector.isDesktopOS(), isTrue);
+      } else {
+        TvDetectionService.debugSetAppleTVOverride(tv);
+      }
+      addTearDown(TvDetectionService.debugReset);
       tester.view.devicePixelRatio = 1;
       tester.view.physicalSize = const Size(1280, 8000);
       addTearDown(tester.view.reset);
@@ -59,10 +67,16 @@ void main() {
       final isHandheld = platform == TargetPlatform.android || platform == TargetPlatform.iOS;
       expect(find.text(t.settings.showMobileLiveTv), isHandheld ? findsOneWidget : findsNothing);
       expect(SettingsService.instance.read(SettingsService.showMobileLiveTv), isFalse);
-      expect(find.text(t.settings.useClassicMobileBackdrop), isHandheld ? findsOneWidget : findsNothing);
+      final hasBackdropControls = !tv && (isHandheld || DesktopUiScale.isDesktopPlatform(platform));
+      expect(find.text(t.settings.useClassicMobileBackdrop), hasBackdropControls ? findsOneWidget : findsNothing);
       expect(SettingsService.instance.read(SettingsService.useClassicMobileBackdrop), isFalse);
-      expect(find.text(t.settings.darkenMobileBackdrop), isHandheld ? findsOneWidget : findsNothing);
+      expect(find.text(t.settings.darkenMobileBackdrop), hasBackdropControls ? findsOneWidget : findsNothing);
       expect(SettingsService.instance.read(SettingsService.darkenMobileBackdrop), isTrue);
+      expect(
+        find.byKey(const ValueKey('mobile_backdrop_darkness')),
+        hasBackdropControls ? findsOneWidget : findsNothing,
+      );
+      expect(SettingsService.instance.read(SettingsService.mobileBackdropDarkness), closeTo(0.50, 0.001));
 
       final switches = tester
           .widgetList<SettingSwitchTile>(find.byWidgetPredicate((widget) => widget is SettingSwitchTile))
@@ -323,6 +337,54 @@ void main() {
     expect(find.text('65%'), findsOneWidget);
     expect(find.byKey(const ValueKey('glass_blur_amount')), findsNothing);
     expect(find.byKey(const ValueKey('glass_background_brightness')), findsNothing);
+  });
+
+  testWidgets('mobile Navigation group exposes searchInTopBar and conditional separateBottomSearchButton', (
+    tester,
+  ) async {
+    TvDetectionService.debugSetAppleTVOverride(false);
+    addTearDown(() => TvDetectionService.debugSetAppleTVOverride(null));
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(520, 5000);
+    addTearDown(tester.view.resetDevicePixelRatio);
+    addTearDown(tester.view.resetPhysicalSize);
+
+    final supporter = SupporterService.forTesting(availability: SupporterAvailability.hidden);
+    final theme = ThemeProvider(supporter: supporter);
+    addTearDown(supporter.dispose);
+    addTearDown(theme.dispose);
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [ChangeNotifierProvider<ThemeProvider>.value(value: theme)],
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.iOS),
+          home: const AppearanceSettingsScreen(),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    expect(SettingsService.instance.read(SettingsService.searchInTopBar), isFalse);
+    expect(SettingsService.instance.read(SettingsService.separateBottomSearchButton), isFalse);
+    expect(find.text(t.settings.searchInTopBar), findsOneWidget);
+    expect(find.text(t.settings.separateBottomSearchButton), findsOneWidget);
+
+    // Turning Search Button in Top Bar ON hides Separate Search Button.
+    await tester.tap(find.text(t.settings.searchInTopBar));
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.searchInTopBar), isTrue);
+    expect(find.text(t.settings.separateBottomSearchButton), findsNothing);
+
+    // Turning Search Button in Top Bar back OFF restores Separate Search Button.
+    await tester.tap(find.text(t.settings.searchInTopBar));
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.searchInTopBar), isFalse);
+    expect(find.text(t.settings.separateBottomSearchButton), findsOneWidget);
+
+    await tester.tap(find.text(t.settings.separateBottomSearchButton));
+    await tester.pumpAndSettle();
+    expect(SettingsService.instance.read(SettingsService.separateBottomSearchButton), isTrue);
   });
 }
 

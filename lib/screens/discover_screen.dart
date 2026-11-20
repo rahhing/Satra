@@ -30,6 +30,7 @@ import '../widgets/optimized_media_image.dart' show ClearLogoImage, blurArtwork;
 import '../widgets/toolbar_scrim.dart';
 import '../widgets/glass_surface.dart';
 import '../widgets/ios_glass_control.dart';
+import '../spotlight/spotlight_shortcut.dart';
 import '../widgets/browse_toolbar_actions.dart';
 import '../widgets/focusable_tab_chip.dart';
 import '../media/media_library.dart';
@@ -714,7 +715,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final foregroundColor = colorScheme.onSurface;
     final showSections = PlatformDetector.shouldUseSideNavigation(context);
     if (!showSections && PlatformDetector.isMobile(context)) {
-      return _buildMobileOverlaidAppBar(context, foregroundColor: foregroundColor);
+      return _buildMobileOverlaidAppBar(context);
     }
     final libraries = _visibleHomeLibraries(context);
     return ToolbarScrim.navigation(
@@ -858,10 +859,14 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     unawaited(smoothScrollToTop(_scrollController));
   }
 
-  Widget _buildMobileOverlaidAppBar(BuildContext context, {required Color foregroundColor}) {
+  Widget _buildMobileOverlaidAppBar(BuildContext context) {
     final safePadding = MediaQuery.paddingOf(context);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final foregroundColor = theme.colorScheme.onSurface;
     final glassTint = isDark ? const Color(0xFF07080C) : null;
+    final searchInTopBar = SettingsService.instance.read(SettingsService.searchInTopBar);
+    final canSearch = searchInTopBar && SpotlightScope.maybeOf(context) != null;
     return Padding(
       padding: EdgeInsets.only(
         top: safePadding.top + 6,
@@ -870,37 +875,38 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         bottom: 8,
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          IOSGlassButton(
-            label: t.discover.title,
-            title: t.discover.title,
-            titleSize: Theme.of(context).textTheme.headlineSmall?.fontSize,
-            onPressed: scrollToTop,
-            child: GestureDetector(
-              key: const ValueKey('discover_scroll_to_top_pill'),
-              behavior: HitTestBehavior.opaque,
-              onTap: scrollToTop,
-              child: GlassSurface(
-                interactive: true,
-                borderRadius: const BorderRadius.all(Radius.circular(999)),
-                sigma: 26,
-                opacity: 0.68,
-                tint: glassTint,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-                  child: Text(
-                    t.discover.title,
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      color: foregroundColor,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: -0.5,
+          if (canSearch) ...[
+            SizedBox.square(
+              key: const ValueKey('discover_search_button'),
+              dimension: 46,
+              child: IOSGlassButton(
+                label: t.common.search,
+                symbol: 'magnifyingglass',
+                symbolSize: 19,
+                regularSymbolWeight: true,
+                foregroundColor: foregroundColor,
+                onPressed: () => SpotlightScope.open(context),
+                child: GlassSurface(
+                  interactive: true,
+                  borderRadius: const BorderRadius.all(Radius.circular(999)),
+                  sigma: 26,
+                  opacity: 0.68,
+                  tint: glassTint,
+                  child: Material(
+                    type: MaterialType.transparency,
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: () => SpotlightScope.open(context),
+                      child: Center(child: AppIcon(Symbols.search_rounded, size: 21, color: foregroundColor)),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-          const Spacer(),
+            const SizedBox(width: 8),
+          ],
           GlassSurface(
             interactive: true,
             borderRadius: const BorderRadius.all(Radius.circular(999)),
@@ -914,6 +920,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                 onRefresh: manualRefresh,
                 onNavigateLeft: () {},
                 onNavigateDown: _focusContentFromAppBar,
+                showSearchAction: false,
                 onProfileSwitchingChanged: (busy) {
                   if (mounted) setState(() => _switchingProfile = busy);
                 },
@@ -933,6 +940,8 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         SettingsService.showHeroSection,
         SettingsService.useClassicMobileBackdrop,
         SettingsService.darkenMobileBackdrop,
+        SettingsService.mobileBackdropDarkness,
+        SettingsService.searchInTopBar,
         SettingsService.hideSpoilers,
         SettingsService.libraryDensity,
         SettingsService.episodePosterMode,
@@ -945,7 +954,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     if (!PlatformDetector.shouldUseSideNavigation(context)) return _buildRecommendedContent(context);
     final libraries = _visibleHomeLibraries(context);
     return Material(
-      color: Theme.of(context).scaffoldBackgroundColor,
+      color: ArtworkAtmosphereScope.backgroundColorOf(context),
       child: Stack(
         fit: StackFit.expand,
         clipBehavior: Clip.none,
@@ -990,8 +999,15 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final continueWatchingHub = _onDeck.isEmpty ? null : _continueWatchingHub;
     final isIOS = PlatformDetector.isHandheldIOS(context);
     final isMobileBackdrop = PlatformDetector.isMobile(context) && !PlatformDetector.isAutomotive();
-    final useAnchoredBackdrop = isMobileBackdrop && !svc.read(SettingsService.useClassicMobileBackdrop);
-    final darkenBackdrop = isMobileBackdrop && svc.read(SettingsService.darkenMobileBackdrop);
+    final useDesktopBackdrop = ArtworkAtmosphereScope.isEnabled(context);
+    final useAnchoredBackdrop =
+        useDesktopBackdrop || (isMobileBackdrop && !svc.read(SettingsService.useClassicMobileBackdrop));
+    final darkenBackdrop = (isMobileBackdrop || useDesktopBackdrop) && svc.read(SettingsService.darkenMobileBackdrop);
+    final backdropDarkness = svc.read(SettingsService.mobileBackdropDarkness).clamp(0.0, 1.0);
+    if (useDesktopBackdrop && (_onDeck.isEmpty || !showHeroSection)) {
+      final fallback = _onDeck.firstOrNull ?? _hubs.expand((hub) => hub.items).firstOrNull;
+      if (fallback != null) ArtworkAtmosphereScope.select(context, fallback, onlyIfEmpty: true);
+    }
     final heroHeight = _heroHeight(context);
     final scrollView = CustomScrollView(
       controller: _scrollController,
@@ -1106,7 +1122,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final isMobile = PlatformDetector.isMobile(context);
 
     return Material(
-      color: theme.scaffoldBackgroundColor,
+      color: ArtworkAtmosphereScope.backgroundColorOf(context),
       child: Stack(
         fit: StackFit.expand,
         children: [
@@ -1124,6 +1140,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                           if (size.isEmpty) return const SizedBox.shrink();
                           final paths = item.heroArtCandidates(containerAspectRatio: size.aspectRatio);
                           if (paths.isEmpty) return ColoredBox(color: theme.scaffoldBackgroundColor);
+                          final compactLandscape = _usesCompactLandscapeHero(context);
                           final artwork = CyclingMediaBackdrop(
                             mediaKey: item.globalKey,
                             imagePaths: paths,
@@ -1132,14 +1149,17 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                             height: size.height,
                             fallbackColor: theme.scaffoldBackgroundColor,
                             active: false,
-                            focusCrop: useAnchoredBackdrop,
+                            alignment: compactLandscape ? const Alignment(0, -0.58) : Alignment.center,
+                            focusCrop: useAnchoredBackdrop && !compactLandscape,
                             frameBuilder: !useAnchoredBackdrop
                                 ? null
                                 : (_, artwork) => _AnchoredHeroBackdrop(
                                     scrollController: _scrollController,
                                     heroHeight: heroHeight,
-                                    artworkHeightFraction: _usesCompactLandscapeHero(context) ? .90 : .72,
+                                    artworkHeightFraction: compactLandscape ? 1.0 : .72,
+                                    isCompactLandscape: compactLandscape,
                                     darkenBackdrop: darkenBackdrop,
+                                    backdropDarkness: backdropDarkness,
                                     artwork: artwork,
                                   ),
                           );
@@ -1149,6 +1169,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                                   scrollController: _scrollController,
                                   heroHeight: math.min(500 + MediaQuery.paddingOf(context).top, size.height * 0.65),
                                   darkenBackdrop: darkenBackdrop,
+                                  backdropDarkness: backdropDarkness,
                                   child: artwork,
                                 );
                         },
@@ -1164,9 +1185,9 @@ class _DiscoverScreenState extends State<DiscoverScreen>
                 child: DecoratedBox(
                   decoration: BoxDecoration(
                     gradient: RadialGradient(
-                      center: const AlignmentDirectional(-.88, -.42),
-                      radius: 1.15,
-                      colors: [theme.scaffoldBackgroundColor.withValues(alpha: .64), Colors.transparent],
+                      center: const AlignmentDirectional(-.85, .55),
+                      radius: 1.05,
+                      colors: [theme.scaffoldBackgroundColor.withValues(alpha: .58), Colors.transparent],
                     ),
                   ),
                 ),
@@ -1333,7 +1354,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     final viewportHeight = MediaQuery.sizeOf(context).height;
     final isLandscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     // Leave room to see the start of the shelves on a short phone display.
-    if (_usesCompactLandscapeHero(context)) return math.min(viewportHeight * .68, 310 + statusBarHeight);
+    if (_usesCompactLandscapeHero(context)) return math.min(viewportHeight * .74, 325 + statusBarHeight);
     return isTv
         ? viewportHeight * 0.82
         : useSideNav
@@ -1344,7 +1365,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
   }
 
   Widget _buildHeroSection(double heroHeight, {required bool drawsBackdrop}) {
-    ArtworkAtmosphereScope.select(context, _onDeck[_heroIndex.value.clamp(0, _onDeck.length - 1)]);
+    ArtworkAtmosphereScope.select(context, _onDeck[_heroIndex.value.clamp(0, _onDeck.length - 1)], onlyIfEmpty: true);
     final isTv = PlatformDetector.isTV();
     final compactLandscape = _usesCompactLandscapeHero(context);
     return SliverToBoxAdapter(
@@ -1498,6 +1519,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
     // heroClient resolves to the actual server's client (Plex or Jellyfin) so
     // each backend's transcoder builds sized URLs. Size the request to the
     // drift box, which is wider than the hero, so the art stays sharp.
+    final compactLandscape = _usesCompactLandscapeHero(context);
     return blurArtwork(
       CyclingMediaBackdrop(
         mediaKey: heroItem.globalKey,
@@ -1508,6 +1530,7 @@ class _DiscoverScreenState extends State<DiscoverScreen>
         width: artSize.width,
         height: artSize.height,
         fallbackColor: fallbackColor,
+        alignment: compactLandscape ? const Alignment(0, -0.58) : Alignment.center,
         focusCrop: PlatformDetector.isDesktop(context),
       ),
     );
@@ -1823,6 +1846,8 @@ class _AnchoredHeroBackdrop extends StatelessWidget {
     required this.heroHeight,
     required this.artworkHeightFraction,
     required this.darkenBackdrop,
+    this.backdropDarkness = 0.50,
+    this.isCompactLandscape = false,
   });
 
   final Widget artwork;
@@ -1830,6 +1855,8 @@ class _AnchoredHeroBackdrop extends StatelessWidget {
   final double heroHeight;
   final double artworkHeightFraction;
   final bool darkenBackdrop;
+  final double backdropDarkness;
+  final bool isCompactLandscape;
 
   @override
   Widget build(BuildContext context) => LayoutBuilder(
@@ -1838,9 +1865,13 @@ class _AnchoredHeroBackdrop extends StatelessWidget {
       if (size.isEmpty) return const SizedBox.shrink();
       final theme = Theme.of(context);
       final shadeBaseColor = theme.brightness == Brightness.light ? theme.scaffoldBackgroundColor : Colors.black;
-      // A shorter, near-square sharp region preserves more of a widescreen
-      // image before it fades into the full-height blur behind the controls.
-      final sharpHeight = math.min(size.height, math.min(heroHeight * artworkHeightFraction, size.width / .95));
+      // In compact landscape on phones, keep the full viewport height for the
+      // sharp 16:9 backdrop instead of cropping into a skinny panoramic ribbon
+      // that slices off characters' heads and faces. In portrait, a shorter
+      // near-square region preserves more width before fading into the blur.
+      final sharpHeight = isCompactLandscape
+          ? size.height
+          : math.min(size.height, math.min(heroHeight * artworkHeightFraction, size.width / .95));
       final artworkFrame = SizedBox(width: size.width, height: sharpHeight, child: artwork);
       return Stack(
         fit: StackFit.expand,
@@ -1876,11 +1907,11 @@ class _AnchoredHeroBackdrop extends StatelessWidget {
                 child: RepaintBoundary(
                   child: ShaderMask(
                     blendMode: BlendMode.dstIn,
-                    shaderCallback: (bounds) => const LinearGradient(
+                    shaderCallback: (bounds) => LinearGradient(
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
-                      colors: [Colors.white, Colors.white, Colors.transparent],
-                      stops: [0, .42, 1],
+                      colors: const [Colors.white, Colors.white, Colors.transparent],
+                      stops: isCompactLandscape ? const [0, .60, 1] : const [0, .42, 1],
                     ).createShader(bounds),
                     child: artwork,
                   ),
@@ -1905,6 +1936,7 @@ class _AnchoredHeroBackdrop extends StatelessWidget {
               artworkEnd: sharpHeight / size.height,
               heroHeight: heroHeight,
               darkenBackdrop: darkenBackdrop,
+              backdropDarkness: backdropDarkness,
               baseColor: shadeBaseColor,
             ),
           ),
@@ -1923,6 +1955,7 @@ Widget _heroBackgroundShade(
   double? artworkEnd,
   double? heroHeight,
   bool darkenBackdrop = false,
+  double backdropDarkness = 0.50,
   Color baseColor = Colors.black,
 }) {
   if (!darkenBackdrop) {
@@ -1946,6 +1979,23 @@ Widget _heroBackgroundShade(
     );
   }
 
+  final d = backdropDarkness.clamp(0.0, 1.0);
+  double lerpCurve(double low, double mid, double high) {
+    if (d <= 0.5) {
+      final u = d / 0.5;
+      return low + (mid - low) * u;
+    }
+    final u = (d - 0.5) / 0.5;
+    return mid + (high - mid) * u;
+  }
+
+  // Keep the sharp backdrop area crisp while scaling how dark the blurred area
+  // outside the backdrop image becomes (from gentle tint at 0% to solid dark
+  // at 100%, matching the default tuned curve at 50%).
+  final sharpEndAlpha = lerpCurve(0.42, 0.56, 0.96);
+  final cwAlpha = lerpCurve(0.50, 0.66, 1.0);
+  final maxAlpha = lerpCurve(0.72, 0.93, 1.0);
+
   final cwDocStart = (heroHeight != null && heroHeight > 0) ? heroHeight : height * 0.65;
   final sharpDocEnd = artworkEnd != null ? math.min(cwDocStart, artworkEnd * height) : cwDocStart * 0.72;
   final sharpDocMid = sharpDocEnd * 0.42;
@@ -1957,15 +2007,15 @@ Widget _heroBackgroundShade(
     }
     if (docY <= sharpDocEnd) {
       final span = sharpDocEnd - sharpDocMid;
-      return span > 0 ? 0.12 + (0.56 - 0.12) * ((docY - sharpDocMid) / span) : 0.56;
+      return span > 0 ? 0.12 + (sharpEndAlpha - 0.12) * ((docY - sharpDocMid) / span) : sharpEndAlpha;
     }
     if (docY <= cwDocStart) {
       final span = cwDocStart - sharpDocEnd;
-      return span > 0 ? 0.56 + (0.66 - 0.56) * ((docY - sharpDocEnd) / span) : 0.66;
+      return span > 0 ? sharpEndAlpha + (cwAlpha - sharpEndAlpha) * ((docY - sharpDocEnd) / span) : cwAlpha;
     }
     final depth = height > 0 ? ((docY - cwDocStart) / (height * 0.90)).clamp(0.0, 1.0) : 1.0;
     final eased = 1.0 - math.pow(1.0 - depth, 1.85).toDouble();
-    return 0.66 + (0.93 - 0.66) * eased;
+    return cwAlpha + (maxAlpha - cwAlpha) * eased;
   }
 
   final rawStops = <double>[
@@ -2010,12 +2060,14 @@ class _HeroBackgroundFade extends StatelessWidget {
     required this.scrollController,
     required this.heroHeight,
     this.darkenBackdrop = false,
+    this.backdropDarkness = 0.50,
   });
 
   final Widget child;
   final ScrollController scrollController;
   final double heroHeight;
   final bool darkenBackdrop;
+  final double backdropDarkness;
 
   @override
   Widget build(BuildContext context) {
@@ -2053,6 +2105,7 @@ class _HeroBackgroundFade extends StatelessWidget {
                 height,
                 heroHeight: heroHeight,
                 darkenBackdrop: darkenBackdrop,
+                backdropDarkness: backdropDarkness,
                 baseColor: shadeBaseColor,
               ),
             ],

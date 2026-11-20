@@ -8,6 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:logger/logger.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import '../../focus/focusable_action_bar.dart';
+import '../../widgets/artwork_atmosphere.dart';
 import '../../widgets/app_icon.dart';
 import '../../focus/key_event_utils.dart';
 import '../../navigation/page_refresh_shortcut.dart';
@@ -389,6 +390,7 @@ class _LogsScreenState extends State<LogsScreen> with MountedSetStateMixin {
       child: PrimaryScrollController(
         controller: _scrollController,
         child: Scaffold(
+          backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
           body: Actions(
             actions: <Type, Action<Intent>>{
               ExtendSelectionByCharacterIntent: _CollapsingSelectionMoveAction<ExtendSelectionByCharacterIntent>(),

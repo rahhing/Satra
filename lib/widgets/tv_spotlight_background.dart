@@ -16,6 +16,7 @@ import '../utils/media_image_helper.dart';
 import '../utils/platform_detector.dart';
 import '../services/settings_service.dart';
 import '../utils/tone_mapped_logo_image.dart';
+import 'artwork_atmosphere.dart';
 import 'cycling_media_backdrop.dart';
 import 'spotlight_artwork.dart';
 import 'spotlight_shading.dart';
@@ -63,21 +64,41 @@ class TvSpotlightBackground extends StatelessWidget {
   Widget build(BuildContext context) {
     final media = item;
     final bgColor = Theme.of(context).scaffoldBackgroundColor;
+    if (media != null) ArtworkAtmosphereScope.select(context, media, onlyIfEmpty: true);
 
     final size = MediaQuery.sizeOf(context);
     final isDesktop = PlatformDetector.isDesktopOS() && !PlatformDetector.isTVDevice();
+    final supportsBackdrop = ArtworkAtmosphereScope.supportsDesktopArtwork(context);
     final containerAspect = size.width / size.height;
     final fallbackPaths = media == null
         ? const <String>[]
         : <String>[...media.heroArtCandidates(containerAspectRatio: containerAspect), ?media.thumbPath];
-    return SettingValueBuilder<bool>(
-      pref: SettingsService.tvCornerSpotlightBackdrop,
-      builder: (context, cornerBackdrop, _) {
+    return SettingsBuilder(
+      prefs: supportsBackdrop
+          ? const [
+              SettingsService.tvCornerSpotlightBackdrop,
+              SettingsService.useClassicMobileBackdrop,
+              SettingsService.darkenMobileBackdrop,
+              SettingsService.mobileBackdropDarkness,
+            ]
+          : const [SettingsService.tvCornerSpotlightBackdrop],
+      builder: (context) {
+        final cornerBackdrop = context.settingsRead(SettingsService.tvCornerSpotlightBackdrop);
+        final useDesktopBackdrop =
+            supportsBackdrop &&
+            !context.settingsRead(SettingsService.useClassicMobileBackdrop) &&
+            AppMotion.effectsEnabled(context);
+        final darkness = useDesktopBackdrop ? desktopArtworkDarkness() : null;
         final shelfStart = ((size.height - contentBottom) / size.height + 0.06).clamp(0.45, 0.76);
         final dockBand = isDesktop ? 0.0 : ((contentLeft ?? 24) * 0.75 / size.width).clamp(0.025, 0.12);
         final backdrop = CyclingMediaBackdrop(
           controller: backdropController,
-          frameBuilder: (context, artwork) => SpotlightArtwork(artwork: artwork, size: size, corner: cornerBackdrop),
+          frameBuilder: (context, artwork) => SpotlightArtwork(
+            artwork: artwork,
+            size: size,
+            corner: cornerBackdrop,
+            blurShade: darkness == null ? null : bgColor.withValues(alpha: darkness),
+          ),
           focusCrop: isDesktop,
           mediaKey: media?.globalKey,
           imagePaths: media?.heroRotationPaths(containerAspectRatio: containerAspect) ?? const [],

@@ -10,6 +10,7 @@ import '../media/media_item.dart';
 import '../media/media_server_client.dart';
 import '../media/media_sort.dart';
 import '../services/settings_service.dart';
+import '../widgets/artwork_atmosphere.dart';
 import '../widgets/settings_builder.dart';
 import '../widgets/system_bottom_inset.dart';
 import '../utils/app_logger.dart';
@@ -499,6 +500,7 @@ class _HubDetailScreenState extends State<HubDetailScreen>
           if (handleBackNavigation() && mounted) Navigator.pop(context);
         },
         child: Scaffold(
+          backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
           key: _overlayChildKey,
           // Horizontal-only SafeArea: the grid clears a landscape notch or
           // iPhone Duo's portrait sensor column.

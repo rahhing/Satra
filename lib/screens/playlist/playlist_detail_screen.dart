@@ -13,6 +13,7 @@ import '../../utils/app_logger.dart';
 import '../../utils/error_message_utils.dart';
 import '../../utils/continuation_pagination_coordinator.dart';
 import '../../utils/music_navigation.dart';
+import '../../widgets/artwork_atmosphere.dart';
 import '../../widgets/app_icon.dart';
 import '../../widgets/desktop_app_bar.dart';
 import '../../focus/dpad_navigator.dart';
@@ -784,7 +785,10 @@ class _PlaylistDetailScreenState extends BaseMediaListDetailScreen<PlaylistDetai
         controller: scrollController,
         // Horizontal-only SafeArea: rows clear a landscape notch or iPhone
         // Duo's portrait sensor column.
-        child: Scaffold(body: SafeArea(top: false, bottom: false, child: scrollView)),
+        child: Scaffold(
+          backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
+          body: SafeArea(top: false, bottom: false, child: scrollView),
+        ),
       ),
     );
   }

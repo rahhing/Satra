@@ -43,6 +43,7 @@ import '../watch_together/providers/watch_together_provider.dart';
 import '../watch_together/watch_together.dart' show WatchNoticeListener;
 import '../widgets/music/mini_player.dart';
 import '../widgets/agent_control_scope.dart';
+import '../widgets/artwork_atmosphere.dart';
 import 'profile_navigation_scope.dart';
 import 'settings_shortcut.dart';
 
@@ -376,6 +377,22 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
 
   @override
   Widget build(BuildContext context) {
+    final navigation = Stack(
+      children: [
+        Navigator(
+          key: _navigatorKey,
+          observers: [
+            _routeObserver,
+            _musicRouteObserver,
+            _settingsRouteTracker,
+            _spotlightRouteTracker,
+            BackKeySuppressorObserver(),
+          ],
+          onGenerateRoute: _onGenerateRoute,
+        ),
+        const Positioned.fill(child: MusicMiniPlayerOverlay()),
+      ],
+    );
     return ProfileNavigationScope(
       navigatorKey: _navigatorKey,
       routeObserver: _routeObserver,
@@ -403,22 +420,9 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
               child: SettingsShortcut(
                 navigatorKey: _navigatorKey,
                 settingsRoutes: _settingsRouteTracker,
-                child: Stack(
-                  children: [
-                    Navigator(
-                      key: _navigatorKey,
-                      observers: [
-                        _routeObserver,
-                        _musicRouteObserver,
-                        _settingsRouteTracker,
-                        _spotlightRouteTracker,
-                        BackKeySuppressorObserver(),
-                      ],
-                      onGenerateRoute: _onGenerateRoute,
-                    ),
-                    const Positioned.fill(child: MusicMiniPlayerOverlay()),
-                  ],
-                ),
+                child: ArtworkAtmosphereScope.supportsDesktopArtwork(context)
+                    ? ArtworkAtmosphereHost(child: navigation)
+                    : navigation,
               ),
             ),
           ),

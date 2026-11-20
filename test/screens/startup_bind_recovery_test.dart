@@ -116,7 +116,7 @@ void main() {
   });
 
   group('main screen bottom navigation tabs', () {
-    test('mobile online hides Settings when another tab is active', () {
+    test('mobile online hides Settings and Downloads when another tab is active', () {
       final tabs = mainScreenBottomNavigationTabs(
         visibleTabs: allNavigationTabs,
         isMobile: true,
@@ -125,6 +125,7 @@ void main() {
       );
 
       expect(_ids(tabs), isNot(contains(NavigationTabId.settings)));
+      expect(_ids(tabs), isNot(contains(NavigationTabId.downloads)));
     });
 
     test('mobile offline includes Downloads and Settings', () {

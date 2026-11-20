@@ -669,6 +669,7 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showHeroSection = BoolPref('show_hero_section', defaultValue: true);
   static const useClassicMobileBackdrop = BoolPref('use_classic_mobile_backdrop');
   static const darkenMobileBackdrop = BoolPref('darken_mobile_backdrop', defaultValue: true);
+  static const mobileBackdropDarkness = DoublePref('mobile_backdrop_darkness', defaultValue: 0.50);
   static const tvFullCardLayout = BoolPref('tv_full_card_layout', defaultValue: true);
   static const focusGlow = BoolPref('focus_glow', defaultValue: false);
   static const cardHoverLift = BoolPref('card_hover_lift', defaultValue: true);
@@ -923,6 +924,8 @@ class SettingsService extends BaseSharedPreferencesService {
   static const showSeasonPostersOnTabs = BoolPref('show_season_posters_on_tabs');
   static const hideSpoilers = BoolPref('hide_spoilers');
   static const showNavBarLabels = BoolPref('show_nav_bar_labels', defaultValue: true);
+  static const searchInTopBar = BoolPref('search_in_top_bar');
+  static const separateBottomSearchButton = BoolPref('separate_bottom_search_button');
   static const globalShaderPreset = StringPref('global_shader_preset', defaultValue: 'none');
   static const requireProfileSelectionOnOpen = BoolPref('require_profile_selection_on_open');
   static const useExternalPlayer = _UseExternalPlayerPref();
@@ -1534,6 +1537,7 @@ class SettingsService extends BaseSharedPreferencesService {
     showHeroSection,
     useClassicMobileBackdrop,
     darkenMobileBackdrop,
+    mobileBackdropDarkness,
     sleepTimerDuration,
     audioSyncOffset,
     subtitleSyncOffset,
@@ -1586,6 +1590,8 @@ class SettingsService extends BaseSharedPreferencesService {
     showSeasonPostersOnTabs,
     hideSpoilers,
     showNavBarLabels,
+    searchInTopBar,
+    separateBottomSearchButton,
     globalShaderPreset,
     requireProfileSelectionOnOpen,
     useExternalPlayer,

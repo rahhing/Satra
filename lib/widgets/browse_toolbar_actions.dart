@@ -20,14 +20,18 @@ import '../screens/downloads/downloads_screen.dart';
 import '../screens/profile/profile_switch_screen.dart';
 import '../screens/profile/profile_teardown.dart';
 import '../services/fullscreen_state_manager.dart';
+import '../services/settings_service.dart';
+import '../spotlight/spotlight_shortcut.dart';
 import '../utils/dialogs.dart';
 import '../utils/platform_detector.dart';
 import '../watch_together/watch_together.dart';
 import 'app_icon.dart';
 import 'app_menu.dart';
 import 'companion_remote/remote_session_dialog.dart';
+import 'ios_glass_control.dart';
 import 'library_management_sheet.dart';
 import 'server_activities_button.dart';
+import 'settings_builder.dart';
 import 'system_clock.dart';
 import 'utility_panel_route.dart';
 
@@ -42,6 +46,7 @@ class BrowseToolbarActions extends StatefulWidget {
     this.extraActions = const [],
     this.onManageLibraries,
     this.onProfileSwitchingChanged,
+    this.showSearchAction = true,
   });
 
   final GlobalKey<FocusableActionBarState> actionBarKey;
@@ -51,6 +56,7 @@ class BrowseToolbarActions extends StatefulWidget {
   final List<FocusableAction> extraActions;
   final VoidCallback? onManageLibraries;
   final ValueChanged<bool>? onProfileSwitchingChanged;
+  final bool showSearchAction;
 
   @override
   State<BrowseToolbarActions> createState() => _BrowseToolbarActionsState();
@@ -315,81 +321,128 @@ class _BrowseToolbarActionsState extends State<BrowseToolbarActions> {
                 );
 
                 if (compactMobile) {
-                  return FocusableActionBar(
-                    key: widget.actionBarKey,
-                    onNavigateLeft: widget.onNavigateLeft,
-                    onNavigateDown: widget.onNavigateDown,
-                    actions: [
-                      ...widget.extraActions,
-                      if (watchTogether.isInSession)
-                        FocusableAction(
-                          debugLabel: 'watch_together',
-                          onPressed: openWatchTogether,
-                          child: buildWatchTogetherButton(),
-                        ),
-                      if (companionRemote.isConnected)
-                        FocusableAction(
-                          debugLabel: 'companion_remote',
-                          onPressed: openCompanionRemote,
-                          child: buildCompanionRemoteButton(),
-                        ),
-                      FocusableAction(
-                        debugLabel: 'mobile_more_actions',
-                        child: AppMenuButton<String>(
-                          tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
-                          iosGlassSymbol: 'ellipsis',
-                          iosGlassSymbolSize: 18,
-                          iosGlassChromeless: true,
-                          iosGlassForegroundColor: foregroundColor,
-                          iosMenuSymbol: (action) => switch (action) {
-                            'watch_together' => 'person.2',
-                            'companion_remote' => 'iphone',
-                            'manage_libraries' => 'square.and.pencil',
-                            'refresh' => 'arrow.clockwise',
-                            _ => null,
-                          },
-                          adaptiveSheet: true,
-                          anchorAlignment: AppMenuAnchorAlignment.end,
-                          entriesBuilder: (_) => [
-                            AppMenuItem(
-                              value: 'watch_together',
-                              icon: Symbols.group_rounded,
-                              label: t.watchTogether.title,
+                  Widget buildCompactBar(bool searchInTopBar) {
+                    final canSearch =
+                        searchInTopBar && widget.showSearchAction && SpotlightScope.maybeOf(context) != null;
+                    return FocusableActionBar(
+                      key: widget.actionBarKey,
+                      onNavigateLeft: widget.onNavigateLeft,
+                      onNavigateDown: widget.onNavigateDown,
+                      actions: [
+                        ...widget.extraActions,
+                        if (canSearch)
+                          FocusableAction(
+                            debugLabel: 'mobile_search',
+                            onPressed: () => SpotlightScope.open(context),
+                            child: IconButton(
+                              key: const ValueKey('toolbar_search_button'),
+                              style: compactButtonStyle,
+                              icon: AppIcon(Symbols.search_rounded, size: 21, color: foregroundColor),
+                              onPressed: () => SpotlightScope.open(context),
+                              tooltip: t.common.search,
                             ),
-                            AppMenuItem(
-                              value: 'companion_remote',
-                              icon: Symbols.phone_android_rounded,
-                              label: t.companionRemote.title,
-                            ),
-                            if (hasLibraries)
-                              AppMenuItem(
-                                value: 'manage_libraries',
-                                icon: Symbols.edit_rounded,
-                                label: t.libraries.manageLibraries,
+                          ),
+                        if (watchTogether.isInSession)
+                          FocusableAction(
+                            debugLabel: 'watch_together',
+                            onPressed: openWatchTogether,
+                            child: buildWatchTogetherButton(),
+                          ),
+                        if (companionRemote.isConnected)
+                          FocusableAction(
+                            debugLabel: 'companion_remote',
+                            onPressed: openCompanionRemote,
+                            child: buildCompanionRemoteButton(),
+                          ),
+                        FocusableAction(
+                          debugLabel: 'downloads',
+                          onPressed: () => _handleOpenDownloads(context),
+                          child: Tooltip(
+                            message: t.navigation.downloads,
+                            child: IOSGlassButton(
+                              label: t.navigation.downloads,
+                              symbol: 'arrow.down',
+                              symbolSize: 17,
+                              chromeless: true,
+                              foregroundColor: foregroundColor,
+                              onPressed: () => _handleOpenDownloads(context),
+                              child: IconButton(
+                                style: compactButtonStyle,
+                                icon: AppIcon(Symbols.download_rounded, size: 21, color: foregroundColor),
+                                onPressed: () => _handleOpenDownloads(context),
+                                tooltip: t.navigation.downloads,
                               ),
-                            AppMenuItem(value: 'refresh', icon: Symbols.refresh_rounded, label: t.common.refresh),
-                          ],
-                          onSelected: (action) {
-                            switch (action) {
-                              case 'watch_together':
-                                openWatchTogether();
-                              case 'companion_remote':
-                                openCompanionRemote();
-                              case 'manage_libraries':
-                                (widget.onManageLibraries ?? () => showLibraryManagementSheet(context)).call();
-                              case 'refresh':
-                                widget.onRefresh();
-                            }
-                          },
-                          child: SizedBox(
-                            width: 40,
-                            height: 40,
-                            child: Center(child: AppIcon(Symbols.more_horiz_rounded, size: 21, color: foregroundColor)),
+                            ),
                           ),
                         ),
-                      ),
-                      _buildUserMenuAction(context, compact: true),
-                    ],
+                        FocusableAction(
+                          debugLabel: 'mobile_more_actions',
+                          child: AppMenuButton<String>(
+                            tooltip: MaterialLocalizations.of(context).moreButtonTooltip,
+                            iosGlassSymbol: 'ellipsis',
+                            iosGlassSymbolSize: 18,
+                            iosGlassChromeless: true,
+                            iosGlassForegroundColor: foregroundColor,
+                            iosMenuSymbol: (action) => switch (action) {
+                              'watch_together' => 'person.2',
+                              'companion_remote' => 'iphone',
+                              'manage_libraries' => 'square.and.pencil',
+                              'refresh' => 'arrow.clockwise',
+                              _ => null,
+                            },
+                            adaptiveSheet: true,
+                            anchorAlignment: AppMenuAnchorAlignment.end,
+                            entriesBuilder: (_) => [
+                              AppMenuItem(
+                                value: 'watch_together',
+                                icon: Symbols.group_rounded,
+                                label: t.watchTogether.title,
+                              ),
+                              AppMenuItem(
+                                value: 'companion_remote',
+                                icon: Symbols.phone_android_rounded,
+                                label: t.companionRemote.title,
+                              ),
+                              if (hasLibraries)
+                                AppMenuItem(
+                                  value: 'manage_libraries',
+                                  icon: Symbols.edit_rounded,
+                                  label: t.libraries.manageLibraries,
+                                ),
+                              AppMenuItem(value: 'refresh', icon: Symbols.refresh_rounded, label: t.common.refresh),
+                            ],
+                            onSelected: (action) {
+                              switch (action) {
+                                case 'watch_together':
+                                  openWatchTogether();
+                                case 'companion_remote':
+                                  openCompanionRemote();
+                                case 'manage_libraries':
+                                  (widget.onManageLibraries ?? () => showLibraryManagementSheet(context)).call();
+                                case 'refresh':
+                                  widget.onRefresh();
+                              }
+                            },
+                            child: SizedBox(
+                              width: 40,
+                              height: 40,
+                              child: Center(
+                                child: AppIcon(Symbols.more_horiz_rounded, size: 21, color: foregroundColor),
+                              ),
+                            ),
+                          ),
+                        ),
+                        _buildUserMenuAction(context, compact: true),
+                      ],
+                    );
+                  }
+
+                  if (SettingsService.instanceOrNull == null) {
+                    return buildCompactBar(false);
+                  }
+                  return SettingValueBuilder<bool>(
+                    pref: SettingsService.searchInTopBar,
+                    builder: (_, searchInTopBar, _) => buildCompactBar(searchInTopBar),
                   );
                 }
 

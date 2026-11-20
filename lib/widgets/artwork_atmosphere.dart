@@ -9,6 +9,8 @@ import '../media/media_item_types.dart';
 import '../media/media_server_client.dart';
 import '../services/settings_service.dart';
 import '../theme/app_motion.dart';
+import '../utils/desktop_ui_scale.dart';
+import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
 import 'cycling_media_backdrop.dart';
 import 'settings_builder.dart';
@@ -36,28 +38,37 @@ class ArtworkAtmosphereController extends ValueNotifier<MediaItem?> {
 }
 
 class ArtworkAtmosphereScope extends InheritedWidget {
-  const ArtworkAtmosphereScope({super.key, required this.controller, required super.child});
+  const ArtworkAtmosphereScope({super.key, required this.controller, required this.enabled, required super.child});
 
   final ArtworkAtmosphereController controller;
+  final bool enabled;
+
+  static bool supportsDesktopArtwork(BuildContext context) =>
+      !PlatformDetector.isTVDevice() && DesktopUiScale.isDesktopPlatform(Theme.of(context).platform);
 
   static ArtworkAtmosphereController? maybeOf(BuildContext context) =>
-      (context.getElementForInheritedWidgetOfExactType<ArtworkAtmosphereScope>()?.widget as ArtworkAtmosphereScope?)
-          ?.controller;
+      context.getInheritedWidgetOfExactType<ArtworkAtmosphereScope>()?.controller;
 
-  static void select(BuildContext context, Object item) {
+  static bool isEnabled(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<ArtworkAtmosphereScope>()?.enabled ?? false;
+
+  static Color backgroundColorOf(BuildContext context) =>
+      isEnabled(context) ? Colors.transparent : Theme.of(context).scaffoldBackgroundColor;
+
+  static void select(BuildContext context, Object item, {bool onlyIfEmpty = false}) {
     if (item is! MediaItem) return;
-    final controller = maybeOf(context);
-    if (controller == null) return;
+    final scope = context.getInheritedWidgetOfExactType<ArtworkAtmosphereScope>();
+    if (scope == null || !scope.enabled) return;
+    if (onlyIfEmpty && scope.controller._pendingKey != null) return;
     final hide = SettingsService.instance.read(SettingsService.hideSpoilers) && item.shouldHideSpoiler;
-    controller.select(hide ? null : item);
+    scope.controller.select(hide ? null : item);
   }
 
   @override
-  bool updateShouldNotify(ArtworkAtmosphereScope oldWidget) => controller != oldWidget.controller;
+  bool updateShouldNotify(ArtworkAtmosphereScope oldWidget) => enabled != oldWidget.enabled;
 }
 
-// ignore: unused-code
-/// A black canvas with a soft wash from the selected title's real artwork.
+/// A canvas with a soft wash from the selected title's artwork.
 /// Foreground pages remain independent; glass chrome samples this same canvas.
 class ArtworkAtmosphereHost extends StatefulWidget {
   const ArtworkAtmosphereHost({super.key, required this.child, this.allowNetwork = true});
@@ -79,33 +90,54 @@ class _ArtworkAtmosphereHostState extends State<ArtworkAtmosphereHost> {
   }
 
   @override
-  Widget build(BuildContext context) => ArtworkAtmosphereScope(
-    controller: _controller,
-    child: Stack(
-      fit: StackFit.expand,
-      children: [
-        Positioned.fill(
-          child: IgnorePointer(
-            child: ExcludeSemantics(
-              child: RepaintBoundary(
-                child: ValueListenableBuilder<MediaItem?>(
-                  valueListenable: _controller,
-                  builder: (context, item, _) => SettingValueBuilder<bool>(
-                    pref: SettingsService.hideSpoilers,
-                    builder: (context, hideSpoilers, _) => ArtworkAtmosphere(
-                      item: hideSpoilers && (item?.shouldHideSpoiler ?? false) ? null : item,
-                      allowNetwork: widget.allowNetwork,
+  Widget build(BuildContext context) => SettingValueBuilder<bool>(
+    pref: SettingsService.useClassicMobileBackdrop,
+    child: widget.child,
+    builder: (context, classic, child) {
+      final enabled = !classic && AppMotion.effectsEnabled(context);
+      return ArtworkAtmosphereScope(
+        controller: _controller,
+        enabled: enabled,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            if (enabled)
+              Positioned.fill(
+                child: IgnorePointer(
+                  child: ExcludeSemantics(
+                    child: RepaintBoundary(
+                      child: ValueListenableBuilder<MediaItem?>(
+                        valueListenable: _controller,
+                        builder: (context, item, _) => SettingsBuilder(
+                          prefs: const [
+                            SettingsService.hideSpoilers,
+                            SettingsService.darkenMobileBackdrop,
+                            SettingsService.mobileBackdropDarkness,
+                          ],
+                          builder: (context) => ArtworkAtmosphere(
+                            item: item,
+                            allowNetwork: widget.allowNetwork,
+                            darkness: desktopArtworkDarkness(),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            child!,
+          ],
         ),
-        widget.child,
-      ],
-    ),
+      );
+    },
   );
+}
+
+double desktopArtworkDarkness() {
+  final settings = SettingsService.instance;
+  return settings.read(SettingsService.darkenMobileBackdrop)
+      ? settings.read(SettingsService.mobileBackdropDarkness).clamp(0.0, 1.0)
+      : 0.0;
 }
 
 class ArtworkAtmosphere extends StatelessWidget {
@@ -115,12 +147,14 @@ class ArtworkAtmosphere extends StatelessWidget {
     this.client,
     this.allowNetwork = true,
     this.localArtworkPathResolver,
+    this.darkness,
   });
 
   final MediaItem? item;
   final MediaServerClient? client;
   final bool allowNetwork;
   final String? Function(String artworkPath)? localArtworkPathResolver;
+  final double? darkness;
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +166,10 @@ class ArtworkAtmosphere extends StatelessWidget {
       return ColoredBox(color: theme.scaffoldBackgroundColor);
     }
     final size = MediaQuery.sizeOf(context);
-    final paths = media.heroArtCandidates(containerAspectRatio: size.aspectRatio);
+    final paths = [
+      ...media.heroArtCandidates(containerAspectRatio: size.aspectRatio),
+      if (darkness != null && (media.thumbPath?.isNotEmpty ?? false)) media.thumbPath!,
+    ];
     if (paths.isEmpty) return ColoredBox(color: theme.scaffoldBackgroundColor);
     final mediaClient =
         client ?? (allowNetwork ? context.tryGetMediaClientForServer(serverIdOrNull(media.serverId)) : null);
@@ -150,7 +187,7 @@ class ArtworkAtmosphere extends StatelessWidget {
                 imageFilter: ImageFilter.blur(sigmaX: 42, sigmaY: 42, tileMode: TileMode.clamp),
                 child: CyclingMediaBackdrop(
                   mediaKey: media.globalKey,
-                  imagePaths: paths.take(1).toList(),
+                  imagePaths: darkness == null ? paths.take(1).toList() : paths,
                   client: mediaClient,
                   allowNetwork: allowNetwork,
                   localArtworkPathResolver: localArtworkPathResolver,
@@ -166,11 +203,16 @@ class ArtworkAtmosphere extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topRight,
                     end: Alignment.bottomLeft,
-                    colors: [
-                      theme.scaffoldBackgroundColor.withValues(alpha: effects ? 0.58 : 0.78),
-                      theme.scaffoldBackgroundColor.withValues(alpha: 0.82),
-                      theme.scaffoldBackgroundColor,
-                    ],
+                    colors: darkness == null
+                        ? [
+                            theme.scaffoldBackgroundColor.withValues(alpha: effects ? 0.58 : 0.78),
+                            theme.scaffoldBackgroundColor.withValues(alpha: 0.82),
+                            theme.scaffoldBackgroundColor,
+                          ]
+                        : [
+                            for (final base in const [0.40, 0.58, 0.75])
+                              theme.scaffoldBackgroundColor.withValues(alpha: base + (1 - base) * darkness!),
+                          ],
                     stops: const [0, 0.65, 1],
                   ),
                 ),

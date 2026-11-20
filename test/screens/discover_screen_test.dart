@@ -42,6 +42,7 @@ import 'package:satra/providers/multi_server_provider.dart';
 import 'package:satra/screens/discover_screen.dart';
 import 'package:satra/screens/main_screen.dart';
 import 'package:satra/screens/libraries/libraries_screen.dart';
+import 'package:satra/widgets/artwork_atmosphere.dart';
 import 'package:satra/widgets/focusable_tab_chip.dart';
 import 'package:satra/widgets/glass_surface.dart';
 import 'package:satra/widgets/hub_section.dart';
@@ -746,6 +747,56 @@ void main() {
     await tester.pumpWidget(const SizedBox());
   });
 
+  testWidgets('desktop backdrop stays behind pushed pages and responds to Appearance settings', (tester) async {
+    final movie = testMediaItem(id: 'featured', title: 'Featured', artPath: '/art', serverId: 'server_1');
+    final client = _FakeMediaServerClient(continueWatching: [movie], hubs: const []);
+    await _pumpDiscoverShell(
+      tester,
+      isTv: false,
+      platform: TargetPlatform.macOS,
+      mediaClient: client,
+      useSharedArtwork: true,
+    );
+    await tester.pump(const Duration(milliseconds: 200));
+
+    final blur = find.byKey(const ValueKey('discover_backdrop_blur'));
+    expect(blur, findsOneWidget);
+    final discover = tester.element(find.byType(DiscoverScreen));
+    final navigator = Navigator.of(discover);
+    unawaited(
+      navigator.push<void>(
+        MaterialPageRoute(
+          builder: (context) {
+            return Scaffold(
+              backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
+              body: const Text('Next page'),
+            );
+          },
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    ArtworkAtmosphere background() => tester.widget<ArtworkAtmosphere>(find.byType(ArtworkAtmosphere));
+    expect(background().item?.id, movie.id);
+    expect(background().darkness, 0.50);
+    final settings = SettingsService.instance;
+    await settings.write(SettingsService.mobileBackdropDarkness, 0.85);
+    await tester.pump();
+    expect(background().darkness, 0.85);
+    await settings.write(SettingsService.darkenMobileBackdrop, false);
+    await tester.pump();
+    expect(background().darkness, 0);
+    await settings.write(SettingsService.useClassicMobileBackdrop, true);
+    await tester.pump();
+    expect(find.byType(ArtworkAtmosphere), findsNothing);
+    expect(find.text('Next page'), findsOneWidget);
+    navigator.pop();
+    await tester.pumpAndSettle();
+    expect(blur, findsNothing);
+    await tester.pumpWidget(const SizedBox());
+  });
+
   testWidgets('iPhone landscape Discover keeps part of the first shelf visible below the hero', (tester) async {
     final movie = testMediaItem(id: 'featured', title: 'Featured', artPath: '/art', serverId: 'server_1');
     final client = _FakeMediaServerClient(continueWatching: [movie], hubs: const []);
@@ -790,6 +841,7 @@ void main() {
     }
 
     expect(find.byKey(const ValueKey('hero_page_0')), findsOneWidget);
+    expect(find.byKey(const ValueKey('discover_scroll_to_top_pill')), findsNothing);
     expect(find.byIcon(Symbols.pause_rounded), findsNothing);
     expect(find.byType(RefreshIndicator), findsNothing);
     expect(alpha(), closeTo(.04, .001));
@@ -847,6 +899,14 @@ void main() {
     scroll.jumpTo(0);
     await tester.pump();
     await settings.write(SettingsService.darkenMobileBackdrop, true);
+    await settings.write(SettingsService.mobileBackdropDarkness, 1.0);
+    await tester.pump();
+    final fullDarkGradient =
+        (tester.widget<DecoratedBox>(shade).decoration as BoxDecoration).gradient as LinearGradient;
+    expect(fullDarkGradient.colors.first.a, closeTo(.04, .001));
+    expect(fullDarkGradient.colors[2].a, closeTo(.96, .001));
+    expect(fullDarkGradient.colors.last.a, closeTo(1.0, .001));
+    await settings.write(SettingsService.mobileBackdropDarkness, 0.50);
     await tester.pump();
 
     await settings.write(SettingsService.useClassicMobileBackdrop, true);
@@ -885,7 +945,8 @@ void main() {
 
   testWidgets('the home clock is TV-only chrome', (tester) async {
     await _pumpDiscoverShell(tester, isTv: false);
-    expect(find.text(t.discover.title), findsOneWidget);
+    expect(find.byType(DiscoverScreen), findsOneWidget);
+    expect(find.byKey(const ValueKey('discover_scroll_to_top_pill')), findsNothing);
     expect(
       find.byType(SystemClock),
       findsNothing,
@@ -1355,6 +1416,7 @@ Future<void> _pumpDiscoverShell(
   WatchTogetherProvider? watchTogether,
   TargetPlatform? platform,
   _FakeMediaServerClient? mediaClient,
+  bool useSharedArtwork = false,
 }) async {
   TvDetectionService.debugSetAppleTVOverride(isTv);
   await SettingsService.getInstance();
@@ -1426,6 +1488,7 @@ Future<void> _pumpDiscoverShell(
         child: InputModeTracker(
           child: MaterialApp(
             theme: monoTheme(MonoPalette.dark).copyWith(platform: platform),
+            builder: useSharedArtwork ? (_, child) => ArtworkAtmosphereHost(child: child!) : null,
             home: MainScreenFocusScope(
               sideNavigationWidth: _testExpandedBleed,
               reservedSideNavigationWidth: _testCollapsedBleed,

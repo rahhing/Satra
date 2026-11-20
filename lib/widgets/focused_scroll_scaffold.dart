@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../focus/input_mode_tracker.dart';
 import '../focus/key_event_utils.dart';
+import 'artwork_atmosphere.dart';
 import 'desktop_app_bar.dart';
 import 'system_bottom_inset.dart';
 import 'utility_panel_route.dart';
@@ -109,6 +110,7 @@ class _FocusedScrollScaffoldState extends State<FocusedScrollScaffold> {
       child: FocusScope(
         node: _scopeNode,
         child: Scaffold(
+          backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
           bottomNavigationBar: widget.bottomBar,
           // Horizontal-only SafeArea at the region owner: rows clear a
           // landscape notch or iPhone Duo's portrait sensor column. The app

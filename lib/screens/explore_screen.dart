@@ -23,6 +23,7 @@ import '../services/settings_service.dart';
 import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
 import '../utils/scroll_to_top.dart';
+import '../widgets/artwork_atmosphere.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/app_menu.dart';
 import '../widgets/catalog_source_logo.dart';
@@ -404,6 +405,7 @@ class ExploreScreenState extends State<ExploreScreen>
     }
 
     return Scaffold(
+      backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
       body: RefreshIndicator(
         onRefresh: _handleRefresh,
         child: SafeArea(top: false, bottom: false, child: content),

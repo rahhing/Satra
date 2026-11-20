@@ -1,3 +1,6 @@
+import 'package:collection/collection.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -8,6 +11,7 @@ import '../../focus/key_event_utils.dart';
 import '../../i18n/strings.g.dart';
 import '../../mixins/controller_disposer_mixin.dart';
 import '../../profiles/plex_home_switch.dart';
+import '../../theme/app_motion.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/platform_detector.dart';
 import '../../widgets/app_icon.dart';
@@ -77,6 +81,15 @@ class _PinEntryDialogState extends State<PinEntryDialog> with SingleTickerProvid
 
   @override
   Widget build(BuildContext context) {
+    if (_shouldUseNativeIOSPinKeypad(context)) {
+      return _IOSNativePinKeypad(
+        userName: widget.userName,
+        errorMessage: widget.errorMessage,
+        onSubmit: _submit,
+        onCancel: _cancel,
+      );
+    }
+
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
     final isDark = theme.brightness == Brightness.dark;
@@ -789,8 +802,146 @@ class _PinKey {
   }
 }
 
+bool _shouldUseNativeIOSPinKeypad(BuildContext context) =>
+    PlatformDetector.isHandheldIOS(context) && GlassSurface.supportsNativeIOSSwiftUISurfaces;
+
+/// Native SwiftUI Lock Screen circular passcode unlock view for handheld iOS.
+class _IOSNativePinKeypad extends StatefulWidget {
+  const _IOSNativePinKeypad({
+    required this.userName,
+    required this.errorMessage,
+    required this.onSubmit,
+    required this.onCancel,
+  });
+
+  final String userName;
+  final String? errorMessage;
+  final ValueChanged<String> onSubmit;
+  final VoidCallback onCancel;
+
+  @override
+  State<_IOSNativePinKeypad> createState() => _IOSNativePinKeypadState();
+}
+
+class _IOSNativePinKeypadState extends State<_IOSNativePinKeypad> {
+  static const _viewType = 'com.satra/ios_pin_keypad';
+  static const _equality = DeepCollectionEquality();
+  static final _gestures = <Factory<OneSequenceGestureRecognizer>>{
+    Factory<EagerGestureRecognizer>(EagerGestureRecognizer.new),
+  };
+
+  MethodChannel? _channel;
+  Map<String, Object>? _lastParams;
+
+  Map<String, Object> _params(BuildContext context) {
+    final theme = Theme.of(context);
+    return <String, Object>{
+      'userName': widget.userName,
+      'subtitle': '',
+      if (widget.errorMessage != null) 'errorMessage': widget.errorMessage!,
+      'cancelLabel': t.common.cancel,
+      'deleteLabel': t.common.delete,
+      'dark': theme.brightness == Brightness.dark,
+      'accentArgb': theme.colorScheme.primary.toARGB32(),
+    };
+  }
+
+  void _sendUpdate(Map<String, Object> params) {
+    final channel = _channel;
+    if (channel == null || _equality.equals(params, _lastParams)) return;
+    _lastParams = params;
+    channel.invokeMethod<void>('update', params).ignore();
+  }
+
+  KeyEventResult _handleHardwareKey(FocusNode _, KeyEvent event) {
+    final backResult = handleBackKeyAction(event, widget.onCancel);
+    if (backResult != KeyEventResult.ignored) return backResult;
+
+    if (event is KeyDownEvent) {
+      final key = event.logicalKey;
+      if (key == LogicalKeyboardKey.backspace || key == LogicalKeyboardKey.delete) {
+        _channel?.invokeMethod<void>('hardwareBackspace').ignore();
+        return KeyEventResult.handled;
+      }
+      final digit = _TvPinInputState._digitKeyMap[key];
+      if (digit != null) {
+        _channel?.invokeMethod<void>('hardwareDigit', digit).ignore();
+        return KeyEventResult.handled;
+      }
+    }
+    return KeyEventResult.ignored;
+  }
+
+  @override
+  void dispose() {
+    _channel?.setMethodCallHandler(null);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final params = _params(context);
+    _sendUpdate(params);
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) widget.onCancel();
+      },
+      child: Focus(
+        autofocus: true,
+        onKeyEvent: _handleHardwareKey,
+        child: SizedBox.expand(
+          child: UiKitView(
+            key: const ValueKey('ios_native_pin_keypad'),
+            viewType: _viewType,
+            layoutDirection: Directionality.of(context),
+            creationParams: params,
+            creationParamsCodec: const StandardMessageCodec(),
+            gestureRecognizers: _gestures,
+            onPlatformViewCreated: (id) {
+              if (!mounted) return;
+              final channel = MethodChannel('$_viewType/$id');
+              _channel = channel;
+              channel.setMethodCallHandler((call) async {
+                if (!mounted) return;
+                if (call.method == 'submit' && call.arguments is String) {
+                  widget.onSubmit(call.arguments as String);
+                } else if (call.method == 'cancel') {
+                  widget.onCancel();
+                }
+              });
+              _lastParams = params;
+              _sendUpdate(_params(context));
+            },
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 /// Shows the PIN entry dialog and returns the entered PIN, or null if cancelled
 Future<String?> showPinEntryDialog(BuildContext context, String userName, {String? errorMessage}) {
+  if (_shouldUseNativeIOSPinKeypad(context)) {
+    return Navigator.of(context, rootNavigator: true).push<String>(
+      PageRouteBuilder<String>(
+        opaque: false,
+        barrierDismissible: false,
+        barrierColor: Colors.transparent,
+        transitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 220)),
+        reverseTransitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 180)),
+        pageBuilder: (routeContext, animation, secondaryAnimation) =>
+            PinEntryDialog(userName: userName, errorMessage: errorMessage),
+        transitionsBuilder: (context, animation, _, child) {
+          if (AppMotion.duration(context) == Duration.zero) return child;
+          return FadeTransition(
+            opacity: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic),
+            child: child,
+          );
+        },
+      ),
+    );
+  }
   return showAnimatedRootDialog<String>(
     context: context,
     barrierDismissible: false,

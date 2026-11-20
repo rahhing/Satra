@@ -1,3 +1,5 @@
+import 'dart:ui' show Tristate;
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -5,6 +7,7 @@ import 'package:material_symbols_icons/symbols.dart';
 import 'package:satra/focus/input_mode_tracker.dart';
 import 'package:satra/i18n/strings.g.dart';
 import 'package:satra/navigation/navigation_tabs.dart';
+import 'package:satra/screens/main_screen.dart';
 import 'package:satra/services/settings_service.dart' hide ThemeMode;
 import 'package:satra/theme/mono_theme.dart';
 import 'package:satra/utils/platform_detector.dart';
@@ -111,7 +114,7 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
-  testWidgets('native iOS tab and Search controls dispatch their own actions', (tester) async {
+  testWidgets('native iOS tab bar combines Search into a single control and dispatches actions', (tester) async {
     debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
     TvDetectionService.debugSetAppleTVOverride(false);
     GlassSurface.debugEnableIOSNativeGlass = true;
@@ -142,18 +145,49 @@ void main() {
     );
 
     final controls = tester.widgetList<IOSGlassControl>(find.byType(IOSGlassControl)).toList();
-    expect(controls.map((control) => control.configuration['kind']), ['tabBar', 'button']);
-    final [tabBar, search] = controls;
-    expect(search.configuration['symbol'], 'magnifyingglass');
-    expect(search.configuration['symbolSize'], 21);
-    expect(search.configuration['regularSymbolWeight'], isTrue);
-    expect(tester.getSize(find.byWidget(tabBar)).height, greaterThanOrEqualTo(72));
-    expect(tester.getRect(find.byWidget(tabBar)).right, lessThan(tester.getRect(find.byWidget(search)).left));
+    expect(controls.map((control) => control.configuration['kind']), ['tabBar']);
+    final tabBar = controls.single;
+    final configuredTabs = tabBar.configuration['tabs']! as List<Map<String, String>>;
+    expect(configuredTabs.last, {'id': 'search', 'label': t.common.search});
+    expect(tabBar.configuration['separateSearch'], isFalse);
+    expect(tester.getSize(find.byWidget(tabBar)).height, greaterThanOrEqualTo(64));
+
     tabBar.onAction('selected', NavigationTabId.discover.name);
     tabBar.onAction('selected', NavigationTabId.libraries.name);
     tabBar.onAction('librariesHeld', null);
-    search.onAction('pressed', null);
-    expect((selected, reselected, librariesHeld, searchOpened), (NavigationTabId.libraries, 1, 1, 1));
+    tabBar.onAction('searchPressed', null);
+    tabBar.onAction('selected', 'search');
+    expect((selected, reselected, librariesHeld, searchOpened), (NavigationTabId.libraries, 1, 1, 2));
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.oled).copyWith(platform: TargetPlatform.iOS),
+          home: Scaffold(
+            bottomNavigationBar: MobileGlassTabBar(
+              tabs: NavigationTab.getVisibleTabs(isOffline: false),
+              selectedTab: NavigationTabId.discover,
+              hideLabels: false,
+              separateSearch: true,
+              isSearchSelected: true,
+              onDestinationSelected: (value) => selected = value,
+              onActiveTabReselected: () => reselected++,
+              onLibrariesLongPress: () => librariesHeld++,
+              onSearchPressed: () => searchOpened++,
+            ),
+          ),
+        ),
+      ),
+    );
+    final separatedTabBar = tester.widget<IOSGlassControl>(find.byType(IOSGlassControl));
+    expect(separatedTabBar.configuration['separateSearch'], isTrue);
+    expect(separatedTabBar.configuration['selected'], 'search');
+    expect(
+      (separatedTabBar.configuration['tabs']! as List<Map<String, String>>).last,
+      {'id': 'search', 'label': t.common.search},
+    );
+    separatedTabBar.onAction('searchPressed', null);
+    expect(searchOpened, 3);
 
     await settings.write(SettingsService.liquidGlass, false);
     await tester.pumpAndSettle();
@@ -161,8 +195,93 @@ void main() {
     debugDefaultTargetPlatformOverride = null;
   });
 
+  testWidgets('MobileGlassTabBar separates Search into a detached circular orb when separateSearch is true', (
+    tester,
+  ) async {
+    TvDetectionService.debugSetAppleTVOverride(false);
+    await SettingsService.getInstance();
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(375, 812);
+    addTearDown(() {
+      tester.view.resetDevicePixelRatio();
+      tester.view.resetPhysicalSize();
+    });
+
+    final tabs = NavigationTab.getVisibleTabs(
+      isOffline: false,
+      hasExplore: true,
+    ).where((tab) => tab.id != NavigationTabId.settings).toList();
+    var searchOpened = 0;
+
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.oled, cornerRadius: 14).copyWith(platform: TargetPlatform.iOS),
+          home: Scaffold(
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              child: MobileGlassTabBar(
+                tabs: tabs,
+                selectedTab: NavigationTabId.discover,
+                hideLabels: false,
+                separateSearch: true,
+                onDestinationSelected: (_) {},
+                onSearchPressed: () => searchOpened++,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    final glassSurfaces = tester.widgetList<GlassSurface>(find.byType(GlassSurface)).toList();
+    expect(glassSurfaces, hasLength(2));
+    expect(find.byKey(const ValueKey('mobile_glass_search_button')), findsNothing);
+    final searchOrb = find.byKey(const ValueKey('mobile_glass_search_orb'));
+    expect(searchOrb, findsOneWidget);
+
+    final mainPillRect = tester.getRect(find.byWidget(glassSurfaces.first));
+    final searchOrbRect = tester.getRect(searchOrb);
+    expect(searchOrbRect.left, greaterThan(mainPillRect.right));
+    expect(searchOrbRect.width, closeTo(searchOrbRect.height, 0.01));
+
+    await tester.tap(searchOrb);
+    await tester.pump();
+    expect(searchOpened, 1);
+
+    // When searching, the separated orb is selected and no main tab stays selected.
+    await tester.pumpWidget(
+      TranslationProvider(
+        child: MaterialApp(
+          theme: monoTheme(MonoPalette.oled, cornerRadius: 14).copyWith(platform: TargetPlatform.iOS),
+          home: Scaffold(
+            bottomNavigationBar: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              child: MobileGlassTabBar(
+                tabs: tabs,
+                selectedTab: NavigationTabId.discover,
+                hideLabels: false,
+                separateSearch: true,
+                isSearchSelected: true,
+                onDestinationSelected: (_) {},
+                onSearchPressed: () => searchOpened++,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(tester.getSemantics(searchOrb).flagsCollection.isSelected, Tristate.isTrue);
+    expect(
+      tester.getSemantics(find.ancestor(of: find.text(t.common.home), matching: find.byType(Semantics)).first).flagsCollection.isSelected,
+      Tristate.isFalse,
+    );
+  });
+
   testWidgets(
-    'MobileGlassTabBar switches tabs, scrubs horizontally across tabs, triggers reselect scroll-to-top, and opens Search orb',
+    'MobileGlassTabBar integrates Search in the single capsule, switches tabs, scrubs across tabs, and triggers reselect',
     (tester) async {
       TvDetectionService.debugSetAppleTVOverride(false);
       await SettingsService.getInstance();
@@ -212,15 +331,13 @@ void main() {
       await tester.pumpAndSettle();
 
       final glass = tester.widgetList<GlassSurface>(find.byType(GlassSurface)).toList();
-      expect(glass, hasLength(2));
-      expect(glass.last.interactive, glass.first.interactive);
-      expect(glass.last.tint, glass.first.tint);
-      expect(glass.last.opacity, glass.first.opacity);
-      expect(glass.last.sigma, glass.first.sigma);
-      final searchOrb = find.byKey(const ValueKey('mobile_glass_search_orb'));
-      final glassBounds = tester.getRect(find.byWidget(glass.first));
-      expect(tester.getRect(searchOrb).left - glassBounds.right, greaterThan(0));
-      expect(glassBounds.width / tabs.length, greaterThan(54));
+      expect(glass, hasLength(1));
+      final searchButton = find.byKey(const ValueKey('mobile_glass_search_button'));
+      expect(searchButton, findsOneWidget);
+      final glassBounds = tester.getRect(find.byWidget(glass.single));
+      final searchRect = tester.getRect(searchButton);
+      expect(searchRect.left, greaterThanOrEqualTo(glassBounds.left));
+      expect(searchRect.right, lessThanOrEqualTo(glassBounds.right));
 
       // Re-tapping active Home tab invokes scroll-to-top callback.
       await tester.tap(find.text(t.common.home));
@@ -237,7 +354,7 @@ void main() {
       await tester.pump();
       expect(librariesLongPressed, 1);
 
-      // Dragging horizontally across the capsule scrubs the Liquid Glass loupe to Explore.
+      // Dragging horizontally across the capsule scrubs the Liquid Glass loupe to Explore without opening Search.
       final homeCenter = tester.getCenter(find.text(t.common.home));
       final exploreCenter = tester.getCenter(find.text(t.navigation.explore));
       final gesture = await tester.startGesture(homeCenter);
@@ -245,6 +362,7 @@ void main() {
       await gesture.moveTo(exploreCenter);
       await tester.pump(const Duration(milliseconds: 50));
       expect(selected, NavigationTabId.explore);
+      expect(searchOpened, 0);
       await gesture.up();
       await tester.pumpAndSettle();
 
@@ -255,11 +373,63 @@ void main() {
       await tester.pumpAndSettle();
       expect(selected, NavigationTabId.explore);
 
-      await tester.tap(searchOrb);
+      await tester.tap(searchButton);
       await tester.pump();
       expect(searchOpened, 1);
     },
   );
+
+  test('mobileBottomBarPadding lowers floating bar to native SwiftUI TabView height on iOS and keeps Android safe', () {
+    // Portrait Face ID iPhone (34pt bottom safe area) sits cleanly at 18pt above physical bottom.
+    expect(
+      mobileBottomBarPadding(
+        safePadding: const EdgeInsets.only(bottom: 34),
+        isIOS: true,
+        isCompactLandscape: false,
+      ),
+      const EdgeInsets.fromLTRB(12, 0, 12, 18),
+    );
+
+    // Compact landscape Face ID iPhone respects horizontal safe cutouts and sits cleanly above indicator.
+    expect(
+      mobileBottomBarPadding(
+        safePadding: const EdgeInsets.only(left: 44, right: 44, bottom: 21),
+        isIOS: true,
+        isCompactLandscape: true,
+      ),
+      const EdgeInsets.fromLTRB(56, 0, 56, 12),
+    );
+
+    // Home-button iPhone (0pt bottom safe area).
+    expect(
+      mobileBottomBarPadding(
+        safePadding: EdgeInsets.zero,
+        isIOS: true,
+        isCompactLandscape: false,
+      ),
+      const EdgeInsets.fromLTRB(12, 0, 12, 10),
+    );
+
+    // Android gesture bar (~24dp) sits low at 16dp.
+    expect(
+      mobileBottomBarPadding(
+        safePadding: const EdgeInsets.only(bottom: 24),
+        isIOS: false,
+        isCompactLandscape: false,
+      ),
+      const EdgeInsets.fromLTRB(12, 0, 12, 16),
+    );
+
+    // Android 3-button nav (~48dp) stays clear above the buttons.
+    expect(
+      mobileBottomBarPadding(
+        safePadding: const EdgeInsets.only(bottom: 48),
+        isIOS: false,
+        isCompactLandscape: false,
+      ),
+      const EdgeInsets.fromLTRB(12, 0, 12, 54),
+    );
+  });
 
   testWidgets('smoothScrollToTop dynamically animates deep scroll offsets back to 0', (tester) async {
     final controller = ScrollController();

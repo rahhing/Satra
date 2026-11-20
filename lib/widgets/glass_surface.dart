@@ -109,6 +109,13 @@ class GlassSurface extends StatelessWidget {
         (io.Platform.isIOS && _hostIOSSupportsLiquidGlass && WidgetsBinding.instance is WidgetsFlutterBinding);
   }
 
+  /// Whether a platform view can host native SwiftUI surfaces (Spotlight blur
+  /// backdrop, Lock Screen PIN keypad), which require iOS 15+ rather than iOS 26+.
+  static bool get supportsNativeIOSSwiftUISurfaces {
+    if (kIsWeb || defaultTargetPlatform != TargetPlatform.iOS) return false;
+    return debugEnableIOSNativeGlass ?? (io.Platform.isIOS && WidgetsBinding.instance is WidgetsFlutterBinding);
+  }
+
   final Widget child;
   final BorderRadius borderRadius;
   final Color? tint;

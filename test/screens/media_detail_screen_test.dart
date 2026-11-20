@@ -2321,6 +2321,20 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('desktop detail blends the hero into the blurred artwork behind the overview', (tester) async {
+      final movie = testMediaItem(
+        id: 'desktop_movie',
+        title: 'Featured Film',
+        summary: 'Two teenagers discover that they have mysteriously swapped lives.',
+        serverId: 'server_1',
+      );
+      final client = _FakeMediaServerClient(show: movie, childrenByParent: const {});
+      await pumpPhoneDetail(tester, client, movie, theme: monoTheme(MonoPalette.dark).copyWith(platform: .macOS));
+
+      expect(find.byKey(const ValueKey('detail_atmosphere_fade')), findsOneWidget);
+      expect(find.text(t.discover.overview), findsOneWidget);
+    });
+
     testWidgets('iPhone detail flows from Play into the synopsis without a separate overview header', (tester) async {
       const summary = 'Two teenagers discover that they have mysteriously swapped lives.';
       final movie = testMediaItem(

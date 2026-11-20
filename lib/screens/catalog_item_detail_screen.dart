@@ -49,6 +49,7 @@ import '../utils/rating_utils.dart';
 import '../utils/snackbar_helper.dart';
 import '../utils/trailer_urls.dart';
 import '../utils/video_player_navigation.dart';
+import '../widgets/artwork_atmosphere.dart';
 import '../widgets/app_bar_back_button.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/backend_badge.dart';
@@ -1412,6 +1413,7 @@ class _CatalogItemDetailScreenState extends State<CatalogItemDetailScreen> {
         builder: (hostContext) => Focus(
           onKeyEvent: (_, event) => handleBackKeyNavigation(hostContext, event),
           child: Scaffold(
+            backgroundColor: ArtworkAtmosphereScope.backgroundColorOf(context),
             body: Stack(
               children: [
                 SingleChildScrollView(

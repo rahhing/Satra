@@ -1,5 +1,7 @@
+import '../widgets/artwork_atmosphere.dart';
 import '../widgets/cycling_media_backdrop.dart';
 import 'dart:async';
+import 'dart:math' as math;
 import '../media/ids.dart';
 import '../media/media_server_client.dart';
 import '../navigation/main_screen_scope.dart';
@@ -266,9 +268,52 @@ List<NavigationTab> mainScreenBottomNavigationTabs({
 }) {
   if (!isMobile) return visibleTabs;
   return visibleTabs.where((tab) {
-    if (tab.id != NavigationTabId.settings) return true;
-    return isOffline || currentTab == NavigationTabId.settings;
+    if (tab.id == NavigationTabId.settings) {
+      return isOffline || currentTab == NavigationTabId.settings;
+    }
+    if (tab.id == NavigationTabId.downloads) {
+      return isOffline || currentTab == NavigationTabId.downloads;
+    }
+    return true;
   }).toList();
+}
+
+/// Computes outer padding for the floating mobile bottom tab bar so it sits at
+/// Apple's native SwiftUI `TabView` height (resting cleanly above the home
+/// indicator instead of floating above the full 34pt safe area) while still
+/// clearing Android's 3-button navigation bar and landscape safe areas.
+@visibleForTesting
+EdgeInsets mobileBottomBarPadding({
+  required EdgeInsets safePadding,
+  required bool isIOS,
+  required bool isCompactLandscape,
+}) {
+  const horizontalInset = 12.0;
+  final double bottom;
+  if (isIOS) {
+    if (safePadding.bottom <= 0) {
+      bottom = 10.0;
+    } else if (isCompactLandscape) {
+      bottom = math.max(10.0, safePadding.bottom - 9.0);
+    } else {
+      // Face ID iPhones report 34pt bottom safe area while the home indicator
+      // sits at 8..13pt; native SwiftUI floating tab bars sit ~18-20pt from
+      // the physical bottom edge rather than above the full 34pt safe area.
+      bottom = math.max(10.0, safePadding.bottom - 16.0);
+    }
+  } else {
+    // On Android, gesture-nav devices report ~16-24dp while 3-button nav
+    // reports >=36dp (typically 48dp) which must remain completely unobstructed.
+    if (safePadding.bottom >= 36.0) {
+      bottom = safePadding.bottom + 6.0;
+    } else if (safePadding.bottom > 0) {
+      bottom = math.max(10.0, safePadding.bottom - 8.0);
+    } else {
+      bottom = 10.0;
+    }
+  }
+
+  return EdgeInsets.fromLTRB(safePadding.left + horizontalInset, 0, safePadding.right + horizontalInset, bottom);
 }
 
 @visibleForTesting
@@ -1695,16 +1740,27 @@ class _MainScreenState extends State<MainScreen>
 
   static const _contentTabs = [NavigationTabId.discover, NavigationTabId.libraries];
 
-  Widget _buildBottomNavigationBar(BuildContext context, {required bool hideLabels, required bool isLandscape}) {
+  Widget _buildBottomNavigationBar(
+    BuildContext context, {
+    required bool hideLabels,
+    required bool isLandscape,
+    required bool showSearch,
+    required bool separateSearch,
+    required bool isSearchSelected,
+    EdgeInsets fallbackPadding = EdgeInsets.zero,
+  }) {
     return MobileGlassTabBar(
       tabs: _getBottomNavigationTabs(context),
       selectedTab: _currentTab,
       hideLabels: hideLabels,
       isLandscape: isLandscape,
+      separateSearch: separateSearch,
+      isSearchSelected: isSearchSelected,
+      fallbackPadding: fallbackPadding,
       onDestinationSelected: _selectTab,
       onActiveTabReselected: () => _onScreen<ScrollToTopable>(_currentTab, (screen) => screen.scrollToTop()),
       onLibrariesLongPress: () => _showLibraryQuickPicker(context),
-      onSearchPressed: _isOffline ? null : () => _openSpotlight(),
+      onSearchPressed: showSearch ? () => _openSpotlight() : null,
     );
   }
 
@@ -1764,7 +1820,7 @@ class _MainScreenState extends State<MainScreen>
                 openSpotlight: _openSpotlight,
                 reconnectOffline: _isOffline ? _triggerReconnect : null,
                 child: ColoredBox(
-                  color: Theme.of(context).scaffoldBackgroundColor,
+                  color: ArtworkAtmosphereScope.backgroundColorOf(context),
                   child: FocusScope(
                     node: _contentFocusScope,
                     child: NotificationListener<ScrollNotification>(
@@ -1818,9 +1874,12 @@ class _MainScreenState extends State<MainScreen>
       backgroundColor: Colors.transparent,
       body: VerticalBarShell(
         edge: edge,
-        railBuilder: (context, barWidth) => SettingValueBuilder<bool>(
-          pref: SettingsService.showNavBarLabels,
-          builder: (context, showNavBarLabels, _) {
+        railBuilder: (context, barWidth) => SettingsBuilder(
+          prefs: const [SettingsService.showNavBarLabels, SettingsService.searchInTopBar],
+          builder: (context) {
+            final svc = SettingsService.instance;
+            final showNavBarLabels = svc.read(SettingsService.showNavBarLabels);
+            final searchInTopBar = svc.read(SettingsService.searchInTopBar);
             _scheduleNavBarMeasure(rail: true, reportsInset: false);
             return MobileNavigationRail(
               key: _navBarKey,
@@ -1829,7 +1888,7 @@ class _MainScreenState extends State<MainScreen>
               showLabels: showNavBarLabels,
               onDestinationSelected: _selectTab,
               onLibrariesLongPress: () => _showLibraryQuickPicker(context),
-              onSearchPressed: _isOffline ? null : () => _openSpotlight(),
+              onSearchPressed: (_isOffline || searchInTopBar) ? null : () => _openSpotlight(),
               isOffline: _isOffline,
               isReconnecting: _isReconnecting,
               onReconnect: _triggerReconnect,
@@ -1861,9 +1920,12 @@ class _MainScreenState extends State<MainScreen>
                 child: SafeArea(
                   left: !isRtl,
                   right: isRtl,
-                  child: SettingValueBuilder<bool>(
-                    pref: SettingsService.showNavBarLabels,
-                    builder: (context, showNavBarLabels, _) {
+                  child: SettingsBuilder(
+                    prefs: const [SettingsService.showNavBarLabels, SettingsService.searchInTopBar],
+                    builder: (context) {
+                      final svc = SettingsService.instance;
+                      final showNavBarLabels = svc.read(SettingsService.showNavBarLabels);
+                      final searchInTopBar = svc.read(SettingsService.searchInTopBar);
                       _scheduleNavBarMeasure(rail: true);
                       return MobileNavigationRail(
                         tabs: _getBottomNavigationTabs(context),
@@ -1871,7 +1933,7 @@ class _MainScreenState extends State<MainScreen>
                         showLabels: showNavBarLabels,
                         onDestinationSelected: _selectTab,
                         onLibrariesLongPress: () => _showLibraryQuickPicker(context),
-                        onSearchPressed: _isOffline ? null : () => _openSpotlight(),
+                        onSearchPressed: (_isOffline || searchInTopBar) ? null : () => _openSpotlight(),
                         isOffline: _isOffline,
                         isReconnecting: _isReconnecting,
                         onReconnect: _triggerReconnect,
@@ -1967,19 +2029,38 @@ class _MainScreenState extends State<MainScreen>
                 ),
               ),
             ),
-          SettingValueBuilder<bool>(
-            pref: SettingsService.showNavBarLabels,
-            builder: (context, showNavBarLabels, _) {
-              final hideLabels = !showNavBarLabels;
-              final horizontalInset = PlatformDetector.isHandheldIOS(context) ? 8.0 : 16.0;
+          SettingsBuilder(
+            prefs: const [
+              SettingsService.showNavBarLabels,
+              SettingsService.searchInTopBar,
+              SettingsService.separateBottomSearchButton,
+            ],
+            builder: (context) {
+              final svc = SettingsService.instance;
+              final hideLabels = !svc.read(SettingsService.showNavBarLabels);
+              final searchInTopBar = svc.read(SettingsService.searchInTopBar);
+              final separateSearch = svc.read(SettingsService.separateBottomSearchButton);
+              final isIOS = PlatformDetector.isHandheldIOS(context);
+              final barPadding = mobileBottomBarPadding(
+                safePadding: MediaQuery.paddingOf(context),
+                isIOS: isIOS,
+                isCompactLandscape: compactLandscape,
+              );
               _scheduleNavBarMeasure(rail: false);
-              return SafeArea(
-                top: false,
-                minimum: EdgeInsets.fromLTRB(horizontalInset, 0, horizontalInset, compactLandscape ? 12 : 10),
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: compactLandscape ? 500 : double.infinity),
-                  child: _buildBottomNavigationBar(context, hideLabels: hideLabels, isLandscape: compactLandscape),
-                ),
+              Widget buildBar(bool isSearchSelected) => _buildBottomNavigationBar(
+                context,
+                hideLabels: hideLabels,
+                isLandscape: compactLandscape,
+                showSearch: !searchInTopBar && !_isOffline,
+                separateSearch: separateSearch,
+                isSearchSelected: isSearchSelected,
+                fallbackPadding: barPadding,
+              );
+              final spotlight = SpotlightScope.maybeOf(context);
+              if (spotlight == null) return buildBar(false);
+              return ValueListenableBuilder<bool>(
+                valueListenable: spotlight.isOpenListenable,
+                builder: (_, isSpotlightOpen, _) => buildBar(isSpotlightOpen),
               );
             },
           ),

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math' as math;
 import 'dart:typed_data';
+import 'dart:ui' as ui;
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -32,11 +33,21 @@ import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
 import '../widgets/app_icon.dart';
 import '../widgets/glass_surface.dart';
+import '../widgets/ios_glass_control.dart';
 import '../widgets/optimized_media_image.dart';
 import 'spotlight_models.dart';
 import 'spotlight_settings_index.dart';
 
 const spotlightRouteName = '/spotlight';
+
+/// Uses the frameless full-screen blur Spotlight experience on handheld mobile
+/// phones (portrait or compact landscape), while keeping the centered glass
+/// modal bubble on desktop, TV, and large tablets.
+bool _useFramelessMobileSpotlight(BuildContext context) {
+  if (!PlatformDetector.isMobile(context)) return false;
+  final size = MediaQuery.sizeOf(context);
+  return size.width < 600 || size.height < 500;
+}
 
 /// Builds the floating glassmorphic Universal Spotlight route (`Ctrl + Space`).
 Route<void> buildSpotlightRoute({
@@ -45,19 +56,64 @@ Route<void> buildSpotlightRoute({
   SpotlightShellCallbacks callbacks = const SpotlightShellCallbacks(),
   String? initialQuery,
 }) {
-  final isMobileHost = PlatformDetector.isMobile(hostContext);
+  final isMobileHost = _useFramelessMobileSpotlight(hostContext);
   return PageRouteBuilder<void>(
     settings: const RouteSettings(name: spotlightRouteName),
     opaque: false,
     barrierDismissible: true,
     barrierLabel: t.common.close,
-    barrierColor: Colors.black.withValues(alpha: isMobileHost ? 0.68 : 0.38),
-    transitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 200)),
-    reverseTransitionDuration: AppMotion.systemDuration(const Duration(milliseconds: 150)),
+    barrierColor: isMobileHost ? Colors.transparent : Colors.black.withValues(alpha: 0.38),
+    transitionDuration: AppMotion.systemDuration(Duration(milliseconds: isMobileHost ? 300 : 200)),
+    reverseTransitionDuration: AppMotion.systemDuration(Duration(milliseconds: isMobileHost ? 210 : 150)),
     pageBuilder: (routeContext, animation, secondaryAnimation) {
+      void dismiss() {
+        if (routeContext.mounted) {
+          Navigator.of(routeContext).pop();
+        }
+      }
+
+      void activateDismiss() {
+        if (!routeContext.mounted) return;
+        final route = ModalRoute.of(routeContext);
+        final nav = Navigator.of(routeContext);
+        if (route != null && route.isActive) {
+          nav.removeRoute(route);
+        } else {
+          nav.pop();
+        }
+      }
+
       final keyboardBottom = MediaQuery.viewInsetsOf(routeContext).bottom;
+      if (isMobileHost) {
+        return Stack(
+          fit: StackFit.expand,
+          children: [
+            _MobileSpotlightBackdrop(animation: animation, onTapDismiss: dismiss),
+            AnimatedPadding(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              padding: EdgeInsets.only(bottom: keyboardBottom),
+              child: SafeArea(
+                bottom: false,
+                child: SideNavigationScope(
+                  child: UniversalSpotlightBubble(
+                    hostContext: hostContext,
+                    hostNavigator: hostNavigator,
+                    callbacks: callbacks,
+                    initialQuery: initialQuery,
+                    routeAnimation: animation,
+                    onDismiss: dismiss,
+                    onActivateDismiss: activateDismiss,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      }
+
       final viewport = MediaQuery.sizeOf(routeContext);
-      final isCompact = viewport.width < 600 || (isMobileHost && viewport.height < 500);
+      final isCompact = viewport.width < 600;
       return AnimatedPadding(
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
@@ -75,21 +131,8 @@ Route<void> buildSpotlightRoute({
                   hostNavigator: hostNavigator,
                   callbacks: callbacks,
                   initialQuery: initialQuery,
-                  onDismiss: () {
-                    if (routeContext.mounted) {
-                      Navigator.of(routeContext).pop();
-                    }
-                  },
-                  onActivateDismiss: () {
-                    if (!routeContext.mounted) return;
-                    final route = ModalRoute.of(routeContext);
-                    final nav = Navigator.of(routeContext);
-                    if (route != null && route.isActive) {
-                      nav.removeRoute(route);
-                    } else {
-                      nav.pop();
-                    }
-                  },
+                  onDismiss: dismiss,
+                  onActivateDismiss: activateDismiss,
                 ),
               ),
             ),
@@ -98,6 +141,12 @@ Route<void> buildSpotlightRoute({
       );
     },
     transitionsBuilder: (context, animation, _, child) {
+      if (isMobileHost) {
+        return GlassTransitionScope(
+          animation: CurvedAnimation(parent: animation, curve: Curves.easeOutCubic, reverseCurve: Curves.easeInCubic),
+          child: child,
+        );
+      }
       if (AppMotion.duration(context) == Duration.zero) return child;
       final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve, reverseCurve: Curves.easeInCubic);
       return GlassTransitionScope(
@@ -152,7 +201,12 @@ final class _SpotlightLayoutMetrics {
   final Float64List selectableBottom;
   final double totalContentHeight;
 
-  factory _SpotlightLayoutMetrics.compute(List<_SpotlightListRow> rows, int selectableCount, double textScale) {
+  factory _SpotlightLayoutMetrics.compute(
+    List<_SpotlightListRow> rows,
+    int selectableCount,
+    double textScale, {
+    bool isMobile = false,
+  }) {
     final clampedScale = textScale.clamp(1.0, 1.45);
     final extents = Float64List(rows.length);
     final selTop = Float64List(selectableCount);
@@ -170,7 +224,8 @@ final class _SpotlightLayoutMetrics {
           pendingHeaderTop ??= cursor;
         case _SpotlightEntryRow(:final entry, :final selectableIndex):
           final isTallPoster = _usesTallPoster(entry);
-          ext = (isTallPoster ? 76.0 : 62.0) * clampedScale;
+          final baseExtent = isMobile ? (isTallPoster ? 82.0 : 68.0) : (isTallPoster ? 76.0 : 62.0);
+          ext = baseExtent * clampedScale;
           final rowTop = cursor;
           final rowBottom = cursor + ext;
           if (selectableIndex == 0) {
@@ -219,6 +274,7 @@ class UniversalSpotlightBubble extends StatefulWidget {
     this.onActivateDismiss,
     this.callbacks = const SpotlightShellCallbacks(),
     this.initialQuery,
+    this.routeAnimation,
   });
 
   final BuildContext hostContext;
@@ -227,6 +283,7 @@ class UniversalSpotlightBubble extends StatefulWidget {
   final VoidCallback? onActivateDismiss;
   final SpotlightShellCallbacks callbacks;
   final String? initialQuery;
+  final Animation<double>? routeAnimation;
 
   @override
   State<UniversalSpotlightBubble> createState() => _UniversalSpotlightBubbleState();
@@ -264,6 +321,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
   _SpotlightDisplayData? _cachedDisplay;
   _SpotlightLayoutMetrics? _cachedMetrics;
   double? _cachedMetricsTextScale;
+  bool? _cachedMetricsIsMobile;
 
   @override
   void initState() {
@@ -301,12 +359,18 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
 
   _SpotlightDisplayData _ensureDisplay() => _cachedDisplay ??= _computeDisplay();
 
-  _SpotlightLayoutMetrics _ensureMetrics(_SpotlightDisplayData display, double textScale) {
-    if (_cachedMetrics != null && _cachedMetricsTextScale == textScale) {
+  _SpotlightLayoutMetrics _ensureMetrics(_SpotlightDisplayData display, double textScale, {bool isMobile = false}) {
+    if (_cachedMetrics != null && _cachedMetricsTextScale == textScale && _cachedMetricsIsMobile == isMobile) {
       return _cachedMetrics!;
     }
     _cachedMetricsTextScale = textScale;
-    return _cachedMetrics = _SpotlightLayoutMetrics.compute(display.rows, display.selectable.length, textScale);
+    _cachedMetricsIsMobile = isMobile;
+    return _cachedMetrics = _SpotlightLayoutMetrics.compute(
+      display.rows,
+      display.selectable.length,
+      textScale,
+      isMobile: isMobile,
+    );
   }
 
   void _onSmoothScrollTick(Duration elapsed) {
@@ -739,7 +803,8 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     if (index < 0 || index >= display.selectable.length) return;
 
     final textScale = mounted ? MediaQuery.textScalerOf(context).scale(1.0) : 1.0;
-    final metrics = _ensureMetrics(display, textScale);
+    final isMobile = mounted && _useFramelessMobileSpotlight(context);
+    final metrics = _ensureMetrics(display, textScale, isMobile: isMobile);
     final viewportHeight = _scrollController.hasClients && _scrollController.position.hasContentDimensions
         ? _scrollController.position.viewportDimension
         : _lastListViewportHeight;
@@ -867,30 +932,46 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     final isDark = theme.brightness == Brightness.dark;
     final colorScheme = theme.colorScheme;
     final tk = tokens(context);
-    final viewportHeight = MediaQuery.sizeOf(context).height;
+    final viewportSize = MediaQuery.sizeOf(context);
+    final viewportHeight = viewportSize.height;
     final keyboardBottom = MediaQuery.viewInsetsOf(context).bottom;
     final safeVertical = MediaQuery.paddingOf(context).vertical;
-    final isMobile = PlatformDetector.isMobile(context);
-    final usableHeight = (viewportHeight - keyboardBottom - safeVertical - (isMobile ? 28.0 : 48.0)).clamp(
-      220.0,
-      660.0,
-    );
-    final maxBubbleHeight = keyboardBottom > 0
-        ? usableHeight
-        : math.min(usableHeight, viewportHeight * (isMobile ? 0.68 : 0.76));
-    final hairlineColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.09 : 0.08);
+    final isMobile = _useFramelessMobileSpotlight(context);
     final textScale = MediaQuery.textScalerOf(context).scale(1.0);
 
     final display = _ensureDisplay();
     final selectable = display.selectable;
     final categories = display.categories;
-    final metrics = _ensureMetrics(display, textScale);
+    final metrics = _ensureMetrics(display, textScale, isMobile: isMobile);
 
     if (selectable.isNotEmpty && _selectedIndexNotifier.value >= selectable.length) {
       _selectedIndexNotifier.value = selectable.length - 1;
     }
 
-    final bubbleRadius = isMobile ? const BorderRadius.all(Radius.circular(28)) : _bubbleRadius;
+    if (isMobile) {
+      return Semantics(
+        label: t.spotlight.title,
+        container: true,
+        child: Focus(
+          canRequestFocus: false,
+          onKeyEvent: (_, event) => _handleKeyEvent(event),
+          child: _buildMobileFramelessLayout(
+            context,
+            display: display,
+            metrics: metrics,
+            colorScheme: colorScheme,
+            tk: tk,
+            isDark: isDark,
+            viewportSize: viewportSize,
+            keyboardBottom: keyboardBottom,
+          ),
+        ),
+      );
+    }
+
+    final usableHeight = (viewportHeight - keyboardBottom - safeVertical - 48.0).clamp(220.0, 660.0);
+    final maxBubbleHeight = keyboardBottom > 0 ? usableHeight : math.min(usableHeight, viewportHeight * 0.76);
+    final hairlineColor = colorScheme.onSurface.withValues(alpha: isDark ? 0.09 : 0.08);
 
     return Semantics(
       label: t.spotlight.title,
@@ -910,21 +991,22 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
             constraints: BoxConstraints(maxWidth: 820, maxHeight: maxBubbleHeight),
             child: GlassSurface(
               tint: isDark ? const Color(0xFF06070B) : colorScheme.surface,
-              opacity: isMobile ? (isDark ? 0.90 : 0.93) : (isDark ? 0.80 : 0.85),
-              sigma: isMobile ? 34 : 28,
-              borderRadius: bubbleRadius,
+              opacity: isDark ? 0.80 : 0.85,
+              sigma: 28,
+              borderRadius: _bubbleRadius,
               child: Material(
                 type: MaterialType.transparency,
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildSearchHeader(context, colorScheme, tk, isMobile: isMobile, isDark: isDark),
-                    if (categories.length > 1) _buildCategoryStrip(context, categories, colorScheme, tk),
+                    _buildSearchHeader(context, colorScheme, tk, isMobile: false, isDark: isDark),
+                    if (categories.length > 1)
+                      _buildCategoryStrip(context, categories, colorScheme, tk, isFramelessMobile: false, isDark: isDark),
                     Container(height: 1, color: hairlineColor),
                     Flexible(
                       child: selectable.isEmpty
-                          ? SingleChildScrollView(child: _buildEmptyState(tk, isMobile: isMobile))
+                          ? SingleChildScrollView(child: _buildEmptyState(tk, isMobile: false))
                           : LayoutBuilder(
                               builder: (context, constraints) {
                                 final maxListHeight = constraints.maxHeight.isFinite
@@ -950,17 +1032,15 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                           onPointerScroll: _handlePointerScroll,
                                           child: ListView.builder(
                                             controller: _scrollController,
-                                            keyboardDismissBehavior: isMobile
-                                                ? ScrollViewKeyboardDismissBehavior.onDrag
-                                                : ScrollViewKeyboardDismissBehavior.manual,
+                                            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.manual,
                                             shrinkWrap: false,
                                             addAutomaticKeepAlives: false,
                                             addSemanticIndexes: false,
                                             scrollCacheExtent: const ScrollCacheExtent.pixels(320),
-                                            padding: EdgeInsets.fromLTRB(
-                                              isMobile ? 10 : 14,
+                                            padding: const EdgeInsets.fromLTRB(
+                                              14,
                                               _SpotlightLayoutMetrics.listTopPadding,
-                                              isMobile ? 10 : 14,
+                                              14,
                                               _SpotlightLayoutMetrics.listBottomPadding,
                                             ),
                                             itemCount: display.rows.length,
@@ -972,7 +1052,13 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                               final row = display.rows[rowIndex];
                                               return switch (row) {
                                                 _SpotlightHeaderRow(:final title, :final isFirst) =>
-                                                  _buildSectionHeader(context, title, tk, isFirst: isFirst),
+                                                  _buildSectionHeader(
+                                                    context,
+                                                    title,
+                                                    tk,
+                                                    isFirst: isFirst,
+                                                    isFramelessMobile: false,
+                                                  ),
                                                 _SpotlightEntryRow(
                                                   :final entry,
                                                   :final selectableIndex,
@@ -984,7 +1070,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                                     index: selectableIndex,
                                                     sectioned: sectioned,
                                                     isDark: isDark,
-                                                    isMobile: isMobile,
+                                                    isMobile: false,
                                                     colorScheme: colorScheme,
                                                     tk: tk,
                                                   ),
@@ -999,16 +1085,401 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                               },
                             ),
                     ),
-                    if (!isMobile) ...[
-                      Container(height: 1, color: hairlineColor),
-                      _buildFooterHints(context, tk, colorScheme, isDark: isDark),
-                    ],
+                    Container(height: 1, color: hairlineColor),
+                    _buildFooterHints(context, tk, colorScheme, isDark: isDark),
                   ],
                 ),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _buildMobileFramelessLayout(
+    BuildContext context, {
+    required _SpotlightDisplayData display,
+    required _SpotlightLayoutMetrics metrics,
+    required ColorScheme colorScheme,
+    required MonoTokens tk,
+    required bool isDark,
+    required Size viewportSize,
+    required double keyboardBottom,
+  }) {
+    final isCompactLandscape = viewportSize.height < 500 || (viewportSize.height - keyboardBottom) < 200;
+    final reducedMotion = AppMotion.duration(context) == Duration.zero;
+    final routeAnim = widget.routeAnimation;
+    final safeBottom = keyboardBottom > 0 ? 12.0 : math.max(20.0, MediaQuery.paddingOf(context).bottom + 14.0);
+
+    Widget wrapReveal(
+      Widget child, {
+      required double beginInterval,
+      required double endInterval,
+      required double yOffset,
+      double beginScale = 1.0,
+      Curve curve = Curves.easeOutCubic,
+    }) {
+      if (reducedMotion || routeAnim == null) return child;
+      return AnimatedBuilder(
+        animation: routeAnim,
+        child: child,
+        builder: (context, inner) {
+          final raw = ((routeAnim.value - beginInterval) / (endInterval - beginInterval)).clamp(0.0, 1.0);
+          final t = curve.transform(raw);
+          final scale = ui.lerpDouble(beginScale, 1.0, t)!;
+          final dy = ui.lerpDouble(yOffset, 0.0, t)!;
+          return Opacity(
+            opacity: raw.clamp(0.0, 1.0),
+            child: Transform.translate(
+              offset: Offset(0, dy),
+              child: beginScale == 1.0 ? inner : Transform.scale(scale: scale, child: inner),
+            ),
+          );
+        },
+      );
+    }
+
+    final header = wrapReveal(
+      _buildMobileSearchHeader(
+        context,
+        colorScheme,
+        tk,
+        isDark: isDark,
+        isCompactLandscape: isCompactLandscape,
+      ),
+      beginInterval: 0.0,
+      endInterval: 0.72,
+      yOffset: -14.0,
+      beginScale: 0.94,
+      curve: Curves.easeOutBack,
+    );
+
+    final chips = display.categories.length > 1
+        ? wrapReveal(
+            _buildCategoryStrip(
+              context,
+              display.categories,
+              colorScheme,
+              tk,
+              isFramelessMobile: true,
+              isDark: isDark,
+              isCompactLandscape: isCompactLandscape,
+            ),
+            beginInterval: 0.12,
+            endInterval: 0.85,
+            yOffset: -8.0,
+          )
+        : null;
+
+    final results = wrapReveal(
+      display.selectable.isEmpty
+          ? GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: widget.onDismiss,
+              child: Align(
+                alignment: Alignment.topCenter,
+                child: SingleChildScrollView(
+                  child: _buildEmptyState(tk, isMobile: true, isCompactLandscape: isCompactLandscape),
+                ),
+              ),
+            )
+          : GestureDetector(
+              behavior: HitTestBehavior.translucent,
+              onTap: widget.onDismiss,
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  _lastListViewportHeight = constraints.maxHeight.isFinite ? constraints.maxHeight : 360.0;
+                  return ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.transparent, Colors.white, Colors.white],
+                      stops: [0.0, 0.032, 1.0],
+                    ).createShader(bounds),
+                    blendMode: BlendMode.dstIn,
+                    child: ScrollConfiguration(
+                      behavior: const _SpotlightScrollBehavior(),
+                      child: NotificationListener<ScrollUpdateNotification>(
+                        onNotification: (notification) {
+                          if (!_smoothScrollTicker.isActive && notification.dragDetails != null) {
+                            _smoothTargetOffset = notification.metrics.pixels;
+                          }
+                          return false;
+                        },
+                        child: Listener(
+                          onPointerDown: (_) => _stopSmoothScroll(),
+                          child: _SpotlightWheelRegion(
+                            onPointerScroll: _handlePointerScroll,
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+                              addAutomaticKeepAlives: false,
+                              addSemanticIndexes: false,
+                              scrollCacheExtent: const ScrollCacheExtent.pixels(360),
+                              padding: EdgeInsets.fromLTRB(
+                                16,
+                                _SpotlightLayoutMetrics.listTopPadding,
+                                16,
+                                safeBottom,
+                              ),
+                              itemCount: display.rows.length,
+                              itemExtentBuilder: (rowIndex, _) =>
+                                  rowIndex >= 0 && rowIndex < metrics.rowExtents.length
+                                  ? metrics.rowExtents[rowIndex]
+                                  : null,
+                              itemBuilder: (context, rowIndex) {
+                                final row = display.rows[rowIndex];
+                                final tile = switch (row) {
+                                  _SpotlightHeaderRow(:final title, :final isFirst) => _buildSectionHeader(
+                                    context,
+                                    title,
+                                    tk,
+                                    isFirst: isFirst,
+                                    isFramelessMobile: true,
+                                  ),
+                                  _SpotlightEntryRow(:final entry, :final selectableIndex, :final sectioned) =>
+                                    _buildEntryTile(
+                                      context,
+                                      entry: entry,
+                                      index: selectableIndex,
+                                      sectioned: sectioned,
+                                      isDark: isDark,
+                                      isMobile: true,
+                                      colorScheme: colorScheme,
+                                      tk: tk,
+                                    ),
+                                };
+                                if (reducedMotion || rowIndex > 10) return tile;
+                                final revealKey = switch (row) {
+                                  _SpotlightHeaderRow(:final title) => ValueKey('reveal_hdr:$title'),
+                                  _SpotlightEntryRow(:final entry) => ValueKey('reveal_entry:${entry.id}'),
+                                };
+                                return _SpotlightRevealItem(
+                                  key: revealKey,
+                                  staggerIndex: rowIndex,
+                                  child: tile,
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+      beginInterval: 0.16,
+      endInterval: 1.0,
+      yOffset: 16.0,
+    );
+
+    return Material(
+      type: MaterialType.transparency,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          header,
+          ?chips,
+          Expanded(child: results),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMobileSearchHeader(
+    BuildContext context,
+    ColorScheme colorScheme,
+    MonoTokens tk, {
+    required bool isDark,
+    required bool isCompactLandscape,
+  }) {
+    final hasQuery = _controller.text.isNotEmpty;
+    final pillHeight = isCompactLandscape ? 44.0 : 52.0;
+    const pillRadius = BorderRadius.all(Radius.circular(999));
+    final useNativeIOSGlass = GlassSurface.supportsNativeIOSGlass;
+
+    final pillInterior = SizedBox(
+      height: pillHeight,
+      child: Row(
+        children: [
+          const SizedBox(width: 16),
+          SizedBox(
+            width: 22,
+            height: 22,
+            child: Center(
+              child: _isLoadingRemote
+                  ? SizedBox(
+                      width: 18,
+                      height: 18,
+                      child: CircularProgressIndicator(strokeWidth: 2.0, color: colorScheme.primary),
+                    )
+                  : AppIcon(
+                      Symbols.search_rounded,
+                      size: 21,
+                      color: colorScheme.onSurface.withValues(alpha: isDark ? 0.78 : 0.72),
+                    ),
+            ),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: TextField(
+              key: const ValueKey('spotlight_search_input'),
+              controller: _controller,
+              focusNode: _inputFocusNode,
+              autofocus: true,
+              textInputAction: TextInputAction.search,
+              onSubmitted: (value) {
+                if (_debounceTimer?.isActive ?? false) _scheduleRemoteSearch(value.trim(), immediate: true);
+              },
+              onChanged: _onQueryChanged,
+              cursorColor: colorScheme.primary,
+              cursorWidth: 2.0,
+              cursorRadius: const Radius.circular(1),
+              style: TextStyle(
+                fontSize: 17.0,
+                fontWeight: FontWeight.w500,
+                letterSpacing: -0.25,
+                color: colorScheme.onSurface,
+              ),
+              decoration: InputDecoration(
+                isCollapsed: true,
+                filled: false,
+                fillColor: Colors.transparent,
+                hoverColor: Colors.transparent,
+                focusColor: Colors.transparent,
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                hintText: t.spotlight.placeholder,
+                hintStyle: TextStyle(
+                  fontSize: 17.0,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: -0.2,
+                  color: colorScheme.onSurface.withValues(alpha: isDark ? 0.50 : 0.48),
+                ),
+                contentPadding: const EdgeInsets.symmetric(vertical: 5),
+              ),
+            ),
+          ),
+          if (hasQuery)
+            IconButton(
+              visualDensity: VisualDensity.standard,
+              style: const ButtonStyle(
+                padding: WidgetStatePropertyAll(EdgeInsets.all(6)),
+                minimumSize: WidgetStatePropertyAll(Size.square(44)),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              tooltip: t.common.clear,
+              icon: AppIcon(
+                Symbols.cancel_rounded,
+                fill: 1,
+                size: 19,
+                color: colorScheme.onSurface.withValues(alpha: isDark ? 0.65 : 0.55),
+              ),
+              onPressed: () {
+                _controller.clear();
+                _onQueryChanged('');
+                _inputFocusNode.requestFocus();
+              },
+            )
+          else
+            const SizedBox(width: 14),
+        ],
+      ),
+    );
+
+    final Widget searchPill = useNativeIOSGlass
+        ? GlassSurface(
+            interactive: true,
+            tint: isDark ? const Color(0xFF141824) : colorScheme.surface,
+            opacity: isDark ? 0.48 : 0.72,
+            sigma: 26,
+            borderRadius: pillRadius,
+            child: pillInterior,
+          )
+        : DecoratedBox(
+            decoration: BoxDecoration(
+              color: isDark
+                  ? colorScheme.onSurface.withValues(alpha: 0.13)
+                  : colorScheme.surface.withValues(alpha: 0.86),
+              borderRadius: pillRadius,
+              border: Border.all(
+                width: 0.9,
+                color: colorScheme.onSurface.withValues(alpha: isDark ? 0.22 : 0.12),
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: isDark ? 0.28 : 0.10),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: pillInterior,
+          );
+
+    final closeOrbFallback = Material(
+      type: MaterialType.transparency,
+      child: InkWell(
+        onTap: widget.onDismiss,
+        customBorder: const CircleBorder(),
+        highlightColor: colorScheme.onSurface.withValues(alpha: isDark ? 0.18 : 0.12),
+        splashColor: Colors.transparent,
+        child: Ink(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: isDark
+                ? colorScheme.onSurface.withValues(alpha: 0.13)
+                : colorScheme.surface.withValues(alpha: 0.86),
+            border: Border.all(
+              width: 0.9,
+              color: colorScheme.onSurface.withValues(alpha: isDark ? 0.22 : 0.12),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.24 : 0.08),
+                blurRadius: 14,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Center(
+            child: AppIcon(
+              Symbols.close_rounded,
+              size: 20,
+              color: colorScheme.onSurface.withValues(alpha: 0.86),
+            ),
+          ),
+        ),
+      ),
+    );
+
+    final closeOrb = Tooltip(
+      message: t.common.close,
+      child: SizedBox.square(
+        dimension: 44,
+        child: IOSGlassButton(
+          label: t.common.close,
+          symbol: 'xmark',
+          symbolSize: 16,
+          onPressed: widget.onDismiss,
+          child: closeOrbFallback,
+        ),
+      ),
+    );
+
+    return Padding(
+      padding: EdgeInsets.fromLTRB(16, isCompactLandscape ? 6 : 12, 16, isCompactLandscape ? 6 : 10),
+      child: Row(
+        children: [
+          Expanded(child: searchPill),
+          const SizedBox(width: 10),
+          closeOrb,
+        ],
       ),
     );
   }
@@ -1138,23 +1609,32 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     BuildContext context,
     List<SpotlightCategory> categories,
     ColorScheme colorScheme,
-    MonoTokens tk,
-  ) {
-    final isMobile = PlatformDetector.isMobile(context);
+    MonoTokens tk, {
+    required bool isFramelessMobile,
+    required bool isDark,
+    bool isCompactLandscape = false,
+  }) {
     final effectiveCategory = categories.contains(_selectedCategory) ? _selectedCategory : SpotlightCategory.all;
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
-      padding: EdgeInsets.fromLTRB(isMobile ? 14 : 20, 0, isMobile ? 14 : 20, isMobile ? 12 : 15),
+      padding: EdgeInsets.fromLTRB(
+        isFramelessMobile ? 16 : 20,
+        0,
+        isFramelessMobile ? 16 : 20,
+        isFramelessMobile ? (isCompactLandscape ? 6 : 10) : 15,
+      ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
           for (var i = 0; i < categories.length; i++) ...[
-            if (i > 0) const SizedBox(width: 6),
+            if (i > 0) SizedBox(width: isFramelessMobile ? 8 : 6),
             _SpotlightFilterChip(
               label: categories[i].label,
               active: categories[i] == effectiveCategory,
               colorScheme: colorScheme,
               tk: tk,
+              isFramelessMobile: isFramelessMobile,
+              isDark: isDark,
               onTap: () {
                 _selectedIndexNotifier.value = 0;
                 _hoverSuppressed = true;
@@ -1172,20 +1652,29 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     );
   }
 
-  Widget _buildSectionHeader(BuildContext context, String title, MonoTokens tk, {required bool isFirst}) {
+  Widget _buildSectionHeader(
+    BuildContext context,
+    String title,
+    MonoTokens tk, {
+    required bool isFirst,
+    required bool isFramelessMobile,
+  }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Align(
       alignment: AlignmentDirectional.bottomStart,
       child: Padding(
-        padding: EdgeInsets.fromLTRB(12, isFirst ? 2 : 8, 12, 6),
+        padding: EdgeInsets.fromLTRB(isFramelessMobile ? 6 : 12, isFirst ? 2 : 8, 12, 6),
         child: Text(
-          title,
+          isFramelessMobile ? title.toUpperCase() : title,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
-            fontSize: 12.5,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.2,
-            color: tk.textMuted.withValues(alpha: 0.68),
+            fontSize: isFramelessMobile ? 11.5 : 12.5,
+            fontWeight: FontWeight.w700,
+            letterSpacing: isFramelessMobile ? 0.75 : 0.2,
+            color: isFramelessMobile
+                ? colorScheme.onSurface.withValues(alpha: 0.62)
+                : tk.textMuted.withValues(alpha: 0.68),
           ),
         ),
       ),
@@ -1217,26 +1706,45 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
         valueListenable: _selectedIndexNotifier,
         builder: (context, selectedIndex, _) {
           final isSelected = showKeyboardSelection && selectedIndex == index;
+          final tileRadius = BorderRadius.all(Radius.circular(isMobile ? 16 : 14));
+          final Color tileBackground;
+          final Border? tileBorder;
+          if (isMobile) {
+            tileBackground = isSelected
+                ? colorScheme.onSurface.withValues(alpha: isDark ? 0.16 : 0.88)
+                : (isDark
+                      ? colorScheme.onSurface.withValues(alpha: 0.085)
+                      : colorScheme.surface.withValues(alpha: 0.72));
+            tileBorder = Border.all(
+              width: 0.75,
+              color: colorScheme.onSurface.withValues(alpha: isDark ? 0.13 : 0.10),
+            );
+          } else {
+            tileBackground = isSelected
+                ? colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07)
+                : Colors.transparent;
+            tileBorder = null;
+          }
+
           return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 1.5),
+            padding: EdgeInsets.symmetric(vertical: isMobile ? 3.5 : 1.5),
             child: Material(
               type: MaterialType.transparency,
               child: InkWell(
-                borderRadius: const BorderRadius.all(Radius.circular(14)),
-                highlightColor: colorScheme.onSurface.withValues(alpha: isDark ? 0.11 : 0.08),
+                borderRadius: tileRadius,
+                highlightColor: colorScheme.onSurface.withValues(alpha: isDark ? 0.15 : 0.10),
                 splashColor: Colors.transparent,
                 onTap: () => _activateEntry(entry),
                 child: Ink(
-                  padding: EdgeInsets.symmetric(horizontal: isCompactPhone ? 12 : 14),
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 13 : (isCompactPhone ? 12 : 14)),
                   decoration: BoxDecoration(
-                    color: isSelected
-                        ? colorScheme.onSurface.withValues(alpha: isDark ? 0.10 : 0.07)
-                        : Colors.transparent,
-                    borderRadius: const BorderRadius.all(Radius.circular(14)),
+                    color: tileBackground,
+                    borderRadius: tileRadius,
+                    border: tileBorder,
                   ),
                   child: Row(
                     children: [
-                      _buildLeadingVisual(context, entry, isSelected, colorScheme, tk),
+                      _buildLeadingVisual(context, entry, isSelected, colorScheme, tk, isMobile: isMobile, isDark: isDark),
                       SizedBox(width: isCompactPhone ? 13 : 15),
                       Expanded(
                         child: Column(
@@ -1250,7 +1758,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 fontSize: isCompactPhone ? 15.5 : 16,
-                                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                                fontWeight: (isSelected || isMobile) ? FontWeight.w600 : FontWeight.w500,
                                 letterSpacing: -0.15,
                                 color: colorScheme.onSurface,
                               ),
@@ -1263,7 +1771,9 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontSize: isCompactPhone ? 13.0 : 13.5,
-                                  color: tk.textMuted.withValues(alpha: 0.74),
+                                  color: isMobile
+                                      ? colorScheme.onSurface.withValues(alpha: isDark ? 0.72 : 0.66)
+                                      : tk.textMuted.withValues(alpha: 0.74),
                                 ),
                               ),
                             ],
@@ -1272,21 +1782,42 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
                       ),
                       if (showBadge) ...[
                         const SizedBox(width: 10),
-                        Text(
-                          entry.badge!,
-                          style: TextStyle(
-                            fontSize: 12.5,
-                            fontWeight: FontWeight.w500,
-                            color: tk.textMuted.withValues(alpha: isSelected ? 0.80 : 0.58),
+                        if (isMobile)
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: colorScheme.onSurface.withValues(alpha: isDark ? 0.11 : 0.08),
+                              borderRadius: const BorderRadius.all(Radius.circular(999)),
+                            ),
+                            child: Text(
+                              entry.badge!,
+                              style: TextStyle(
+                                fontSize: 11.5,
+                                fontWeight: FontWeight.w600,
+                                color: colorScheme.onSurface.withValues(alpha: 0.76),
+                              ),
+                            ),
+                          )
+                        else
+                          Text(
+                            entry.badge!,
+                            style: TextStyle(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500,
+                              color: tk.textMuted.withValues(alpha: isSelected ? 0.80 : 0.58),
+                            ),
                           ),
-                        ),
                       ],
                       if (isSelected) ...[
                         const SizedBox(width: 10),
                         _KeycapBadge(label: '↵', colorScheme: colorScheme, tk: tk, isDark: isDark),
                       ] else if (isCompactPhone) ...[
                         const SizedBox(width: 6),
-                        AppIcon(Symbols.chevron_right_rounded, size: 18, color: tk.textMuted.withValues(alpha: 0.42)),
+                        AppIcon(
+                          Symbols.chevron_right_rounded,
+                          size: 18,
+                          color: colorScheme.onSurface.withValues(alpha: isDark ? 0.42 : 0.36),
+                        ),
                       ],
                     ],
                   ),
@@ -1304,8 +1835,10 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
     SpotlightEntry entry,
     bool isSelected,
     ColorScheme colorScheme,
-    MonoTokens tk,
-  ) {
+    MonoTokens tk, {
+    required bool isMobile,
+    required bool isDark,
+  }) {
     final mediaItem = entry.mediaItem;
     if (mediaItem != null) {
       final client = widget.hostContext.mounted
@@ -1321,7 +1854,16 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
       return DecoratedBox(
         decoration: BoxDecoration(
           borderRadius: const BorderRadius.all(Radius.circular(8)),
-          border: Border.fromBorderSide(BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.08))),
+          border: Border.fromBorderSide(BorderSide(color: colorScheme.onSurface.withValues(alpha: isMobile ? 0.14 : 0.08))),
+          boxShadow: isMobile
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.36 : 0.16),
+                    blurRadius: 10,
+                    offset: const Offset(0, 3),
+                  ),
+                ]
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.all(1),
@@ -1351,7 +1893,16 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
       return DecoratedBox(
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.fromBorderSide(BorderSide(color: colorScheme.onSurface.withValues(alpha: 0.08))),
+          border: Border.fromBorderSide(BorderSide(color: colorScheme.onSurface.withValues(alpha: isMobile ? 0.14 : 0.08))),
+          boxShadow: isMobile
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: isDark ? 0.30 : 0.14),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ]
+              : null,
         ),
         child: Padding(
           padding: const EdgeInsets.all(1),
@@ -1378,7 +1929,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
       width: 40,
       height: 40,
       decoration: BoxDecoration(
-        color: colorScheme.onSurface.withValues(alpha: isSelected ? 0.12 : 0.055),
+        color: colorScheme.onSurface.withValues(alpha: isMobile ? (isDark ? 0.12 : 0.08) : (isSelected ? 0.12 : 0.055)),
         borderRadius: const BorderRadius.all(Radius.circular(11)),
       ),
       child: Center(
@@ -1386,15 +1937,18 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           entry.icon,
           size: 22,
           fill: isSelected ? 1 : 0,
-          color: isSelected ? colorScheme.onSurface : tk.textMuted.withValues(alpha: 0.85),
+          color: (isSelected || isMobile) ? colorScheme.onSurface.withValues(alpha: 0.90) : tk.textMuted.withValues(alpha: 0.85),
         ),
       ),
     );
   }
 
-  Widget _buildEmptyState(MonoTokens tk, {required bool isMobile}) {
+  Widget _buildEmptyState(MonoTokens tk, {required bool isMobile, bool isCompactLandscape = false}) {
     final query = _controller.text.trim();
-    final padding = EdgeInsets.symmetric(vertical: isMobile ? 18 : 48, horizontal: isMobile ? 16 : 28);
+    final padding = EdgeInsets.symmetric(
+      vertical: isMobile ? (isCompactLandscape ? 12 : 44) : 48,
+      horizontal: isMobile ? 24 : 28,
+    );
     if (_isLoadingRemote) {
       return Padding(
         padding: padding,
@@ -1409,8 +1963,8 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          AppIcon(Symbols.search_off_rounded, size: 36, color: tk.textMuted.withValues(alpha: 0.5)),
-          const SizedBox(height: 12),
+          AppIcon(Symbols.search_off_rounded, size: isCompactLandscape ? 28 : 36, color: tk.textMuted.withValues(alpha: 0.62)),
+          SizedBox(height: isCompactLandscape ? 6 : 12),
           Text(
             query.isEmpty ? t.spotlight.emptyPromptTitle : t.spotlight.noResultsTitle(query: query),
             textAlign: TextAlign.center,
@@ -1420,7 +1974,7 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           Text(
             query.isEmpty ? t.spotlight.emptyPromptSubtitle : t.spotlight.noResultsSubtitle,
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 14, color: tk.textMuted.withValues(alpha: 0.78)),
+            style: TextStyle(fontSize: 14, color: tk.textMuted.withValues(alpha: 0.82)),
           ),
         ],
       ),
@@ -1468,6 +2022,218 @@ class _UniversalSpotlightBubbleState extends State<UniversalSpotlightBubble> wit
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Full-screen fancy blur backdrop for frameless mobile Spotlight.
+///
+/// Uses a native SwiftUI `Material` + atmospheric gradient platform view on
+/// handheld iOS (`com.satra/ios_spotlight_backdrop`), and a GPU `BackdropFilter`
+/// + matching gradient veil on Android and non-native fallback environments.
+class _MobileSpotlightBackdrop extends StatefulWidget {
+  const _MobileSpotlightBackdrop({required this.animation, required this.onTapDismiss});
+
+  final Animation<double> animation;
+  final VoidCallback onTapDismiss;
+
+  @override
+  State<_MobileSpotlightBackdrop> createState() => _MobileSpotlightBackdropState();
+}
+
+class _MobileSpotlightBackdropState extends State<_MobileSpotlightBackdrop> {
+  static const _channel = MethodChannel('com.satra/ios_spotlight_backdrop');
+
+  int? _viewId;
+  double _lastSentProgress = -1;
+  bool? _lastSentDark;
+  int? _lastSentAccent;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.animation.addListener(_onAnimationTick);
+  }
+
+  @override
+  void didUpdateWidget(covariant _MobileSpotlightBackdrop oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.animation != widget.animation) {
+      oldWidget.animation.removeListener(_onAnimationTick);
+      widget.animation.addListener(_onAnimationTick);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.animation.removeListener(_onAnimationTick);
+    super.dispose();
+  }
+
+  double _curvedProgress(BuildContext context) {
+    if (AppMotion.duration(context) == Duration.zero) return 1.0;
+    return Curves.easeOutCubic.transform(widget.animation.value.clamp(0.0, 1.0));
+  }
+
+  void _onAnimationTick() {
+    if (!mounted || _viewId == null) return;
+    _pushNativeUpdate(context);
+  }
+
+  void _pushNativeUpdate(BuildContext context, {bool force = false}) {
+    final viewId = _viewId;
+    if (viewId == null) return;
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accentArgb = theme.colorScheme.primary.toARGB32();
+    final progress = _curvedProgress(context);
+
+    final isBoundary = progress <= 0.001 || progress >= 0.999;
+    if (!force &&
+        _lastSentDark == isDark &&
+        _lastSentAccent == accentArgb &&
+        !isBoundary &&
+        (progress - _lastSentProgress).abs() < 0.015) {
+      return;
+    }
+    if (!force && _lastSentDark == isDark && _lastSentAccent == accentArgb && progress == _lastSentProgress) {
+      return;
+    }
+
+    _lastSentDark = isDark;
+    _lastSentAccent = accentArgb;
+    _lastSentProgress = progress;
+    _channel
+        .invokeMethod<void>('update', {
+          'viewId': viewId,
+          'dark': isDark,
+          'progress': progress,
+          'accentArgb': accentArgb,
+        })
+        .ignore();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final accent = theme.colorScheme.primary;
+    final effectsEnabled = AppMotion.effectsEnabled(context);
+
+    if (GlassSurface.supportsNativeIOSSwiftUISurfaces && effectsEnabled) {
+      final initialProgress = _curvedProgress(context);
+      if (_viewId != null) {
+        _pushNativeUpdate(context);
+      }
+      return Stack(
+        key: const ValueKey('mobile_spotlight_backdrop'),
+        fit: StackFit.expand,
+        children: [
+          IgnorePointer(
+            child: UiKitView(
+              viewType: 'com.satra/ios_spotlight_backdrop',
+              creationParams: <String, Object>{
+                'dark': isDark,
+                'progress': initialProgress,
+                'accentArgb': accent.toARGB32(),
+              },
+              creationParamsCodec: const StandardMessageCodec(),
+              onPlatformViewCreated: (id) {
+                if (!mounted) return;
+                _viewId = id;
+                _pushNativeUpdate(context, force: true);
+              },
+            ),
+          ),
+          GestureDetector(
+            key: const ValueKey('mobile_spotlight_backdrop_dismiss'),
+            behavior: HitTestBehavior.opaque,
+            onTap: widget.onTapDismiss,
+            child: const SizedBox.expand(),
+          ),
+        ],
+      );
+    }
+
+    return AnimatedBuilder(
+      key: const ValueKey('mobile_spotlight_backdrop'),
+      animation: widget.animation,
+      builder: (context, _) {
+        final t = _curvedProgress(context);
+        final veil = DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: isDark
+                  ? [
+                      const Color(0xFF06080F).withValues(alpha: 0.64 * t),
+                      const Color(0xFF06080F).withValues(alpha: 0.52 * t),
+                      const Color(0xFF04050A).withValues(alpha: 0.72 * t),
+                    ]
+                  : [
+                      const Color(0xFFF6F7FB).withValues(alpha: 0.68 * t),
+                      const Color(0xFFF6F7FB).withValues(alpha: 0.56 * t),
+                      const Color(0xFFEDF0F7).withValues(alpha: 0.74 * t),
+                    ],
+            ),
+          ),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                center: const Alignment(0, -0.88),
+                radius: 1.15,
+                colors: [accent.withValues(alpha: (isDark ? 0.16 : 0.10) * t), Colors.transparent],
+              ),
+            ),
+            child: const SizedBox.expand(),
+          ),
+        );
+
+        final backdrop = effectsEnabled && t > 0.01
+            ? ClipRect(
+                child: BackdropFilter(
+                  filter: ui.ImageFilter.blur(sigmaX: 28 * t, sigmaY: 28 * t),
+                  child: veil,
+                ),
+              )
+            : veil;
+
+        return GestureDetector(
+          key: const ValueKey('mobile_spotlight_backdrop_dismiss'),
+          behavior: HitTestBehavior.opaque,
+          onTap: widget.onTapDismiss,
+          child: backdrop,
+        );
+      },
+    );
+  }
+}
+
+/// Subtle staggered pop-in entrance for frameless mobile Spotlight rows.
+class _SpotlightRevealItem extends StatelessWidget {
+  const _SpotlightRevealItem({super.key, required this.staggerIndex, required this.child});
+
+  final int staggerIndex;
+  final Widget child;
+
+  @override
+  Widget build(BuildContext context) {
+    final delayFraction = (staggerIndex * 0.075).clamp(0.0, 0.45);
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: 1.0),
+      duration: Duration(milliseconds: 240 + (staggerIndex.clamp(0, 8) * 26)),
+      curve: Interval(delayFraction, 1.0, curve: Curves.easeOutCubic),
+      child: child,
+      builder: (context, t, inner) {
+        return Opacity(
+          opacity: t.clamp(0.0, 1.0),
+          child: Transform.translate(
+            offset: Offset(0, ui.lerpDouble(10.0, 0.0, t)!),
+            child: Transform.scale(scale: ui.lerpDouble(0.96, 1.0, t)!, child: inner),
+          ),
+        );
+      },
     );
   }
 }
@@ -1532,6 +2298,8 @@ class _SpotlightFilterChip extends StatefulWidget {
     required this.colorScheme,
     required this.tk,
     required this.onTap,
+    this.isFramelessMobile = false,
+    this.isDark = true,
   });
 
   final String label;
@@ -1539,6 +2307,8 @@ class _SpotlightFilterChip extends StatefulWidget {
   final ColorScheme colorScheme;
   final MonoTokens tk;
   final VoidCallback onTap;
+  final bool isFramelessMobile;
+  final bool isDark;
 
   @override
   State<_SpotlightFilterChip> createState() => _SpotlightFilterChipState();
@@ -1551,12 +2321,19 @@ class _SpotlightFilterChipState extends State<_SpotlightFilterChip> {
   Widget build(BuildContext context) {
     final active = widget.active;
     final colorScheme = widget.colorScheme;
+    final isFrameless = widget.isFramelessMobile;
     final bg = active
         ? colorScheme.primary
-        : (_hovered ? colorScheme.onSurface.withValues(alpha: 0.07) : Colors.transparent);
+        : isFrameless
+            ? (widget.isDark
+                  ? colorScheme.onSurface.withValues(alpha: 0.12)
+                  : colorScheme.surface.withValues(alpha: 0.78))
+            : (_hovered ? colorScheme.onSurface.withValues(alpha: 0.07) : Colors.transparent);
     final fg = active
         ? colorScheme.onPrimary
-        : (_hovered ? colorScheme.onSurface : widget.tk.textMuted.withValues(alpha: 0.85));
+        : isFrameless
+            ? colorScheme.onSurface.withValues(alpha: 0.88)
+            : (_hovered ? colorScheme.onSurface : widget.tk.textMuted.withValues(alpha: 0.85));
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -1568,12 +2345,21 @@ class _SpotlightFilterChipState extends State<_SpotlightFilterChip> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 130),
           curve: Curves.easeOutCubic,
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7.5),
-          decoration: BoxDecoration(color: bg, borderRadius: const BorderRadius.all(Radius.circular(999))),
+          padding: EdgeInsets.symmetric(horizontal: isFrameless ? 14 : 16, vertical: isFrameless ? 7 : 7.5),
+          decoration: BoxDecoration(
+            color: bg,
+            borderRadius: const BorderRadius.all(Radius.circular(999)),
+            border: isFrameless && !active
+                ? Border.all(
+                    width: 0.8,
+                    color: colorScheme.onSurface.withValues(alpha: widget.isDark ? 0.16 : 0.12),
+                  )
+                : null,
+          ),
           child: Text(
             widget.label,
             style: TextStyle(
-              fontSize: 14,
+              fontSize: isFrameless ? 13.5 : 14,
               fontWeight: active ? FontWeight.w600 : FontWeight.w500,
               letterSpacing: -0.1,
               color: fg,

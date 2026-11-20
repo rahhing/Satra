@@ -17,12 +17,15 @@ import 'package:satra/media/server_capabilities.dart';
 import 'package:satra/providers/hidden_libraries_provider.dart';
 import 'package:satra/providers/libraries_provider.dart';
 import 'package:satra/providers/multi_server_provider.dart';
+import 'package:satra/services/settings_service.dart';
 import 'package:satra/spotlight/spotlight_dialog.dart';
 import 'package:satra/spotlight/spotlight_models.dart';
 import 'package:satra/spotlight/spotlight_settings_index.dart';
 import 'package:satra/spotlight/spotlight_shortcut.dart';
 import 'package:satra/theme/mono_theme.dart';
 import 'package:satra/utils/media_server_http_client.dart';
+import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/widgets/glass_surface.dart';
 
 import '../test_helpers/media_items.dart';
 import '../test_helpers/multi_server_fixtures.dart';
@@ -110,6 +113,7 @@ void main() {
 
   setUp(() {
     resetSharedPreferencesForTest();
+    SettingsService.resetForTesting();
     LocaleSettings.setLocaleSync(AppLocale.en);
   });
 
@@ -616,5 +620,112 @@ void main() {
         expect(selectedLibraryKey, 'srv-1:lib-anime');
       },
     );
+
+    testWidgets('mobile Spotlight mounts full-screen SwiftUI blur backdrop on iOS and dismisses on backdrop tap', (
+      tester,
+    ) async {
+      await SettingsService.getInstance();
+      debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+      PlatformDetector.debugSetIsIOSOverride(true);
+      PlatformDetector.debugSetIsDesktopOSOverride(false);
+      TvDetectionService.debugSetAppleTVOverride(false);
+      GlassSurface.debugEnableIOSNativeGlass = true;
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(393, 852);
+      addTearDown(() {
+        PlatformDetector.debugSetIsIOSOverride(null);
+        PlatformDetector.debugSetIsDesktopOSOverride(null);
+        TvDetectionService.debugReset();
+        GlassSurface.debugEnableIOSNativeGlass = null;
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetPhysicalSize();
+      });
+
+      try {
+        final navigator = GlobalKey<NavigatorState>();
+        await tester.pumpWidget(
+          TranslationProvider(
+            child: MaterialApp(
+              navigatorKey: navigator,
+              theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.iOS),
+              home: const Scaffold(body: SizedBox(key: ValueKey('spotlight_ios_host'))),
+            ),
+          ),
+        );
+        final route = buildSpotlightRoute(
+          hostContext: tester.element(find.byKey(const ValueKey('spotlight_ios_host'))),
+          hostNavigator: navigator.currentState!,
+          initialQuery: 'unmatched query',
+        );
+        navigator.currentState!.push(route);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const ValueKey('mobile_spotlight_backdrop')), findsOneWidget);
+        final backdropViews = tester
+            .widgetList<UiKitView>(find.byType(UiKitView))
+            .where((v) => v.viewType == 'com.satra/ios_spotlight_backdrop')
+            .toList();
+        expect(backdropViews, hasLength(1));
+
+        // Tapping empty space below the empty state dismisses frameless Spotlight.
+        await tester.tapAt(const Offset(196, 700));
+        await tester.pumpAndSettle();
+        expect(find.byType(UniversalSpotlightBubble), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
+
+    testWidgets('mobile Spotlight renders GPU BackdropFilter on Android and dismisses on tap', (tester) async {
+      debugDefaultTargetPlatformOverride = TargetPlatform.android;
+      PlatformDetector.debugSetIsIOSOverride(false);
+      PlatformDetector.debugSetIsDesktopOSOverride(false);
+      TvDetectionService.debugSetAppleTVOverride(false);
+      tester.view.devicePixelRatio = 1.0;
+      tester.view.physicalSize = const Size(412, 915);
+      addTearDown(() {
+        PlatformDetector.debugSetIsIOSOverride(null);
+        PlatformDetector.debugSetIsDesktopOSOverride(null);
+        TvDetectionService.debugReset();
+        tester.view.resetDevicePixelRatio();
+        tester.view.resetPhysicalSize();
+      });
+
+      try {
+        final navigator = GlobalKey<NavigatorState>();
+        await tester.pumpWidget(
+          TranslationProvider(
+            child: MaterialApp(
+              navigatorKey: navigator,
+              theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.android),
+              home: const Scaffold(body: SizedBox(key: ValueKey('spotlight_android_host'))),
+            ),
+          ),
+        );
+        final route = buildSpotlightRoute(
+          hostContext: tester.element(find.byKey(const ValueKey('spotlight_android_host'))),
+          hostNavigator: navigator.currentState!,
+          initialQuery: 'unmatched query',
+        );
+        navigator.currentState!.push(route);
+        await tester.pumpAndSettle();
+
+        expect(find.byKey(const ValueKey('mobile_spotlight_backdrop')), findsOneWidget);
+        expect(
+          find.descendant(
+            of: find.byKey(const ValueKey('mobile_spotlight_backdrop')),
+            matching: find.byType(BackdropFilter),
+          ),
+          findsOneWidget,
+        );
+        expect(find.byType(GlassSurface), findsNothing);
+
+        await tester.tapAt(const Offset(206, 750));
+        await tester.pumpAndSettle();
+        expect(find.byType(UniversalSpotlightBubble), findsNothing);
+      } finally {
+        debugDefaultTargetPlatformOverride = null;
+      }
+    });
   });
 }
