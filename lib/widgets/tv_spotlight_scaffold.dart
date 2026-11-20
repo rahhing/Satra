@@ -30,7 +30,16 @@ class TvSpotlightController extends ValueNotifier<MediaItem?> {
 
   void select(MediaItem item) {
     void apply() {
-      if (value?.globalKey == item.globalKey) return;
+      final current = value;
+      if (current != null &&
+          current.globalKey == item.globalKey &&
+          current.thumbPath == item.thumbPath &&
+          current.artPath == item.artPath &&
+          current.grandparentThumbPath == item.grandparentThumbPath &&
+          current.grandparentArtPath == item.grandparentArtPath &&
+          current.clearLogoPath == item.clearLogoPath) {
+        return;
+      }
       value = item;
     }
 

@@ -11,7 +11,7 @@ class BackdropCache with WidgetsBindingObserver {
     : assert(maximumBytes >= 0),
       assert(maximumEntries >= 0) {
     WidgetsBinding.instance.addObserver(this);
-    artworkCacheRevision.addListener(_releaseImages);
+    artworkCacheRevision.addListener(clear);
   }
 
   final int maximumBytes;
@@ -94,7 +94,7 @@ class BackdropCache with WidgetsBindingObserver {
   void dispose() {
     _disposed = true;
     WidgetsBinding.instance.removeObserver(this);
-    artworkCacheRevision.removeListener(_releaseImages);
+    artworkCacheRevision.removeListener(clear);
     clear();
   }
 }

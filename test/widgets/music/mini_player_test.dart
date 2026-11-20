@@ -19,6 +19,7 @@ import 'package:satra/services/settings_service.dart';
 import 'package:satra/theme/mono_theme.dart';
 import 'package:satra/utils/music_navigation.dart';
 import 'package:satra/utils/platform_detector.dart';
+import 'package:satra/utils/video_player_navigation.dart';
 import 'package:satra/widgets/app_icon.dart';
 import 'package:satra/widgets/music/mini_player.dart';
 import 'package:provider/provider.dart';
@@ -494,5 +495,56 @@ void main() {
 
     expect(find.text('Dawn'), findsNothing);
     expect(find.byType(IconButton), findsNothing);
+  });
+
+  test('videoPlayerActive tracks the top non-popup video route accurately', () {
+    final observer = MusicUiRouteObserver();
+    addTearDown(() {
+      observer.suppress.dispose();
+      observer.videoPlayerActive.dispose();
+    });
+
+    final home = MaterialPageRoute<void>(builder: (_) => const SizedBox.shrink());
+    final nowPlaying = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: kNowPlayingRouteName),
+      builder: (_) => const SizedBox.shrink(),
+    );
+    final video1 = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: kVideoPlayerRouteName),
+      builder: (_) => const SizedBox.shrink(),
+    );
+    final video2 = MaterialPageRoute<void>(
+      settings: const RouteSettings(name: kVideoPlayerRouteName),
+      builder: (_) => const SizedBox.shrink(),
+    );
+    final dialog = RawDialogRoute<void>(
+      pageBuilder: (_, _, _) => const SizedBox.shrink(),
+    );
+
+    observer.didPush(home, null);
+    expect(observer.videoPlayerActive.value, isFalse);
+
+    observer.didPush(nowPlaying, home);
+    expect(observer.suppress.value, isTrue);
+    expect(observer.videoPlayerActive.value, isFalse);
+
+    observer.didPush(video1, nowPlaying);
+    expect(observer.suppress.value, isTrue);
+    expect(observer.videoPlayerActive.value, isTrue);
+
+    // Dialogs opened above the video player must not restore the opaque backdrop.
+    observer.didPush(dialog, video1);
+    expect(observer.videoPlayerActive.value, isTrue);
+
+    observer.didPop(dialog, video1);
+    expect(observer.videoPlayerActive.value, isTrue);
+
+    // Replacing video with the next episode keeps videoPlayerActive true.
+    observer.didReplace(newRoute: video2, oldRoute: video1);
+    expect(observer.videoPlayerActive.value, isTrue);
+
+    observer.didPop(video2, nowPlaying);
+    expect(observer.videoPlayerActive.value, isFalse);
+    expect(observer.suppress.value, isTrue);
   });
 }

@@ -4,12 +4,25 @@ import 'dart:ui' as ui;
 
 import 'package:flutter/painting.dart';
 
+import '../services/image_cache_service.dart';
+
 /// Keeps a small, shared cache of crop hints from already-decoded artwork.
 class ArtworkFocalPoint {
   static const _cacheLimit = 64;
   static final _cache = <Object, Future<Offset>>{};
+  static int _cacheRevision = -1;
+
+  static void clearCache() {
+    _cache.clear();
+    _cacheRevision = artworkCacheRevision.value;
+  }
 
   static Future<Offset> resolve(Object key, ui.Image image) {
+    final revision = artworkCacheRevision.value;
+    if (_cacheRevision != revision) {
+      _cache.clear();
+      _cacheRevision = revision;
+    }
     final cached = _cache.remove(key);
     if (cached != null) {
       _cache[key] = cached;

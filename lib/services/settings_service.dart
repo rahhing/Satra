@@ -1816,5 +1816,6 @@ class SettingsService extends BaseSharedPreferencesService {
     refreshActiveListenables();
   }
 
-  Future<void> clearImageCache() => PlexImageCacheManager.instance.clearArtworkCache();
+  Future<void> clearImageCache({Future<void> Function()? beforeReload}) =>
+      PlexImageCacheManager.instance.clearArtworkCache(beforeReload: beforeReload);
 }

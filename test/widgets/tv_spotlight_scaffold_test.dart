@@ -95,4 +95,30 @@ void main() {
       same(refreshed),
     );
   });
+
+  test('spotlight controller updates selection when artwork paths change for the same item', () {
+    final stale = testMediaItem(
+      id: 'same',
+      backend: MediaBackend.plex,
+      kind: MediaKind.movie,
+      title: 'Title',
+      artPath: '/art/old',
+      thumbPath: '/thumb/old',
+    );
+    final refreshed = testMediaItem(
+      id: 'same',
+      backend: MediaBackend.plex,
+      kind: MediaKind.movie,
+      title: 'Title',
+      artPath: '/art/new',
+      thumbPath: '/thumb/new',
+    );
+    final controller = TvSpotlightController(settleDelay: Duration.zero);
+    addTearDown(controller.dispose);
+    controller.select(stale);
+    expect(controller.value, same(stale));
+
+    controller.select(refreshed);
+    expect(controller.value, same(refreshed));
+  });
 }

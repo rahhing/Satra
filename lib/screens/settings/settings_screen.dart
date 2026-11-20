@@ -15,9 +15,11 @@ import '../../i18n/strings.g.dart';
 import '../../mixins/mounted_set_state_mixin.dart';
 import '../../mixins/refreshable.dart';
 import '../../providers/account_preferences_controller.dart';
+import '../../providers/discover_provider.dart';
 import '../../providers/hidden_libraries_provider.dart';
 import '../../providers/download_provider.dart';
 import '../../providers/libraries_provider.dart';
+import '../../services/api_cache.dart';
 import '../../services/donation_service.dart';
 import '../../services/download_storage_service.dart';
 import '../../services/file_picker_service.dart';
@@ -32,7 +34,9 @@ import '../../services/settings_service.dart' as settings;
 import '../../services/settings_mutation_service.dart';
 import '../../services/supporter/supporter_mode.dart';
 import '../../widgets/artwork_atmosphere.dart';
+import '../../widgets/artwork_focal_point.dart';
 import '../../widgets/background_download_warning_banner.dart';
+import '../../widgets/media_card.dart';
 import '../../services/update_service.dart';
 import '../../utils/dialogs.dart';
 import '../../utils/snackbar_helper.dart';
@@ -73,6 +77,7 @@ class SettingsScreen extends StatefulWidget {
     this.settingsExporter,
     this.settingsImporter,
     this.backgroundWorkDiagnosticsService,
+    this.imageCacheClearer,
   });
 
   @visibleForTesting
@@ -85,6 +90,8 @@ class SettingsScreen extends StatefulWidget {
   final Future<ImportResult?> Function()? settingsImporter;
   @visibleForTesting
   final BackgroundWorkDiagnosticsService? backgroundWorkDiagnosticsService;
+  @visibleForTesting
+  final Future<void> Function({Future<void> Function()? beforeReload})? imageCacheClearer;
 
   @override
   State<SettingsScreen> createState() => _SettingsScreenState();
@@ -811,8 +818,24 @@ class _SettingsScreenState extends State<SettingsScreen> with FocusableTab, Moun
       message: t.settings.clearImageCacheDescription,
       confirmText: t.common.clear,
     );
-    if (!confirmed) return;
-    await _settingsService.clearImageCache();
+    if (!confirmed || !mounted) return;
+    DiscoverProvider? discover;
+    try {
+      discover = context.read<DiscoverProvider>();
+    } on ProviderNotFoundException {
+      discover = null;
+    }
+    final clearImageCache = widget.imageCacheClearer ?? _settingsService.clearImageCache;
+    await clearImageCache(
+      beforeReload: () async {
+        MediaCard.clearFailedPosterUrls();
+        ArtworkFocalPoint.clearCache();
+        await ApiCache.clearRegisteredVolatile();
+        if (discover != null) {
+          await discover.refreshNow().timeout(const Duration(seconds: 4));
+        }
+      },
+    );
     if (mounted) showSuccessSnackBar(context, t.settings.clearImageCacheSuccess);
   }
 

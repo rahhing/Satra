@@ -43,14 +43,21 @@ class PlexImageCacheManager extends ce_cache.DefaultCacheManager {
   static final PlexImageCacheManager instance = PlexImageCacheManager._();
   Future<void>? _clearArtworkInFlight;
 
-  Future<void> clearArtworkCache() =>
-      _clearArtworkInFlight ??= _clearArtwork().whenComplete(() => _clearArtworkInFlight = null);
+  Future<void> clearArtworkCache({Future<void> Function()? beforeReload}) =>
+      _clearArtworkInFlight ??= _clearArtwork(beforeReload: beforeReload).whenComplete(() => _clearArtworkInFlight = null);
 
-  Future<void> _clearArtwork() async {
+  Future<void> _clearArtwork({Future<void> Function()? beforeReload}) async {
     await emptyCache();
     final memoryCache = PaintingBinding.instance.imageCache;
     memoryCache.clear();
     memoryCache.clearLiveImages();
+    if (beforeReload != null) {
+      try {
+        await beforeReload();
+      } catch (_) {
+        // Offline or slow metadata refresh must not block local artwork reload.
+      }
+    }
     _artworkCacheRevision.value++;
   }
 

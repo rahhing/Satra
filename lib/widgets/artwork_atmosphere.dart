@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:ui';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../media/ids.dart';
 import '../media/media_item.dart';
 import '../media/media_item_types.dart';
 import '../media/media_server_client.dart';
+import '../services/image_cache_service.dart';
 import '../services/settings_service.dart';
 import '../theme/app_motion.dart';
 import '../utils/desktop_ui_scale.dart';
@@ -18,20 +20,43 @@ import 'settings_builder.dart';
 /// Selection is debounced so quickly crossing a shelf does not fetch a backdrop
 /// for every poster. Only this shared background listens, never the card grid.
 class ArtworkAtmosphereController extends ValueNotifier<MediaItem?> {
-  ArtworkAtmosphereController() : super(null);
+  ArtworkAtmosphereController() : super(null) {
+    artworkCacheRevision.addListener(_handleArtworkCacheClear);
+  }
 
   Timer? _settle;
-  String? _pendingKey;
+  String? _pendingGlobalKey;
+  Object? _pendingIdentity;
+
+  void _handleArtworkCacheClear() {
+    _pendingGlobalKey = null;
+    _pendingIdentity = null;
+  }
+
+  static Object? _artworkIdentity(MediaItem? item) => item == null
+      ? null
+      : (
+          item.globalKey,
+          item.thumbPath,
+          item.artPath,
+          item.parentThumbPath,
+          item.grandparentThumbPath,
+          item.grandparentArtPath,
+          item.clearLogoPath,
+        );
 
   void select(MediaItem? item) {
-    if (_pendingKey == item?.globalKey) return;
+    final identity = _artworkIdentity(item);
+    if (_pendingIdentity == identity) return;
     _settle?.cancel();
-    _pendingKey = item?.globalKey;
+    _pendingGlobalKey = item?.globalKey;
+    _pendingIdentity = identity;
     _settle = Timer(const Duration(milliseconds: 160), () => value = item);
   }
 
   @override
   void dispose() {
+    artworkCacheRevision.removeListener(_handleArtworkCacheClear);
     _settle?.cancel();
     super.dispose();
   }
@@ -59,7 +84,8 @@ class ArtworkAtmosphereScope extends InheritedWidget {
     if (item is! MediaItem) return;
     final scope = context.getInheritedWidgetOfExactType<ArtworkAtmosphereScope>();
     if (scope == null || !scope.enabled) return;
-    if (onlyIfEmpty && scope.controller._pendingKey != null) return;
+    final pendingKey = scope.controller._pendingGlobalKey;
+    if (onlyIfEmpty && pendingKey != null && pendingKey != item.globalKey) return;
     final hide = SettingsService.instance.read(SettingsService.hideSpoilers) && item.shouldHideSpoiler;
     scope.controller.select(hide ? null : item);
   }
@@ -71,10 +97,14 @@ class ArtworkAtmosphereScope extends InheritedWidget {
 /// A canvas with a soft wash from the selected title's artwork.
 /// Foreground pages remain independent; glass chrome samples this same canvas.
 class ArtworkAtmosphereHost extends StatefulWidget {
-  const ArtworkAtmosphereHost({super.key, required this.child, this.allowNetwork = true});
+  const ArtworkAtmosphereHost({super.key, required this.child, this.allowNetwork = true, this.suppressed});
 
   final Widget child;
   final bool allowNetwork;
+
+  /// When true, omits the opaque backdrop layer so routes that punch through
+  /// to a native video plane beneath Flutter (e.g. desktop mpv) stay visible.
+  final ValueListenable<bool>? suppressed;
 
   @override
   State<ArtworkAtmosphereHost> createState() => _ArtworkAtmosphereHostState();
@@ -89,12 +119,37 @@ class _ArtworkAtmosphereHostState extends State<ArtworkAtmosphereHost> {
     super.dispose();
   }
 
+  Widget _buildBackdropLayer() => Positioned.fill(
+    child: IgnorePointer(
+      child: ExcludeSemantics(
+        child: RepaintBoundary(
+          child: ValueListenableBuilder<MediaItem?>(
+            valueListenable: _controller,
+            builder: (context, item, _) => SettingsBuilder(
+              prefs: const [
+                SettingsService.hideSpoilers,
+                SettingsService.darkenMobileBackdrop,
+                SettingsService.mobileBackdropDarkness,
+              ],
+              builder: (context) => ArtworkAtmosphere(
+                item: item,
+                allowNetwork: widget.allowNetwork,
+                darkness: desktopArtworkDarkness(),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+
   @override
   Widget build(BuildContext context) => SettingValueBuilder<bool>(
     pref: SettingsService.useClassicMobileBackdrop,
     child: widget.child,
     builder: (context, classic, child) {
       final enabled = !classic && AppMotion.effectsEnabled(context);
+      final suppressed = widget.suppressed;
       return ArtworkAtmosphereScope(
         controller: _controller,
         enabled: enabled,
@@ -102,29 +157,14 @@ class _ArtworkAtmosphereHostState extends State<ArtworkAtmosphereHost> {
           fit: StackFit.expand,
           children: [
             if (enabled)
-              Positioned.fill(
-                child: IgnorePointer(
-                  child: ExcludeSemantics(
-                    child: RepaintBoundary(
-                      child: ValueListenableBuilder<MediaItem?>(
-                        valueListenable: _controller,
-                        builder: (context, item, _) => SettingsBuilder(
-                          prefs: const [
-                            SettingsService.hideSpoilers,
-                            SettingsService.darkenMobileBackdrop,
-                            SettingsService.mobileBackdropDarkness,
-                          ],
-                          builder: (context) => ArtworkAtmosphere(
-                            item: item,
-                            allowNetwork: widget.allowNetwork,
-                            darkness: desktopArtworkDarkness(),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              if (suppressed != null)
+                ValueListenableBuilder<bool>(
+                  valueListenable: suppressed,
+                  builder: (context, isSuppressed, _) =>
+                      isSuppressed ? const SizedBox.shrink() : _buildBackdropLayer(),
+                )
+              else
+                _buildBackdropLayer(),
             child!,
           ],
         ),

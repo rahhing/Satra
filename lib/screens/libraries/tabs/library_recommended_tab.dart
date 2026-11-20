@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../../services/backdrop_cache.dart';
+import '../../../services/image_cache_service.dart';
 import '../../../services/settings_service.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
@@ -60,6 +61,17 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
   BackdropCache? _backdrops;
 
   @override
+  void initState() {
+    super.initState();
+    artworkCacheRevision.addListener(_handleArtworkCacheClear);
+  }
+
+  void _handleArtworkCacheClear() {
+    if (!mounted) return;
+    unawaited(loadItems());
+  }
+
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     _backdrops = context.read<BackdropCache?>();
@@ -106,6 +118,7 @@ class _LibraryRecommendedTabState extends BaseLibraryTabState<MediaHub, LibraryR
 
   @override
   void dispose() {
+    artworkCacheRevision.removeListener(_handleArtworkCacheClear);
     _spotlight.dispose();
     super.dispose();
   }

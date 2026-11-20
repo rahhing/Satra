@@ -363,6 +363,7 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
     profileNavigationRegistry.detachMainScaffoldMessenger(_mainScaffoldMessengerKey);
     _miniPlayerInsets.dispose();
     _musicRouteObserver.suppress.dispose();
+    _musicRouteObserver.videoPlayerActive.dispose();
     super.dispose();
   }
 
@@ -421,7 +422,7 @@ class _ProfileSessionNavigatorState extends State<_ProfileSessionNavigator> {
                 navigatorKey: _navigatorKey,
                 settingsRoutes: _settingsRouteTracker,
                 child: ArtworkAtmosphereScope.supportsDesktopArtwork(context)
-                    ? ArtworkAtmosphereHost(child: navigation)
+                    ? ArtworkAtmosphereHost(suppressed: _musicRouteObserver.videoPlayerActive, child: navigation)
                     : navigation,
               ),
             ),

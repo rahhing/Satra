@@ -36,6 +36,11 @@ class MusicUiRouteObserver extends NavigatorObserver {
   /// True while the mini-player should stay hidden for route reasons.
   final ValueNotifier<bool> suppress = ValueNotifier<bool>(false);
 
+  /// True while the top non-popup route is the native-backed video player.
+  /// Desktop backdrop hosts hide their opaque canvas while this is set so the
+  /// underlying mpv video plane remains visible through the transparent route.
+  final ValueNotifier<bool> videoPlayerActive = ValueNotifier<bool>(false);
+
   final List<Route<dynamic>> _stack = [];
 
   static bool _isSuppressingRoute(Route<dynamic> route) {
@@ -45,13 +50,16 @@ class MusicUiRouteObserver extends NavigatorObserver {
 
   void _recompute() {
     var suppressing = false;
+    var videoActive = false;
     for (var i = _stack.length - 1; i >= 0; i--) {
       final route = _stack[i];
       if (route is PopupRoute) continue;
       suppressing = _isSuppressingRoute(route);
+      videoActive = route.settings.name == kVideoPlayerRouteName;
       break;
     }
     suppress.value = suppressing;
+    videoPlayerActive.value = videoActive;
   }
 
   @override

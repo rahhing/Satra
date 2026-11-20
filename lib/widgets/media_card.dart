@@ -32,6 +32,7 @@ import 'catalog_context_menu.dart';
 import 'settings_builder.dart';
 import 'watched_indicator.dart';
 import '../utils/content_utils.dart';
+import '../services/image_cache_service.dart';
 import '../utils/media_image_helper.dart';
 import '../utils/platform_detector.dart';
 import '../utils/provider_extensions.dart';
@@ -47,10 +48,23 @@ import 'optimized_media_image.dart';
 
 const _failedPosterUrlCacheLimit = 512;
 final _failedPosterUrls = <String>{};
+int _failedPosterUrlsRevision = -1;
 
-bool _hasFailedPosterUrl(String? url) => url != null && _failedPosterUrls.contains(url);
+void _syncFailedPosterUrlsRevision() {
+  final revision = artworkCacheRevision.value;
+  if (_failedPosterUrlsRevision != revision) {
+    _failedPosterUrls.clear();
+    _failedPosterUrlsRevision = revision;
+  }
+}
+
+bool _hasFailedPosterUrl(String? url) {
+  _syncFailedPosterUrlsRevision();
+  return url != null && _failedPosterUrls.contains(url);
+}
 
 void _rememberFailedPosterUrl(String? url) {
+  _syncFailedPosterUrlsRevision();
   if (url == null || url.isEmpty) return;
   _failedPosterUrls.remove(url);
   _failedPosterUrls.add(url);
@@ -205,6 +219,13 @@ String mediaCardSemanticLabel(Object item) {
 }
 
 class MediaCard extends StatefulWidget {
+  /// Clears memoized failed poster URLs so an explicit image-cache clear
+  /// retries primary artwork before falling back.
+  static void clearFailedPosterUrls() {
+    _failedPosterUrls.clear();
+    _failedPosterUrlsRevision = artworkCacheRevision.value;
+  }
+
   /// Either a [MediaItem] or a [MediaPlaylist]. Typed as [Object] because Dart
   /// has no nominal union type — runtime `is` checks select the variant.
   final Object item;

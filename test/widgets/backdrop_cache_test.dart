@@ -7,6 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/testing.dart';
 import 'package:provider/provider.dart';
+import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
+import 'package:satra/media/media_kind.dart';
 import 'package:satra/services/backdrop_cache.dart';
 import 'package:satra/services/image_cache_service.dart';
 import 'package:satra/widgets/cycling_media_backdrop.dart';
@@ -99,6 +102,10 @@ void main() {
   testWidgets('clearing artwork reloads a mounted backdrop and releases retained images', (tester) async {
     final cache = BackdropCache();
     addTearDown(cache.dispose);
+    cache.rememberSelection(
+      'lib_1',
+      MediaItem(id: 'cw_1', backend: MediaBackend.plex, kind: MediaKind.movie, title: 'Continue Watching'),
+    );
     var mountedLoads = 0;
     var retainedLoads = 0;
     final mountedImage = _CountingImage(() => mountedLoads++);
@@ -106,6 +113,7 @@ void main() {
     await show(tester, cache, retainedImage);
     await show(tester, cache, mountedImage);
 
+    final events = <String>[];
     await tester.runAsync(() async {
       final directory = await Directory.systemTemp.createTemp('satra_clear_backdrops_');
       final manager = PlexImageCacheManager.forTesting(
@@ -117,11 +125,18 @@ void main() {
         await directory.delete(recursive: true);
       });
       final file = await manager.putFile('https://example.invalid/continue-watching.jpg', base64Decode(_png));
-      await manager.clearArtworkCache();
+      await manager.clearArtworkCache(
+        beforeReload: () async {
+          events.add('exists_during_beforeReload:${await file.exists()}');
+          events.add('selection_before_bump:${cache.selectionFor('lib_1') != null}');
+        },
+      );
       expect(await file.exists(), isFalse);
     });
 
     await tester.pump();
+    expect(events, ['exists_during_beforeReload:false', 'selection_before_bump:true']);
+    expect(cache.selectionFor('lib_1'), isNull);
     expect(mountedLoads, 2);
     await show(tester, cache, retainedImage);
     expect(retainedLoads, 2);

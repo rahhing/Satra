@@ -11,7 +11,9 @@ import 'package:path_provider_platform_interface/path_provider_platform_interfac
 import 'package:satra/connection/connection_registry.dart';
 import 'package:satra/database/app_database.dart';
 import 'package:satra/i18n/strings.g.dart';
+import 'package:satra/media/ids.dart';
 import 'package:satra/media/media_backend.dart';
+import 'package:satra/media/media_item.dart';
 import 'package:satra/media/media_kind.dart';
 import 'package:satra/media/media_library.dart';
 import 'package:satra/profiles/active_profile_provider.dart';
@@ -19,6 +21,7 @@ import 'package:satra/profiles/plex_home_service.dart';
 import 'package:satra/profiles/profile_connection_registry.dart';
 import 'package:satra/profiles/profile_registry.dart';
 import 'package:satra/providers/account_preferences_controller.dart';
+import 'package:satra/providers/discover_provider.dart';
 import 'package:satra/providers/hidden_libraries_provider.dart';
 import 'package:satra/providers/libraries_provider.dart';
 import 'package:satra/providers/download_provider.dart';
@@ -26,6 +29,7 @@ import 'package:satra/providers/seerr_account_provider.dart';
 import 'package:satra/providers/theme_provider.dart';
 import 'package:satra/providers/trackers_provider.dart';
 import 'package:satra/screens/settings/settings_screen.dart';
+import 'package:satra/services/api_cache.dart';
 import 'package:satra/services/background_work_diagnostics_service.dart';
 import 'package:satra/services/donation_service.dart';
 import 'package:satra/services/download_storage_service.dart';
@@ -594,6 +598,48 @@ void main() {
     expect(find.text(t.settings.saveFailed), findsOneWidget);
     expect(find.text(t.settings.importSettingsSuccess), findsNothing);
   });
+
+  testWidgets('confirming Clear Image Cache drops volatile API cache and refreshes Continue Watching', (tester) async {
+    final discover = _FakeDiscoverProvider();
+    addTearDown(discover.dispose);
+    final events = <String>[];
+    final harness = await _pumpSettingsScreen(
+      tester,
+      discoverProvider: discover,
+      imageCacheClearer: ({Future<void> Function()? beforeReload}) async {
+        events.add('clear_disk_and_memory');
+        await beforeReload?.call();
+        events.add('bump_revision');
+      },
+    );
+    addTearDown(() => harness.dispose(tester));
+
+    final apiCache = _TestApiCache(harness.database);
+    ApiCache.registerInstance(apiCache, {MediaBackend.plex});
+    await tester.runAsync(() async {
+      await apiCache.put(ServerId('srv1'), '/library/metadata/101', {'thumb': '/old'});
+      await apiCache.put(ServerId('srv1'), '/library/metadata/202', {'thumb': '/pinned'});
+      await apiCache.pin(ServerId('srv1'), '/library/metadata/202');
+    });
+
+    discover.onRefreshNow = () async {
+      events.add('discover_refresh');
+      return DiscoverRefreshOutcome.refreshed;
+    };
+
+    await tester.tap(find.text(t.settings.clearImageCache));
+    await _pumpUi(tester);
+    await tester.tap(find.widgetWithText(DialogActionButton, t.common.clear));
+    await _pumpUi(tester);
+
+    expect(events, ['clear_disk_and_memory', 'discover_refresh', 'bump_revision']);
+    expect(discover.refreshNowCalls, 1);
+    await tester.runAsync(() async {
+      expect(await apiCache.get(ServerId('srv1'), '/library/metadata/101'), isNull);
+      expect(await apiCache.get(ServerId('srv1'), '/library/metadata/202'), isNotNull);
+    });
+    expect(find.text(t.settings.clearImageCacheSuccess), findsOneWidget);
+  });
 }
 
 Finder _navigationTileFor(String title) =>
@@ -676,6 +722,8 @@ Future<_SettingsHarness> _pumpSettingsScreen(
   Future<String?> Function()? settingsExporter,
   Future<ImportResult?> Function()? settingsImporter,
   BackgroundWorkDiagnosticsService? backgroundWorkDiagnosticsService,
+  Future<void> Function({Future<void> Function()? beforeReload})? imageCacheClearer,
+  DiscoverProvider? discoverProvider,
   bool pushSettingsRoute = false,
   List<MediaLibrary> initialLibraries = const [],
   Future<bool> Function(RequireWiFi requirement)? requireWiFiOverride,
@@ -774,6 +822,7 @@ Future<_SettingsHarness> _pumpSettingsScreen(
           ChangeNotifierProvider<SeerrAccountProvider>.value(value: seerr),
           ChangeNotifierProvider<DownloadProvider>.value(value: downloadProvider),
           ChangeNotifierProvider<AccountPreferencesController>.value(value: accountPreferences),
+          if (discoverProvider != null) ChangeNotifierProvider<DiscoverProvider>.value(value: discoverProvider),
         ],
         child: MaterialApp(
           theme: monoTheme(MonoPalette.dark).copyWith(platform: TargetPlatform.android),
@@ -789,6 +838,7 @@ Future<_SettingsHarness> _pumpSettingsScreen(
                               settingsExporter: settingsExporter,
                               settingsImporter: settingsImporter,
                               backgroundWorkDiagnosticsService: backgroundWorkDiagnosticsService,
+                              imageCacheClearer: imageCacheClearer,
                             ),
                           ),
                         ),
@@ -802,6 +852,7 @@ Future<_SettingsHarness> _pumpSettingsScreen(
                   settingsExporter: settingsExporter,
                   settingsImporter: settingsImporter,
                   backgroundWorkDiagnosticsService: backgroundWorkDiagnosticsService,
+                  imageCacheClearer: imageCacheClearer,
                 ),
         ),
       ),
@@ -859,4 +910,44 @@ class _FakeDirectoryPicker implements FilePickerDelegate {
     if (error != null) throw error;
     return directoryPath;
   }
+}
+
+class _FakeDiscoverProvider extends ChangeNotifier implements DiscoverProvider {
+  int refreshNowCalls = 0;
+  Future<DiscoverRefreshOutcome> Function()? onRefreshNow;
+
+  @override
+  Future<DiscoverRefreshOutcome> refreshNow() async {
+    refreshNowCalls++;
+    return await (onRefreshNow?.call() ?? Future.value(DiscoverRefreshOutcome.refreshed));
+  }
+
+  @override
+  dynamic noSuchMethod(Invocation invocation) => super.noSuchMethod(invocation);
+}
+
+class _TestApiCache extends ApiCache {
+  _TestApiCache(super.db);
+
+  @override
+  Future<void> applyWatchState({
+    required ServerId serverId,
+    required String itemId,
+    required bool isWatched,
+    int? viewOffsetMs,
+    int? lastViewedAt,
+    int? viewedLeafCount,
+  }) async {}
+
+  @override
+  Future<void> deleteForItem(ServerId serverId, String itemId) async {}
+
+  @override
+  Future<Map<String, MediaItem>> getAllPinnedMetadata({Set<ServerId>? cacheServerIds}) async => const {};
+
+  @override
+  Future<MediaItem?> getMetadata(ServerId serverId, String itemId) async => null;
+
+  @override
+  Future<void> pinForOffline(ServerId serverId, String itemId) async {}
 }
