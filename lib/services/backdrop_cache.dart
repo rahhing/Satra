@@ -1,6 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../media/media_item.dart';
+import 'image_cache_service.dart';
 
 /// Profile-owned LRU of backdrops already displayed. No prefetching: listeners
 /// attach only after a frame is painted, keeping recent decodes reusable while
@@ -10,6 +11,7 @@ class BackdropCache with WidgetsBindingObserver {
     : assert(maximumBytes >= 0),
       assert(maximumEntries >= 0) {
     WidgetsBinding.instance.addObserver(this);
+    artworkCacheRevision.addListener(_releaseImages);
   }
 
   final int maximumBytes;
@@ -75,10 +77,14 @@ class BackdropCache with WidgetsBindingObserver {
     entry.stream.removeListener(entry.listener);
   }
 
-  void clear() {
+  void _releaseImages() {
     for (final provider in _images.keys.toList()) {
       _remove(provider);
     }
+  }
+
+  void clear() {
+    _releaseImages();
     _selections.clear();
   }
 
@@ -88,6 +94,7 @@ class BackdropCache with WidgetsBindingObserver {
   void dispose() {
     _disposed = true;
     WidgetsBinding.instance.removeObserver(this);
+    artworkCacheRevision.removeListener(_releaseImages);
     clear();
   }
 }

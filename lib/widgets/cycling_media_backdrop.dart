@@ -10,6 +10,7 @@ import '../theme/app_motion.dart';
 
 import '../media/media_server_client.dart';
 import '../services/device_performance.dart';
+import '../services/image_cache_service.dart';
 import '../utils/media_image_helper.dart';
 import 'artwork_focal_point.dart';
 import 'optimized_media_image.dart';
@@ -28,8 +29,15 @@ class _BackdropTransitionScopeState extends State<BackdropTransitionScope> {
   final memory = _BackdropHandoff();
 
   @override
+  void initState() {
+    super.initState();
+    artworkCacheRevision.addListener(memory.clear);
+  }
+
+  @override
   void dispose() {
-    memory.dispose();
+    artworkCacheRevision.removeListener(memory.clear);
+    memory.clear();
     super.dispose();
   }
 
@@ -56,7 +64,11 @@ class _BackdropHandoff {
     key = artworkKey;
   }
 
-  void dispose() => frame?.dispose();
+  void clear() {
+    frame?.dispose();
+    frame = null;
+    key = null;
+  }
 }
 
 Future<bool> _defaultLocalFileExists(File file) => file.exists();
@@ -177,6 +189,7 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
   @override
   void initState() {
     super.initState();
+    artworkCacheRevision.addListener(_handleArtworkCacheClear);
     WidgetsBinding.instance.addObserver(this);
     _lifecycleResumed = switch (WidgetsBinding.instance.lifecycleState) {
       null || AppLifecycleState.resumed => true,
@@ -225,6 +238,7 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
 
   @override
   void dispose() {
+    artworkCacheRevision.removeListener(_handleArtworkCacheClear);
     widget.controller?._detach(this);
     WidgetsBinding.instance.removeObserver(this);
     _rotationTimer?.cancel();
@@ -365,9 +379,18 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
 
   void _reportMissingProvider(String path) {
     if (!_pendingProviderFailures.add(path)) return;
+    final revision = artworkCacheRevision.value;
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (mounted) _handleImageError(path);
+      if (mounted && revision == artworkCacheRevision.value) _handleImageError(path);
     });
+  }
+
+  void _handleArtworkCacheClear() {
+    setState(() {
+      _failedPaths.clear();
+      _pendingProviderFailures.clear();
+    });
+    _restartRotationTimer();
   }
 
   Widget _buildCrossfade(
@@ -382,6 +405,7 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
     final compose = widget.frameBuilder;
     if (compose != null || widget.focusCrop) {
       return _ComposedBackdropArtwork(
+        key: ValueKey(artworkCacheRevision.value),
         artworkKey: (widget.mediaKey, path),
         image: provider,
         pending: pending,
@@ -397,6 +421,7 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
     final fadeDuration = _disableAnimations ? Duration.zero : DevicePerformance.reducedDuration(widget.fadeDuration);
 
     return _BackdropArtworkCrossfade(
+      key: ValueKey(artworkCacheRevision.value),
       artworkKey: (widget.mediaKey, path),
       imageErrorKey: path,
       image: provider,
@@ -441,6 +466,7 @@ class _CyclingMediaBackdropState extends State<CyclingMediaBackdrop> with Widget
 /// show different titles when returning to a cached backdrop during scrolling.
 class _ComposedBackdropArtwork extends StatefulWidget {
   const _ComposedBackdropArtwork({
+    super.key,
     required this.artworkKey,
     required this.image,
     required this.pending,
@@ -469,6 +495,7 @@ class _ComposedBackdropArtwork extends StatefulWidget {
 }
 
 class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with SingleTickerProviderStateMixin {
+  final _cacheRevision = artworkCacheRevision.value;
   ImageStream? _stream;
   ImageStreamListener? _listener;
   ImageInfo? _displayed;
@@ -487,7 +514,7 @@ class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with
     _handoff = context.dependOnInheritedWidgetOfExactType<_BackdropMemory>()?.memory;
     final active = TickerMode.valuesOf(context).enabled;
     final wasActive = _active;
-    if (wasActive && !active) {
+    if (wasActive && !active && _cacheRevision == artworkCacheRevision.value) {
       final frame = _opacity.value >= 0.5 ? _displayed : _previous;
       final key = _opacity.value >= 0.5 ? _displayedKey : _previousKey;
       if (frame != null) _handoff?.remember(frame, key);
@@ -533,7 +560,9 @@ class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with
     _retire(_previous);
     _previous = null;
     _previousKey = null;
-    if (_active && _displayed != null) _handoff?.remember(_displayed!, _displayedKey);
+    if (_active && _displayed != null && _cacheRevision == artworkCacheRevision.value) {
+      _handoff?.remember(_displayed!, _displayedKey);
+    }
     if (mounted) setState(() {});
   }
 
@@ -596,7 +625,7 @@ class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with
     _stream = stream;
     _listener = ImageStreamListener(
       (frame, synchronous) {
-        if (!mounted || generation != _generation) {
+        if (!mounted || generation != _generation || _cacheRevision != artworkCacheRevision.value) {
           frame.dispose();
           return;
         }
@@ -677,6 +706,7 @@ class _ComposedBackdropArtworkState extends State<_ComposedBackdropArtwork> with
 
 class _BackdropArtworkCrossfade extends StatefulWidget {
   const _BackdropArtworkCrossfade({
+    super.key,
     required this.artworkKey,
     required this.imageErrorKey,
     required this.image,

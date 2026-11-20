@@ -7,7 +7,6 @@ import '../media/media_version_preference.dart';
 import '../media/media_source_info.dart' show PlaybackExtras;
 import 'dart:io';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import '../models/hotkey_model.dart';
 import 'image_cache_service.dart';
@@ -1817,9 +1816,5 @@ class SettingsService extends BaseSharedPreferencesService {
     refreshActiveListenables();
   }
 
-  Future<void> clearImageCache() async {
-    PaintingBinding.instance.imageCache.clear();
-    PaintingBinding.instance.imageCache.clearLiveImages();
-    await PlexImageCacheManager.instance.emptyCache();
-  }
+  Future<void> clearImageCache() => PlexImageCacheManager.instance.clearArtworkCache();
 }

@@ -7,7 +7,8 @@ import 'package:cached_network_image_ce/cached_network_image.dart'
 // behind a narrower unsupported-platform stub.
 // ignore: implementation_imports
 import 'package:cached_network_image_ce/src/cache/default_cache_manager.dart' as ce_cache;
-import 'package:flutter/foundation.dart' show visibleForTesting;
+import 'package:flutter/foundation.dart' show ValueListenable, ValueNotifier, visibleForTesting;
+import 'package:flutter/painting.dart' show PaintingBinding;
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 
@@ -15,6 +16,10 @@ import '../utils/media_server_http_client.dart';
 import 'device_performance.dart';
 
 final _artworkHttpClient = MediaServerHttpClient();
+final _artworkCacheRevision = ValueNotifier(0);
+
+/// Changes after an explicit cache clear so mounted artwork can reload.
+ValueListenable<int> get artworkCacheRevision => _artworkCacheRevision;
 
 @visibleForTesting
 int artworkRequestConcurrencyForTier({required bool reduced}) => reduced ? 3 : 6;
@@ -36,6 +41,18 @@ Future<void> closeArtworkHttpClientGracefully({Duration drainTimeout = const Dur
 /// the shared platform client supplies the connection pool it fans out over.
 class PlexImageCacheManager extends ce_cache.DefaultCacheManager {
   static final PlexImageCacheManager instance = PlexImageCacheManager._();
+  Future<void>? _clearArtworkInFlight;
+
+  Future<void> clearArtworkCache() =>
+      _clearArtworkInFlight ??= _clearArtwork().whenComplete(() => _clearArtworkInFlight = null);
+
+  Future<void> _clearArtwork() async {
+    await emptyCache();
+    final memoryCache = PaintingBinding.instance.imageCache;
+    memoryCache.clear();
+    memoryCache.clearLiveImages();
+    _artworkCacheRevision.value++;
+  }
 
   PlexImageCacheManager._()
     : this.forTesting(

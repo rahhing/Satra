@@ -9,6 +9,7 @@ import 'package:satra/widgets/app_icon.dart';
 
 import '../media/media_server_client.dart';
 import '../services/device_performance.dart';
+import '../services/image_cache_service.dart';
 import '../utils/app_logger.dart';
 import '../utils/media_image_helper.dart';
 import '../utils/obfuscation_utils.dart';
@@ -499,8 +500,9 @@ class _OptimizedMediaImageState extends State<OptimizedMediaImage> {
     );
 
     // Reduced tier: swap in directly, no fade machinery at all.
+    final Widget image;
     if (DevicePerformance.isReduced) {
-      return _withArtworkDim(
+      image = _withArtworkDim(
         widget.artworkDim,
         (tint) => Image(
           image: resizedProvider,
@@ -520,19 +522,25 @@ class _OptimizedMediaImageState extends State<OptimizedMediaImage> {
           },
         ),
       );
+    } else {
+      image = _FadeInNetworkImage(
+        image: resizedProvider,
+        width: widget.width,
+        height: widget.height,
+        fit: widget.fit,
+        filterQuality: _filterQuality(context),
+        alignment: widget.alignment,
+        duration: widget.fadeInDuration,
+        placeholderBuilder: (context) => _buildPlaceholder(context, imageUrl),
+        errorBuilder: _networkErrorBuilder(imageUrl),
+        artworkDim: widget.artworkDim,
+      );
     }
 
-    return _FadeInNetworkImage(
-      image: resizedProvider,
-      width: widget.width,
-      height: widget.height,
-      fit: widget.fit,
-      filterQuality: _filterQuality(context),
-      alignment: widget.alignment,
-      duration: widget.fadeInDuration,
-      placeholderBuilder: (context) => _buildPlaceholder(context, imageUrl),
-      errorBuilder: _networkErrorBuilder(imageUrl),
-      artworkDim: widget.artworkDim,
+    return ValueListenableBuilder<int>(
+      valueListenable: artworkCacheRevision,
+      child: image,
+      builder: (context, revision, child) => KeyedSubtree(key: ValueKey(revision), child: child!),
     );
   }
 

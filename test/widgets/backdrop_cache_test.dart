@@ -1,11 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/testing.dart';
 import 'package:provider/provider.dart';
 import 'package:satra/services/backdrop_cache.dart';
+import 'package:satra/services/image_cache_service.dart';
 import 'package:satra/widgets/cycling_media_backdrop.dart';
 
 const _png = 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=';
@@ -91,6 +94,37 @@ void main() {
     await show(tester, cache, null);
     await show(tester, cache, first);
     expect(firstLoads, 2);
+  });
+
+  testWidgets('clearing artwork reloads a mounted backdrop and releases retained images', (tester) async {
+    final cache = BackdropCache();
+    addTearDown(cache.dispose);
+    var mountedLoads = 0;
+    var retainedLoads = 0;
+    final mountedImage = _CountingImage(() => mountedLoads++);
+    final retainedImage = _CountingImage(() => retainedLoads++);
+    await show(tester, cache, retainedImage);
+    await show(tester, cache, mountedImage);
+
+    await tester.runAsync(() async {
+      final directory = await Directory.systemTemp.createTemp('satra_clear_backdrops_');
+      final manager = PlexImageCacheManager.forTesting(
+        httpClientFactory: () => MockClient((_) => throw StateError('Unexpected download')),
+        cacheDirectoryProvider: () async => directory,
+      );
+      addTearDown(() async {
+        await manager.dispose();
+        await directory.delete(recursive: true);
+      });
+      final file = await manager.putFile('https://example.invalid/continue-watching.jpg', base64Decode(_png));
+      await manager.clearArtworkCache();
+      expect(await file.exists(), isFalse);
+    });
+
+    await tester.pump();
+    expect(mountedLoads, 2);
+    await show(tester, cache, retainedImage);
+    expect(retainedLoads, 2);
   });
 
   testWidgets('byte budget and memory pressure release decoded backdrops', (tester) async {
